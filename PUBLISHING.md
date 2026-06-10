@@ -130,3 +130,10 @@ SKIP_HOME_SERVER=1 npm run publish
 
 The command overwrites matching files such as `index.html`, but it does not
 delete remote-only files by default.
+
+The home-server nginx config needs this static fallback so Quartz links without
+`.html` work:
+
+```nginx
+try_files $uri $uri/ $uri.html =404;
+```
