@@ -101,3 +101,21 @@ npm run publish -- "Publish new reading notes"
 The command syncs `publish: true` Obsidian notes, rebuilds the site, commits
 changed `content` and `html` files, and pushes to GitHub. Cloudflare deploys
 automatically after the push.
+
+## Optional home-server publishing
+
+To publish the same built site to a home server, set `HOME_SERVER_TARGET` to an
+SSH destination that points at the nginx html directory:
+
+```bash
+HOME_SERVER_TARGET="user@home-server:/path/to/docker-compose/nginx/html/" npm run publish
+```
+
+Example:
+
+```bash
+HOME_SERVER_TARGET="jerry@192.168.1.10:/opt/nginx/html/" npm run publish
+```
+
+This uses `rsync -az public/ "$HOME_SERVER_TARGET"` and does not delete remote
+files by default.

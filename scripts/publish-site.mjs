@@ -35,6 +35,15 @@ function hasStagedChanges() {
   return result.status === 1
 }
 
+function deployHomeServer() {
+  const target = process.env.HOME_SERVER_TARGET?.trim()
+  if (!target) return
+
+  const source = "public/"
+  console.log(`Syncing built site to home server: ${target}`)
+  run("rsync", ["-az", source, target])
+}
+
 const message =
   process.argv.slice(2).join(" ").trim() ||
   `Publish site content ${new Date().toISOString().slice(0, 10)}`
@@ -51,6 +60,7 @@ run("git", ["add", "content", "html"])
 const status = output("git", ["status", "--short"])
 
 if (!hasStagedChanges()) {
+  deployHomeServer()
   console.log("No published content changes found. Nothing to push.")
   process.exit(0)
 }
@@ -60,3 +70,5 @@ run("git", ["commit", "-m", message])
 
 console.log("Pushing to GitHub. Cloudflare will deploy after the push.")
 run("git", ["push"])
+
+deployHomeServer()
