@@ -83,3 +83,21 @@ html/report.html -> https://notes.melyi.uk/html/report.html
 
 The homepage automatically adds an "独立网页" section for every `.html` file
 inside the `html` folder.
+
+## One-command publishing
+
+Publish Obsidian notes and standalone HTML together:
+
+```bash
+npm run publish
+```
+
+With a custom commit message:
+
+```bash
+npm run publish -- "Publish new reading notes"
+```
+
+The command syncs `publish: true` Obsidian notes, rebuilds the site, commits
+changed `content` and `html` files, and pushes to GitHub. Cloudflare deploys
+automatically after the push.

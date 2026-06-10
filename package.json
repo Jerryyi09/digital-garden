@@ -13,6 +13,7 @@
   },
   "scripts": {
     "quartz": "./quartz/bootstrap-cli.mjs",
+    "publish": "node scripts/publish-site.mjs",
     "publish-notes": "node scripts/publish-notes.mjs",
     "prepare-quartz": "node scripts/regenerate-plugin-index.mjs",
     "build": "node scripts/update-homepage-html.mjs && node scripts/regenerate-plugin-index.mjs && node quartz/bootstrap-cli.mjs build && node scripts/copy-html.mjs",
