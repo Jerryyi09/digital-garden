@@ -102,6 +102,22 @@ The command syncs `publish: true` Obsidian notes, rebuilds the site, commits
 changed `content` and `html` files, and pushes to GitHub. Cloudflare deploys
 automatically after the push.
 
+The site now generates the MVP portal pages during build:
+
+```text
+Home
+Library
+Gallery
+Studio
+```
+
+`Library` is generated from published Obsidian notes, `Gallery` is generated
+from the `html` folder, and `Studio` reads downloadable resource links from:
+
+```text
+studio/downloads-index.json
+```
+
 ## Optional home-server publishing
 
 The one-command publisher also copies the built site to the home server:
