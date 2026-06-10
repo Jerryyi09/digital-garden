@@ -6,7 +6,12 @@ const contentDir = path.join(projectRoot, "content")
 const htmlDir = path.join(projectRoot, "html")
 const studioIndexPath = path.join(projectRoot, "studio", "downloads-index.json")
 
-const generatedPages = new Set(["index.md", "library.md", "gallery.md", "studio.md"])
+const generatedPages = new Set([
+  "index.md",
+  path.join("library", "index.md"),
+  path.join("gallery", "index.md"),
+  path.join("studio", "index.md"),
+])
 
 async function pathExists(filePath) {
   try {
@@ -281,7 +286,9 @@ function emptyState() {
 }
 
 async function writePage(name, content) {
-  await fs.writeFile(path.join(contentDir, name), content)
+  const outputPath = path.join(contentDir, name)
+  await fs.mkdir(path.dirname(outputPath), { recursive: true })
+  await fs.writeFile(outputPath, content)
 }
 
 async function main() {
@@ -291,7 +298,7 @@ async function main() {
 
   await writePage("index.md", homePage(notes, gallery, studio))
   await writePage(
-    "library.md",
+    path.join("library", "index.md"),
     listingPage({
       title: "Library",
       eyebrow: "Notes / Reading / Thinking",
@@ -301,7 +308,7 @@ async function main() {
     }),
   )
   await writePage(
-    "gallery.md",
+    path.join("gallery", "index.md"),
     listingPage({
       title: "Gallery",
       eyebrow: "Works / Pages / Visuals",
@@ -311,7 +318,7 @@ async function main() {
     }),
   )
   await writePage(
-    "studio.md",
+    path.join("studio", "index.md"),
     listingPage({
       title: "Studio",
       eyebrow: "Resources / Tools / Downloads",
