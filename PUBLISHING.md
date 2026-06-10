@@ -51,14 +51,16 @@ For another vault:
 VAULT_PATH="/absolute/path/to/vault" npm run publish-notes
 ```
 
-## Cloudflare Pages settings
+## Cloudflare Workers settings
 
-Use these settings when connecting the GitHub repository:
+Cloudflare now deploys static sites through Workers Static Assets.
+Connect the GitHub repository to a Worker and use these build settings:
 
 ```text
 Production branch: v5
 Build command: npm ci && npm run build
-Build output directory: public
+Deploy command: npx wrangler deploy
+Root directory: /
 ```
 
 Recommended custom domain:
