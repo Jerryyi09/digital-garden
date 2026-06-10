@@ -104,18 +104,29 @@ automatically after the push.
 
 ## Optional home-server publishing
 
-To publish the same built site to a home server, set `HOME_SERVER_TARGET` to an
-SSH destination that points at the nginx html directory:
+The one-command publisher also copies the built site to the home server:
 
 ```bash
-HOME_SERVER_TARGET="user@home-server:/path/to/docker-compose/nginx/html/" npm run publish
+scp -r -P 2222 -i ~/.ssh/id_rsa public/. hp@10.0.0.85:~/docker-compose/nginx/html/
 ```
 
-Example:
+So the normal command publishes to GitHub/Cloudflare and the home server:
 
 ```bash
-HOME_SERVER_TARGET="jerry@192.168.1.10:/opt/nginx/html/" npm run publish
+npm run publish
 ```
 
-This uses `rsync -az public/ "$HOME_SERVER_TARGET"` and does not delete remote
-files by default.
+Override the home-server target:
+
+```bash
+HOME_SERVER_TARGET="user@host:/path/to/nginx/html/" npm run publish
+```
+
+Skip home-server publishing for one run:
+
+```bash
+SKIP_HOME_SERVER=1 npm run publish
+```
+
+The command overwrites matching files such as `index.html`, but it does not
+delete remote-only files by default.

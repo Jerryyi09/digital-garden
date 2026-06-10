@@ -36,12 +36,24 @@ function hasStagedChanges() {
 }
 
 function deployHomeServer() {
-  const target = process.env.HOME_SERVER_TARGET?.trim()
+  if (process.env.SKIP_HOME_SERVER === "1") return
+
+  const target =
+    process.env.HOME_SERVER_TARGET?.trim() ||
+    "hp@10.0.0.85:~/docker-compose/nginx/html/"
+
   if (!target) return
 
-  const source = "public/"
-  console.log(`Syncing built site to home server: ${target}`)
-  run("rsync", ["-az", source, target])
+  console.log(`Copying built site to home server: ${target}`)
+  run("scp", [
+    "-r",
+    "-P",
+    "2222",
+    "-i",
+    "/Users/jerryyi/.ssh/id_rsa",
+    "public/.",
+    target,
+  ])
 }
 
 const message =
