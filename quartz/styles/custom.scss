@@ -24,13 +24,45 @@ body {
   --content-width: min(1180px, calc(100vw - 40px));
 }
 
-#quartz-root:has(article.garden-page) .page-header,
-#quartz-root:has(article.garden-page) .left.sidebar,
-#quartz-root:has(article.garden-page) .right.sidebar {
+body[data-slug="index"] .page-header,
+body[data-slug="library/index"] .page-header,
+body[data-slug="gallery/index"] .page-header,
+body[data-slug="studio/index"] .page-header,
+body[data-slug="index"] .left.sidebar,
+body[data-slug="library/index"] .left.sidebar,
+body[data-slug="gallery/index"] .left.sidebar,
+body[data-slug="studio/index"] .left.sidebar,
+body[data-slug="index"] .right.sidebar,
+body[data-slug="library/index"] .right.sidebar,
+body[data-slug="gallery/index"] .right.sidebar,
+body[data-slug="studio/index"] .right.sidebar {
   display: none;
 }
 
-#quartz-root:has(article.garden-page) .center {
+body[data-slug="index"] #quartz-root,
+body[data-slug="library/index"] #quartz-root,
+body[data-slug="gallery/index"] #quartz-root,
+body[data-slug="studio/index"] #quartz-root,
+body[data-slug="index"] #quartz-body,
+body[data-slug="library/index"] #quartz-body,
+body[data-slug="gallery/index"] #quartz-body,
+body[data-slug="studio/index"] #quartz-body {
+  display: block;
+  max-width: none;
+  width: 100%;
+}
+
+body[data-slug="index"] #quartz-body,
+body[data-slug="library/index"] #quartz-body,
+body[data-slug="gallery/index"] #quartz-body,
+body[data-slug="studio/index"] #quartz-body {
+  padding: 0;
+}
+
+body[data-slug="index"] .center,
+body[data-slug="library/index"] .center,
+body[data-slug="gallery/index"] .center,
+body[data-slug="studio/index"] .center {
   margin: 0 auto;
   max-width: none;
   width: 100%;
@@ -105,7 +137,14 @@ article.garden-page {
   border-radius: 8px;
   overflow: hidden;
   background: var(--garden-paper);
+  background-image: url("/static/garden/cockatiel-hero.png");
+  background-position: center;
+  background-size: cover;
   box-shadow: var(--garden-shadow);
+}
+
+.garden-hero-art picture {
+  display: block;
 }
 
 .garden-hero-art img {
@@ -113,6 +152,8 @@ article.garden-page {
   width: 100%;
   aspect-ratio: 16 / 11;
   object-fit: cover;
+  margin: 0;
+  border-radius: 0;
 }
 
 .garden-nav {

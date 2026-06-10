@@ -18,7 +18,9 @@ cssclasses:
 </nav>
   </div>
   <figure class="garden-hero-art">
-    <img src="/static/garden/cockatiel-hero.png" alt="A dreamy editorial illustration of a cockatiel in Rosemary Garden" />
+    <picture>
+      <img src="/static/garden/cockatiel-hero.png" alt="A dreamy editorial illustration of a cockatiel in Rosemary Garden" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/static/garden/cockatiel-hero.png'" />
+    </picture>
   </figure>
 </section>
 
