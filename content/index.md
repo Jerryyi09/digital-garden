@@ -15,5 +15,5 @@ tags:
 ## 独立网页
 
 - [《未选择的路》· 罗伯特·弗罗斯特诗歌解读](/html/未选择的路/)
-- [数学解题 = 拍电影 · 五层同构模型](/html/Math_to_Movie/)
+- [数学解题 = 拍电影 · 五层同构模型](/html/math_to_movie/)
 <!-- standalone-html:end -->
