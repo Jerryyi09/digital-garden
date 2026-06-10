@@ -20,6 +20,7 @@ async function copyDir(source, destination) {
 
   for (const entry of entries) {
     if (entry.name === ".DS_Store") continue
+    if (entry.name === "README.md") continue
 
     const sourcePath = path.join(source, entry.name)
     const destinationPath = path.join(destination, entry.name)

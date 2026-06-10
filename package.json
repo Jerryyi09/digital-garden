@@ -15,7 +15,7 @@
     "quartz": "./quartz/bootstrap-cli.mjs",
     "publish-notes": "node scripts/publish-notes.mjs",
     "prepare-quartz": "node scripts/regenerate-plugin-index.mjs",
-    "build": "node scripts/regenerate-plugin-index.mjs && node quartz/bootstrap-cli.mjs build && node scripts/copy-html.mjs",
+    "build": "node scripts/update-homepage-html.mjs && node scripts/regenerate-plugin-index.mjs && node quartz/bootstrap-cli.mjs build && node scripts/copy-html.mjs",
     "preview": "node scripts/regenerate-plugin-index.mjs && node quartz/bootstrap-cli.mjs build --serve",
     "docs": "npx quartz build --serve -d docs",
     "check": "tsc --noEmit && npx prettier . --check",

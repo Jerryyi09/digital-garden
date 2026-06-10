@@ -80,3 +80,6 @@ Examples:
 html/demo/index.html -> https://notes.melyi.uk/html/demo/
 html/report.html -> https://notes.melyi.uk/html/report.html
 ```
+
+The homepage automatically adds an "独立网页" section for every `.html` file
+inside the `html` folder.
