@@ -60,7 +60,7 @@ async function walk(dir, files = []) {
 function hasPublishTrue(markdown) {
   const match = markdown.match(/^---\n([\s\S]*?)\n---/)
   if (!match) return false
-  return /^publish:\s*true\s*$/im.test(match[1])
+  return /^publish:\s*["']?true["']?\s*$/im.test(match[1])
 }
 
 function titleFromFile(filePath) {
