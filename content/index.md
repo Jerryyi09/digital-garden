@@ -70,7 +70,7 @@ cssclasses:
   <strong>《万物简史》导读</strong>
   <span>作者：比尔·布莱森（Bill Bryson）| 译者：严维明、陈邕 | 出版：接力出版社（中文版）/ 皇冠出版社（台版）</span>
 </a>
-<a class="garden-card" href="https://melyi.uk:8089/alist">
+<a class="garden-card" href="https://melyi.uk:8089/alist/" data-router-ignore>
   <span class="garden-card-kicker">Studio / Resource Hub</span>
   <strong>Alist Resource Library</strong>
   <span>Browse extended files, media, and long-term resources.</span>

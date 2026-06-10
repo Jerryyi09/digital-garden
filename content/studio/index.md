@@ -18,7 +18,7 @@ cssclasses:
 </section>
 
 <section class="garden-section">
-  <div class="garden-card-grid"><a class="garden-card" href="https://melyi.uk:8089/alist">
+  <div class="garden-card-grid"><a class="garden-card" href="https://melyi.uk:8089/alist/" data-router-ignore>
   <span class="garden-card-kicker">Studio / Resource Hub</span>
   <strong>Alist Resource Library</strong>
   <span>Browse extended files, media, and long-term resources.</span>

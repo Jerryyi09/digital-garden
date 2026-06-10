@@ -158,7 +158,7 @@ async function getStudioItems() {
     title: "Alist Resource Library",
     type: "Resource Hub",
     summary: "Browse extended files, media, and long-term resources.",
-    url: "https://melyi.uk:8089/alist",
+    url: "https://melyi.uk:8089/alist/",
     room: "Studio",
   }
 
@@ -180,7 +180,9 @@ async function getStudioItems() {
 }
 
 function card(item) {
-  return `<a class="garden-card" href="${escapeHtml(item.url)}">
+  const routerIgnore = /^https?:\/\//i.test(item.url) ? " data-router-ignore" : ""
+
+  return `<a class="garden-card" href="${escapeHtml(item.url)}"${routerIgnore}>
   <span class="garden-card-kicker">${escapeHtml(item.room)} / ${escapeHtml(item.type)}</span>
   <strong>${escapeHtml(item.title)}</strong>
   <span>${escapeHtml(item.summary)}</span>
