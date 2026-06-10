@@ -68,3 +68,15 @@ Recommended custom domain:
 ```text
 notes.melyi.uk
 ```
+
+## Publish standalone HTML
+
+Put already-generated HTML pages in the `html` folder. They are copied to
+`public/html` after Quartz builds.
+
+Examples:
+
+```text
+html/demo/index.html -> https://notes.melyi.uk/html/demo/
+html/report.html -> https://notes.melyi.uk/html/report.html
+```
