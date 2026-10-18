@@ -192,7 +192,11 @@ function render() {
     title.textContent = item.name.replace(AUDIO, "")
     const meta = document.createElement("small")
     meta.textContent = record ? `${record.completed ? "已听完" : "听至"} ${durationText(record.position)} / ${durationText(record.duration)}` : item.is_dir ? "打开目录 →" : `${(item.size / 1024 / 1024).toFixed(1)} MB · 开始收听`
-    button.append(kind, title, meta)
+    const action = document.createElement("span")
+    action.className = "row-action"
+    action.setAttribute("aria-hidden", "true")
+    action.textContent = item.is_dir ? "↗" : "▷"
+    button.append(kind, title, meta, action)
     if (record) {
       const bar = document.createElement("progress")
       bar.max = record.duration || 1
@@ -201,7 +205,11 @@ function render() {
       button.append(bar)
     }
     button.onclick = attempt(() => item.is_dir ? browse(item.path) : loadTrack(item))
-    $("items").append(button)
+    const row = document.createElement("div")
+    row.className = "item-row"
+    row.setAttribute("role", "listitem")
+    row.append(button)
+    $("items").append(row)
   }
   if (!items.length) {
     const empty = document.createElement("p")
