@@ -25,6 +25,8 @@ Cloudflare 按现有 GitHub `v5` 分支自动构建发布，不改变 Workers/Ac
 
 NUC HTTP server 原本没有 `/alist` 代理，内网版需补上与 HTTPS 相同的代理块，并在两个代理块中关闭 `proxy_buffering`。现有 Range/If-Range 透传应保留。AList 已返回跨域允许头，Cloudflare 前端请求时使用 `credentials: omit`，令牌放在 Authorization，不依赖跨站 Cookie。
 
+HTTP 站点的 `server_name` 同时加入 `10.0.0.85`。现有 `default.conf` 也是独立 HTTP 站点，若不明确匹配 IP，内网请求可能落入默认 404 站点。部署脚本会自动补齐该项。
+
 ```nginx
 location /alist {
   proxy_pass http://alist:5244;

@@ -15,6 +15,12 @@ def patch_nginx(source):
   http, rest = source[:first_end], source[first_end:]
   if "listen 80;" not in http or "proxy_pass http://alist:5244;" not in rest:
     raise ValueError("Nginx configuration differs from the documented NUC")
+  # The existing default.conf is a separate HTTP vhost; match the LAN IP explicitly.
+  name = re.search(r"server_name\s+([^;]+);", http)
+  if not name:
+    raise ValueError("Cannot identify the HTTP virtual host")
+  if "10.0.0.85" not in name.group(1).split():
+    http = http[:name.end(1)] + " 10.0.0.85" + http[name.end(1):]
   if "location /alist" not in http:
     marker = "    location /.well-known/acme-challenge/ {"
     if marker not in http:
