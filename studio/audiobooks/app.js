@@ -441,7 +441,8 @@ async function setupReadalong(track, request) {
     if (request !== playRequest || !Array.isArray(timeline)) return
 
     readalongManifest = manifest
-    readalongTimeline = timeline
+    const trackFiltered = timeline.filter((s) => !s.audioSourceId || s.audioSourceId === track.name)
+    readalongTimeline = trackFiltered.length ? trackFiltered : timeline
     readalongParentPath = parent
     $("readalong-toggle").hidden = false
     $("readalong-toggle").textContent = "📖 边听边读"

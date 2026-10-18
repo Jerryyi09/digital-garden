@@ -44,10 +44,11 @@ def export_readalong_bundle(
     source_epub: Path,
     primary_audio: Path,
     alist_audio_path: str,
-    chunk_durations: list[float] | None = None,
+    chunk_durations: dict[str, float] | list[float] | None = None,
     source_offset: float = 0.0,
     chapters_meta: list[dict] | None = None,
     model_name: str = "tiny.en",
+    audio_sources_meta: list[dict] | None = None,
 ) -> dict:
     """Extract and build PWA-ready readalong bundle from the generated overlay EPUB."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -62,7 +63,7 @@ def export_readalong_bundle(
 
         # Extract all non-audio files (HTML, CSS, images, etc.) into text_dir
         for name in names:
-            if name.lower().endswith((".m4a", ".mp3", ".m4b", ".wav")):
+            if name.endswith("/") or name.lower().endswith((".m4a", ".mp3", ".m4b", ".wav")):
                 continue
             dest = text_dir / name
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -134,31 +135,113 @@ def export_readalong_bundle(
 
     for chunk_name in distinct_chunks:
         chunk_offsets[chunk_name] = current_offset
-        # Fall back to 600s if duration not provided
         chunk_dur = chunk_dur_map.get(chunk_name, 600.0)
         current_offset += chunk_dur
 
-    # Build absolute timeline for PWA
-    audio_source_id = primary_audio.name
+    # Build timeline segments mapped to concrete audio files
     timeline_segments = []
+    has_multiple_sources = bool(audio_sources_meta and len(audio_sources_meta) > 1)
+
     for s in segments:
         base_offset = chunk_offsets.get(s["chunk_audio"], source_offset)
         abs_start = round(base_offset + s["chunk_start"], 3)
         abs_end = round(base_offset + s["chunk_end"], 3)
-        timeline_segments.append({
-            "audioSourceId": audio_source_id,
-            "start": abs_start,
-            "end": abs_end,
-            "document": s["document"],
-            "fragment": s["fragment"],
-            "text": s["text"],
-            "reviewStatus": "unreviewed",
-        })
 
-    # Timeline MUST be strictly sorted by start time for binary search
-    timeline_segments.sort(key=lambda seg: (seg["start"], seg["end"]))
+        if has_multiple_sources:
+            # Locate which source file this segment falls into
+            matched_src = next(
+                (src for src in audio_sources_meta if src["start_offset"] <= abs_start < src["end_offset"]),
+                None,
+            )
+            if not matched_src:
+                matched_src = audio_sources_meta[-1] if abs_start >= audio_sources_meta[-1]["end_offset"] else audio_sources_meta[0]
+
+            rel_start = round(max(0.0, abs_start - matched_src["start_offset"]), 3)
+            rel_end = round(min(matched_src["duration"], abs_end - matched_src["start_offset"]), 3)
+            if rel_end <= rel_start:
+                rel_end = round(rel_start + 0.1, 3)
+
+            timeline_segments.append({
+                "audioSourceId": matched_src["id"],
+                "start": rel_start,
+                "end": rel_end,
+                "document": s["document"],
+                "fragment": s["fragment"],
+                "text": s["text"],
+                "reviewStatus": "unreviewed",
+            })
+        else:
+            audio_source_id = primary_audio.name
+            timeline_segments.append({
+                "audioSourceId": audio_source_id,
+                "start": abs_start,
+                "end": abs_end,
+                "document": s["document"],
+                "fragment": s["fragment"],
+                "text": s["text"],
+                "reviewStatus": "unreviewed",
+            })
+
+    # Timeline MUST be strictly sorted by (audioSourceId, start, end)
+    timeline_segments.sort(key=lambda seg: (seg["audioSourceId"], seg["start"], seg["end"]))
 
     # Save timeline.json
+    timeline_path = output_dir / "timeline.json"
+    timeline_path.write_text(json.dumps(timeline_segments, ensure_ascii=False, indent=2) + "\n")
+
+    # Read EPUB title & metadata
+    epub_sha256 = compute_sha256(source_epub)
+
+    audio_sources_list = []
+    if audio_sources_meta:
+        for src in audio_sources_meta:
+            audio_sources_list.append({
+                "id": src["id"],
+                "name": src["id"],
+                "alistPath": src["alistPath"],
+                "sha256": src.get("sha256", ""),
+                "duration": src.get("duration", 0.0),
+            })
+    else:
+        audio_sha256 = compute_sha256(primary_audio)
+        audio_sources_list.append({
+            "id": primary_audio.name,
+            "name": primary_audio.name,
+            "alistPath": alist_audio_path,
+            "sha256": audio_sha256,
+        })
+
+    # Build readalong.manifest.json
+    manifest = {
+        "schemaVersion": 1,
+        "bookId": book_id,
+        "language": "en",
+        "sourceEpubSha256": epub_sha256,
+        "timing": {
+            "engine": "whisper-word",
+            "model": model_name,
+        },
+        "audioSources": audio_sources_list,
+        "timeline": "timeline.json",
+        "textRoot": "text/",
+        "segmentCount": len(timeline_segments),
+        "chapters": chapters_meta or [],
+    }
+
+    manifest_path = output_dir / "readalong.manifest.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+
+    # Copy generated EPUB as standalone standard export
+    export_epub = output_dir / "book.readalong.epub"
+    if not export_epub.exists() or export_epub.stat().st_size != generated_epub.stat().st_size:
+        shutil.copyfile(generated_epub, export_epub)
+
+    return {
+        "output_dir": str(output_dir),
+        "manifest_path": str(manifest_path),
+        "timeline_path": str(timeline_path),
+        "segment_count": len(timeline_segments),
+    }
     timeline_path = output_dir / "timeline.json"
     timeline_path.write_text(json.dumps(timeline_segments, ensure_ascii=False, indent=2) + "\n")
 

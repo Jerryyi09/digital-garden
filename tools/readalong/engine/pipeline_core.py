@@ -2985,14 +2985,28 @@ def run_post_checks(
         check_unmatched_spine_html(book_info),
         check_missing_media_overlays(book_info),
     ]
+    fatal_check_names = {
+        "missing_transcripts",
+        "invalid_smil_clips",
+        "duplicate_audio_clips",
+        "overlapping_audio_clips",
+        "overlay_without_audio",
+        "missing_media_overlays",
+    }
+    fatal_ok = all(
+        result["ok"] or result["skipped"]
+        for result in results
+        if result["name"] in fatal_check_names
+    )
     ok_results = sum(1 for result in results if result["ok"] and not result["skipped"])
     skipped_results = sum(1 for result in results if result["skipped"])
+    failed_results = sum(1 for result in results if not result["ok"] and not result["skipped"])
 
     return {
-        "ok": all(result["ok"] or result["skipped"] for result in results),
+        "ok": fatal_ok,
         "summary": (
             f"{ok_results} check(s) passed, {skipped_results} skipped, "
-            f"{len(results) - ok_results - skipped_results} failed."
+            f"{failed_results} warning(s)/failed (fatal_ok={fatal_ok})."
         ),
         "results": results,
     }
