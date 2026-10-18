@@ -42,3 +42,37 @@ test("replacing a file creates a different progress identity", () => {
   assert.notEqual(trackId(track), trackId({ ...track, size: 200 }))
   assert.notEqual(trackId(track), trackId({ ...track, modified: "2026-10-19" }))
 })
+
+test("readalong paths remain strictly within library root", () => {
+  const manifestPath = `${ROOT}/心智成长/The Power of Habit - Charles Duhigg/readalong/readalong.manifest.json`
+  assert.ok(isWithinRoot(manifestPath))
+  assert.equal(isWithinRoot(`${ROOT}/../readalong.manifest.json`), false)
+})
+
+test("binary search accurately locates active audio segment", () => {
+  const timeline = [
+    { start: 16.908, end: 22.588, fragment: "seg1" },
+    { start: 22.588, end: 26.788, fragment: "seg2" },
+    { start: 26.788, end: 27.748, fragment: "seg3" },
+  ]
+  function findSegment(list, time) {
+    let low = 0, high = list.length - 1
+    while (low <= high) {
+      const mid = (low + high) >> 1
+      const seg = list[mid]
+      if (time < seg.start) high = mid - 1
+      else if (time >= seg.end) low = mid + 1
+      else return seg
+    }
+    if (high >= 0 && time - list[high].end < 0.6) return list[high]
+    if (low < list.length && list[low].start - time < 0.6) return list[low]
+    return null
+  }
+  assert.equal(findSegment(timeline, 10.0), null)
+  assert.equal(findSegment(timeline, 18.0)?.fragment, "seg1")
+  assert.equal(findSegment(timeline, 22.588)?.fragment, "seg2")
+  assert.equal(findSegment(timeline, 27.0)?.fragment, "seg3")
+  assert.equal(findSegment(timeline, 27.8)?.fragment, "seg3") // within 0.6s tolerance
+  assert.equal(findSegment(timeline, 50.0), null)
+})
+

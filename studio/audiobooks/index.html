@@ -44,9 +44,35 @@
       </section>
       <footer>MP3 / M4A / M4B · iPhone Safari → 分享 → 添加到主屏幕<br>进度保存在当前浏览器；可在连接设置中导出备份。</footer>
     </main>
+    <section id="readalong" class="readalong" aria-label="音文同步跟读" hidden>
+      <div class="readalong-bar">
+        <div class="readalong-title-group">
+          <span class="readalong-badge">EPUB 跟读</span>
+          <h3 id="readalong-chapter-title">正文跟读</h3>
+        </div>
+        <div class="readalong-actions">
+          <button id="readalong-locate" class="primary subtle-action" title="定位当前朗读句子" hidden>📍 回到朗读</button>
+          <button id="readalong-follow" class="subtle-action">跟随：开</button>
+          <label class="size-control"><span class="sr-only">字号</span>
+            <select id="readalong-size" aria-label="正文字号">
+              <option value="14">14px</option>
+              <option value="16" selected>16px</option>
+              <option value="18">18px</option>
+              <option value="20">20px</option>
+              <option value="22">22px</option>
+            </select>
+          </label>
+          <button id="readalong-close" class="subtle-action" aria-label="关闭跟读">✕</button>
+        </div>
+      </div>
+      <div class="readalong-frame-container">
+        <iframe id="readalong-frame" title="电子书跟读正文" sandbox="allow-same-origin allow-scripts"></iframe>
+        <div id="readalong-loading" class="readalong-loading" hidden>正在载入电子书内容…</div>
+      </div>
+    </section>
     <section id="player" class="player" aria-label="正在收听" hidden>
       <div class="now"><span class="eyebrow">NOW LISTENING</span><h2 id="track-title"></h2><p id="track-folder"></p></div>
-      <div class="playback"><audio id="audio" controls preload="metadata" playsinline></audio><div class="transport"><button id="rewind" aria-label="后退15秒">↶ 15 秒</button><button id="play" class="primary" disabled>播放</button><button id="forward" aria-label="前进30秒">30 秒 ↷</button><label>倍速 <select id="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select></label><button id="next">下一节 →</button></div><p id="player-status" role="status"></p></div>
+      <div class="playback"><audio id="audio" controls preload="metadata" playsinline></audio><div class="transport"><button id="rewind" aria-label="后退15秒">↶ 15 秒</button><button id="play" class="primary" disabled>播放</button><button id="forward" aria-label="前进30秒">30 秒 ↷</button><label>倍速 <select id="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select></label><button id="readalong-toggle" class="readalong-btn" hidden>📖 边听边读</button><button id="next">下一节 →</button></div><p id="player-status" role="status"></p></div>
     </section>
     <dialog id="settings">
       <form id="connection-form">

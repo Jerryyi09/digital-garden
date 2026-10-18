@@ -1,4 +1,4 @@
-const CACHE = "garden-audiobooks-v2"
+const CACHE = "garden-audiobooks-v3"
 const SHELL = ["./", "./app.js", "./config.js", "./app.css", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)))

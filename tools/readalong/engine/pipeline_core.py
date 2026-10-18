@@ -1,0 +1,3482 @@
+"""
+EPUB audiobook synchronization pipeline.
+
+Purpose
+-------
+
+Transform one source audiobook file and one source ebook (`.epub`)
+into a Media Overlay-capable EPUB package.
+
+Primary responsibilities:
+
+- create a working EPUB copy
+- split the audiobook into numbered chunks
+- transcribe each chunk
+- match transcript chunks to EPUB HTML in reading order
+- mark HTML with stable segment ids
+- align transcript words to marked HTML segments
+- generate one SMIL overlay per HTML file
+- package audio/SMIL/CSS assets into the EPUB
+- patch the OPF manifest/metadata for Media Overlays
+- audit the resulting artifacts and package state
+
+Operational constraints:
+
+- audiobook chapter markers are only approximate input, not authoritative structure
+- EPUB spine order is authoritative for reading order; filename order is not
+- an audio chunk may start in the middle of an HTML file
+- multiple audio chunks may map to the same HTML file
+- every path in `book_info` is a basename resolved against `folder_name` via
+  `resolve_book_path`; nothing depends on the process working directory
+- validation must inspect both loose working artifacts and packaged EPUB contents
+
+Pipeline overview
+-----------------
+
+1. Discover and prepare inputs.
+   `preprocess()` finds the local audio file and `.epub`, copies the source EPUB to a
+   working `.epub3`, and records OPF-related metadata in `book_info`.
+
+2. Split the audiobook into manageable chunks.
+   `split_audio()` uses `ffprobe` chapter metadata when present, otherwise it falls
+   back to fixed-duration chunks, and `ffmpeg` creates numbered
+   audio files (`000.m4a`, `001.m4a`, ...). The default split mode is stream copy so
+   packaged overlay audio keeps source quality unless the operator explicitly asks for
+   AAC re-encoding. These chapter markers are only a starting point; later matching can
+   still place a chunk into the middle of an HTML file.
+
+3. Transcribe each audio chunk.
+   `transcribe_audio()` produces sibling WhisperX JSON files. These `.json` files are
+   the canonical transcript artifacts for the matching and alignment stages.
+
+4. Match audio chunks to HTML windows.
+   `link_html_with_audio()` reads the EPUB spine in reading order, slices each HTML
+   file into overlapping lexical windows, and then scores each transcript against the
+   candidate windows. This stage is semantic/lexical matching, not final timestamp
+   alignment.
+
+5. Mark HTML with stable segment ids.
+   `mark_segments()` runs `mark_sentence.mark_sentences()` on each matched HTML file
+   once, injecting segment spans that later SMIL entries can target.
+
+6. Align transcript words to HTML segment tokens.
+   `create_smil_files()` performs fine-grained token alignment between transcript
+   words and the marked HTML segments. This is where we turn transcript text into real
+   timestamps per segment.
+
+7. Package assets into the working EPUB.
+   `merge_files()` adds audio, SMIL, and CSS assets into the `.epub3` zip.
+
+8. Rewrite the OPF for Media Overlays.
+   `post_processing_opf()` adds the overlay manifest items, duration metadata, and
+   `media-overlay` references from HTML items to the per-HTML SMIL files, then moves
+   the finished package to a final `.epub` path.
+
+9. Run read-only post checks.
+   The `check_*` helpers and `run_post_checks()` audit the loose artifacts and the
+   packaged EPUB to catch missing transcripts, missing SMIL coverage, duplicate clip
+   reuse, and broken OPF wiring.
+
+Core data model: `book_info`
+----------------------------
+
+`book_info` is the shared mutable context for one book run. It carries discovered
+paths, pipeline settings, and intermediate artifacts between stages.
+
+Typical keys include:
+
+- `folder_name`: working directory for one book
+- `audio_file`: source audiobook path/name
+- `epub_file`: working EPUB path/name used for matching
+- `out_file`: working `.epub3` file (basename inside `folder_name`) that gets
+  mutated and finally moved to the caller-supplied package path
+- `opf_file`, `opf_dir`: package metadata derived from the working EPUB
+- `audio_extension`: output split-audio extension, usually `.m4a`
+- `audio_codec`: split-audio codec profile, usually `copy`
+- `audio_bitrate`, `audio_sample_rate`, `audio_channels`: optional AAC re-encode
+  settings used only when `audio_codec` is `aac`
+- `model`: optional semantic model handle (historically used for embeddings)
+- `matched_list`: the bridge artifact between semantic matching and timestamp
+  alignment
+
+Key invariants
+--------------
+
+- Never modify the source EPUB directly. The pipeline works against a copied
+  `.epub3` file.
+- Matching is done in EPUB spine order, not naive lexical filename order.
+- A single HTML file can own many audio chunks, but packaging should still produce
+  exactly one SMIL per HTML file.
+- OPF overlay wiring points from HTML manifest items to those per-HTML SMIL files.
+- Post checks validate artifacts; they do not generate or repair them.
+
+Frequent operator mistakes
+--------------------------
+
+1. `matched_list.json` can become stale.
+   If a new transcript JSON appears after matching was already run, the saved match
+   list no longer reflects the current folder contents.
+
+2. The "real packaged EPUB" may not be the EPUB sitting in the book folder.
+   After OPF post-processing, the working `.epub3` is moved to a final `.epub` path.
+   Validation must distinguish a processed package from the original source EPUB.
+
+3. Matching and alignment are intentionally separate.
+   `link_html_with_audio()` chooses the most likely HTML window. It does not create
+   timestamps. `create_smil_files()` then performs the token-level alignment inside
+   the chosen HTML file.
+
+Section map
+-----------
+
+- EPUB/ZIP helpers: path, XML, and archive manipulation
+- audio split/transcription: loose artifact generation
+- HTML/audio matching: choose the right HTML region per transcript
+- segment marking + token alignment: turn text correspondence into timestamps
+- packaging/OPF updates: make the EPUB declare and reference the generated assets
+- post checks: audit the output and intermediate artifacts
+
+High-risk areas
+---------------
+
+- choosing the wrong packaged EPUB candidate for validation
+- assuming one audio chunk maps to one HTML file from the beginning
+- stale `matched_list.json` data after new transcripts appear
+- OPF path normalization and relative href calculations
+- alignment cases where an audiobook chunk begins in the middle of a chapter file
+"""
+
+import difflib
+import glob
+import io
+import json
+import math
+import os
+import posixpath
+import re
+import shutil
+import subprocess
+import warnings
+import zipfile
+from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import redirect_stderr, redirect_stdout
+from html import escape
+from pathlib import Path
+
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+from tqdm import tqdm
+
+from epub_reference_index import build_reference_index
+from mark_sentence import mark_sentences
+from transcription_backend import (
+    default_model_for_backend,
+    detect_transcription_backend,
+    transcribe_file,
+)
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+warnings.filterwarnings("ignore", category=UserWarning, module="zipfile")
+
+# Stream-copy chunks should match the planned span very closely, so a tight
+# tolerance is appropriate. AAC re-encoding, however, introduces encoder priming
+# delay and frame-boundary padding that make the reported stream duration drift
+# from the planned (end_time - start_time) by more than a second on some inputs.
+# Without a looser tolerance for AAC, otherwise-valid chunks are judged
+# "incomplete" and the entire split stage is needlessly re-run.
+SPLIT_AUDIO_DURATION_TOLERANCE_SECONDS = 1.0
+SPLIT_AUDIO_DURATION_TOLERANCE_SECONDS_AAC = 5.0
+MIN_CHUNK_DURATION_SECONDS = 10.0
+
+
+def split_audio_duration_tolerance(book_info):
+    """Return the chunk-duration tolerance appropriate for the configured codec."""
+    if book_info.get("audio_codec") == "aac":
+        return SPLIT_AUDIO_DURATION_TOLERANCE_SECONDS_AAC
+    return SPLIT_AUDIO_DURATION_TOLERANCE_SECONDS
+
+
+# === EPUB and ZIP helpers ===
+
+
+def preprocess(book_info, source_epub_path):
+    # Working model:
+    # - source `.epub` remains untouched
+    # - all mutations happen against a copied `.epub3` inside the book folder
+    # - final packaging later moves that working copy to a caller-supplied path
+    audio_file = book_info.get("audio_file")
+    if not audio_file:
+        raise FileNotFoundError("book_info['audio_file'] must name the source audio")
+    epub_file = os.path.basename(str(source_epub_path))
+    out_file = os.path.splitext(epub_file)[0] + ".epub3"
+    out_path = resolve_book_path(book_info, out_file)
+    shutil.copy(str(source_epub_path), out_path)
+
+    with zipfile.ZipFile(out_path, "r") as f:
+        opf_file = find_opf_path(f)
+    if not opf_file:
+        raise ValueError(f"No OPF package document found in {source_epub_path}")
+
+    book_info["opf_file"] = opf_file
+    book_info["opf_dir"] = posixpath.dirname(opf_file) or "."
+    return audio_file, epub_file, out_file
+
+
+def plan_audio_chunks(book_info, audio_path=None):
+    if audio_path is None:
+        audio_path = resolve_book_path(book_info, book_info["audio_file"])
+
+    audio_extension = book_info["audio_extension"]
+    output = subprocess.check_output(
+        [
+            "ffprobe",
+            "-v",
+            "quiet",
+            "-i",
+            str(audio_path),
+            "-show_chapters",
+            "-print_format",
+            "json",
+        ],
+        text=True,
+    )
+    chapters = json.loads(output).get("chapters", [])
+    chunks = []
+    for chapter_info in chapters:
+        start_time = float(chapter_info["start_time"])
+        end_time = float(chapter_info["end_time"])
+        if end_time <= start_time:
+            continue
+        chunks.append({"start_time": start_time, "end_time": end_time})
+
+    if chunks:
+        # Merge chunks that are too short for reliable stream-copy splitting.
+        # Very short segments (e.g. section headers of a few seconds) can land
+        # entirely within a single AAC keyframe interval, causing ffmpeg to fail
+        # when it cannot find a clean packet boundary.  Absorbing them into a
+        # neighbour eliminates the problem at source level.
+        min_seconds = float(book_info.get("min_chunk_seconds", MIN_CHUNK_DURATION_SECONDS))
+        merged = [chunks[0]]
+        for chunk in chunks[1:]:
+            prev = merged[-1]
+            if prev["end_time"] - prev["start_time"] < min_seconds:
+                # Previous chunk is too short – extend it to cover this chunk.
+                prev["end_time"] = chunk["end_time"]
+            else:
+                merged.append(chunk)
+        # If the last chunk ended up too short, absorb it into its predecessor.
+        if len(merged) >= 2 and merged[-1]["end_time"] - merged[-1]["start_time"] < min_seconds:
+            merged[-2]["end_time"] = merged[-1]["end_time"]
+            merged.pop()
+
+        # Chapter markers rarely start exactly at 0 or end exactly at the stream end.
+        # Audio outside [first.start, last.end] would otherwise never be cut,
+        # transcribed, or packaged. Snap the edges to the audio stream (the same
+        # probe the completeness check uses), ignoring sub-second drift.
+        if merged[0]["start_time"] > 0.5:
+            merged[0]["start_time"] = 0.0
+        stream_duration = get_primary_audio_stream_duration(str(audio_path))
+        if stream_duration is not None and stream_duration - merged[-1]["end_time"] > 0.5:
+            merged[-1]["end_time"] = stream_duration
+
+        return [
+            {
+                "id": idx,
+                "start_time": str(c["start_time"]),
+                "end_time": str(c["end_time"]),
+                "output_name": f"{str(idx).zfill(3)}{audio_extension}",
+            }
+            for idx, c in enumerate(merged)
+        ]
+
+    total_duration = get_audio_duration(str(audio_path))
+    chunk_seconds = int(book_info.get("chunk_seconds", 600))
+    chunk_count = int(total_duration // chunk_seconds)
+    if total_duration % chunk_seconds:
+        chunk_count += 1
+
+    for chunk_id in range(chunk_count):
+        start_time = chunk_id * chunk_seconds
+        end_time = min(total_duration, start_time + chunk_seconds)
+        if end_time <= start_time:
+            continue
+        chunks.append(
+            {
+                "id": chunk_id,
+                "start_time": str(start_time),
+                "end_time": str(end_time),
+                "output_name": f"{str(chunk_id).zfill(3)}{audio_extension}",
+            }
+        )
+    return chunks
+
+
+def replace_files_in_zip(zip_path, replacements):
+    # ZIP update strategy:
+    # rewrite the archive into a temporary file while replacing selected entries.
+    # This is more predictable than trying to mutate EPUB contents in place.
+    temp_zip = zip_path + ".tmp"
+
+    with zipfile.ZipFile(zip_path, "r") as original_zip:
+        with zipfile.ZipFile(
+            temp_zip, "w", compression=zipfile.ZIP_DEFLATED
+        ) as new_zip:
+            for item in original_zip.infolist():
+                if item.filename not in replacements:
+                    new_zip.writestr(item, original_zip.read(item.filename))
+
+            for file_name, content in replacements.items():
+                new_zip.writestr(file_name, content)
+
+    os.replace(temp_zip, zip_path)
+
+
+def convert_soup_to_html(soup):
+    # Serialize the soup directly. We previously round-tripped through
+    # minidom.parseString(str(soup)) purely for pretty-printed indentation, which
+    # forced a `str(soup).replace("opf:", "")` beforehand because minidom rejects the
+    # undeclared `opf:` prefix. That blind string replace silently corrupted any text
+    # or attribute containing the substring `opf:` (e.g. `opf:role`/`opf:file-as`
+    # attributes and prose mentioning `opf:`). BeautifulSoup already emits well-formed
+    # XML with the namespace prefix declared, and EPUB readers do not care about
+    # indentation, so serializing str(soup) directly is both correct and cheaper.
+    return str(soup)
+
+
+def find_opf_path(zip_file):
+    """Locate the OPF package document inside an open EPUB zip, or return None.
+
+    Prefers the `rootfile` declared in META-INF/container.xml (the only authoritative
+    pointer) and falls back to the first `*.opf` entry for packages with a missing or
+    broken container.
+    """
+    try:
+        container = BeautifulSoup(zip_file.read("META-INF/container.xml"), "xml")
+        rootfile = container.find("rootfile")
+        full_path = rootfile.get("full-path") if rootfile else None
+        if full_path and full_path in zip_file.namelist():
+            return full_path
+    except (KeyError, OSError, zipfile.BadZipFile):
+        pass
+    return next((name for name in zip_file.namelist() if name.endswith(".opf")), None)
+
+
+def get_relative_zip_href(source_path, target_path):
+    source_dir = posixpath.dirname(source_path) or "."
+    return posixpath.relpath(target_path, start=source_dir)
+
+
+def seconds_to_media_duration(seconds):
+    total_milliseconds = max(0, int(round(seconds * 1000)))
+    hours, remainder = divmod(total_milliseconds, 3600000)
+    minutes, remainder = divmod(remainder, 60000)
+    secs, milliseconds = divmod(remainder, 1000)
+    return f"{hours}:{minutes:02d}:{secs:02d}.{milliseconds:03d}"
+
+
+def get_smil_duration(smil_file):
+    # A grouped SMIL may reference multiple different audio files. The correct SMIL
+    # duration is therefore the sum of its clip durations, not the maximum clip end.
+    with open(smil_file, "r", encoding="utf-8") as f:
+        soup = BeautifulSoup(f.read(), "xml")
+
+    total_duration = 0.0
+    for audio_el in soup.find_all("audio"):
+        clip_begin = parse_smil_clock_value(audio_el.get("clipBegin"))
+        clip_end = parse_smil_clock_value(audio_el.get("clipEnd"))
+        if clip_begin is None or clip_end is None:
+            continue
+        total_duration += max(0.0, clip_end - clip_begin)
+
+    return total_duration
+
+
+def parse_ncx_nav_points(container):
+    if container is None:
+        return []
+
+    nav_points = []
+    for nav_point in container.find_all("navPoint", recursive=False):
+        label_el = nav_point.find("text")
+        content_el = nav_point.find("content")
+        if not label_el or not content_el or not content_el.get("src"):
+            continue
+
+        nav_points.append(
+            {
+                "label": label_el.get_text(strip=True),
+                "href": content_el["src"],
+                "children": parse_ncx_nav_points(nav_point),
+            }
+        )
+
+    return nav_points
+
+
+def render_nav_points(nav_points, level=3):
+    indent = "  " * level
+    lines = [f"{indent}<ol>"]
+    for point in nav_points:
+        lines.append(
+            f'{indent}  <li><a href="{escape(point["href"], quote=True)}">{escape(point["label"])}</a>'
+        )
+        if point["children"]:
+            lines.append(render_nav_points(point["children"], level + 2))
+            lines.append(f"{indent}  </li>")
+        else:
+            lines[-1] += "</li>"
+    lines.append(f"{indent}</ol>")
+    return "\n".join(lines)
+
+
+def build_nav_document(title, nav_points):
+    nav_list = render_nav_points(nav_points)
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
+  <head>
+    <title>{escape(title or "Contents")}</title>
+  </head>
+  <body>
+    <nav epub:type="toc" id="toc">
+      <h1>Contents</h1>
+{nav_list}
+    </nav>
+  </body>
+</html>
+"""
+
+
+def get_spine_ordered_html_files(zip_file):
+    # Filename sorting is not a reliable reading order. Front matter, appendices, and
+    # generated nav files often sort in surprising ways. The OPF spine is the actual
+    # "book order" we want for matching and monotonic progression.
+    html_files = [
+        file_name
+        for file_name in zip_file.namelist()
+        if file_name.endswith((".htm", ".html", ".xhtml"))
+    ]
+    if not html_files:
+        return []
+
+    opf_file = find_opf_path(zip_file)
+    if not opf_file:
+        return sorted(html_files)
+
+    with zip_file.open(opf_file) as f:
+        soup = BeautifulSoup(f.read(), "xml")
+
+    opf_dir = posixpath.dirname(opf_file) or "."
+    manifest_map = {}
+    for item in soup.find_all("item"):
+        item_id = item.get("id")
+        href = item.get("href")
+        if item_id and href:
+            manifest_map[item_id] = posixpath.normpath(posixpath.join(opf_dir, href))
+
+    spine_files = []
+    for itemref in soup.find_all("itemref"):
+        href = manifest_map.get(itemref.get("idref"))
+        if href in html_files and href not in spine_files:
+            spine_files.append(href)
+
+    remaining_files = [file_name for file_name in html_files if file_name not in spine_files]
+    return spine_files + sorted(remaining_files)
+
+
+# === Audio splitting and transcription ===
+
+
+def expected_chunk_duration(chunk_info):
+    return max(0.0, float(chunk_info["end_time"]) - float(chunk_info["start_time"]))
+
+
+def get_primary_audio_stream_duration(audio_path):
+    try:
+        output = subprocess.check_output(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "a",
+                "-show_entries",
+                "stream=duration",
+                "-print_format",
+                "json",
+                audio_path,
+            ],
+            text=True,
+        )
+    except Exception:
+        return None
+
+    streams = json.loads(output).get("streams", [])
+    if not streams:
+        return None
+
+    for stream in streams:
+        duration = stream.get("duration")
+        if duration is None:
+            continue
+        try:
+            parsed_duration = float(duration)
+        except (TypeError, ValueError):
+            continue
+        if parsed_duration > 0.0:
+            return parsed_duration
+
+    # Last-resort format-level probe. This helper's contract is to return None (not
+    # raise) on any failure, since callers such as is_audio_chunk_complete treat None
+    # as "duration unknown -> chunk not verifiable". get_audio_duration now raises
+    # when it cannot determine a duration, so translate that back into None here.
+    try:
+        fallback_duration = get_audio_duration(audio_path)
+    except RuntimeError:
+        return None
+    return fallback_duration if fallback_duration > 0.0 else None
+
+
+# === Artifact compatibility stamps =========================================
+#
+# The split and transcribe stages are expensive, so a signature change (see
+# build_signature in generate_epub_overlay.py) deliberately preserves the run/
+# chunks and transcripts rather than deleting them. Reconcile then decides, per
+# artifact, whether the preserved file is still valid for the *current* config.
+#
+# Historically reconcile checked only existence (transcripts) or duration (chunks),
+# so a chunk cut with a different codec/bitrate, or a transcript from a different
+# model/language, was silently reused. To make the reconcile actually re-validate
+# (as its docstring always promised), each produced artifact gets a sidecar `.meta`
+# JSON stamp recording the config that produced it. The stamp is written *last*
+# (after the artifact itself), so a stamp's presence proves the artifact was fully
+# written -- which also makes a Ctrl-C/crash-truncated transcript detectable (no
+# stamp -> re-derive), independent of atomic writes.
+#
+# Note: artifacts produced before stamps existed have no `.meta`, so the first run
+# after this change re-splits and re-transcribes. That is intentional -- accepting a
+# stampless artifact would reintroduce the exact hole this closes.
+
+
+def _stamp_path_for(artifact_path):
+    return f"{artifact_path}.meta"
+
+
+def chunk_compatibility_stamp(book_info, chunk_info):
+    """Config that must match for a preserved audio chunk to be reused as-is."""
+    return {
+        "kind": "audio_chunk",
+        "audio_codec": book_info.get("audio_codec", "copy"),
+        "audio_bitrate": book_info.get("audio_bitrate"),
+        "audio_sample_rate": book_info.get("audio_sample_rate"),
+        "audio_channels": book_info.get("audio_channels"),
+        "chunk_seconds": book_info.get("chunk_seconds"),
+        "start_time": str(chunk_info["start_time"]),
+        "end_time": str(chunk_info["end_time"]),
+    }
+
+
+def transcript_compatibility_stamp(book_info, chunk_stamp):
+    """Config that must match for a preserved transcript to be reused as-is.
+
+    Embeds the parent chunk's stamp so re-cutting the chunk (different codec, chunk
+    boundaries, etc.) also invalidates the transcript that was aligned against it.
+    """
+    return {
+        "kind": "transcript",
+        "backend": book_info.get("backend"),
+        "model": book_info.get("model"),
+        "language": book_info.get("language"),
+        "chunk_stamp": chunk_stamp,
+    }
+
+
+def write_compatibility_stamp(artifact_path, stamp):
+    """Write a stamp sidecar next to an artifact. Call *after* the artifact exists."""
+    atomic_write_json_local(_stamp_path_for(artifact_path), stamp)
+
+
+def read_compatibility_stamp(artifact_path):
+    stamp_path = _stamp_path_for(artifact_path)
+    if not os.path.exists(stamp_path):
+        return None
+    try:
+        with open(stamp_path, "r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, ValueError):
+        return None
+
+
+def stamp_matches(artifact_path, expected_stamp):
+    """True if the artifact has a stamp equal to expected_stamp."""
+    return read_compatibility_stamp(artifact_path) == expected_stamp
+
+
+def is_transcript_complete(book_info, chunk_basename):
+    """True if the transcript for `chunk_basename` exists and is valid for the current
+    config (matching model/language/backend and produced from the current chunk).
+
+    Used by the transcribe-stage reconcile so a transcript from a prior run with a
+    different model/language/chunking is re-derived instead of silently reused.
+    """
+    chunk_path = resolve_book_path(book_info, chunk_basename)
+    json_basename = transcript_basename(chunk_basename, book_info["audio_extension"])
+    json_path = resolve_book_path(book_info, json_basename)
+    if not os.path.exists(json_path):
+        return False
+    expected = transcript_compatibility_stamp(
+        book_info, read_compatibility_stamp(chunk_path)
+    )
+    return stamp_matches(json_path, expected)
+
+
+def atomic_write_json_local(path, payload):
+    """Atomically write JSON to `path` (temp file + os.replace).
+
+    pipeline_core has no shared atomic-write helper (only zip repackaging uses
+    os.replace), and the transcript write historically used a plain open()+dump that
+    truncates the target in place. This mirrors generate_epub_overlay.atomic_write_*
+    so transcripts and stamps can never be left half-written at their final path.
+    """
+    tmp_path = f"{path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+    os.replace(tmp_path, path)
+
+
+def is_audio_chunk_complete(
+    book_info,
+    chunk_info,
+    tolerance=None,
+):
+    if tolerance is None:
+        tolerance = split_audio_duration_tolerance(book_info)
+    output_path = resolve_book_path(book_info, chunk_info["output_name"])
+    if not os.path.exists(output_path):
+        return False
+
+    # The chunk must have been produced by the current audio config, not merely be a
+    # file of the right duration. Without this, a chunk stream-copied in a prior run
+    # would pass the duration check after the user switched to (e.g.) aac/64k.
+    if not stamp_matches(output_path, chunk_compatibility_stamp(book_info, chunk_info)):
+        return False
+
+    expected_duration = expected_chunk_duration(chunk_info)
+    if expected_duration <= 0.0:
+        return False
+
+    actual_duration = get_primary_audio_stream_duration(output_path)
+    return actual_duration is not None and abs(actual_duration - expected_duration) <= tolerance
+
+
+def split_audio_chunk(book_info, chunk_info):
+    start_time = chunk_info["start_time"]
+    end_time = chunk_info["end_time"]
+    out_name = chunk_info["output_name"]
+    output_path = resolve_book_path(book_info, out_name)
+    input_path = resolve_book_path(book_info, book_info["audio_file"])
+
+    audio_codec = book_info.get("audio_codec", "copy")
+    ffmpeg_audio_args = ["-c:a", "copy"]
+    if audio_codec == "aac":
+        ffmpeg_audio_args = ["-c:a", "aac"]
+        if book_info.get("audio_bitrate"):
+            ffmpeg_audio_args.extend(["-b:a", book_info["audio_bitrate"]])
+        if book_info.get("audio_sample_rate"):
+            ffmpeg_audio_args.extend(["-ar", str(book_info["audio_sample_rate"])])
+        if book_info.get("audio_channels"):
+            ffmpeg_audio_args.extend(["-ac", str(book_info["audio_channels"])])
+    elif audio_codec != "copy":
+        raise ValueError(f"Unsupported audio codec profile: {audio_codec}")
+
+    result = subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-loglevel",
+            "error",
+            "-nostats",
+            "-i",
+            input_path,
+            "-ss",
+            start_time,
+            "-to",
+            end_time,
+            "-map",
+            "0:a:0",
+            "-vn",
+            "-sn",
+            "-dn",
+            *ffmpeg_audio_args,
+            output_path,
+        ],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        error_output = (result.stderr or result.stdout or "Unknown ffmpeg error").strip()
+        raise RuntimeError(f"ffmpeg failed while creating {out_name}: {error_output}")
+    # Stamp the chunk with the config that produced it *before* the completeness
+    # check (which now requires a matching stamp). Written after ffmpeg succeeds so a
+    # stamp only exists for a fully created chunk.
+    write_compatibility_stamp(output_path, chunk_compatibility_stamp(book_info, chunk_info))
+    if not is_audio_chunk_complete(book_info, chunk_info):
+        raise RuntimeError(f"ffmpeg created an invalid audio chunk: {out_name}")
+
+
+def planned_chunk_basenames(book_info):
+    """Chunk file basenames (`NNN<ext>`) from the current chunk plan.
+
+    Every stage after split derives its chunk/transcript list from this, never from
+    what happens to be on disk, so files left by an older plan cannot leak into
+    transcription, matching, or packaging.
+    """
+    return [chunk["output_name"] for chunk in plan_audio_chunks(book_info)]
+
+
+def transcript_basename(chunk_basename, audio_extension):
+    return chunk_basename[: -len(audio_extension)] + ".json"
+
+
+_STALE_CHUNK_RE_TEMPLATE = r"^(\d{{3,}})(?:{ext}|\.json)(?:\.meta)?$"
+
+
+def prune_stale_chunk_artifacts(book_info, chunk_plan):
+    """Delete chunk files, transcripts and stamps whose ordinal is not in the plan.
+
+    Chunks and transcripts are preserved across signature changes because they are
+    expensive, but a plan change (new audio, different --chunk-seconds) can leave
+    `NNN.*` files beyond the new plan. Left alone they were re-transcribed (stale
+    stamp), matched, packaged and declared in the OPF. Returns the number of stale
+    ordinals removed.
+    """
+    audio_extension = book_info["audio_extension"]
+    folder = get_book_folder(book_info)
+    planned_ordinals = {
+        os.path.splitext(chunk["output_name"])[0] for chunk in chunk_plan
+    }
+    # Never touch the copied source audiobook, even if its name looks chunk-like.
+    protected = {os.path.basename(book_info.get("audio_file") or "")}
+    pattern = re.compile(_STALE_CHUNK_RE_TEMPLATE.format(ext=re.escape(audio_extension)))
+
+    stale_ordinals = set()
+    for name in sorted(os.listdir(folder)):
+        match = pattern.match(name)
+        if not match or name in protected or match.group(1) in planned_ordinals:
+            continue
+        os.remove(os.path.join(folder, name))
+        stale_ordinals.add(match.group(1))
+    return len(stale_ordinals)
+
+
+def split_audio(book_info):
+    # The chapter markers embedded in the audiobook are useful for creating chunks, but
+    # they are not trusted as final semantic matches to the book text. They simply give
+    # us manageable audio segments for transcription and later matching. By default the
+    # chunks are stream-copied so the packaged overlay keeps source audio quality.
+    chunk_plan = plan_audio_chunks(book_info)
+    split_stats = {
+        "reused_chunk_count": 0,
+        "regenerated_chunk_count": 0,
+        "created_chunk_count": 0,
+        "pruned_chunk_count": prune_stale_chunk_artifacts(book_info, chunk_plan),
+    }
+    pending_chunks = []
+
+    for chunk_info in chunk_plan:
+        output_path = resolve_book_path(book_info, chunk_info["output_name"])
+        if is_audio_chunk_complete(book_info, chunk_info):
+            split_stats["reused_chunk_count"] += 1
+            continue
+        if os.path.exists(output_path):
+            split_stats["regenerated_chunk_count"] += 1
+        else:
+            split_stats["created_chunk_count"] += 1
+        pending_chunks.append(chunk_info)
+
+    if not pending_chunks:
+        return split_stats
+
+    split_jobs = max(1, min(int(book_info.get("split_jobs", 1)), os.cpu_count() or 1))
+    if split_jobs == 1 or len(pending_chunks) == 1:
+        for chunk_info in tqdm(pending_chunks, desc="Splitting audio", unit="chunk"):
+            split_audio_chunk(book_info, chunk_info)
+        return split_stats
+
+    with ThreadPoolExecutor(max_workers=split_jobs) as executor:
+        futures = {
+            executor.submit(split_audio_chunk, book_info, chunk_info): chunk_info
+            for chunk_info in pending_chunks
+        }
+        try:
+            for future in tqdm(as_completed(futures), total=len(futures), desc="Splitting audio", unit="chunk"):
+                future.result()
+        except Exception:
+            for future in futures:
+                future.cancel()
+            raise
+    return split_stats
+
+
+def print_nonzero_summary(label, counters):
+    parts = [f"{value} {name}" for name, value in counters if value]
+    if parts:
+        print(f"{label}: " + ", ".join(parts))
+
+
+def transcribe_audio(book_info):
+    # Transcription is per split audio chunk, not against the original source audio. The
+    # sibling JSON files become the canonical transcript inputs for both matching and
+    # fine-grained timestamp alignment.
+    backend = book_info.get("backend") or detect_transcription_backend()
+    model = book_info.get("model") or default_model_for_backend(backend)
+    language = book_info.get("language") or "en"
+    batch_size = int(book_info.get("batch_size") or 1)
+
+    for file in tqdm(
+        planned_chunk_basenames(book_info),
+        desc="Transcribing audio",
+        unit="chunk",
+    ):
+        json_file = transcript_basename(file, book_info["audio_extension"])
+        chunk_path = resolve_book_path(book_info, file)
+        json_path = resolve_book_path(book_info, json_file)
+        # Skip only if a prior transcript exists AND its stamp matches the current
+        # model/language/backend AND references the current chunk stamp. A stampless
+        # or mismatched transcript (different config, or a crash-truncated file that
+        # never got its stamp) is re-transcribed rather than silently reused.
+        expected_stamp = transcript_compatibility_stamp(
+            book_info, read_compatibility_stamp(chunk_path)
+        )
+        if os.path.exists(json_path) and stamp_matches(json_path, expected_stamp):
+            continue
+
+        stdout_buffer = io.StringIO()
+        stderr_buffer = io.StringIO()
+        try:
+            with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
+                result = transcribe_file(
+                    chunk_path,
+                    model,
+                    language,
+                    backend,
+                    batch_size,
+                )
+        except Exception as exc:
+            error_output = (stderr_buffer.getvalue() or stdout_buffer.getvalue()).strip()
+            if error_output:
+                raise RuntimeError(
+                    f"transcription failed for {file}: {error_output}"
+                ) from exc
+            raise RuntimeError(f"transcription failed for {file}: {exc}") from exc
+
+        # Write the transcript atomically, then its stamp last, so an interrupted
+        # write leaves neither a truncated transcript at the final path nor a stamp.
+        atomic_write_json_local(json_path, result)
+        write_compatibility_stamp(json_path, expected_stamp)
+
+
+
+# === Semantic / lexical matching between transcripts and HTML ===
+
+
+# Coarse-matcher tuning. Only tokens of at least MATCH_TOKEN_MIN_LENGTH characters
+# take part in the multiset-overlap prefilter (short function words are noise); a
+# window needs MATCH_OVERLAP_THRESHOLD such shared tokens and a blended score of
+# MATCH_SCORE_THRESHOLD to be accepted. The top MATCH_TOP_K_WINDOWS overlap
+# candidates are rescored with a sequence ratio over the probe-length prefix.
+MATCH_PROBE_TOKENS = 120
+MATCH_TOKEN_MIN_LENGTH = 4
+MATCH_OVERLAP_THRESHOLD = 6
+MATCH_SCORE_THRESHOLD = 0.35
+MATCH_TOP_K_WINDOWS = 24
+# When a transcript continues into the next spine file, rewind the audio cursor by
+# this many tokens so the next span re-checks the overlap region instead of
+# dropping boundary words.
+CONTINUATION_OVERLAP_BACKTRACK = 24
+
+
+def match_tokens_of(tokens):
+    return [token for token in tokens if len(token) >= MATCH_TOKEN_MIN_LENGTH]
+
+
+def score_probe_candidates(probe_tokens, probe_match_tokens, candidates, min_allowed_index):
+    """Pick the best candidate window for a transcript probe.
+
+    Two-stage lexical scoring: a cheap multiset token-overlap count ranks every
+    candidate, then the top MATCH_TOP_K_WINDOWS are rescored with a difflib ratio
+    over the probe-length prefix. The final score blends overlap (0.7), sequence
+    ratio (0.3) and a small forward-order bonus for windows at or after
+    `min_allowed_index`. Returns (candidate or None, score, overlap_count).
+    """
+    if not probe_match_tokens or not candidates:
+        return None, 0.0, 0
+
+    probe_counter = Counter(probe_match_tokens)
+    overlap_scored = []
+    for candidate in candidates:
+        overlap_count = sum(
+            min(probe_counter[token], candidate["match_counter"].get(token, 0))
+            for token in probe_counter
+        )
+        if overlap_count > 0:
+            overlap_scored.append((overlap_count, candidate))
+    if not overlap_scored:
+        return None, 0.0, 0
+
+    overlap_scored.sort(key=lambda item: (item[0], -item[1]["global_index"]), reverse=True)
+
+    best_match, best_score, best_overlap = None, 0.0, 0
+    for overlap_count, candidate in overlap_scored[:MATCH_TOP_K_WINDOWS]:
+        sequence_score = difflib.SequenceMatcher(
+            None,
+            candidate["window_tokens"][: len(probe_tokens)],
+            probe_tokens,
+            autojunk=False,
+        ).ratio()
+        overlap_score = overlap_count / max(1, len(probe_match_tokens))
+        order_bonus = 0.02 if candidate["global_index"] >= min_allowed_index else 0.0
+        combined_score = (overlap_score * 0.7) + (sequence_score * 0.3) + order_bonus
+        if combined_score > best_score:
+            best_match, best_score, best_overlap = candidate, combined_score, overlap_count
+
+    return best_match, best_score, best_overlap
+
+
+def select_short_page_match(probe_tokens, candidates, last_matched_html_order):
+    """Short-page fallback for when the regular scorer rejects a transcript.
+
+    Tiny divider/heading pages ("PART 6 / THE GREEN CARD MAN") cannot reach the
+    overlap/score thresholds even when the narration opens with exactly that text.
+    Accept the first candidate that (a) is a whole short page, (b) does not move
+    backward in spine order (a hard gate, unlike the soft bias of the main path)
+    and (c) whose tokens appear as a contiguous run at the start of the probe.
+    """
+    for candidate in candidates:
+        if not is_short_page_candidate(candidate):
+            continue
+        if candidate["html_order"] < last_matched_html_order:
+            continue
+        if probe_contains_page_prefix(probe_tokens, candidate["window_tokens"]):
+            return candidate
+    return None
+
+
+def _index_epub_windows(epub_path, stats):
+    """Tokenize every spine HTML file and cut it into overlapping match windows.
+
+    Returns (html_files, candidates, candidates_by_file, html_token_map). Each
+    candidate carries file identity, token offsets, lexical counters and a global
+    reading-order index used for the soft forward bias.
+    """
+    candidates = []
+    candidates_by_file = defaultdict(list)
+    html_token_map = {}
+
+    with zipfile.ZipFile(epub_path, "r") as zf:
+        html_files = get_spine_ordered_html_files(zf)
+        for html_order, file_name in enumerate(tqdm(html_files, desc="Indexing EPUB", unit="file")):
+            try:
+                with zf.open(file_name) as handle:
+                    raw_html = handle.read()
+                try:
+                    html_content = raw_html.decode("utf-8")
+                except UnicodeDecodeError:
+                    stats["decode_fallbacks"] += 1
+                    html_content = raw_html.decode("latin-1", errors="replace")
+                soup = BeautifulSoup(html_content, "lxml")
+                for script_or_style in soup(["script", "style"]):
+                    script_or_style.decompose()
+                token_items = extract_text_token_items(soup.get_text(separator=" ", strip=True))
+            except Exception as exc:
+                raise RuntimeError(f"Could not index HTML file {file_name!r} for matching: {exc}") from exc
+
+            if len(token_items) < SHORT_PAGE_MIN_TOKENS:
+                stats["html_skipped_short"] += 1
+                continue
+            html_token_map[file_name] = token_items
+
+            # Overlapping windows let a transcript opening land near the middle of a
+            # long chapter and still score well; short pages get one full-file window.
+            for window_index, (window_start, window_end) in enumerate(build_match_windows(token_items)):
+                window_items = token_items[window_start:window_end]
+                window_tokens = [token["token"] for token in window_items]
+                candidate = {
+                    "file_name": file_name,
+                    "html_order": html_order,
+                    "window_index": window_index,
+                    "window_start": window_start,
+                    "window_end": window_end,
+                    "text_preview": " ".join(token["display"] for token in window_items)[:200],
+                    "window_tokens": window_tokens,
+                    "match_counter": Counter(match_tokens_of(window_tokens)),
+                    "global_index": len(candidates),
+                }
+                candidates.append(candidate)
+                candidates_by_file[file_name].append(candidate)
+
+    return html_files, candidates, candidates_by_file, html_token_map
+
+
+def _span_record(json_file, candidate, score, span_index, audio_start_index, audio_token_count):
+    return {
+        "json_file": json_file,
+        "html_file": candidate["file_name"],
+        "score": float(score),
+        "html_order": candidate["html_order"],
+        "window_index": candidate["window_index"],
+        "window_start": candidate["window_start"],
+        "window_end": candidate["window_end"],
+        "candidate_index": candidate["global_index"],
+        "span_index": span_index,
+        "audio_start_index": audio_start_index,
+        "audio_end_index": audio_token_count - 1,
+    }
+
+
+def _extend_with_continuations(json_file, audio_tokens, primary, html_files, candidates_by_file, html_token_map, stats):
+    """Attach the next consecutive spine files as further spans of one transcript.
+
+    A chapter's audio often runs past the end of its HTML file into the next one
+    (or the transcript starts mid-file). After the primary match, walk an audio
+    cursor forward and accept the next spine file while its opening scores well
+    against the remaining transcript.
+    """
+    span_matches = [_span_record(json_file, primary, primary["_score"], 0, 0, len(audio_tokens))]
+
+    alignment = align_tokens(
+        html_token_map.get(primary["file_name"], []),
+        audio_tokens,
+        0,
+        len(audio_tokens) - 1,
+        window_start=primary["window_start"],
+        window_end=primary["window_end"],
+    )
+    cursor = 0
+    if alignment and alignment["max_audio_idx"] >= 0:
+        cursor = max(0, alignment["max_audio_idx"] - CONTINUATION_OVERLAP_BACKTRACK + 1)
+
+    current_html_order = primary["html_order"]
+    while cursor < len(audio_tokens):
+        next_html_order = current_html_order + 1
+        if next_html_order >= len(html_files):
+            break
+        next_file = html_files[next_html_order]
+        next_candidates = [
+            candidate
+            for candidate in candidates_by_file.get(next_file, [])
+            if candidate["window_start"] <= MATCH_WINDOW_SIZE * 2
+        ] or candidates_by_file.get(next_file, [])
+        if not next_candidates:
+            break
+
+        probe_tokens = [
+            item["token"] for item in audio_tokens[cursor : cursor + MATCH_PROBE_TOKENS] if item["token"]
+        ]
+        probe_match_tokens = match_tokens_of(probe_tokens)
+        if not probe_match_tokens:
+            break
+
+        candidate, score, overlap = score_probe_candidates(
+            probe_tokens, probe_match_tokens, next_candidates, primary["global_index"]
+        )
+        if candidate is None or score < MATCH_SCORE_THRESHOLD or overlap < MATCH_OVERLAP_THRESHOLD:
+            break
+
+        alignment = align_tokens(
+            html_token_map.get(next_file, []),
+            audio_tokens,
+            cursor,
+            len(audio_tokens) - 1,
+            window_start=candidate["window_start"],
+            window_end=candidate["window_end"],
+        )
+        if not alignment or alignment["max_audio_idx"] <= cursor:
+            break
+
+        span_matches.append(_span_record(json_file, candidate, score, len(span_matches), cursor, len(audio_tokens)))
+        cursor = max(cursor, alignment["max_audio_idx"] - CONTINUATION_OVERLAP_BACKTRACK + 1)
+        current_html_order = next_html_order
+        stats["continuation_spans"] += 1
+
+    # Each span's audio end is back-filled from the next span's start so spans
+    # never overlap.
+    for index, span_match in enumerate(span_matches):
+        next_start = (
+            span_matches[index + 1]["audio_start_index"]
+            if index + 1 < len(span_matches)
+            else len(audio_tokens)
+        )
+        span_match["audio_end_index"] = max(span_match["audio_start_index"], next_start - 1)
+    return span_matches
+
+
+def link_html_with_audio(book_info):
+    """Map each transcript chunk onto the HTML file(s) it narrates.
+
+    Matching model: build overlapping token windows over every spine HTML file, then
+    score each transcript's opening against those windows. This supports mid-file
+    starts and multi-chunk chapters. It decides *which text*, not timestamps; see
+    create_smil_files for the fine alignment.
+    """
+    epub_path = book_info.get("epub_file")
+    if not epub_path:
+        raise RuntimeError("book_info['epub_file'] is required for matching")
+    epub_path = resolve_book_path(book_info, epub_path)
+    if not os.path.exists(epub_path):
+        raise FileNotFoundError(f"EPUB file not found at path: {epub_path}")
+
+    index_stats = {"decode_fallbacks": 0, "html_skipped_short": 0}
+    html_files, candidates, candidates_by_file, html_token_map = _index_epub_windows(
+        epub_path, index_stats
+    )
+    if not candidates:
+        print(f"❌ No matchable HTML text found in EPUB: {epub_path}. Matched list will be empty.")
+        return []
+    print_nonzero_summary(
+        "Indexing summary",
+        [
+            ("decode fallback(s)", index_stats["decode_fallbacks"]),
+            ("short/empty HTML file(s) skipped", index_stats["html_skipped_short"]),
+        ],
+    )
+
+    # Transcripts are addressed via the chunk plan, not a directory glob, so a stale
+    # NNN.json from an older plan is never matched. A planned transcript that is
+    # missing is skipped here and reported by validation (missing_transcripts).
+    json_files = [
+        transcript_basename(name, book_info["audio_extension"])
+        for name in planned_chunk_basenames(book_info)
+    ]
+    json_files = [name for name in json_files if os.path.exists(resolve_book_path(book_info, name))]
+    if not json_files:
+        print("❌ No transcript files exist for the chunk plan. Matched list will be empty.")
+        return []
+
+    matched_list = []
+    last_global_index = 0
+    # Spine order of the most recently accepted match: a hard forward-order gate
+    # for the short-page fallback so a divider page is never linked out of order.
+    last_matched_html_order = -1
+    stats = {
+        "matched_transcripts": 0,
+        "short_page_matches": 0,
+        "json_skipped_short": 0,
+        "json_skipped_probe": 0,
+        "no_overlap": 0,
+        "below_threshold": 0,
+        "continuation_spans": 0,
+        "backward_warnings": 0,
+    }
+
+    for json_file in tqdm(json_files, desc="Matching transcripts", unit="file"):
+        try:
+            audio_tokens = load_audio_tokens(resolve_book_path(book_info, json_file))
+        except json.JSONDecodeError as exc:
+            # Stamps guarantee a transcript reaching the matcher was fully written, so
+            # unparseable JSON is real corruption; fail loudly instead of silently
+            # dropping the chunk's chapter from the overlay.
+            raise RuntimeError(
+                f"Transcript {json_file!r} is not valid JSON; its chapter would be "
+                f"silently dropped from the overlay. Re-run the transcribe stage "
+                f"(or delete {json_file!r} and its .meta) to regenerate it: {exc}"
+            ) from exc
+
+        if len(audio_tokens) < SHORT_PAGE_MIN_TOKENS:
+            stats["json_skipped_short"] += 1
+            continue
+
+        # Only the transcript opening is used as the probe text; that is usually
+        # enough to identify the right chapter/window.
+        probe_tokens = [item["token"] for item in audio_tokens[:MATCH_PROBE_TOKENS] if item["token"]]
+        probe_match_tokens = match_tokens_of(probe_tokens)
+        if not probe_match_tokens:
+            stats["json_skipped_probe"] += 1
+            continue
+
+        best_match, best_score, best_overlap = score_probe_candidates(
+            probe_tokens, probe_match_tokens, candidates, max(0, last_global_index - 1)
+        )
+        if best_match is None:
+            stats["no_overlap"] += 1
+            continue
+
+        if best_score >= MATCH_SCORE_THRESHOLD and best_overlap >= MATCH_OVERLAP_THRESHOLD:
+            primary = dict(best_match, _score=best_score)
+            spans = _extend_with_continuations(
+                json_file, audio_tokens, primary, html_files, candidates_by_file, html_token_map, stats
+            )
+        else:
+            short_match = select_short_page_match(probe_tokens, candidates, last_matched_html_order)
+            if short_match is None:
+                stats["below_threshold"] += 1
+                continue
+            spans = [_span_record(json_file, short_match, best_score, 0, 0, len(audio_tokens))]
+            stats["short_page_matches"] += 1
+
+        matched_list.extend(spans)
+        stats["matched_transcripts"] += 1
+        last_global_index = spans[-1]["candidate_index"]
+        last_matched_html_order = max(last_matched_html_order, spans[-1]["html_order"])
+
+        # Diagnostic only: count suspicious backward jumps in spine order (front
+        # matter such as an introduction is exempt).
+        if len(matched_list) >= 2:
+            previous, current = matched_list[-2], matched_list[-1]
+            previous_name = previous["html_file"].lower()
+            if current["html_order"] < previous["html_order"] and not any(
+                marker in previous_name for marker in ("introduction", "preface", "intro")
+            ):
+                stats["backward_warnings"] += 1
+
+    print_nonzero_summary(
+        "Matching summary",
+        [
+            ("matched transcript(s)", stats["matched_transcripts"]),
+            ("transcript-to-HTML link(s)", len(matched_list)),
+            ("short divider-page match(es)", stats["short_page_matches"]),
+            ("additional consecutive span(s)", stats["continuation_spans"]),
+            ("low-content transcript(s) skipped", stats["json_skipped_short"]),
+            ("transcript(s) skipped for missing probe tokens", stats["json_skipped_probe"]),
+            ("transcript(s) with no lexical overlap", stats["no_overlap"]),
+            ("transcript(s) below threshold", stats["below_threshold"]),
+            ("backward-order warning(s)", stats["backward_warnings"]),
+        ],
+    )
+    return matched_list
+
+
+# === Segment marking and alignment helpers ===
+
+
+def _load_reference_sets(zip_file, book_info):
+    """Build (referenced_classes, referenced_ids) for the whole EPUB, or None.
+
+    These drive `mark_sentences`' redundant-markup cleanup. The cleaner treats the
+    sets as complete, so an empty set would strip *every* class and id. When the
+    index cannot be built (no OPF recorded, unreadable OPF, indexer error) return
+    None so the caller skips cleanup altogether instead of destroying the markup.
+    """
+    opf_file = book_info.get("opf_file")
+    opf_dir = book_info.get("opf_dir") or "."
+    if not opf_file:
+        warnings.warn("No OPF recorded in book_info; skipping redundant-markup cleanup")
+        return None
+    try:
+        with zip_file.open(opf_file) as handle:
+            opf_soup = BeautifulSoup(handle.read(), "xml")
+        return build_reference_index(zip_file, opf_soup, opf_dir)
+    except Exception as error:
+        warnings.warn(
+            f"Could not build EPUB reference index ({error!r}); "
+            "skipping redundant-markup cleanup"
+        )
+        return None
+
+
+def mark_segments(book_info):
+    # Segment ids belong to HTML files, not to audio files. If multiple audio chunks
+    # map to the same HTML chapter, we still want one consistent set of segment ids in
+    # that HTML file, so we process each HTML file at most once here.
+    matched_items = normalize_matched_list(book_info["matched_list"])
+    replacements = {}
+    language = book_info.get("language") or "en"
+    css_zip_path = (
+        f"{book_info['opf_dir']}/readaloud.css"
+        if book_info["opf_dir"] != "."
+        else "readaloud.css"
+    )
+
+    working_epub = resolve_book_path(book_info, book_info["out_file"])
+    with zipfile.ZipFile(working_epub, "r") as f:
+        reference_sets = _load_reference_sets(f, book_info)
+        referenced_classes, referenced_ids = reference_sets or (None, None)
+        processed_html_files = set()
+        for item in matched_items:
+            html_file_name = item["html_file"]
+            if html_file_name in processed_html_files:
+                continue
+
+            processed_html_files.add(html_file_name)
+            with f.open(html_file_name) as html_file:
+                html_content = html_file.read()
+
+            replacements[html_file_name] = mark_sentences(
+                html_content,
+                make_segment_prefix(html_file_name),
+                language=language,
+                referenced_classes=referenced_classes,
+                referenced_ids=referenced_ids,
+                css_href=get_relative_zip_href(html_file_name, css_zip_path),
+            )
+
+    if replacements:
+        replace_files_in_zip(working_epub, replacements)
+
+
+def clean_token(text):
+    """Normalize text for alignment: lowercase and alpha-numeric only."""
+    if not text:
+        return ""
+    return re.sub(r"[^\w]", "", text.lower())
+
+
+# Hyphen-like separators that ASR engines usually treat as word boundaries.
+# A compound such as "dry-swallowed" appears as one whitespace token in the HTML
+# but WhisperX emits it as two words ("dry", "swallowed"). Splitting on these
+# before `clean_token` keeps both token streams at the same granularity so the
+# sequence aligner can match them. Apostrophes are intentionally NOT split:
+# "don't" -> "dont" already matches the single ASR word.
+_HYPHEN_SPLIT_RE = re.compile(r"[-\u2010\u2011\u2012\u2013\u2014\u2015]")
+
+
+def split_into_match_tokens(word):
+    """Split one whitespace word into one-or-more normalized alignment tokens.
+
+    Splits on hyphen/dash characters first, then normalizes each piece with
+    `clean_token`, dropping pieces that normalize to empty.
+    """
+    if not word:
+        return []
+    tokens = []
+    for piece in _HYPHEN_SPLIT_RE.split(word):
+        token = clean_token(piece)
+        if token:
+            tokens.append(token)
+    return tokens
+
+
+def sanitize_identifier(value):
+    value = re.sub(r"[^0-9A-Za-z]+", "_", value).strip("_").lower()
+    if not value:
+        return "item"
+    if value[0].isdigit():
+        value = "item_" + value
+    return value
+
+
+def make_segment_prefix(html_file):
+    return f"seg_{sanitize_identifier(posixpath.splitext(html_file)[0])}"
+
+
+def make_overlay_basename(html_file):
+    return f"{sanitize_identifier(posixpath.splitext(html_file)[0])}.smil"
+
+
+def make_overlay_id(html_file):
+    return f"html_overlay.{sanitize_identifier(posixpath.splitext(html_file)[0])}"
+
+
+def normalize_match_item(item):
+    """Return a copy of a matched_list.json record with every field typed and present.
+
+    Records are always written by link_html_with_audio as dicts; the defaults only
+    guard against hand-edited files.
+    """
+    if not isinstance(item, dict):
+        raise ValueError(f"Unsupported matched item: {item!r}")
+    normalized = dict(item)
+    normalized["json_file"] = normalized.get("json_file", "")
+    normalized["html_file"] = normalized.get("html_file", "")
+    normalized["score"] = float(normalized.get("score", 0.0))
+    normalized["window_start"] = int(normalized.get("window_start", 0))
+    normalized["window_end"] = int(normalized.get("window_end", normalized["window_start"]))
+    normalized["html_order"] = int(normalized.get("html_order", 0))
+    normalized["candidate_index"] = int(
+        normalized.get("candidate_index", normalized.get("window_index", 0))
+    )
+    normalized["span_index"] = int(normalized.get("span_index", 0))
+    normalized["audio_start_index"] = int(normalized.get("audio_start_index", 0))
+    normalized["audio_end_index"] = int(normalized.get("audio_end_index", -1))
+    return normalized
+
+
+def normalize_matched_list(matched_list):
+    return [normalize_match_item(item) for item in matched_list]
+
+
+def sort_matched_items(matched_list):
+    return sorted(
+        normalize_matched_list(matched_list),
+        key=lambda item: (
+            item["json_file"],
+            item["span_index"],
+            item["html_order"],
+            item["candidate_index"],
+        ),
+    )
+
+
+def iter_matched_json_groups(matched_list):
+    grouped = {}
+    for item in sort_matched_items(matched_list):
+        grouped.setdefault(item["json_file"], []).append(item)
+    return grouped.items()
+
+
+def extract_text_token_items(text):
+    token_items = []
+    for word in text.split():
+        for token in split_into_match_tokens(word):
+            token_items.append({"display": word, "token": token})
+    return token_items
+
+
+# Matching window tuning. The regular path builds overlapping windows of
+# MATCH_WINDOW_SIZE tokens and discards windows shorter than MATCH_WINDOW_MIN_TOKENS
+# so a transcript opening can still anchor inside a long chapter. Short divider/
+# heading pages (e.g. "PART 6 / THE GREEN CARD MAN") are shorter than that minimum
+# and would otherwise produce no candidate at all; SHORT_PAGE_MIN_TOKENS mirrors the
+# indexing gate so such pages still get a single full-file window to match against.
+MATCH_WINDOW_SIZE = 160
+MATCH_WINDOW_STEP = 80
+MATCH_WINDOW_MIN_TOKENS = 20
+SHORT_PAGE_MIN_TOKENS = 5
+# When the regular scorer fails, a short page can still be linked if (most of) its
+# token sequence appears as a contiguous run at the start of the transcript probe.
+# SHORT_PAGE_PREFIX_MAX_OFFSET tolerates a leading stray ASR token or two on the
+# probe side. SHORT_PAGE_HEADER_SKIP tolerates running-header tokens on the page
+# side (e.g. a per-page "11/22/63" head that is printed but not spoken).
+SHORT_PAGE_PREFIX_MAX_OFFSET = 2
+SHORT_PAGE_HEADER_SKIP = 2
+# A short-page match must consecutively cover at least this fraction of the page's
+# tokens (and at least SHORT_PAGE_MIN_RUN tokens) so trivial 1-2 word coincidences
+# do not trigger a match.
+SHORT_PAGE_MIN_COVER_RATIO = 0.6
+SHORT_PAGE_MIN_RUN = 3
+
+
+def build_match_windows(token_items):
+    """Build (window_start, window_end) ranges over a file's token stream.
+
+    Mirrors the regular overlapping-window logic, but guarantees a single
+    full-file window for short pages (>= SHORT_PAGE_MIN_TOKENS but too short to
+    yield a regular window). Returns [] for pages below the indexing gate.
+    """
+    token_count = len(token_items)
+    if token_count < SHORT_PAGE_MIN_TOKENS:
+        return []
+
+    max_start = max(0, token_count - MATCH_WINDOW_SIZE)
+    window_starts = list(range(0, max_start + 1, MATCH_WINDOW_STEP)) or [0]
+    if window_starts[-1] != max_start:
+        window_starts.append(max_start)
+
+    window_ranges = []
+    for window_start in window_starts:
+        window_end = min(token_count, window_start + MATCH_WINDOW_SIZE)
+        if window_end - window_start < MATCH_WINDOW_MIN_TOKENS:
+            continue
+        window_ranges.append((window_start, window_end))
+
+    # Short page: every regular window was dropped for being too short. Fall back to
+    # one window spanning the whole page so it can still be a match candidate.
+    if not window_ranges:
+        window_ranges.append((0, token_count))
+
+    return window_ranges
+
+
+def is_short_page_candidate(candidate):
+    """A candidate that represents an entire short divider/heading page."""
+    return (
+        candidate["window_start"] == 0
+        and candidate["window_end"] < MATCH_WINDOW_MIN_TOKENS
+    )
+
+
+def probe_contains_page_prefix(probe_tokens, page_tokens, max_offset=SHORT_PAGE_PREFIX_MAX_OFFSET):
+    """True if (most of) the page's heading is spoken contiguously at the probe start.
+
+    A short divider page like "11/22/63 PART 6 THE GREEN CARD MAN" carries a printed
+    running header ("11/22/63") that is not spoken, so an exact whole-page prefix
+    match would fail. This accepts a match when a contiguous suffix of the page
+    tokens (after skipping up to SHORT_PAGE_HEADER_SKIP leading header tokens) occurs
+    as a contiguous run beginning within `max_offset` tokens of the probe start, and
+    that run covers at least max(ceil(SHORT_PAGE_MIN_COVER_RATIO * len(page)),
+    SHORT_PAGE_MIN_RUN) page tokens. Comparison uses raw cleaned tokens (no length
+    filter) so short heading words like "the"/"man" still count.
+    """
+    if not page_tokens or not probe_tokens:
+        return False
+
+    min_run = max(
+        SHORT_PAGE_MIN_RUN,
+        math.ceil(SHORT_PAGE_MIN_COVER_RATIO * len(page_tokens)),
+    )
+    if min_run > len(probe_tokens):
+        return False
+
+    # Try dropping 0..SHORT_PAGE_HEADER_SKIP leading (header) tokens from the page,
+    # as long as enough page tokens remain to satisfy the minimum run.
+    max_header_skip = min(SHORT_PAGE_HEADER_SKIP, len(page_tokens) - min_run)
+    for header_skip in range(0, max_header_skip + 1):
+        run = page_tokens[header_skip:]
+        if len(run) > len(probe_tokens):
+            continue
+        last_start = min(max_offset, len(probe_tokens) - len(run))
+        for offset in range(0, last_start + 1):
+            if probe_tokens[offset : offset + len(run)] == run:
+                return True
+    return False
+
+
+def load_audio_tokens(json_file):
+    # WhisperX outputs can appear either as top-level `word_segments` or nested under
+    # per-segment `words`. This loader normalizes both layouts into one token stream.
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    audio_data = data.get("word_segments")
+    if audio_data is None:
+        audio_data = []
+        for segment in data.get("segments", []):
+            audio_data.extend(segment.get("words", []))
+
+    audio_tokens = []
+    for word_info in audio_data:
+        word = word_info.get("word", "")
+        if "start" not in word_info or "end" not in word_info:
+            continue
+        # If ASR ever emits a single hyphenated word, split it to stay symmetric
+        # with the HTML side. Each sub-token reuses the parent word's start/end;
+        # the alignment envelope only uses min-start/max-end, so the segment span
+        # stays correct without fragile per-character time splitting.
+        for token in split_into_match_tokens(word):
+            audio_tokens.append(
+                {
+                    "token": token,
+                    "word": word,
+                    "start": word_info["start"],
+                    "end": word_info["end"],
+                }
+            )
+
+    return audio_tokens
+
+
+def load_html_segments_and_tokens(zip_path, html_file):
+    # After `mark_segments()`, each HTML file contains stable `*-segment` ids. This
+    # helper loads the marked HTML and flattens it into segment-aware token records so
+    # transcript alignment can map from token matches back to segment ids.
+    with zipfile.ZipFile(zip_path, "r") as z:
+        with z.open(html_file) as f:
+            soup = BeautifulSoup(f, "lxml")
+
+    segments = soup.select('[id*="-segment"]')
+    html_tokens = []
+    for seg_index, seg in enumerate(segments):
+        seg_text = seg.get_text()
+        seg_id = seg.get("id")
+        for word in seg_text.split():
+            for token in split_into_match_tokens(word):
+                html_tokens.append(
+                    {"token": token, "seg_id": seg_id, "seg_index": seg_index}
+                )
+
+    return segments, html_tokens
+
+
+def build_raw_matches(opcodes, html_tokens, audio_tokens, html_offset=0, audio_offset=0):
+    """Turn SequenceMatcher equal-runs into per-segment timestamp envelopes + stats.
+
+    Returns a dict with `raw_matches` ({seg_id: envelope}, only for HTML tokens that
+    carry a `seg_id`; the coarse matcher's tokens do not), `matched_token_count`,
+    `max_html_idx`, `min_audio_idx` and `max_audio_idx` (absolute indices).
+    """
+    raw_matches = {}
+    matched_token_count = 0
+    max_html_idx = html_offset - 1
+    min_audio_idx = None
+    max_audio_idx = audio_offset - 1
+
+    for tag, i1, i2, j1, j2 in opcodes:
+        if tag != "equal":
+            continue
+
+        for relative_html_idx in range(i1, i2):
+            offset = relative_html_idx - i1
+            audio_idx = audio_offset + j1 + offset
+            if audio_idx >= len(audio_tokens):
+                break
+
+            html_idx = html_offset + relative_html_idx
+            html_token = html_tokens[html_idx]
+            audio_info = audio_tokens[audio_idx]
+            seg_id = html_token.get("seg_id")
+
+            if seg_id is not None:
+                envelope = raw_matches.setdefault(
+                    seg_id,
+                    {
+                        "start": audio_info["start"],
+                        "end": audio_info["end"],
+                        "audio_text_parts": [],
+                        "segment_index": html_token["seg_index"],
+                    },
+                )
+                envelope["start"] = min(envelope["start"], audio_info["start"])
+                envelope["end"] = max(envelope["end"], audio_info["end"])
+                envelope["audio_text_parts"].append((audio_idx, audio_info["word"]))
+
+            matched_token_count += 1
+            max_html_idx = max(max_html_idx, html_idx)
+            min_audio_idx = audio_idx if min_audio_idx is None else min(min_audio_idx, audio_idx)
+            max_audio_idx = max(max_audio_idx, audio_idx)
+
+    return {
+        "raw_matches": raw_matches,
+        "matched_token_count": matched_token_count,
+        "max_html_idx": max_html_idx,
+        "min_audio_idx": min_audio_idx,
+        "max_audio_idx": max_audio_idx,
+    }
+
+
+def alignment_search_ranges(html_token_count, audio_token_count, window_start, window_end, prefix_only):
+    """Progressively widening (start, end) HTML token ranges to try, cheapest first.
+
+    Starting near the matched window keeps difflib fast on long chapters; the later
+    ranges recover from a poor hint. `prefix_only` is for continuation spans, whose
+    audio starts at the top of the next file.
+    """
+    if prefix_only:
+        prefix_end = min(
+            html_token_count,
+            max(window_end + audio_token_count + 200, audio_token_count + 600),
+        )
+        ranges = [(0, prefix_end)]
+        if prefix_end < html_token_count:
+            ranges.append((0, html_token_count))
+        return ranges
+
+    search_start = min(html_token_count, max(0, window_start - 250))
+    search_end = min(
+        html_token_count,
+        max(window_end + audio_token_count + 400, search_start + audio_token_count + 1200),
+    )
+    ranges = [(search_start, max(search_start, search_end))]
+    if search_end < html_token_count:
+        ranges.append((search_start, html_token_count))
+    if search_start > 0:
+        ranges.append((0, html_token_count))
+    return ranges
+
+
+def align_tokens(
+    html_tokens,
+    audio_tokens,
+    audio_start,
+    audio_end,
+    *,
+    window_start,
+    window_end,
+    prefix_only=False,
+):
+    """Align audio_tokens[audio_start:audio_end + 1] against html_tokens.
+
+    Tries the widening search ranges in order and stops once enough tokens match
+    (25 or 20% of the slice). Returns the best build_raw_matches() result, or None
+    when there is nothing to align. Used by both the coarse matcher (to estimate how
+    far into a transcript an HTML file reaches) and SMIL generation (to time
+    segments); the HTML tokens need a `seg_id` only for the latter.
+    """
+    audio_slice = audio_tokens[audio_start : audio_end + 1]
+    if not audio_slice or not html_tokens:
+        return None
+    audio_values = [token["token"] for token in audio_slice]
+    good_enough = max(25, int(len(audio_slice) * 0.2))
+
+    best = None
+    for range_start, range_end in alignment_search_ranges(
+        len(html_tokens), len(audio_slice), window_start, window_end, prefix_only
+    ):
+        if range_end <= range_start:
+            continue
+        matcher = difflib.SequenceMatcher(
+            None,
+            [token["token"] for token in html_tokens[range_start:range_end]],
+            audio_values,
+            autojunk=False,
+        )
+        result = build_raw_matches(
+            matcher.get_opcodes(),
+            html_tokens,
+            audio_tokens,
+            html_offset=range_start,
+            audio_offset=audio_start,
+        )
+        if best is None or result["matched_token_count"] > best["matched_token_count"]:
+            best = result
+        if result["matched_token_count"] >= good_enough:
+            break
+    return best
+
+
+def build_segment_match_list(raw_matches, segments):
+    # Raw equal-token matches are usually sparse and jagged. This function turns them
+    # into a segment-ordered list before later timing normalization.
+    matched_ordered_list = []
+    for seg_index, seg in enumerate(segments):
+        seg_id = seg.get("id")
+        if seg_id not in raw_matches:
+            continue
+
+        data = raw_matches[seg_id]
+        data["audio_text_parts"].sort(key=lambda x: x[0])
+        matched_ordered_list.append(
+            {
+                "id": seg_id,
+                "segment_index": seg_index,
+                "start": float(data["start"]),
+                "end": float(data["end"]),
+                "audio_text": " ".join(word for _, word in data["audio_text_parts"]),
+            }
+        )
+
+    return matched_ordered_list
+
+
+def fill_interior_segment_gaps(matched_ordered_list, segments):
+    # Safety net: a text segment can fail to match any audio word (e.g. a token
+    # granularity mismatch the aligner could not bridge). Without this, the segment
+    # is dropped entirely and its on-screen text gets no highlight while the
+    # neighboring segment silently absorbs its audio span.
+    #
+    # For every UNMATCHED segment that sits strictly between two matched segments
+    # (an interior gap), synthesize an entry by interpolating evenly across the
+    # gap [prev.end, next.start]. Gaps before the first or after the last matched
+    # segment are left alone: there is no reliable anchor to interpolate from.
+    # Non-positive gaps (next start <= prev end) are also left alone to avoid
+    # introducing overlapping clips.
+    if len(matched_ordered_list) < 2:
+        return list(matched_ordered_list)
+
+    seg_id_by_index = {
+        seg_index: seg.get("id") for seg_index, seg in enumerate(segments)
+    }
+    matched_by_index = {item["segment_index"]: item for item in matched_ordered_list}
+    ordered = sorted(matched_ordered_list, key=lambda item: item["segment_index"])
+
+    filled = []
+    for current, nxt in zip(ordered, ordered[1:]):
+        filled.append(current)
+
+        missing_indices = [
+            seg_index
+            for seg_index in range(current["segment_index"] + 1, nxt["segment_index"])
+            if seg_index not in matched_by_index and seg_index in seg_id_by_index
+        ]
+        if not missing_indices:
+            continue
+
+        gap_start = float(current["end"])
+        gap_end = float(nxt["start"])
+        span = gap_end - gap_start
+        # Only interpolate strictly-positive gaps. When the next matched segment
+        # starts at or before the current segment's end (a non-monotonic envelope,
+        # common right before an ellipsis where the segmenter emits punctuation-only
+        # spans), there is no room to place a placeholder. Inserting one anyway would
+        # pin the current segment's end to the placeholder instead of letting the
+        # finalizer collapse it to the next start, producing an overlapping clip.
+        # Skipping keeps the proven overlap-safe behavior: the unmatched span is
+        # dropped and the surrounding clips stay adjacent.
+        if span <= 0:
+            continue
+
+        steps = len(missing_indices) + 1
+        step = span / steps
+
+        for position, seg_index in enumerate(missing_indices, start=1):
+            point_start = gap_start + step * position
+            filled.append(
+                {
+                    "id": seg_id_by_index[seg_index],
+                    "segment_index": seg_index,
+                    "start": point_start,
+                    "end": point_start,
+                    "audio_text": "",
+                    "interpolated": True,
+                }
+            )
+
+    filled.append(ordered[-1])
+    return filled
+
+
+def finalize_segment_timestamps(matched_ordered_list, total_duration, anchor_start=True, anchor_end=True):
+    # This finalizer closes gaps between matched segments and optionally anchors the
+    # global chunk boundaries.
+    matched_ordered_list = [dict(item) for item in matched_ordered_list]
+
+    if matched_ordered_list:
+        # Envelopes can be non-monotonic (a jagged difflib run, or punctuation-only
+        # spans matched out of order). Closing gaps from such starts would give the
+        # earlier segment a negative clip (dropped from the SMIL) and let its
+        # neighbours overlap. Clamp each start to never precede the previous one.
+        for i in range(1, len(matched_ordered_list)):
+            previous_start = matched_ordered_list[i - 1]["start"]
+            if matched_ordered_list[i]["start"] < previous_start:
+                matched_ordered_list[i]["start"] = previous_start
+        for i in range(len(matched_ordered_list) - 1):
+            matched_ordered_list[i]["end"] = matched_ordered_list[i + 1]["start"]
+
+        if anchor_start:
+            matched_ordered_list[0]["start"] = 0.0
+        if anchor_end:
+            matched_ordered_list[-1]["end"] = total_duration
+
+    return matched_ordered_list
+
+
+def get_audio_duration(audio_path):
+    """Container-level duration in seconds via ffprobe; raises RuntimeError on failure.
+
+    Returning 0.0 on failure would silently corrupt downstream consumers (a plan of
+    zero chunks, a last segment anchored to 0.0 and dropped from the SMIL), so fail
+    loudly instead of shipping a truncated overlay.
+    """
+    try:
+        return float(
+            subprocess.check_output(
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-show_entries",
+                    "format=duration",
+                    "-of",
+                    "default=noprint_wrappers=1:nokey=1",
+                    audio_path,
+                ],
+                text=True,
+            ).strip()
+        )
+    except Exception as exc:
+        raise RuntimeError(
+            f"Could not determine audio duration for {audio_path!r}: {exc}"
+        ) from exc
+
+
+# === Post-generation validation helpers ===
+
+
+def build_check_result(
+    name, ok, summary, findings=None, metrics=None, skipped=False
+):
+    return {
+        "name": name,
+        "ok": ok,
+        "skipped": skipped,
+        "summary": summary,
+        "findings": findings or [],
+        "metrics": metrics or {},
+    }
+
+
+def get_book_folder(book_info):
+    return book_info.get("folder_name") or os.getcwd()
+
+
+def resolve_book_path(book_info, file_name):
+    if os.path.isabs(file_name):
+        return file_name
+    return os.path.join(get_book_folder(book_info), file_name)
+
+
+# Audio chunks are named `NNN<ext>` (zero-padded index, >= 3 digits) by
+# plan_audio_chunks (see the `output_name` format there). The prepare stage also
+# copies the *source* audiobook into the same working dir under its original name,
+# so a bare `*<ext>` glob would sweep that full-length source file into the
+# transcription / matching / packaging stages when the source extension happens to
+# equal the chunk extension (true by default: source `.m4a` + default `.m4a`
+# chunks). Match chunk names positively rather than trying to exclude the one
+# known source name, so any non-chunk file in the working dir is ignored.
+CHUNK_BASENAME_RE = re.compile(r"^\d{3,}\.[^.]+$")
+
+
+def is_chunk_basename(name, audio_extension):
+    """True if `name` is a split audio chunk (NNN<ext>) for the given extension."""
+    return bool(CHUNK_BASENAME_RE.match(name)) and name.endswith(audio_extension)
+
+
+# EPUB manifest media-type by audio file extension. The packaged chunk extension is
+# configurable (`--audio-extension`) and independent of the codec, so hardcoding
+# `audio/mp4` mislabels e.g. `.mp3`/`.aac`/`.ogg` assets in the OPF manifest.
+_AUDIO_MEDIA_TYPE_BY_EXT = {
+    ".m4a": "audio/mp4",
+    ".m4b": "audio/mp4",
+    ".mp4": "audio/mp4",
+    ".aac": "audio/aac",
+    ".mp3": "audio/mpeg",
+    ".opus": "audio/ogg",
+    ".ogg": "audio/ogg",
+    ".oga": "audio/ogg",
+    ".wav": "audio/wav",
+    ".flac": "audio/flac",
+}
+
+
+def audio_media_type(book_info):
+    """OPF manifest media-type for the configured audio extension."""
+    ext = (book_info.get("audio_extension") or "").lower()
+    return _AUDIO_MEDIA_TYPE_BY_EXT.get(ext, "audio/mp4")
+
+
+def iter_audio_files(book_info):
+    audio_extension = book_info.get("audio_extension")
+    if not audio_extension:
+        return []
+
+    # glob.escape the folder: real book folders contain "[hash]" (e.g.
+    # ".Book [965f3b22].epubmo/run"), and the unescaped brackets are glob
+    # character classes that match nothing, silently returning zero files.
+    pattern = os.path.join(glob.escape(get_book_folder(book_info)), f"*{audio_extension}")
+    return sorted(
+        name
+        for name in (os.path.basename(path) for path in glob.glob(pattern))
+        if is_chunk_basename(name, audio_extension)
+    )
+
+
+def iter_smil_files(book_info):
+    # See iter_audio_files: escape the folder so "[hash]" in the path is treated
+    # literally instead of as a glob character class.
+    pattern = os.path.join(glob.escape(get_book_folder(book_info)), "*.smil")
+    return sorted(os.path.basename(path) for path in glob.glob(pattern))
+
+
+def parse_smil_clock_value(value):
+    if value is None:
+        return None
+
+    value = value.strip()
+    if value.endswith("s"):
+        value = value[:-1]
+
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+
+def get_audio_inventory(book_info):
+    """One record per audio chunk on disk: duration, transcript status and word count.
+
+    Computed once per validation run and shared by every check. Probe failures record
+    a 0.0 duration (a "no coverage" sentinel the checks already handle) and transcript
+    problems are recorded as a status rather than raised, because validation reports
+    problems instead of aborting on them.
+    """
+    inventory = []
+    for audio_file in iter_audio_files(book_info):
+        json_file = os.path.splitext(audio_file)[0] + ".json"
+        json_path = resolve_book_path(book_info, json_file)
+        word_count = 0
+        if not os.path.exists(json_path):
+            transcript_status = "missing_transcript"
+        else:
+            try:
+                word_count = len(load_audio_tokens(json_path))
+                transcript_status = "ok" if word_count >= 1 else "empty_transcript"
+            except Exception:
+                transcript_status = "unreadable_transcript"
+
+        try:
+            duration = get_audio_duration(resolve_book_path(book_info, audio_file))
+        except RuntimeError:
+            duration = 0.0
+
+        inventory.append(
+            {
+                "audio_file": audio_file,
+                "json_file": json_file,
+                "duration": duration,
+                "word_count": word_count,
+                "transcript_status": transcript_status,
+            }
+        )
+    return inventory
+
+
+def substantial_audio_files(inventory, min_duration=180.0, min_words=300):
+    return [
+        item
+        for item in inventory
+        if item["duration"] >= min_duration or item["word_count"] >= min_words
+    ]
+
+
+def parse_smil_audio_refs(book_info):
+    # This is the central SMIL audit parser. It walks every generated SMIL file and
+    # records both per-reference detail and per-audio aggregates used by multiple post
+    # checks such as coverage, duplicate reuse, and invalid clip detection.
+    refs = []
+    clip_totals = defaultdict(float)
+    clip_counts = defaultdict(int)
+    smil_audio_counts = {}
+    smil_files = iter_smil_files(book_info)
+
+    for smil_file in smil_files:
+        smil_path = resolve_book_path(book_info, smil_file)
+        with open(smil_path, "r", encoding="utf-8") as f:
+            soup = BeautifulSoup(f.read(), "xml")
+
+        valid_audio_count = 0
+        for audio_el in soup.find_all("audio"):
+            par = audio_el.find_parent("par")
+            src = os.path.basename(audio_el.get("src", ""))
+            clip_begin_raw = audio_el.get("clipBegin")
+            clip_end_raw = audio_el.get("clipEnd")
+            clip_begin = parse_smil_clock_value(clip_begin_raw)
+            clip_end = parse_smil_clock_value(clip_end_raw)
+            is_valid = (
+                bool(src)
+                and clip_begin is not None
+                and clip_end is not None
+                and clip_end > clip_begin
+            )
+
+            refs.append(
+                {
+                    "smil_file": smil_file,
+                    "par_id": par.get("id") if par else "",
+                    "audio_file": src,
+                    "clip_begin": clip_begin,
+                    "clip_end": clip_end,
+                    "clip_begin_raw": clip_begin_raw,
+                    "clip_end_raw": clip_end_raw,
+                    "valid": is_valid,
+                }
+            )
+
+            if is_valid:
+                valid_audio_count += 1
+                clip_totals[src] += clip_end - clip_begin
+                clip_counts[src] += 1
+
+        smil_audio_counts[smil_file] = valid_audio_count
+
+    return {
+        "smil_files": smil_files,
+        "refs": refs,
+        "clip_totals": dict(clip_totals),
+        "clip_counts": dict(clip_counts),
+        "smil_audio_counts": smil_audio_counts,
+    }
+
+
+def get_packaged_epub_candidates(book_info):
+    # Validation often needs to inspect "the real packaged EPUB", but that is not
+    # always the same file path as `book_info['out_file']`. This helper enumerates the
+    # likely candidates in preference order without yet deciding which one is truly the
+    # processed package.
+    candidates = []
+
+    def add_candidate(path):
+        if path:
+            candidates.append(os.path.normpath(path))
+
+    def add_epub_family(path):
+        path = os.path.normpath(path)
+        if path.endswith(".epub3"):
+            add_candidate(
+                os.path.normpath(
+                    os.path.join(
+                        os.path.dirname(path),
+                        "..",
+                        os.path.basename(path).replace(".epub3", ".epub"),
+                    )
+                )
+            )
+            add_candidate(path)
+            add_candidate(path.replace(".epub3", ".epub"))
+        elif path.endswith(".epub"):
+            add_candidate(path)
+
+    out_file = book_info.get("out_file")
+    if out_file:
+        add_epub_family(resolve_book_path(book_info, out_file))
+
+    epub_file = book_info.get("epub_file")
+    if epub_file:
+        add_epub_family(resolve_book_path(book_info, epub_file))
+
+    seen = set()
+    ordered_candidates = []
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        ordered_candidates.append(candidate)
+
+    return ordered_candidates
+
+
+def inspect_epub_package(epub_path):
+    # We need a way to distinguish a source/original EPUB from a processed output EPUB.
+    # Overlay artifacts such as `smil/`, `readaloud.css`, and OPF `media-overlay`
+    # attributes are strong signals that a package has passed through this pipeline.
+    if not epub_path or not os.path.exists(epub_path):
+        return None
+
+    try:
+        with zipfile.ZipFile(epub_path, "r") as zf:
+            opf_file = find_opf_path(zf)
+            if not opf_file:
+                return None
+
+            with zf.open(opf_file) as f:
+                soup = BeautifulSoup(f.read(), "xml")
+
+            zip_names = set(zf.namelist())
+    except (zipfile.BadZipFile, OSError):
+        return None
+
+    has_smil_files = any(file_name.startswith("smil/") for file_name in zip_names)
+    has_readaloud_css = any(file_name.endswith("readaloud.css") for file_name in zip_names)
+    has_media_overlays = any(
+        item.get("media-overlay") for item in soup.find_all("item")
+    )
+
+    return {
+        "epub_path": epub_path,
+        "opf_file": opf_file,
+        "opf_dir": posixpath.dirname(opf_file) or ".",
+        "soup": soup,
+        "zip_names": zip_names,
+        "has_smil_files": has_smil_files,
+        "has_readaloud_css": has_readaloud_css,
+        "has_media_overlays": has_media_overlays,
+        "processed": has_smil_files or has_readaloud_css or has_media_overlays,
+    }
+
+
+def get_packaged_epub_path(book_info):
+    first_existing = None
+    for candidate in get_packaged_epub_candidates(book_info):
+        epub_data = inspect_epub_package(candidate)
+        if not epub_data:
+            continue
+        if first_existing is None:
+            first_existing = candidate
+        if epub_data["processed"]:
+            return candidate
+
+    return first_existing
+
+
+def load_epub_opf(book_info, require_processed=False):
+    # Prefer a candidate that looks processed. If none exist and the caller explicitly
+    # requires processed output, return a sentinel payload instead of a false-positive
+    # failure against the original source EPUB.
+    candidate_paths = get_packaged_epub_candidates(book_info)
+    first_existing = None
+
+    for candidate in candidate_paths:
+        epub_data = inspect_epub_package(candidate)
+        if not epub_data:
+            continue
+
+        epub_data["candidate_paths"] = candidate_paths
+        if first_existing is None:
+            first_existing = epub_data
+        if epub_data["processed"]:
+            return epub_data
+
+    if require_processed:
+        return {
+            "candidate_paths": candidate_paths,
+            "processed": False,
+        }
+
+    return first_existing
+
+
+def get_manifest_href_map(opf_soup, opf_dir):
+    by_id = {}
+    by_path = {}
+
+    for item in opf_soup.find_all("item"):
+        item_id = item.get("id")
+        href = item.get("href")
+        resolved_path = None
+        if href:
+            resolved_path = posixpath.normpath(posixpath.join(opf_dir, href))
+
+        if item_id:
+            by_id[item_id] = item
+        if resolved_path:
+            by_path[resolved_path] = item
+
+    return {"by_id": by_id, "by_path": by_path}
+
+
+def check_missing_long_audio(inventory, smil_data, min_duration=180.0, min_words=300):
+    # This check is aimed at "big obvious misses": long or word-heavy audio files that
+    # never appear in any SMIL. The first and last split audio files are exempt because
+    # audiobook intros/outros often have no sensible overlay target.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "missing_long_audio",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    substantial_audio = substantial_audio_files(inventory, min_duration, min_words)
+    audio_files = [item["audio_file"] for item in inventory]
+    if not substantial_audio:
+        return build_check_result(
+            "missing_long_audio",
+            True,
+            "No substantial audio files were found for this book.",
+            metrics={"substantial_audio_files": 0},
+            skipped=True,
+        )
+
+    referenced_audio = {
+        ref["audio_file"] for ref in smil_data["refs"] if ref["valid"] and ref["audio_file"]
+    }
+    allowed_missing = {audio_files[0], audio_files[-1]} if audio_files else set()
+
+    missing_substantial = [
+        item for item in substantial_audio if item["audio_file"] not in referenced_audio
+    ]
+    allowed_boundary_missing = [
+        item for item in missing_substantial if item["audio_file"] in allowed_missing
+    ]
+    findings = [
+        item for item in missing_substantial if item["audio_file"] not in allowed_missing
+    ]
+
+    return build_check_result(
+        "missing_long_audio",
+        ok=not findings,
+        summary=(
+            "No substantial interior audio files are missing from SMIL references."
+            if not findings
+            else f"{len(findings)} substantial interior audio file(s) are not referenced by any SMIL."
+        ),
+        findings=findings,
+        metrics={
+            "substantial_audio_files": len(substantial_audio),
+            "referenced_audio_files": len(referenced_audio),
+            "allowed_missing_boundary_audio_files": sorted(allowed_missing),
+            "missing_but_allowed_count": len(allowed_boundary_missing),
+        },
+    )
+
+
+def check_missing_transcripts(inventory):
+    # Every audio chunk should have a readable sibling `.json` with at least one usable
+    # word. This catches missing, broken, or empty transcription artifacts before later
+    # stages fail more opaquely.
+    if not inventory:
+        return build_check_result(
+            "missing_transcripts",
+            True,
+            "No audio chunks were found to validate.",
+            metrics={"audio_files": 0},
+            skipped=True,
+        )
+
+    findings = [
+        {
+            "audio_file": item["audio_file"],
+            "json_file": item["json_file"],
+            "issue": item["transcript_status"],
+        }
+        for item in inventory
+        if item["transcript_status"] != "ok"
+    ]
+    return build_check_result(
+        "missing_transcripts",
+        ok=not findings,
+        summary=(
+            "Every audio chunk has a readable transcript with at least one word."
+            if not findings
+            else f"{len(findings)} audio chunk(s) are missing a usable transcript."
+        ),
+        findings=findings,
+        metrics={"audio_files": len(inventory)},
+    )
+
+
+def check_low_audio_coverage(
+    inventory,
+    smil_data,
+    min_duration=180.0,
+    min_words=300,
+    coverage_warn_ratio=0.60,
+):
+    # A file can appear in SMILs and still be suspiciously under-covered. This check
+    # compares summed clip durations to the real audio duration to flag transcripts or
+    # alignments that only captured a small fraction of a substantial audio file.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "low_audio_coverage",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    substantial_audio = substantial_audio_files(inventory, min_duration, min_words)
+    if not substantial_audio:
+        return build_check_result(
+            "low_audio_coverage",
+            True,
+            "No substantial audio files were found for this book.",
+            metrics={"substantial_audio_files": 0},
+            skipped=True,
+        )
+
+    findings = []
+    for item in substantial_audio:
+        duration = item["duration"]
+        covered_seconds = smil_data["clip_totals"].get(item["audio_file"], 0.0)
+        clip_count = smil_data["clip_counts"].get(item["audio_file"], 0)
+        coverage_ratio = covered_seconds / duration if duration > 0 else 0.0
+
+        if clip_count > 0 and coverage_ratio < coverage_warn_ratio:
+            findings.append(
+                {
+                    **item,
+                    "covered_seconds": covered_seconds,
+                    "coverage_ratio": coverage_ratio,
+                    "clip_count": clip_count,
+                }
+            )
+
+    return build_check_result(
+        "low_audio_coverage",
+        ok=not findings,
+        summary=(
+            "All referenced substantial audio files have acceptable SMIL coverage."
+            if not findings
+            else f"{len(findings)} substantial audio file(s) have low SMIL coverage."
+        ),
+        findings=findings,
+        metrics={
+            "substantial_audio_files": len(substantial_audio),
+            "coverage_warn_ratio": coverage_warn_ratio,
+        },
+    )
+
+
+def _merge_intervals(intervals):
+    # Merge overlapping/adjacent [begin, end) clip ranges into a sorted, disjoint list.
+    ordered = sorted(intervals)
+    merged = []
+    for begin, end in ordered:
+        if merged and begin <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((begin, end))
+    return merged
+
+
+def check_audio_coverage_gaps(smil_data, min_gap_seconds=1.0):
+    # A chapter that straddles an audio-chunk seam is matched from two chunks. A bad
+    # merge can leave a mid-file span referenced by no clip, so that narration is
+    # skipped on playback AND missing from the OPF media:duration total (the number
+    # the reader app displays). test_low_audio_coverage only compares *summed* coverage
+    # to duration, so an 82%-covered file with a large interior hole passes it. This
+    # check inspects contiguity: for every audio file referenced by SMILs it merges the
+    # clip ranges and flags any interior gap between covered spans.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "audio_coverage_gaps",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    intervals_by_audio = defaultdict(list)
+    for ref in smil_data["refs"]:
+        if ref["valid"] and ref["audio_file"]:
+            intervals_by_audio[ref["audio_file"]].append(
+                (ref["clip_begin"], ref["clip_end"])
+            )
+
+    findings = []
+    for audio_file in sorted(intervals_by_audio):
+        merged = _merge_intervals(intervals_by_audio[audio_file])
+        gaps = []
+        for (_, prev_end), (next_begin, _) in zip(merged, merged[1:]):
+            gap = next_begin - prev_end
+            if gap > min_gap_seconds:
+                gaps.append(
+                    {
+                        "gap_start": round(prev_end, 3),
+                        "gap_end": round(next_begin, 3),
+                        "gap_seconds": round(gap, 3),
+                    }
+                )
+        if gaps:
+            findings.append(
+                {
+                    "audio_file": audio_file,
+                    "gap_count": len(gaps),
+                    "total_gap_seconds": round(sum(g["gap_seconds"] for g in gaps), 3),
+                    "gaps": gaps,
+                }
+            )
+
+    total_gap_seconds = round(sum(f["total_gap_seconds"] for f in findings), 3)
+    return build_check_result(
+        "audio_coverage_gaps",
+        ok=not findings,
+        summary=(
+            "No interior coverage gaps were found in any referenced audio file."
+            if not findings
+            else (
+                f"{len(findings)} audio file(s) have interior coverage gaps "
+                f"totaling {total_gap_seconds}s of unreferenced audio."
+            )
+        ),
+        findings=findings,
+        metrics={
+            "referenced_audio_files": len(intervals_by_audio),
+            "min_gap_seconds": min_gap_seconds,
+            "total_gap_seconds": total_gap_seconds,
+        },
+    )
+
+
+def check_duplicate_audio_clips(smil_data):
+    # Exact duplicate reuse means the same source file and the same clip range appear
+    # multiple times in SMILs. That is often a sign of alignment duplication rather
+    # than legitimate reuse.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "duplicate_audio_clips",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    grouped_refs = defaultdict(list)
+    for ref in smil_data["refs"]:
+        if not ref["valid"]:
+            continue
+
+        clip_key = (
+            ref["audio_file"],
+            round(ref["clip_begin"], 3),
+            round(ref["clip_end"], 3),
+        )
+        grouped_refs[clip_key].append(
+            {"smil_file": ref["smil_file"], "par_id": ref["par_id"]}
+        )
+
+    findings = []
+    for (audio_file, clip_begin, clip_end), refs in grouped_refs.items():
+        if len(refs) > 1:
+            findings.append(
+                {
+                    "audio_file": audio_file,
+                    "clip_begin": clip_begin,
+                    "clip_end": clip_end,
+                    "usage_count": len(refs),
+                    "references": refs,
+                }
+            )
+
+    findings.sort(
+        key=lambda item: (
+            item["audio_file"],
+            item["clip_begin"],
+            item["clip_end"],
+        )
+    )
+
+    return build_check_result(
+        "duplicate_audio_clips",
+        ok=not findings,
+        summary=(
+            "No exact duplicate audio clip ranges were reused in SMIL files."
+            if not findings
+            else f"{len(findings)} exact duplicate audio clip range(s) were reused."
+        ),
+        findings=findings,
+        metrics={
+            "smil_files": len(smil_data["smil_files"]),
+            "valid_audio_refs": sum(1 for ref in smil_data["refs"] if ref["valid"]),
+        },
+    )
+
+
+def check_overlapping_audio_clips(smil_data, min_overlap_seconds=0.5):
+    # Overlap is weaker evidence than an exact duplicate, but substantial overlap on
+    # the same source audio often still indicates that two overlay segments are trying
+    # to claim the same narrated region.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "overlapping_audio_clips",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    refs_by_audio = defaultdict(list)
+    for ref in smil_data["refs"]:
+        if ref["valid"]:
+            refs_by_audio[ref["audio_file"]].append(ref)
+
+    findings = []
+    for audio_file, refs in refs_by_audio.items():
+        refs = sorted(refs, key=lambda ref: (ref["clip_begin"], ref["clip_end"]))
+
+        for i, current_ref in enumerate(refs):
+            for next_ref in refs[i + 1 :]:
+                if next_ref["clip_begin"] >= current_ref["clip_end"]:
+                    break
+
+                if (
+                    round(current_ref["clip_begin"], 3) == round(next_ref["clip_begin"], 3)
+                    and round(current_ref["clip_end"], 3) == round(next_ref["clip_end"], 3)
+                ):
+                    continue
+
+                overlap_seconds = min(
+                    current_ref["clip_end"], next_ref["clip_end"]
+                ) - max(current_ref["clip_begin"], next_ref["clip_begin"])
+
+                if overlap_seconds >= min_overlap_seconds:
+                    findings.append(
+                        {
+                            "audio_file": audio_file,
+                            "overlap_seconds": overlap_seconds,
+                            "first": {
+                                "smil_file": current_ref["smil_file"],
+                                "par_id": current_ref["par_id"],
+                                "clip_begin": current_ref["clip_begin"],
+                                "clip_end": current_ref["clip_end"],
+                            },
+                            "second": {
+                                "smil_file": next_ref["smil_file"],
+                                "par_id": next_ref["par_id"],
+                                "clip_begin": next_ref["clip_begin"],
+                                "clip_end": next_ref["clip_end"],
+                            },
+                        }
+                    )
+
+    findings.sort(
+        key=lambda item: (
+            item["audio_file"],
+            item["first"]["clip_begin"],
+            item["second"]["clip_begin"],
+        )
+    )
+
+    return build_check_result(
+        "overlapping_audio_clips",
+        ok=not findings,
+        summary=(
+            "No overlapping audio clip ranges were reused in SMIL files."
+            if not findings
+            else f"{len(findings)} overlapping audio clip pair(s) were found."
+        ),
+        findings=findings,
+        metrics={
+            "smil_files": len(smil_data["smil_files"]),
+            "audio_files_checked": len(refs_by_audio),
+            "min_overlap_seconds": min_overlap_seconds,
+        },
+    )
+
+
+def check_invalid_smil_clips(smil_data):
+    # This is a structural sanity check on the generated SMIL XML itself. A clip with a
+    # missing src or non-increasing begin/end times is invalid regardless of how it was
+    # produced.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "invalid_smil_clips",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    findings = []
+    for ref in smil_data["refs"]:
+        issue = None
+        if not ref["audio_file"]:
+            issue = "missing_audio_src"
+        elif ref["clip_begin"] is None:
+            issue = "invalid_clip_begin"
+        elif ref["clip_end"] is None:
+            issue = "invalid_clip_end"
+        elif ref["clip_end"] <= ref["clip_begin"]:
+            issue = "clip_end_not_after_clip_begin"
+
+        if issue:
+            findings.append(
+                {
+                    "smil_file": ref["smil_file"],
+                    "par_id": ref["par_id"],
+                    "audio_file": ref["audio_file"],
+                    "clip_begin": ref["clip_begin_raw"],
+                    "clip_end": ref["clip_end_raw"],
+                    "issue": issue,
+                }
+            )
+
+    return build_check_result(
+        "invalid_smil_clips",
+        ok=not findings,
+        summary=(
+            "All SMIL audio clips have valid timing and src values."
+            if not findings
+            else f"{len(findings)} invalid SMIL audio clip(s) were found."
+        ),
+        findings=findings,
+        metrics={
+            "smil_files": len(smil_data["smil_files"]),
+            "audio_refs": len(smil_data["refs"]),
+        },
+    )
+
+
+def check_overlay_without_audio(smil_data):
+    # An HTML overlay SMIL that contains no valid `<audio>` entries is usually a sign
+    # that matching or alignment failed but packaging still created the overlay shell.
+    if not smil_data["smil_files"]:
+        return build_check_result(
+            "overlay_without_audio",
+            True,
+            "No SMIL files were found to validate.",
+            metrics={"smil_files": 0},
+            skipped=True,
+        )
+
+    findings = [
+        {"smil_file": smil_file, "audio_count": smil_data["smil_audio_counts"][smil_file]}
+        for smil_file in smil_data["smil_files"]
+        if smil_data["smil_audio_counts"].get(smil_file, 0) == 0
+    ]
+
+    return build_check_result(
+        "overlay_without_audio",
+        ok=not findings,
+        summary=(
+            "All SMIL files contain at least one valid audio clip."
+            if not findings
+            else f"{len(findings)} SMIL file(s) contain no valid audio clips."
+        ),
+        findings=findings,
+        metrics={"smil_files": len(smil_data["smil_files"])},
+    )
+
+
+def get_toc_like_html_files(zip_file):
+    """Return the set of spine HTML paths that are tables of contents / nav documents.
+
+    Such pages carry chapter-title text but are never narrated, so matching correctly
+    skips them and the unmatched-spine check must not flag them. Detection prefers
+    authoritative OPF signals and falls back to per-document markers:
+
+    - OPF `<guide>` reference with type "toc" (EPUB2 convention);
+    - manifest item with `properties="nav"` (EPUB3 nav document);
+    - an in-document `epub:type="toc"` attribute or a `<nav>` element.
+    """
+    toc_paths = set()
+
+    opf_file = find_opf_path(zip_file)
+    if opf_file:
+        opf_dir = posixpath.dirname(opf_file) or "."
+        try:
+            with zip_file.open(opf_file) as f:
+                opf_soup = BeautifulSoup(f.read(), "xml")
+        except (OSError, zipfile.BadZipFile):
+            opf_soup = None
+
+        if opf_soup is not None:
+            def _resolve(href):
+                return posixpath.normpath(posixpath.join(opf_dir, href))
+
+            # EPUB2 guide: <reference type="toc" href="..."/>.
+            guide = opf_soup.find("guide")
+            if guide:
+                for reference in guide.find_all("reference"):
+                    if (reference.get("type") or "").strip().lower() == "toc":
+                        href = reference.get("href")
+                        if href:
+                            toc_paths.add(_resolve(href.split("#", 1)[0]))
+
+            # EPUB3 nav document: manifest item with properties containing "nav".
+            for item in opf_soup.find_all("item"):
+                properties = (item.get("properties") or "").split()
+                href = item.get("href")
+                if href and "nav" in properties:
+                    toc_paths.add(_resolve(href))
+
+    return toc_paths
+
+
+def _html_declares_toc(soup):
+    """True if the document self-identifies as a TOC via epub:type or a <nav> element."""
+    if soup.find("nav") is not None:
+        return True
+    for element in soup.find_all(attrs={"epub:type": True}):
+        types = (element.get("epub:type") or "").split()
+        if "toc" in types or "landmarks" in types:
+            return True
+    return False
+
+
+def check_unmatched_spine_html(book_info, min_token_count=80):
+    # This check looks for substantive reading-order HTML files that fall between the
+    # first and last matched chapters but never received any match row. Those files are
+    # the clearest signal that playback coverage silently skipped part of the book.
+    matched_items = normalize_matched_list(book_info.get("matched_list", []))
+    if not matched_items:
+        return build_check_result(
+            "unmatched_spine_html",
+            True,
+            "No matched HTML files were provided in book_info.",
+            metrics={"matched_html_files": 0},
+            skipped=True,
+        )
+
+    epub_path = get_packaged_epub_path(book_info)
+    if not epub_path:
+        fallback_path = book_info.get("out_file") or book_info.get("epub_file")
+        epub_path = resolve_book_path(book_info, fallback_path) if fallback_path else None
+    if not epub_path or not os.path.exists(epub_path):
+        return build_check_result(
+            "unmatched_spine_html",
+            True,
+            "No EPUB package was available for unmatched-HTML validation.",
+            metrics={"matched_html_files": len({item['html_file'] for item in matched_items})},
+            skipped=True,
+        )
+
+    try:
+        with zipfile.ZipFile(epub_path, "r") as zf:
+            spine_html_files = get_spine_ordered_html_files(zf)
+            if not spine_html_files:
+                return build_check_result(
+                    "unmatched_spine_html",
+                    True,
+                    "No HTML files were found in the EPUB for unmatched-HTML validation.",
+                    metrics={"epub_path": epub_path, "spine_html_files": 0},
+                    skipped=True,
+                )
+
+            toc_like_files = get_toc_like_html_files(zf)
+            spine_index_map = {html_file: index for index, html_file in enumerate(spine_html_files)}
+            matched_set = {item["html_file"] for item in matched_items}
+            matched_indices = sorted(
+                spine_index_map[item["html_file"]]
+                for item in matched_items
+                if item["html_file"] in spine_index_map
+            )
+            if not matched_indices:
+                return build_check_result(
+                    "unmatched_spine_html",
+                    True,
+                    "No matched HTML files could be located in the EPUB spine order.",
+                    metrics={"epub_path": epub_path, "matched_html_files": len(matched_set)},
+                    skipped=True,
+                )
+
+            findings = []
+            for spine_index in range(matched_indices[0], matched_indices[-1] + 1):
+                html_file = spine_html_files[spine_index]
+                if html_file in matched_set:
+                    continue
+
+                # Tables of contents / nav documents carry chapter-title text but are
+                # never narrated, so matching rightly skips them; don't flag them.
+                if html_file in toc_like_files:
+                    continue
+
+                try:
+                    with zf.open(html_file) as f:
+                        raw_html = f.read()
+                    try:
+                        html_content = raw_html.decode("utf-8")
+                    except UnicodeDecodeError:
+                        html_content = raw_html.decode("latin-1", errors="replace")
+                except Exception:
+                    continue
+
+                soup = BeautifulSoup(html_content, "lxml")
+                for script_or_style in soup(["script", "style"]):
+                    script_or_style.decompose()
+
+                if _html_declares_toc(soup):
+                    continue
+
+                token_count = len(
+                    extract_text_token_items(soup.get_text(separator=" ", strip=True))
+                )
+                if token_count < min_token_count:
+                    continue
+
+                findings.append(
+                    {
+                        "html_file": html_file,
+                        "spine_index": spine_index,
+                        "token_count": token_count,
+                        "issue": "substantive_spine_html_without_match",
+                    }
+                )
+    except (zipfile.BadZipFile, OSError):
+        return build_check_result(
+            "unmatched_spine_html",
+            True,
+            "The EPUB package could not be opened for unmatched-HTML validation.",
+            metrics={"epub_path": epub_path},
+            skipped=True,
+        )
+
+    return build_check_result(
+        "unmatched_spine_html",
+        ok=not findings,
+        summary=(
+            "All substantive spine HTML files between the matched boundaries received overlay coverage."
+            if not findings
+            else f"{len(findings)} substantive spine HTML file(s) were skipped by matching."
+        ),
+        findings=findings,
+        metrics={
+            "epub_path": epub_path,
+            "matched_html_files": len(matched_set),
+            "min_token_count": min_token_count,
+        },
+    )
+
+
+def check_missing_media_overlays(book_info):
+    # This is the packaged-EPUB-side counterpart to the loose SMIL checks above. It
+    # verifies that each matched HTML file is actually wired in the OPF to its overlay
+    # SMIL, and that the referenced overlay file exists inside the package.
+    matched_items = normalize_matched_list(book_info.get("matched_list", []))
+    if not matched_items:
+        return build_check_result(
+            "missing_media_overlays",
+            True,
+            "No matched HTML files were provided in book_info.",
+            metrics={"matched_html_files": 0},
+            skipped=True,
+        )
+
+    opf_data = load_epub_opf(book_info, require_processed=True)
+    if not opf_data or not opf_data.get("processed"):
+        return build_check_result(
+            "missing_media_overlays",
+            True,
+            "No post-processed EPUB with overlay artifacts was found for validation.",
+            metrics={
+                "matched_html_files": len({item['html_file'] for item in matched_items}),
+                "candidate_paths": opf_data.get("candidate_paths", []) if opf_data else [],
+                "processed_epub_found": False,
+            },
+            skipped=True,
+        )
+
+    manifest_map = get_manifest_href_map(opf_data["soup"], opf_data["opf_dir"])
+    html_files = list(dict.fromkeys(item["html_file"] for item in matched_items))
+    findings = []
+
+    for html_file in html_files:
+        html_item = manifest_map["by_path"].get(html_file)
+        if not html_item:
+            findings.append({"html_file": html_file, "issue": "html_item_missing_from_manifest"})
+            continue
+
+        overlay_id = html_item.get("media-overlay")
+        if not overlay_id:
+            findings.append({"html_file": html_file, "issue": "missing_media_overlay"})
+            continue
+
+        overlay_item = manifest_map["by_id"].get(overlay_id)
+        if not overlay_item:
+            findings.append(
+                {
+                    "html_file": html_file,
+                    "media_overlay": overlay_id,
+                    "issue": "overlay_id_missing_from_manifest",
+                }
+            )
+            continue
+
+        overlay_href = overlay_item.get("href")
+        if not overlay_href:
+            findings.append(
+                {
+                    "html_file": html_file,
+                    "media_overlay": overlay_id,
+                    "issue": "overlay_item_missing_href",
+                }
+            )
+            continue
+
+        overlay_path = posixpath.normpath(
+            posixpath.join(opf_data["opf_dir"], overlay_href)
+        )
+        if overlay_path not in opf_data["zip_names"]:
+            findings.append(
+                {
+                    "html_file": html_file,
+                    "media_overlay": overlay_id,
+                    "overlay_path": overlay_path,
+                    "issue": "overlay_file_missing_from_epub",
+                }
+            )
+
+    return build_check_result(
+        "missing_media_overlays",
+        ok=not findings,
+        summary=(
+            "All matched HTML files have valid media-overlay wiring in the OPF."
+            if not findings
+            else f"{len(findings)} HTML file(s) have overlay wiring issues in the OPF."
+        ),
+        findings=findings,
+        metrics={
+            "matched_html_files": len(html_files),
+            "epub_path": opf_data["epub_path"],
+            "candidate_paths": opf_data.get("candidate_paths", []),
+            "processed_epub_found": True,
+        },
+    )
+
+
+def run_post_checks(
+    book_info,
+    min_duration=180.0,
+    min_words=300,
+    coverage_warn_ratio=0.60,
+    min_overlap_seconds=0.5,
+):
+    # The runner intentionally mixes pre-package and post-package checks. Individual
+    # checks decide whether to pass, fail, or skip depending on which artifacts exist.
+    # The audio inventory (one ffprobe per chunk) and the SMIL parse are computed once
+    # here and shared.
+    inventory = get_audio_inventory(book_info)
+    smil_data = parse_smil_audio_refs(book_info)
+    results = [
+        check_missing_transcripts(inventory),
+        check_missing_long_audio(inventory, smil_data, min_duration=min_duration, min_words=min_words),
+        check_low_audio_coverage(
+            inventory,
+            smil_data,
+            min_duration=min_duration,
+            min_words=min_words,
+            coverage_warn_ratio=coverage_warn_ratio,
+        ),
+        check_audio_coverage_gaps(smil_data),
+        check_duplicate_audio_clips(smil_data),
+        check_overlapping_audio_clips(smil_data, min_overlap_seconds=min_overlap_seconds),
+        check_invalid_smil_clips(smil_data),
+        check_overlay_without_audio(smil_data),
+        check_unmatched_spine_html(book_info),
+        check_missing_media_overlays(book_info),
+    ]
+    ok_results = sum(1 for result in results if result["ok"] and not result["skipped"])
+    skipped_results = sum(1 for result in results if result["skipped"])
+
+    return {
+        "ok": all(result["ok"] or result["skipped"] for result in results),
+        "summary": (
+            f"{ok_results} check(s) passed, {skipped_results} skipped, "
+            f"{len(results) - ok_results - skipped_results} failed."
+        ),
+        "results": results,
+    }
+
+
+# === Segment-level alignment and SMIL generation ===
+
+
+def _clip_duration(segment_match):
+    # Real audio span of a finalized segment clip. Used to pick the better of two
+    # clips when the same segment is matched from more than one audio chunk.
+    try:
+        return max(0.0, float(segment_match["end"]) - float(segment_match["start"]))
+    except (KeyError, TypeError, ValueError):
+        return 0.0
+
+
+def resolve_segment_clips(candidate_matches):
+    # candidate_matches: {seg_id: [clip, ...]} where each seg_id may have a clip from
+    # more than one audio chunk (a chapter that straddles a chunk seam is matched from
+    # both the tail of the previous chunk and the body of the next chunk).
+    #
+    # The previous chunk's tail holds only a few seconds of the chapter, but the
+    # aligner + interior-gap fill can cram many seam segments into it -- sometimes with
+    # durations that individually rival the body chunk's real clips. Picking per-segment
+    # by duration therefore still lets a few tail clips win, which punches small holes
+    # in the body audio (that audio is then referenced by no clip and is dropped from
+    # playback and from the media:duration total).
+    #
+    # A chapter's clips overwhelmingly come from one "dominant" audio file (the body).
+    # Resolve every seam segment to that dominant file so the body stays contiguous;
+    # fall back to duration only among clips from the same (dominant) file, or when a
+    # segment was matched solely by a non-dominant chunk (genuine spillover).
+    # A long XHTML chapter can span many equally long audio chunks. A global
+    # dominant-file preference can wrongly place a late repeated phrase in an
+    # earlier chunk's final fraction of a second. Prefer direct token evidence
+    # for this individual segment, then use duration to break a tie.
+    def evidence(clip):
+        dur = _clip_duration(clip)
+        if dur < 0.05:
+            return -1, 0.0
+        tokens = [token for word in clip.get("audio_text", "").split()
+                  for token in split_into_match_tokens(word)]
+        return len(tokens), dur
+    resolved = {}
+    for seg_id, clips in candidate_matches.items():
+        best = max(clips, key=evidence)
+        if _clip_duration(best) >= 0.05:
+            resolved[seg_id] = best
+    return resolved
+
+
+def anchor_audio_file_tails(aggregated_matches_by_html, book_info):
+    # For each packaged audio file, find the resolved clip that ends latest and extend
+    # its clipEnd to the file's true duration, so no audio past the last matched
+    # sentence is left uncovered. Mutates the clip dicts in place. Missing/unprobeable
+    # durations are skipped rather than fatal (this runs inside SMIL generation).
+    latest_clip_by_audio = {}
+    for matches in aggregated_matches_by_html.values():
+        for clip in matches.values():
+            audio_file = clip.get("audio_file")
+            if not audio_file:
+                continue
+            current = latest_clip_by_audio.get(audio_file)
+            if current is None or clip["end"] > current["end"]:
+                latest_clip_by_audio[audio_file] = clip
+
+    for audio_file, clip in latest_clip_by_audio.items():
+        try:
+            duration = get_audio_duration(os.path.join(book_info["folder_name"], audio_file))
+        except RuntimeError:
+            continue
+        if duration > clip["end"]:
+            clip["end"] = duration
+
+
+def write_smil_file(smil_path, html_file, segments, aggregated_matches):
+    """Write one grouped SMIL for `html_file`: a <par> per timed segment, in text order.
+
+    `aggregated_matches` maps segment id -> resolved clip ({start, end, audio_file}).
+    A <par> is written only when end > start; segments without a clip are skipped so
+    the reader falls through to the next timed segment.
+    """
+    soup_smil = BeautifulSoup("<smil/>", "xml")
+    smil = soup_smil.smil
+    smil["xmlns"] = "http://www.w3.org/ns/SMIL"
+    smil["xmlns:epub"] = "http://www.idpf.org/2007/ops"
+    smil["version"] = "3.0"
+
+    body = soup_smil.new_tag("body")
+    smil.append(body)
+    seq = soup_smil.new_tag(
+        "seq",
+        attrs={
+            "id": make_overlay_id(html_file),
+            "epub:textref": "../" + html_file,
+            "epub:type": "chapter",
+        },
+    )
+    body.append(seq)
+
+    prev_audio = None
+    prev_start = -1.0
+    for seg in segments:
+        seg_id = seg.get("id")
+        info = aggregated_matches.get(seg_id)
+        if (
+            info is None
+            or round(info["end"], 3) <= round(info["start"], 3)
+            or (info["end"] - info["start"]) < 0.05
+        ):
+            continue
+        curr_audio = info["audio_file"]
+        curr_start = info["start"]
+        if prev_audio is not None:
+            if curr_audio == prev_audio and curr_start < prev_start:
+                continue
+            elif curr_audio < prev_audio:
+                continue
+        prev_audio = curr_audio
+        prev_start = curr_start
+        par = soup_smil.new_tag("par", id=seg_id)
+        par.append(soup_smil.new_tag("text", src=f"../{html_file}#{seg_id}"))
+        par.append(
+            soup_smil.new_tag(
+                "audio",
+                src=f"../audio/{info['audio_file']}",
+                clipBegin=f"{info['start']:.3f}s",
+                clipEnd=f"{info['end']:.3f}s",
+            )
+        )
+        seq.append(par)
+
+    with open(smil_path, "w", encoding="utf-8") as f:
+        f.write(convert_soup_to_html(soup_smil))
+
+
+def create_smil_files(book_info):
+    # Output model:
+    # one HTML file -> one SMIL file, even when several audio chunks contribute to it.
+    #
+    # Every SMIL is regenerated: seam resolution (resolve_segment_clips) and tail
+    # anchoring work across files, so a SMIL left over from an interrupted or older
+    # run would be inconsistent with its freshly generated neighbours. Skipping the
+    # whole stage when its outputs are complete is the orchestrator's job.
+    matched_items = sort_matched_items(book_info["matched_list"])
+    working_epub = resolve_book_path(book_info, book_info["out_file"])
+    for file in iter_smil_files(book_info):
+        os.remove(resolve_book_path(book_info, file))
+
+    alignment_stats = {
+        "no_audio_tokens": 0,
+        "no_alignment": 0,
+        "no_segments": 0,
+    }
+    matched_html_files = list(dict.fromkeys(item["html_file"] for item in matched_items))
+    aggregated_matches_by_html = {html_file: {} for html_file in matched_html_files}
+    # Per html_file: {seg_id: [candidate clip from each contributing chunk]}.
+    candidate_matches_by_html = {}
+
+    for json_file, items in tqdm(
+        iter_matched_json_groups(matched_items),
+        desc="Generating SMIL",
+        unit="chunk",
+    ):
+        audio_tokens = load_audio_tokens(resolve_book_path(book_info, json_file))
+        if not audio_tokens:
+            alignment_stats["no_audio_tokens"] += 1
+            continue
+
+        audio_filename = json_file.replace(".json", book_info["audio_extension"])
+        total_duration = get_audio_duration(
+            os.path.join(book_info["folder_name"], audio_filename)
+        )
+        audio_cursor = 0
+        chunk_segment_matches = []
+
+        for item in items:
+            segments, html_tokens = load_html_segments_and_tokens(
+                working_epub, item["html_file"]
+            )
+            if not html_tokens:
+                alignment_stats["no_segments"] += 1
+                continue
+
+            audio_start_hint = max(audio_cursor, item["audio_start_index"])
+            if audio_start_hint >= len(audio_tokens):
+                break
+
+            audio_end_hint = item["audio_end_index"]
+            if audio_end_hint < audio_start_hint:
+                audio_end_hint = len(audio_tokens) - 1
+            audio_end_hint = min(len(audio_tokens) - 1, audio_end_hint)
+            audio_slice = audio_tokens[audio_start_hint : audio_end_hint + 1]
+            if not audio_slice:
+                break
+
+            best_match = align_tokens(
+                html_tokens,
+                audio_tokens,
+                audio_start_hint,
+                audio_end_hint,
+                window_start=item["window_start"],
+                window_end=item["window_end"],
+                prefix_only=item["span_index"] != 0,
+            )
+
+            if not best_match or best_match["matched_token_count"] == 0:
+                alignment_stats["no_alignment"] += 1
+                continue
+
+            segment_matches = build_segment_match_list(best_match["raw_matches"], segments)
+            if not segment_matches:
+                alignment_stats["no_segments"] += 1
+                continue
+
+            # Interpolate any interior segment the aligner could not match so its
+            # text still receives a media-overlay entry instead of being absorbed
+            # into a neighbor. Done per item, where `segments`/`segment_index` align.
+            segment_matches = fill_interior_segment_gaps(segment_matches, segments)
+
+            for segment_match in segment_matches:
+                chunk_segment_matches.append(
+                    {
+                        **segment_match,
+                        "html_file": item["html_file"],
+                        "html_order": item["html_order"],
+                        "span_index": item["span_index"],
+                        "audio_file": audio_filename,
+                        "json_file": json_file,
+                    }
+                )
+
+            if best_match["max_audio_idx"] is not None and best_match["max_audio_idx"] >= 0:
+                audio_cursor = max(audio_cursor, best_match["max_audio_idx"] + 1)
+
+        if not chunk_segment_matches:
+            continue
+
+        chunk_segment_matches.sort(
+            key=lambda match: (
+                match["span_index"],
+                match["html_order"],
+                match["segment_index"],
+            )
+        )
+        final_chunk_matches = finalize_segment_timestamps(
+            chunk_segment_matches,
+            total_duration,
+        )
+
+        # Collect every candidate clip per segment. A chapter that straddles an
+        # audio-chunk seam is matched from two chunks (the short tail of the previous
+        # chunk and the body of the next chunk), so a seam segment can get a clip from
+        # each. Winners are resolved after all chunks are processed; see
+        # resolve_segment_clips.
+        for segment_match in final_chunk_matches:
+            candidates = candidate_matches_by_html.setdefault(
+                segment_match["html_file"],
+                {},
+            )
+            candidates.setdefault(segment_match["id"], []).append(segment_match)
+
+    for html_file, candidates in candidate_matches_by_html.items():
+        aggregated_matches_by_html[html_file] = resolve_segment_clips(candidates)
+
+    # Per-chunk finalize_segment_timestamps anchored each chunk's last segment to that
+    # chunk's full audio duration, so every audio file was fully covered. Resolving
+    # seam segments to their dominant (body) chunk can move the clip that used to end a
+    # "previous chunk" file into a different chunk, leaving that file's tail (the last
+    # sentences a chapter speaks before the chunk boundary) referenced by nothing --
+    # dropped from playback and from the media:duration total. Re-anchor per audio
+    # file: extend the latest-ending clip of each file to the file's real duration.
+    anchor_audio_file_tails(aggregated_matches_by_html, book_info)
+
+    for html_file in tqdm(matched_html_files, desc="Writing SMIL", unit="file"):
+        smil_path = resolve_book_path(book_info, make_overlay_basename(html_file))
+
+        segments, _html_tokens = load_html_segments_and_tokens(working_epub, html_file)
+        write_smil_file(smil_path, html_file, segments, aggregated_matches_by_html.get(html_file, {}))
+
+    print_nonzero_summary(
+        "SMIL summary",
+        [
+            ("transcript(s) with no alignable words", alignment_stats["no_audio_tokens"]),
+            ("transcript(s) with no alignment", alignment_stats["no_alignment"]),
+            ("transcript(s) with no matched segments", alignment_stats["no_segments"]),
+        ],
+    )
+
+
+# === Packaging and OPF updates ===
+
+
+def merge_files(book_info):
+    # At this stage all generated assets still exist as loose files in the working
+    # folder. This function copies them into the working `.epub3` archive under the
+    # conventional `audio/`, `smil/`, and CSS paths expected by the OPF.
+    css_zip_path = (
+        f"{book_info['opf_dir']}/readaloud.css"
+        if book_info["opf_dir"] != "."
+        else "readaloud.css"
+    )
+
+    with zipfile.ZipFile(resolve_book_path(book_info, book_info["out_file"]), "a") as f:
+        # Package exactly the planned chunks, never the copied source audiobook or a
+        # stale chunk from an older plan.
+        for file in planned_chunk_basenames(book_info):
+            f.write(resolve_book_path(book_info, file), f"audio/{file}")
+
+        # Package exactly the overlays the OPF rewrite will declare: one per matched
+        # HTML file (create_smil_files writes every one of them).
+        html_files = dict.fromkeys(
+            item["html_file"] for item in normalize_matched_list(book_info["matched_list"])
+        )
+        for file in (make_overlay_basename(html_file) for html_file in html_files):
+            f.write(resolve_book_path(book_info, file), f"smil/{file}")
+
+        css_content = """\
+            .-epub-media-overlay-active {
+              background-color: #ffb;
+            }
+            """
+        f.writestr(css_zip_path, css_content)
+
+
+def post_processing_opf(book_info, output_epub_path):
+    # OPF rewrite responsibilities:
+    # - declare packaged audio assets
+    # - declare one overlay SMIL per matched HTML file
+    # - write per-overlay and total media durations
+    # - attach `media-overlay` references to HTML manifest items
+    # - synthesize a nav document if the source package lacks one
+    # - move the finished working `.epub3` to `output_epub_path`
+    matched_items = normalize_matched_list(book_info["matched_list"])
+    replacements = {}
+    working_epub = resolve_book_path(book_info, book_info["out_file"])
+
+    with zipfile.ZipFile(working_epub, "r") as f:
+        opf_file = find_opf_path(f)
+        if not opf_file:
+            raise ValueError(f"No OPF package document found in {working_epub}")
+        with f.open(opf_file) as handle:
+            soup = BeautifulSoup(handle.read(), "lxml-xml")
+
+        opf_dir = posixpath.dirname(opf_file) or "."
+        package = soup.find("package")
+        package["version"] = "3.0"
+        prefix_value = package.get("prefix", "")
+        media_prefix = "media: http://www.idpf.org/epub/vocab/overlays/#"
+        if media_prefix not in prefix_value:
+            package["prefix"] = (
+                f"{prefix_value} {media_prefix}".strip()
+                if prefix_value
+                else media_prefix
+            )
+
+        metadata = soup.find("metadata")
+
+        manifest = soup.find("manifest")
+
+        # Remove previously generated overlay artifacts before re-adding them.
+        for item in manifest.find_all("item"):
+            if item.has_attr("media-overlay"):
+                del item["media-overlay"]
+            item_id = item.get("id", "")
+            if (
+                item_id.startswith("audio_")
+                or item_id.startswith("html_overlay.")
+                or item_id == "readaloud_style"
+                or item_id == "generated_nav"
+            ):
+                item.decompose()
+
+        for meta in metadata.find_all("meta", attrs={"property": "media:duration"}):
+            meta.decompose()
+
+        nav_item = manifest.find(
+            "item",
+            attrs={"properties": lambda value: value and "nav" in value.split()},
+        )
+
+        # If the source package lacks an XHTML nav, synthesize one from NCX.
+        if not nav_item:
+            ncx_item = manifest.find(
+                "item", attrs={"media-type": "application/x-dtbncx+xml"}
+            )
+            if ncx_item:
+                ncx_zip_path = posixpath.normpath(
+                    posixpath.join(opf_dir, ncx_item["href"])
+                )
+                with f.open(ncx_zip_path) as ncx_file:
+                    ncx_soup = BeautifulSoup(ncx_file.read(), "xml")
+
+                nav_points = parse_ncx_nav_points(ncx_soup.find("navMap"))
+                title_el = metadata.find(lambda tag: tag.name in {"dc:title", "title"})
+                nav_zip_path = f"{opf_dir}/nav.xhtml" if opf_dir != "." else "nav.xhtml"
+                nav_item = soup.new_tag(
+                    "item",
+                    attrs={
+                        "id": "generated_nav",
+                        "href": posixpath.basename(nav_zip_path),
+                        "media-type": "application/xhtml+xml",
+                        "properties": "nav",
+                    },
+                )
+                manifest.insert(0, nav_item)
+                replacements[nav_zip_path] = build_nav_document(
+                    title_el.get_text(strip=True) if title_el else "Contents",
+                    nav_points,
+                )
+
+        # Declare all packaged split-audio files (the planned chunks only).
+        for file_name in planned_chunk_basenames(book_info):
+            item = soup.new_tag(
+                "item",
+                attrs={
+                    "id": f"audio_{file_name}",
+                    "href": get_relative_zip_href(opf_file, f"audio/{file_name}"),
+                    "media-type": audio_media_type(book_info),
+                },
+            )
+            manifest.append(item)
+
+        # Exactly one overlay manifest item is created per matched HTML file.
+        html_overlay_files = list(dict.fromkeys(item["html_file"] for item in matched_items))
+        total_duration = 0.0
+        for html_file in html_overlay_files:
+            file_name = make_overlay_basename(html_file)
+            item = soup.new_tag(
+                "item",
+                attrs={
+                    "id": make_overlay_id(html_file),
+                    "href": get_relative_zip_href(opf_file, f"smil/{file_name}"),
+                    "media-type": "application/smil+xml",
+                },
+            )
+            manifest.append(item)
+
+            smil_duration = get_smil_duration(resolve_book_path(book_info, file_name))
+            total_duration += smil_duration
+
+            duration_meta = soup.new_tag(
+                "meta",
+                attrs={
+                    "property": "media:duration",
+                    "refines": f"#{item['id']}",
+                },
+            )
+            duration_meta.string = seconds_to_media_duration(smil_duration)
+            metadata.append(duration_meta)
+
+        item = soup.new_tag(
+            "item",
+            attrs={
+                "id": "readaloud_style",
+                "href": get_relative_zip_href(
+                    opf_file,
+                    f"{opf_dir}/readaloud.css" if opf_dir != "." else "readaloud.css",
+                ),
+                "media-type": "text/css",
+            },
+        )
+        manifest.append(item)
+
+        total_duration_meta = soup.new_tag("meta", attrs={"property": "media:duration"})
+        total_duration_meta.string = seconds_to_media_duration(total_duration)
+        metadata.append(total_duration_meta)
+
+        # Attach overlay ids to the corresponding HTML manifest items.
+        for html_file in html_overlay_files:
+            el = soup.find(
+                "item",
+                attrs={
+                    "href": lambda href, html_file=html_file: href
+                    and posixpath.normpath(posixpath.join(opf_dir, href)) == html_file
+                },
+            )
+            if el:
+                el["media-overlay"] = make_overlay_id(html_file)
+
+    replacements[opf_file] = convert_soup_to_html(soup)
+    replace_files_in_zip(working_epub, replacements)
+    # The packaged working copy becomes the output; the caller decides where.
+    os.makedirs(os.path.dirname(os.path.abspath(str(output_epub_path))), exist_ok=True)
+    shutil.move(working_epub, str(output_epub_path))
+

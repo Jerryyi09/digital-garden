@@ -2,9 +2,38 @@
 
 日期：2026-10-18。源码：`studio/audiobooks/`。入口由 `studio/downloads-index.json` 生成，独立应用链接使用 `data-router-ignore`，避免 Quartz SPA 接管。
 
-界面更新：书库和最近播放统一为单列列表，整行可点击，展示文件类型、名称、体积或收听位置；手机端将辅助信息换至第二行。保留筛选、排序、播放和进度记录逻辑。PWA 界面缓存升级为 v2，已有主屏幕应用关闭重开后再检查更新。
+后续完整开发任务见 [Claude Code 交接文档](audiobooks-claude-code-handoff.md)。现已交付通用映射工具 `./scripts/readalong`（支持 scan/align/batch/validate/install）以及应用内英文 EPUB 跟读功能。《习惯的力量》（The Power of Habit By Charles Duhigg）约 10.5 小时全书端到端对齐已完成，共生成 12 个 SMIL、11,733 段精确时间轴映射，10/10 项独立校验全部通过，并已安装至书库 `readalong/` 目录。
 
-## 电子书跟读：待实现设计
+界面更新：书库列表中带有音文同步资源的条目高亮展示「📖 跟读」标识；播放器中提供「📖 边听边读」开关，支持应用内沙箱阅读、双向点击跳转、时间轴二分高效定位、自动居中跟随、手动滚动防争抢及字号调节。PWA 界面缓存已升级为 v3。
+
+## 电子书跟读：实现与交付说明
+
+### 1. 通用 CLI 命令接口
+位于 `scripts/readalong`（依赖与逻辑封装于 `tools/readalong/`）：
+```bash
+# 扫描与预检
+./scripts/readalong scan --root "/Volumes/750/Music/有声书" --language en --dry-run
+
+# 单本完整对齐（可指定 --sample prologue 进行局部快速验证）
+./scripts/readalong align --book-dir "/Volumes/750/Music/有声书/心智成长/The Power of Habit - Charles Duhigg" --language en --timing whisper-word --resume
+
+# 批处理
+./scripts/readalong batch --root "/Volumes/750/Music/有声书" --language en --resume
+
+# 独立结构校验
+./scripts/readalong validate --book-id the-power-of-habit-charles-duhigg
+
+# 安装到目标书库
+./scripts/readalong install --book-id the-power-of-habit-charles-duhigg --target-dir "/Volumes/750/Music/有声书/心智成长/The Power of Habit - Charles Duhigg/readalong"
+```
+
+### 2. 产物与数据结构
+各书籍输出包含：
+- `readalong.manifest.json`：书籍元数据、哈希、音频源映射与章节表。
+- `timeline.json`：包含 `audioSourceId`、音频绝对秒数区间 `start/end`、XHTML 路径与定位 `fragment`。
+- `text/`：提取的原书排版与资源，注入 `.readalong-active` 高亮样式（背景 `#dce7ae`，文字 `#163c23`，外边框 `#aec47d`）。
+- `book.readalong.epub`：符合 EPUB 3.3 Media Overlays 标准的独立音文电子书导出。
+- `validation.json`：包含 10 项结构、无重叠、无时间倒退、无未授权修改的完整校验报告。
 
 目前只支持音频与目录，不会列出或打开 PDF/EPUB/MOBI，也没有自动翻页。建议分两期：先实现同目录电子书关联、应用内阅读和独立阅读进度；再添加经过校验的音频时间轴与文本位置映射。音频与书籍同名只能帮助找候选文件，不能证明内容或版本对应。
 
