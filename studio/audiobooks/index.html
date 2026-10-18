@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f0e7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="花园听书">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="referrer" content="no-referrer">
+    <title>花园听书 · Rosemary Garden</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon-180.png">
+    <link rel="stylesheet" href="./app.css">
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <header>
+      <a href="/studio/" class="back">← Studio</a>
+      <span class="wordmark">ROSEMARY GARDEN / LISTEN</span>
+      <button id="settings-open" class="subtle">连接设置</button>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">留一点时间，给耳朵。</p>
+        <h1>听见<br><em>一本书。</em></h1>
+        <div class="intro-note"><p>把故事带在身边。<br>每次回来，从上次的那一页继续。</p><span id="connection">正在连接书库…</span></div>
+      </section>
+      <p id="notice" role="status" aria-live="polite" hidden></p>
+      <section id="resume" class="resume" hidden>
+        <div><span class="eyebrow">接着听 / CONTINUE</span><h2 id="resume-title"></h2><p id="resume-meta"></p></div>
+        <button id="resume-play" class="primary">继续收听 ↗</button>
+      </section>
+      <section class="library" aria-label="有声书书库">
+        <div class="toolbar">
+          <nav class="tabs" aria-label="浏览方式"><button id="browse-tab" aria-pressed="true">书库</button><button id="recent-tab" aria-pressed="false">最近播放</button></nav>
+          <label class="search"><span class="sr-only">搜索当前目录文件名</span><input id="search" type="search" placeholder="搜索当前目录 / 文件名" autocomplete="off"></label>
+          <label><span class="sr-only">排序</span><select id="sort"><option value="name">文件名顺序</option><option value="modified">最近更新</option></select></label>
+        </div>
+        <div class="directory"><nav id="breadcrumbs" aria-label="书库路径"></nav><button id="refresh" class="subtle">刷新目录</button></div>
+        <p id="list-status" role="status"></p>
+        <div id="items" class="items"></div>
+      </section>
+      <footer>MP3 / M4A / M4B · iPhone Safari → 分享 → 添加到主屏幕<br>进度保存在当前浏览器；可在连接设置中导出备份。</footer>
+    </main>
+    <section id="player" class="player" aria-label="正在收听" hidden>
+      <div class="now"><span class="eyebrow">NOW LISTENING</span><h2 id="track-title"></h2><p id="track-folder"></p></div>
+      <div class="playback"><audio id="audio" controls preload="metadata" playsinline></audio><div class="transport"><button id="rewind" aria-label="后退15秒">↶ 15 秒</button><button id="play" class="primary" disabled>播放</button><button id="forward" aria-label="前进30秒">30 秒 ↷</button><label>倍速 <select id="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select></label><button id="next">下一节 →</button></div><p id="player-status" role="status"></p></div>
+    </section>
+    <dialog id="settings">
+      <form id="connection-form">
+        <div class="dialog-head"><h2>连接家庭书库</h2><button type="button" id="settings-close" aria-label="关闭">✕</button></div>
+        <p>使用你已有的 AList 账号登录。有声书只从家庭服务器读取。</p>
+        <label>访问方式<select id="network"><option value="auto">自动选择（推荐）</option><option value="external">外网 · melyi.uk</option><option value="lan">内网 · NUC</option></select></label>
+        <p id="endpoint-note" class="hint"></p>
+        <label>AList 用户名<input id="username" autocomplete="username" required></label>
+        <label>密码<input id="password" type="password" autocomplete="current-password"></label>
+        <label>两步验证码（如有）<input id="otp" inputmode="numeric" autocomplete="one-time-code"></label>
+        <label>目录密码（如有）<input id="folder-password" type="password" autocomplete="off"></label>
+        <label class="check"><input id="remember" type="checkbox">在这台设备记住登录（保存访问令牌，不保存密码）</label>
+        <p id="login-status" role="status"></p>
+        <div class="actions"><button type="submit" class="primary" id="login">登录并打开书库</button><button type="button" id="logout">退出登录</button></div>
+      </form>
+      <hr>
+      <p class="hint">Cloudflare 版通过 HTTPS 访问 NUC。内网 HTTP 地址仅能从内网页面使用；HTTPS 页面不会向内网 HTTP 发送密码。</p>
+      <div class="actions"><button id="export">导出收听记录</button><label class="file-button">导入记录<input id="import" type="file" accept="application/json,.json"></label></div>
+      <p class="hint">不同域名、Safari 与主屏幕应用的存储可能各自独立。第一版不自动跨设备同步。</p>
+    </dialog>
+    <noscript>请启用 JavaScript 以浏览与播放有声书。</noscript>
+  </body>
+</html>

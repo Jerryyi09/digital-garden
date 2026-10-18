@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "title": "有声书 · 听见一本书",
+    "type": "Audiobooks",
+    "description": "分类浏览家庭书库，继续上次收听。支持 MP3、M4A、M4B、倍速与最近播放。",
+    "url": "/studio/audiobooks/",
+    "standalone": true
+  }
+]

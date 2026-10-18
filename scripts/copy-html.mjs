@@ -21,6 +21,7 @@ async function copyDir(source, destination) {
   for (const entry of entries) {
     if (entry.name === ".DS_Store") continue
     if (entry.name === "README.md") continue
+    if (entry.name.endsWith(".test.mjs")) continue
 
     const sourcePath = path.join(source, entry.name)
     const destinationPath = path.join(destination, entry.name)
@@ -39,3 +40,9 @@ if (await pathExists(sourceDir)) {
 } else {
   console.log("No standalone HTML directory found; skipped.")
 }
+
+// Keep the PWA outside Quartz routing and scope its service worker to this app.
+await copyDir(
+  path.join(projectRoot, "studio", "audiobooks"),
+  path.join(projectRoot, "public", "studio", "audiobooks"),
+)

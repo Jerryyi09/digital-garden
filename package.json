@@ -14,6 +14,7 @@
   "scripts": {
     "quartz": "./quartz/bootstrap-cli.mjs",
     "publish": "node scripts/publish-site.mjs",
+    "deploy:audiobooks": "node scripts/deploy-audiobooks.mjs",
     "publish-notes": "node scripts/publish-notes.mjs",
     "prepare-quartz": "node scripts/regenerate-plugin-index.mjs",
     "build": "node scripts/generate-garden-pages.mjs && node scripts/regenerate-plugin-index.mjs && node quartz/bootstrap-cli.mjs build && node scripts/copy-html.mjs",
