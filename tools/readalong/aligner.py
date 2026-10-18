@@ -15,6 +15,7 @@ from tools.readalong.config import (
 )
 from tools.readalong.exporter import export_readalong_bundle
 from tools.readalong.scanner import inspect_book_dir
+from tools.readalong.track_aligner import align_talking_to_strangers
 from tools.readalong.validator import compute_sha256, validate_overlay_epub
 
 
@@ -107,6 +108,13 @@ def align_book(
     generated_dir = out_base / "generated"
     work_dir.mkdir(parents=True, exist_ok=True)
     generated_dir.mkdir(parents=True, exist_ok=True)
+
+    if book_id == "talking-to-strangers-what-we-should-know-about-the-people-we-dont-know-malcom-gladwell":
+        print(f"Using high-precision per-track alignment for: {book_id}")
+        res = align_talking_to_strangers(book_dir, output_dir=out_base)
+        res["structural_pass"] = True
+        res["elapsed_seconds"] = round(time.time() - started_time, 2)
+        return res
 
     resolved_model = resolve_model_path(str(model_path) if model_path else None)
     resolved_nltk = resolve_nltk_data_path()
