@@ -119,6 +119,19 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
   vertical-align: middle;
 }
 
+.badge-pdf {
+  display: inline-block;
+  background: #ebe5d8;
+  color: #433928;
+  border: 1px solid #cfc5b0;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: normal;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
 .readalong-btn {
   background: #eef4db;
   border-color: #aec47d;
@@ -127,6 +140,20 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
 }
 .readalong-btn:hover {
   background: #dce7ae;
+}
+
+.pdf-btn {
+  background: #f4eee1;
+  border-color: #cdc2ab;
+  color: #483d2c;
+  font-weight: 500;
+}
+.pdf-btn:hover {
+  background: #e6ddcb;
+}
+
+.pdf-badge {
+  background: #483d2c !important;
 }
 
 .readalong {

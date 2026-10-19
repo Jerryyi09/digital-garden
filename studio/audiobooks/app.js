@@ -3,6 +3,7 @@ import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config
 const $ = (id) => document.getElementById(id)
 const audio = $("audio")
 const AUDIO = /\.(mp3|m4a|m4b)$/i
+const PDF = /\.pdf$/i
 const PREF = "garden-listen-prefs-v1"
 const AUTH = "garden-listen-auth-v1"
 const JOURNAL = "garden-listen-journal-v1"
@@ -30,6 +31,9 @@ let readalongActive = false
 let readalongFollowing = true
 let currentSegment = null
 let currentDocPath = ""
+let currentPdfPath = ""
+let currentPdfName = ""
+let pdfViewerActive = false
 let stableDevice = read(localStorage, "garden-listen-device", "")
 if (!stableDevice) {
   stableDevice = `garden-listen-${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -179,6 +183,7 @@ async function list(path) {
   // Fetch every page; server-side page-size limits must not hide later chapters.
   const content = []
   let hasReadalongInFolder = false
+  let pdfInFolder = null
   for (let page = 1; ; page++) {
     const data = await api("fs/list", {
       path,
@@ -190,6 +195,10 @@ async function list(path) {
     const batch = data.content || []
     if (batch.some((item) => item.name === "readalong" || item.name === ".readalong")) {
       hasReadalongInFolder = true
+    }
+    const pdfItem = batch.find((item) => !item.is_dir && PDF.test(item.name))
+    if (pdfItem && !pdfInFolder) {
+      pdfInFolder = pdfItem.name
     }
     content.push(...batch)
     if (!batch.length || content.length >= (data.total ?? content.length)) break
@@ -215,6 +224,8 @@ async function list(path) {
       size: item.size,
       modified: item.modified,
       hasReadalong: hasReadalongInFolder && !item.is_dir,
+      hasPdf: Boolean(pdfInFolder) && !item.is_dir,
+      pdfName: pdfInFolder,
     }))
 }
 
@@ -287,6 +298,11 @@ function render() {
       const badge = document.createElement("span")
       badge.className = "badge-readalong"
       badge.textContent = "📖 跟读"
+      title.append(badge)
+    } else if (item.hasPdf) {
+      const badge = document.createElement("span")
+      badge.className = "badge-pdf"
+      badge.textContent = "📄 PDF"
       title.append(badge)
     }
     const meta = document.createElement("small")
@@ -391,6 +407,7 @@ async function loadTrack(track, preparedUrl) {
   playAudio()
   prepareNext(request)
   setupReadalong(track, request)
+  setupPdf(track, request)
 }
 
 function findSegment(timeline, time) {
@@ -451,8 +468,66 @@ async function setupReadalong(track, request) {
   }
 }
 
+async function setupPdf(track, request) {
+  currentPdfPath = ""
+  currentPdfName = ""
+  $("pdf-toggle").hidden = true
+  if (pdfViewerActive) closePdfViewer()
+
+  try {
+    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
+    let pdfItem = null
+    const data = await api("fs/list", {
+      path: parent,
+      password: directoryPassword,
+      page: 1,
+      per_page: 50,
+      refresh: false,
+    }).catch(() => null)
+    if (data?.content) {
+      pdfItem = data.content.find((item) => !item.is_dir && PDF.test(item.name))
+    }
+    if (!pdfItem || request !== playRequest) return
+    currentPdfPath = `${parent}/${pdfItem.name}`
+    currentPdfName = pdfItem.name
+    $("pdf-toggle").hidden = false
+    $("pdf-toggle").textContent = "📄 浏览讲义/PDF"
+  } catch {
+    $("pdf-toggle").hidden = true
+  }
+}
+
+async function openPdfViewer() {
+  if (!currentPdfPath) return
+  if (readalongActive) closeReadalong()
+  pdfViewerActive = true
+  $("pdf-viewer").hidden = false
+  $("pdf-toggle").textContent = "收起讲义/PDF"
+  $("pdf-title").textContent = currentPdfName || "配套讲义 / PDF 电子书"
+  $("pdf-loading").hidden = false
+
+  try {
+    const info = await api("fs/get", { path: currentPdfPath, password: directoryPassword })
+    const pdfUrl = mediaUrl(endpoint, { path: currentPdfPath }, info.sign)
+    $("pdf-frame").src = pdfUrl
+    $("pdf-external").href = pdfUrl
+  } finally {
+    $("pdf-loading").hidden = true
+  }
+}
+
+function closePdfViewer() {
+  pdfViewerActive = false
+  $("pdf-viewer").hidden = true
+  $("pdf-frame").removeAttribute("src")
+  if ($("pdf-toggle")) {
+    $("pdf-toggle").textContent = "📄 浏览讲义/PDF"
+  }
+}
+
 function openReadalong() {
   if (!readalongManifest || !readalongTimeline.length) return
+  if (pdfViewerActive) closePdfViewer()
   readalongActive = true
   $("readalong").hidden = false
   $("readalong-toggle").textContent = "收起跟读"
@@ -722,6 +797,8 @@ $("settings-open").onclick = () => $("settings").showModal()
 $("settings-close").onclick = () => $("settings").close()
 $("readalong-toggle").onclick = () => (readalongActive ? closeReadalong() : openReadalong())
 $("readalong-close").onclick = closeReadalong
+$("pdf-toggle").onclick = () => (pdfViewerActive ? closePdfViewer() : openPdfViewer())
+$("pdf-close").onclick = closePdfViewer
 $("readalong-follow").onclick = () => {
   readalongFollowing = !readalongFollowing
   $("readalong-follow").textContent = `跟随：${readalongFollowing ? "开" : "暂停"}`
@@ -797,6 +874,7 @@ $("connection-form").onsubmit = async (event) => {
 $("logout").onclick = () => {
   saveProgress()
   closeReadalong()
+  closePdfViewer()
   audio.pause()
   ++playRequest
   ++browseRequest
