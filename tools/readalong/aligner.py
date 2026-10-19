@@ -209,6 +209,9 @@ def align_book(
     sys.path.insert(0, str(engine_dir.resolve()))
     import generate_epub_overlay
 
+    pipeline_audio_ext = audio_for_pipeline.suffix.lower()
+    chosen_ext = ".mp3" if pipeline_audio_ext == ".mp3" else ".m4a"
+
     old_argv = sys.argv
     sys.argv = [
         "generate_epub_overlay.py",
@@ -222,6 +225,7 @@ def align_book(
         "--chunk-seconds", str(chunk_seconds),
         "--batch-size", "1",
         "--mlx-cache-gb", "2",
+        "--audio-extension", chosen_ext,
     ]
 
     try:
@@ -237,17 +241,17 @@ def align_book(
         raise RuntimeError("No media-overlay EPUB was produced in generated directory")
     overlay_epub = generated_epubs[0]
 
-    # Probe actual chunk durations from work/run/0*.m4a
+    # Probe actual chunk durations from work/run/0*.*
     run_dir = work_dir / "run"
     chunk_durations = {}
-    chunk_files = sorted(run_dir.glob("0*.m4a"))
+    chunk_files = sorted([f for f in run_dir.glob("0*.*") if f.suffix.lower() in (".m4a", ".mp3", ".aac")])
     for cf in chunk_files:
         try:
             raw = subprocess.check_output([
                 "ffprobe", "-v", "error", "-show_entries", "format=duration",
                 "-of", "default=nw=1:nk=1", str(cf)
             ])
-            # Key can match audio/000.m4a or ../audio/000.m4a
+            # Key can match audio/000.ext or ../audio/000.ext
             chunk_dur = float(raw.strip())
             chunk_durations[f"audio/{cf.name}"] = chunk_dur
             chunk_durations[f"../audio/{cf.name}"] = chunk_dur

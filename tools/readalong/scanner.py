@@ -97,18 +97,8 @@ def slugify(text: str) -> str:
 
 def inspect_book_dir(book_dir: Path) -> dict:
     """Inspect a single book directory for audio and EPUB pairings."""
-    epubs = []
-    audios = []
-
-    for entry in book_dir.iterdir():
-        if is_ignored(entry):
-            continue
-        if entry.is_file():
-            ext = entry.suffix.lower()
-            if ext == ".epub":
-                epubs.append(entry)
-            elif ext in AUDIO_EXTENSIONS:
-                audios.append(entry)
+    epubs = [e for e in book_dir.rglob("*.epub") if not is_ignored(e) and not e.name.startswith("._")]
+    audios = [a for a in book_dir.rglob("*") if a.suffix.lower() in AUDIO_EXTENSIONS and not is_ignored(a) and not a.name.startswith("._")]
 
     # Sort files naturally
     epubs.sort(key=lambda p: p.name)
@@ -116,10 +106,8 @@ def inspect_book_dir(book_dir: Path) -> dict:
 
     book_id = slugify(book_dir.name)
     pairing_status = "unpaired"
-    if len(epubs) == 1 and len(audios) >= 1:
+    if len(epubs) >= 1 and len(audios) >= 1:
         pairing_status = "paired"
-    elif len(epubs) > 1:
-        pairing_status = "multiple_epubs"
     elif not epubs and audios:
         pairing_status = "missing_epub"
     elif epubs and not audios:
@@ -149,19 +137,25 @@ def inspect_book_dir(book_dir: Path) -> dict:
 
 
 def scan_library(root_dir: Path, language: str = "en") -> list[dict]:
-    """Recursively scan a library root for audiobooks."""
+    """Scan a library root for audiobooks."""
     books = []
-    for item in root_dir.rglob("*"):
+    # If root_dir itself contains media directly
+    has_direct_media = any(
+        f.suffix.lower() in AUDIO_EXTENSIONS or f.suffix.lower() == ".epub"
+        for f in root_dir.iterdir() if f.is_file() and not is_ignored(f)
+    )
+    if has_direct_media:
+        return [inspect_book_dir(root_dir)]
+
+    for item in sorted(root_dir.iterdir()):
         if item.is_dir() and not is_ignored(item):
-            # Check if this directory directly contains audio or epub
             has_media = any(
                 f.suffix.lower() in AUDIO_EXTENSIONS or f.suffix.lower() == ".epub"
-                for f in item.iterdir() if f.is_file() and not is_ignored(f)
+                for f in item.rglob("*") if f.is_file() and not is_ignored(f)
             )
             if has_media:
                 info = inspect_book_dir(item)
-                # Filter by language if specified and known
                 epub_lang = (info.get("epub_info") or {}).get("metadata", {}).get("language", "")
-                if not language or not epub_lang or epub_lang.lower().startswith(language.lower()):
+                if not language or not epub_lang or epub_lang.lower().startswith(language.lower()) or epub_lang.lower() == "und":
                     books.append(info)
     return books

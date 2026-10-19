@@ -1,8 +1,10 @@
 # 花园听书：双环境部署与运维
 
-日期：2026-10-18。源码：`studio/audiobooks/`。入口由 `studio/downloads-index.json` 生成，独立应用链接使用 `data-router-ignore`，避免 Quartz SPA 接管。
+日期：2026-10-19。源码：`studio/audiobooks/`。入口由 `studio/downloads-index.json` 生成，独立应用链接使用 `data-router-ignore`，避免 Quartz SPA 接管。
 
-后续完整开发任务见 [Claude Code 交接文档](audiobooks-claude-code-handoff.md)。现已交付通用映射工具 `./scripts/readalong`（支持 scan/align/batch/validate/install）以及应用内英文 EPUB 跟读功能。《习惯的力量》（The Power of Habit By Charles Duhigg）约 10.5 小时全书端到端对齐已完成，共生成 12 个 SMIL、11,733 段精确时间轴映射，10/10 项独立校验全部通过，并已安装至书库 `readalong/` 目录。
+后续完整开发任务见 [Claude Code 交接文档](audiobooks-claude-code-handoff.md)。现已交付通用映射工具 `./scripts/readalong`（支持 scan/align/batch/validate/install）以及应用内英文 EPUB 跟读功能。
+已完成心智成长分类下全部 35 本含 EPUB 电子书的有声书端到端音文映射与独立核验，并对全量 42 个有声书子目录同步安装至书库 `/Volumes/750/Music/有声书/心智成长/`。
+支持版本差异容错机制：当有声书为删节版、序言不同或存在未朗读附录/注释时，管线平滑跳过未朗读内容，确保逐句匹配精准且不中断。
 
 界面更新：书库列表中带有音文同步资源的条目高亮展示「📖 跟读」标识；播放器中提供「📖 边听边读」开关，支持应用内沙箱阅读、双向点击跳转、时间轴二分高效定位、自动居中跟随、手动滚动防争抢及字号调节。PWA 界面缓存已升级为 v3。
 
