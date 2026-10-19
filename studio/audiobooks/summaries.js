@@ -10,10 +10,16 @@ export const BOOK_SUMMARIES = {
     "碎片化网络时代的专注力指南。提出深度工作是数字经济中的稀缺超能力，系统总结无干扰专注的四大践行法则，助你高效产出并重构心智带宽。",
   "Clear Thinking":
     "顶级决策博客Farnam Street创始人力作。深度剖析情绪、自我与群体本能如何扭曲判断，传授识别心智陷阱、保持清醒并做出高概率正确决策的系统方法。",
+  "Cognitive Psychology for Dummies":
+    "通俗系统的认知心理学指南。深入探讨人类大脑如何感知世界、加工信息、储存记忆并做出逻辑推断，全面破译人类日常注意与认知思考的底层机制。",
+  "Critical Thinking Skills for Dummies (2nd Edition)":
+    "简明实用的批判性思维工具书。传授识别逻辑谬误、甄别虚假信息、构建严密论证并进行客观反思的系统技巧，助你在信息泛滥时代做出理性清醒的判断。",
   "DK - How Psychology Works":
     "DK经典图解心理学全书。以清晰图表剖析大脑结构、人格发展、心理疾病及各类心理治疗流派，全方位图解人类行为、感知与心理运作的内在规律。",
   "DK - The Psychology Book":
     "权威心理学大思想巡礼。系统汇聚近百位心理学开创者的核心理论与经典实验，从行为主义到认知革命，生动呈现人类探索灵魂与精神世界的全景。",
+  "Do Hard Things- Why We Get Resilience Wrong and the Surprising Science of Real Toughness":
+    "颠覆盲目逞强的现代坚韧心理学。通过前沿科学与运动心理学案例，揭示直面不适、倾听内心、灵活应对危机方为真正的内心强大，构建持久真实的韧性心智。",
   "Emotional Intelligence":
     "情商理论奠基之作。颠覆唯智商论，揭示情绪自我察觉、自我调控、共情与社交能力的决定性作用，阐明情绪智力如何塑造人生幸福与长远成就。",
   "Eugenia Cheng - The Art of Logic in an Illogical World":
@@ -26,12 +32,18 @@ export const BOOK_SUMMARIES = {
     "基于长期高净值人群调研总结的高绩效法则。提炼寻求清晰、激发活力、提升必要性等六大核心习惯，帮助普通人打破平庸，获得持续而卓越的成就。",
   "How To Win Friends and Influence People":
     "全球畅销近百年的为人处世经典。以真诚、尊重与共情为基石，深入传授赢得信任、有效沟通与化解人际冲突的核心艺术，塑造强大的人际吸引力。",
+  "How You Decide- The Science of Human Decision Making [2016]":
+    "大历史名师讲堂人类决策科学通识课。深入剖析直觉、风险偏好、心理账户与群体影响如何左右选择，传授克服认知陷阱、优化人生重大决策的实用心法。",
   "Influence The Psychology of Persuasion":
     "说服与影响力心理学权威指南。系统揭秘互惠、承诺一致、社会认同、喜好、权威与稀缺六大心理顺从开关，教你洞察劝说机制并避免被无意识操纵。",
   "Introduction to Psychology - Catherine A. Sanderson (TGC)":
     "大历史名师讲堂的心理学入门盛宴。生动讲解感知、记忆、情绪、压力管理与社会心理学，以科学实验为支撑带你洞悉人类复杂心智与日常行为本质。",
+  "Julia Galef - The Scout Mindset":
+    "理性决策倡导者力作。对比捍卫固有立场的“士兵心态”与探求客观事实的“侦察兵心态”，教你克服确认偏误、敢于承认错误，以清澈目光洞悉世界真实面貌。",
   "Kay_Peterson_-_How_You_Learn_Is_How_You_Live":
     "基于库伯经验学习风格理论的自我升级之作。详解经验学习九大模块，帮助你识别个人思维偏好，打破学习与心智盲区，实现终身灵活学习与成长。",
+  "Make Time":
+    "谷歌风投设计冲刺大师的时间管理法。打破忙碌陷阱，围绕精选每日焦点、消除干扰、激发身体能量与持续反思四大维度，助你在纷扰中为真正重要之事创造时间。",
   "Make Your Bed":
     "美国退役四星海军上将麦克雷文的心智箴言。从每天清晨整理床铺这一微小习惯出发，融合海豹突击队严苛训练经验，提炼出直面挫折、坚韧担当的人生信条。",
   "Man's Search for Meaning":
@@ -42,10 +54,14 @@ export const BOOK_SUMMARIES = {
     "通俗易懂的正念减压日常实践指南。提供丰富的简短冥想与感知练习，教你在快节奏现代生活中摆脱焦虑内耗，关注当下呼吸，重获内在专注与平静。",
   "Mindset, The New Psychology of Success":
     "斯坦福大学德韦克教授的心智颠覆之作。深刻对比固定型思维与成长型思维，指明将挑战视为学习契机的心智模式如何决定个人在学习与事业上的终身成就。",
+  "Mindwise [2014]":
+    "芝加哥大学心理学教授的读心科学力作。深入解构人类推测他人意图、情绪与信念的心理盲区，指出过度自信正是误解根源，传授如何真正准确地理解他人。",
   "Peter Hollins - Think Like Sherlock":
     "逻辑思维与深度观察训练指南。拆解夏洛克·福尔摩斯的推断心智模式，系统训练敏锐环境观察力、归纳演绎法与批判性思维，大幅提升问题破解速度。",
   "Practical Intelligence":
     "破局实战智力与高情商思维手册。聚焦现实复杂情境，教你洞察潜台词、分析各方动机、拆解隐性操纵，在社交与商业博弈中快速掌控局势并保持清醒。",
+  "Robert B. Cialdini - Influence, New and Expanded":
+    "影响力心理学全面扩充升级版。在经典六大原则基础上新增“同一性/联盟感”第七原则，深入剖析群体认同驱动力，全方位掌握现代商业与社交中的说服智慧。",
   "Siddhartha - Herman Hesse, Paul Ansdell [1520018711]":
     "诺奖作家黑塞的心灵探索名著。讲述古印度青年悉达多离开原生阶层，经历修行、尘世情欲与绝望痛苦，最终在河流的流水与沉思中体悟宇宙圆融真谛。",
   "Smarter Faster Better":
@@ -54,6 +70,8 @@ export const BOOK_SUMMARIES = {
     "大历史名师讲堂冥想大系。融合东方传统智慧与现代临床神经科学，系统剖析正念冥想对神经回路重塑、情绪调适、身心愈合与认知提升的深远影响。",
   "TTC - The Hidden Factor - Why Thinking Differently is Your Greatest Asset":
     "名师讲授突破思维定势的高维课程。探究常规假设对认知的无形限制，通过丰富跨界案例激发发散思维与创新灵感，将非常规思考转化为核心竞争优势。",
+  "TTC - The Science of Mindfulness":
+    "大历史名师讲堂正念科学经典。立足认知科学与临床医学实证，系统讲授正念减压、情绪聚焦与冥想对大脑神经回路塑造的生理机制，带你科学领悟内在宁静。",
   "TTC - Understanding the Dark Side of Human Nature":
     "深度剖析人性阴暗面的心理哲学课。探究欺骗、攻击、自私、偏见与恶意行为的心理动因与进化逻辑，在理解黑暗机制中建立清醒防御与理性慈悲。",
   "Talking to Strangers What We Should Know About the People We Don’t Know Malcom Gladwell":
@@ -64,6 +82,10 @@ export const BOOK_SUMMARIES = {
     "畅销全球半个多世纪的积极心理学先驱之作。提供简明的精神重塑法则与信念训练，教你摆脱自卑焦虑，以充满希望的心态面对挑战，激活生命充沛活力。",
   "The Wisdom of Insecurity":
     "东方禅宗哲学与西方心智碰撞的思想明珠。揭示追求永恒确定性正是现代人精神焦虑的根源，启发我们在不确定的无常世界中安住当下，获得真正自在。",
+  "Think It":
+    "畅销书作家心智重塑实践指南。通过设定清晰愿景、改变潜意识语言与日常心智训练，帮助你清理负面信念与思维阻碍，激发内在潜能实现全方位人生跃迁。",
+  "Think_Like_a_Psychologist":
+    "拆解复杂行为与人际心理的思维训练书。从肢体语言、潜意识动机到情绪操控防御，教你以专业心理学视角洞察人心，提升社交情商与自我洞察力。",
   "Thinking Fast or Slow":
     "诺奖得主卡尼曼颠覆认知科学的经典巨著。详解人类大脑直觉反应与深思熟虑的两套决策系统，全面梳理锚定、框架效应等认知偏差，助你理性把控人生。",
   "Who We Are Becoming Matters":
