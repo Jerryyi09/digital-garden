@@ -509,7 +509,7 @@ async function openPdfViewer() {
   try {
     const info = await api("fs/get", { path: currentPdfPath, password: directoryPassword })
     const pdfUrl = mediaUrl(endpoint, { path: currentPdfPath }, info.sign)
-    $("pdf-frame").src = pdfUrl
+    $("pdf-frame").src = `./pdf-viewer.html?file=${encodeURIComponent(pdfUrl)}`
     $("pdf-external").href = pdfUrl
   } finally {
     $("pdf-loading").hidden = true

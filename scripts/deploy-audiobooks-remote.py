@@ -35,6 +35,8 @@ def patch_nginx(source):
         proxy_set_header Range $http_range;
         proxy_set_header If-Range $http_if_range;
         proxy_buffering off;
+        proxy_hide_header Content-Disposition;
+        add_header Content-Disposition "inline";
         proxy_redirect / /alist/;
         proxy_redirect /alist:5244/ /alist/;
     }
@@ -42,13 +44,15 @@ def patch_nginx(source):
 """
     http = http.replace(marker, block + marker, 1)
 
-  def disable_buffering(match):
+  def patch_alist_block(match):
     block = match.group(0)
     if "proxy_buffering" not in block:
-      return block[:-1] + "    proxy_buffering off;\n    }"
+      block = block[:-1] + "    proxy_buffering off;\n    }"
+    if "proxy_hide_header Content-Disposition;" not in block:
+      block = block[:-1] + "    proxy_hide_header Content-Disposition;\n        add_header Content-Disposition \"inline\";\n    }"
     return block
 
-  return re.sub(r"location /alist\s*\{[^{}]*\}", disable_buffering, http + rest)
+  return re.sub(r"location /alist\s*\{[^{}]*\}", patch_alist_block, http + rest)
 
 
 def main():
