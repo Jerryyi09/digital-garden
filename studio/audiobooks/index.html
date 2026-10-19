@@ -39,6 +39,10 @@
           <label><span class="sr-only">排序</span><select id="sort"><option value="name">文件名顺序</option><option value="modified">最近更新</option></select></label>
         </div>
         <div class="directory"><nav id="breadcrumbs" aria-label="书库路径"></nav><button id="refresh" class="subtle">刷新目录</button></div>
+        <div id="folder-summary" class="folder-summary" hidden>
+          <div class="summary-tag">内容简介 / OVERVIEW</div>
+          <p id="folder-summary-text"></p>
+        </div>
         <p id="list-status" role="status"></p>
         <div id="items" class="items" role="list" aria-label="书库与最近播放列表"></div>
       </section>

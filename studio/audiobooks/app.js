@@ -1,4 +1,5 @@
 import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
+import { getBookSummary } from "./summaries.js"
 
 const $ = (id) => document.getElementById(id)
 const audio = $("audio")
@@ -266,6 +267,18 @@ function breadcrumbs() {
 
 function render() {
   breadcrumbs()
+
+  // Display full book overview at the top if inside a book folder
+  const currentDirName = folder.slice(ROOT.length).split("/").filter(Boolean).pop() || ""
+  const currentSummary = getBookSummary(currentDirName)
+  if (currentSummary && folder !== ROOT && view === "browse") {
+    $("folder-summary-text").textContent = currentSummary
+    $("folder-summary").hidden = false
+  } else {
+    $("folder-summary").hidden = true
+    $("folder-summary-text").textContent = ""
+  }
+
   $("browse-tab").setAttribute("aria-pressed", String(view === "browse"))
   $("recent-tab").setAttribute("aria-pressed", String(view === "recent"))
   $("search").placeholder = view === "recent" ? "搜索收听记录 / 文件名" : "搜索当前目录 / 文件名"
@@ -286,43 +299,70 @@ function render() {
   for (const item of items) {
     const record = progress(item)
     const button = document.createElement("button")
-    button.className = "item"
-    const kind = document.createElement("span")
-    kind.className = "kind"
-    kind.textContent = item.is_dir
-      ? "↗ 文件夹 / 分类"
-      : `♫ ${item.name.split(".").pop().toUpperCase()}`
-    const title = document.createElement("strong")
-    title.textContent = item.name.replace(AUDIO, "")
-    if (item.hasReadalong) {
-      const badge = document.createElement("span")
-      badge.className = "badge-readalong"
-      badge.textContent = "📖 跟读"
-      title.append(badge)
-    } else if (item.hasPdf) {
-      const badge = document.createElement("span")
-      badge.className = "badge-pdf"
-      badge.textContent = "📄 PDF"
-      title.append(badge)
-    }
-    const meta = document.createElement("small")
-    meta.textContent = record
-      ? `${record.completed ? "已听完" : "听至"} ${durationText(record.position)} / ${durationText(record.duration)}`
-      : item.is_dir
-        ? "打开目录 →"
+
+    if (item.is_dir) {
+      button.className = "item dir-item"
+      const title = document.createElement("strong")
+      title.textContent = item.name.replace(AUDIO, "")
+      if (item.hasReadalong) {
+        const badge = document.createElement("span")
+        badge.className = "badge-readalong"
+        badge.textContent = "📖 跟读"
+        title.append(badge)
+      } else if (item.hasPdf) {
+        const badge = document.createElement("span")
+        badge.className = "badge-pdf"
+        badge.textContent = "📄 PDF"
+        title.append(badge)
+      }
+
+      const descText = getBookSummary(item.name)
+      const desc = document.createElement("p")
+      desc.className = "item-desc"
+      desc.textContent = descText || "点击浏览有声书章节与资料"
+
+      const action = document.createElement("span")
+      action.className = "row-action"
+      action.setAttribute("aria-hidden", "true")
+      action.textContent = "↗"
+
+      button.append(title, desc, action)
+    } else {
+      button.className = "item"
+      const kind = document.createElement("span")
+      kind.className = "kind"
+      kind.textContent = `♫ ${item.name.split(".").pop().toUpperCase()}`
+      const title = document.createElement("strong")
+      title.textContent = item.name.replace(AUDIO, "")
+      if (item.hasReadalong) {
+        const badge = document.createElement("span")
+        badge.className = "badge-readalong"
+        badge.textContent = "📖 跟读"
+        title.append(badge)
+      } else if (item.hasPdf) {
+        const badge = document.createElement("span")
+        badge.className = "badge-pdf"
+        badge.textContent = "📄 PDF"
+        title.append(badge)
+      }
+      const meta = document.createElement("small")
+      meta.textContent = record
+        ? `${record.completed ? "已听完" : "听至"} ${durationText(record.position)} / ${durationText(record.duration)}`
         : `${(item.size / 1024 / 1024).toFixed(1)} MB · 开始收听`
-    const action = document.createElement("span")
-    action.className = "row-action"
-    action.setAttribute("aria-hidden", "true")
-    action.textContent = item.is_dir ? "↗" : "▷"
-    button.append(kind, title, meta, action)
-    if (record) {
-      const bar = document.createElement("progress")
-      bar.max = record.duration || 1
-      bar.value = record.position
-      bar.setAttribute("aria-label", "收听进度")
-      button.append(bar)
+      const action = document.createElement("span")
+      action.className = "row-action"
+      action.setAttribute("aria-hidden", "true")
+      action.textContent = "▷"
+      button.append(kind, title, meta, action)
+      if (record) {
+        const bar = document.createElement("progress")
+        bar.max = record.duration || 1
+        bar.value = record.position
+        bar.setAttribute("aria-label", "收听进度")
+        button.append(bar)
+      }
     }
+
     button.onclick = attempt(() => (item.is_dir ? browse(item.path) : loadTrack(item)))
     const row = document.createElement("div")
     row.className = "item-row"
