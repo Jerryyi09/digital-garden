@@ -32,6 +32,7 @@ let browseRequest = 0
 let preparedNext = null
 let db = null
 let directoryPassword = ""
+let browseError = ""
 
 // Readalong & PDF State
 let readalongManifest = null
@@ -208,16 +209,27 @@ function createBookCoverElement(bookTitle, sizeClass = "size-row", fullImgPath =
 }
 
 async function openDatabase() {
-  db = await new Promise((resolve, reject) => {
-    const request = indexedDB.open("garden-audiobooks", 1)
-    request.onupgradeneeded = () =>
-      request.result.createObjectStore("progress", { keyPath: "key" })
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error)
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("IndexedDB timeout")), 1500),
+  )
+  const openPromise = new Promise((resolve, reject) => {
+    try {
+      if (!window.indexedDB) return reject(new Error("No indexedDB"))
+      const request = indexedDB.open("garden-audiobooks", 1)
+      request.onupgradeneeded = () =>
+        request.result.createObjectStore("progress", { keyPath: "key" })
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+      request.onblocked = () => reject(new Error("IndexedDB blocked"))
+    } catch (e) {
+      reject(e)
+    }
   })
+
+  db = await Promise.race([openPromise, timeoutPromise])
   records = await new Promise((resolve, reject) => {
     const request = db.transaction("progress").objectStore("progress").getAll()
-    request.onsuccess = () => resolve(request.result)
+    request.onsuccess = () => resolve(request.result || [])
     request.onerror = () => reject(request.error)
   })
 }
@@ -264,7 +276,7 @@ async function api(route, body = {}, token = auth?.token) {
   let response
   try {
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 12000)
+    const timer = setTimeout(() => controller.abort(), 8000)
     response = await fetch(`${endpoint}/api/${route}`, {
       method: "POST",
       headers,
@@ -276,7 +288,7 @@ async function api(route, body = {}, token = auth?.token) {
     clearTimeout(timer)
   } catch (err) {
     if (err.name === "AbortError") {
-      throw new Error(`连接书库超时（12秒未响应），请检查家庭服务器网络。`)
+      throw new Error(`连接书库超时（8秒未响应），请检查家庭服务器网络或登录 AList。`)
     }
     throw new Error(
       `无法连接家庭书库（${endpoint}）：${err.message || "网络异常，请检查访问模式。"}`
@@ -292,7 +304,7 @@ async function api(route, body = {}, token = auth?.token) {
 
   if (result.code !== 200) {
     if (result.code === 401) {
-      $("settings")?.showModal()
+      openSettingsModal()
       throw new Error("请使用 AList 账号登录；登录已过期。")
     }
     if (result.code === 400 && String(result.message).toLowerCase().includes("password")) {
@@ -372,15 +384,17 @@ async function browse(path = folder) {
     if (request !== browseRequest) return
     entries = result
     folder = path
+    browseError = ""
     $("search").value = ""
     $("search-clear").hidden = true
     render()
   } catch (err) {
     if (request === browseRequest) {
       entries = []
-      $("list-status").textContent = "未连接书库或登录已过期，请点击右上角设置登录"
-      notice(err.message || "无法连接书库，请登录 AList。")
+      browseError = err.message || "无法连接书库，请登录 AList。"
       render()
+      notice(browseError)
+      openSettingsModal()
     }
   } finally {
     if (request === browseRequest) {
@@ -502,6 +516,25 @@ function render() {
   )
 
   $("items").replaceChildren()
+
+  if (browseError && !entries.length) {
+    $("list-status").textContent = "未连接书库，请点击登录"
+    const empty = document.createElement("div")
+    empty.className = "shelf-empty-state"
+    empty.style.cursor = "pointer"
+    empty.style.textAlign = "center"
+    empty.style.padding = "48px 16px"
+    empty.innerHTML = `
+      <div style="font-size: 36px; margin-bottom: 12px;">🔐</div>
+      <p style="font-weight: 600; font-size: 16px; color: var(--text-main); margin-bottom: 8px;">未连接家庭书库</p>
+      <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px; line-height: 1.5;">${browseError}</p>
+      <button type="button" class="wx-btn wx-btn-primary" style="margin: 0 auto; display: inline-flex; padding: 8px 24px;">立即登录 AList</button>
+    `
+    empty.onclick = openSettingsModal
+    $("items").append(empty)
+    return
+  }
+
   $("list-status").textContent = `${folder === ROOT ? "全部有声书" : currentDirName} · ${items.length} 项${query ? " (已筛选)" : ""}`
 
   for (const item of items) {
@@ -1432,7 +1465,17 @@ function openSettingsModal() {
   } catch {
     /* fallback */
   }
-  dlg.showModal()
+  if (!dlg.open) {
+    try {
+      if (typeof dlg.showModal === "function") {
+        dlg.showModal()
+      } else {
+        dlg.setAttribute("open", "")
+      }
+    } catch {
+      dlg.setAttribute("open", "")
+    }
+  }
 }
 
 on("settings-open", "click", openSettingsModal)
@@ -1632,21 +1675,14 @@ async function init() {
   if (auth?.token) {
     browse(ROOT).catch((err) => {
       console.warn("Initial browse failed:", err)
-      $("list-status").textContent = "未连接书库，请点击右上角设置登录"
+      browseError = err.message || "登录可能已过期，请重新登录 AList。"
       render()
+      openSettingsModal()
     })
   } else {
-    $("list-status").textContent = "未连接家庭书库，请点击右上角设置登录"
+    browseError = "请登录您的 AList 账号以浏览和收听家庭有声书。"
     render()
-    // Open settings dialog if not connected
-    const settingsDlg = $("settings")
-    if (settingsDlg && typeof settingsDlg.showModal === "function") {
-      try {
-        settingsDlg.showModal()
-      } catch {
-        /* Dialog might already be open */
-      }
-    }
+    openSettingsModal()
   }
 
   // Register Service Worker
