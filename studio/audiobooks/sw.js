@@ -1,5 +1,5 @@
-const CACHE = "garden-audiobooks-v16"
-const SHELL = ["./", "./app.js", "./config.js", "./readalong-engine.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
+const CACHE = "garden-audiobooks-v17"
+const SHELL = ["./", "./app.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)))
 })
