@@ -1209,8 +1209,16 @@ function openReadalong() {
   }
 
   const badge = document.querySelector(".readalong-capsule-badge")
-  if (badge) {
-    badge.textContent = readalongTimeline.length ? "跟读模式" : "阅读模式"
+  const followBtn = $("readalong-follow")
+  const locateBtn = $("readalong-locate")
+
+  if (readalongTimeline.length) {
+    if (badge) badge.textContent = "跟读模式"
+    if (followBtn) followBtn.hidden = false
+  } else {
+    if (badge) badge.textContent = "阅读模式"
+    if (followBtn) followBtn.hidden = true
+    if (locateBtn) locateBtn.hidden = true
   }
 
   if (targetDoc && currentDocPath !== targetDoc) {
