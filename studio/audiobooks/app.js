@@ -5,25 +5,28 @@ const $ = (id) => document.getElementById(id)
 const audio = $("audio")
 const AUDIO = /\.(mp3|m4a|m4b)$/i
 const PDF = /\.pdf$/i
-const PREF = "garden-listen-prefs-v1"
+const PREF = "garden-listen-prefs-v2"
 const AUTH = "garden-listen-auth-v1"
 const JOURNAL = "garden-listen-journal-v1"
+
 let prefs = read(localStorage, PREF, { mode: "auto", username: "", speed: 1 })
 let auth = read(sessionStorage, AUTH, null) || read(localStorage, AUTH, null)
-let endpoint = resolveEndpoint()
+let endpoint = resolveEndpoint(prefs.mode)
 let records = []
 let entries = []
 let folder = ROOT
-let view = "browse"
 let current = null
+let currentBookFolder = ""
 let ready = false
 let pendingPosition = null
 let lastSave = 0
 let playRequest = 0
 let browseRequest = 0
 let preparedNext = null
-let db
+let db = null
 let directoryPassword = ""
+
+// Readalong & PDF State
 let readalongManifest = null
 let readalongTimeline = []
 let readalongParentPath = ""
@@ -35,6 +38,14 @@ let currentDocPath = ""
 let currentPdfPath = ""
 let currentPdfName = ""
 let pdfViewerActive = false
+
+// Sleep Timer State
+let sleepTimerId = null
+let sleepTimerMinutes = 0
+let sleepTimerTargetTime = 0
+let sleepTimerMode = "none" // "time" | "track" | "none"
+
+// Device identity
 let stableDevice = read(localStorage, "garden-listen-device", "")
 if (!stableDevice) {
   stableDevice = `garden-listen-${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -66,9 +77,17 @@ function remove(storage, key) {
   }
 }
 
-function notice(message = "") {
-  $("notice").textContent = message
-  $("notice").hidden = !message
+function notice(message = "", duration = 4000) {
+  const el = $("notice")
+  if (!message) {
+    el.hidden = true
+    return
+  }
+  el.textContent = message
+  el.hidden = false
+  setTimeout(() => {
+    if (el.textContent === message) el.hidden = true
+  }, duration)
 }
 
 function fail(error) {
@@ -80,6 +99,7 @@ function attempt(fn) {
       .then(() => fn(...args))
       .catch(fail)
 }
+
 function account() {
   return auth?.username || prefs.username || "guest"
 }
@@ -93,13 +113,17 @@ function progress(track) {
 }
 function durationText(seconds) {
   const s = Math.max(0, Math.floor(Number(seconds) || 0))
-  return `${Math.floor(s / 3600) ? `${Math.floor(s / 3600)}:` : ""}${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`
+  const hrs = Math.floor(s / 3600)
+  const mins = Math.floor((s % 3600) / 60)
+  const secs = String(s % 60).padStart(2, "0")
+  return hrs > 0 ? `${hrs}:${String(mins).padStart(2, "0")}:${secs}` : `${String(mins).padStart(2, "0")}:${secs}`
 }
 
 async function openDatabase() {
   db = await new Promise((resolve, reject) => {
     const request = indexedDB.open("garden-audiobooks", 1)
-    request.onupgradeneeded = () => request.result.createObjectStore("progress", { keyPath: "key" })
+    request.onupgradeneeded = () =>
+      request.result.createObjectStore("progress", { keyPath: "key" })
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
   })
@@ -117,12 +141,10 @@ function persist(record) {
   if (db) {
     const transaction = db.transaction("progress", "readwrite")
     transaction.objectStore("progress").put(record)
-    transaction.onerror = () => notice("收听记录写入失败，请导出记录备份。")
   }
 }
 
 function saveProgress(completed = audio.ended) {
-  // Metadata loading emits timeupdate/pause too; do not overwrite a resume point with zero.
   if (
     !current ||
     !ready ||
@@ -143,8 +165,7 @@ function saveProgress(completed = audio.ended) {
     speed: audio.playbackRate,
   }
   persist(record)
-  // Synchronous journal survives pagehide where IndexedDB may not finish before suspension.
-  if (!write(localStorage, JOURNAL, record)) notice("浏览器禁用了持久存储；请导出收听记录。")
+  write(localStorage, JOURNAL, record)
   lastSave = Date.now()
 }
 
@@ -164,7 +185,7 @@ async function api(route, body = {}, token = auth?.token) {
     })
   } catch {
     throw new Error(
-      "无法连接家庭书库，请检查 NUC 是否在线及访问方式。Cloudflare 只托管界面，播放仍需连接家庭服务器。",
+      "无法连接家庭书库，请检查 NUC 是否在线及网络方式。",
     )
   }
   if (!response.ok) throw new Error(`书库请求失败（HTTP ${response.status}）`)
@@ -172,7 +193,7 @@ async function api(route, body = {}, token = auth?.token) {
   if (result.code !== 200) {
     if (result.code === 401) {
       $("settings").showModal()
-      throw new Error("请使用 AList 账号登录；原登录可能已过期。")
+      throw new Error("请使用 AList 账号登录；登录已过期。")
     }
     throw new Error(result.message || `AList 错误 ${result.code}`)
   }
@@ -181,7 +202,6 @@ async function api(route, body = {}, token = auth?.token) {
 
 async function list(path) {
   if (!isWithinRoot(path)) throw new Error("只能浏览 /750HD/有声书 下的目录")
-  // Fetch every page; server-side page-size limits must not hide later chapters.
   const content = []
   let hasReadalongInFolder = false
   let pdfInFolder = null
@@ -232,19 +252,16 @@ async function list(path) {
 
 async function browse(path = folder) {
   const request = ++browseRequest
-  $("list-status").textContent = "正在读取目录…"
+  $("list-status").textContent = "正在读取目录..."
   $("refresh").disabled = true
   try {
     const result = await list(path)
     if (request !== browseRequest) return
     entries = result
     folder = path
-    view = "browse"
     $("search").value = ""
-    notice()
+    $("search-clear").hidden = true
     render()
-    $("connection").textContent =
-      `${endpoint.startsWith(location.origin) ? "当前站点直连" : "外网 HTTPS"} · 书库已连接`
   } finally {
     if (request === browseRequest) $("refresh").disabled = false
   }
@@ -265,140 +282,176 @@ function breadcrumbs() {
   }
 }
 
+function renderShelf() {
+  const shelfContainer = $("shelf-items")
+  shelfContainer.replaceChildren()
+  const recs = libraryRecords()
+  $("shelf-count").textContent = `${recs.length} 本正在收听`
+
+  if (!recs.length) {
+    const empty = document.createElement("div")
+    empty.className = "shelf-empty-state"
+    empty.textContent = "书架空空如也。前往「书库」选一本好书，开始倾听吧。"
+    shelfContainer.append(empty)
+    return
+  }
+
+  for (const record of recs) {
+    const card = document.createElement("div")
+    card.className = "shelf-card"
+
+    const cover = document.createElement("div")
+    cover.className = "shelf-cover-box"
+    cover.textContent = "📖"
+
+    const title = document.createElement("div")
+    title.className = "shelf-card-title"
+    title.textContent = record.track.name.replace(AUDIO, "")
+
+    const prog = document.createElement("div")
+    prog.className = "shelf-card-progress"
+    const percent = Math.min(100, Math.floor((record.position / (record.duration || 1)) * 100))
+    prog.textContent = record.completed ? "已读完" : `已听 ${percent}%`
+
+    card.append(cover, title, prog)
+    card.onclick = attempt(() => loadTrack(record.track))
+    shelfContainer.append(card)
+  }
+}
+
 function render() {
   breadcrumbs()
 
-  // Display full book overview at the top if inside a book folder
+  // Display full book overview banner if inside a book folder
   const currentDirName = folder.slice(ROOT.length).split("/").filter(Boolean).pop() || ""
   const currentSummary = getBookSummary(currentDirName)
-  if (currentSummary && folder !== ROOT && view === "browse") {
-    $("folder-summary-text").textContent = currentSummary
+  const isBookFolder = folder !== ROOT && entries.some((item) => !item.is_dir)
+
+  if (isBookFolder) {
+    $("banner-title").textContent = currentDirName
+    $("folder-summary-text").textContent = currentSummary || "暂无简介，点击章节即可播放。"
+    $("banner-readalong-badge").hidden = !entries.some((i) => i.hasReadalong)
+    $("banner-pdf-badge").hidden = !entries.some((i) => i.hasPdf)
     $("folder-summary").hidden = false
   } else {
     $("folder-summary").hidden = true
-    $("folder-summary-text").textContent = ""
   }
 
-  $("browse-tab").setAttribute("aria-pressed", String(view === "browse"))
-  $("recent-tab").setAttribute("aria-pressed", String(view === "recent"))
-  $("search").placeholder = view === "recent" ? "搜索收听记录 / 文件名" : "搜索当前目录 / 文件名"
   const query = $("search").value.trim().toLocaleLowerCase()
-  let items = view === "recent" ? libraryRecords().map((record) => record.track) : [...entries]
-  items = items.filter((item) => item.name.toLocaleLowerCase().includes(query))
-  if (view !== "recent")
-    items.sort(
-      (a, b) =>
-        Number(b.is_dir) - Number(a.is_dir) ||
-        ($("sort").value === "modified"
-          ? (Date.parse(b.modified) || 0) - (Date.parse(a.modified) || 0)
-          : a.name.localeCompare(b.name, "zh-CN", { numeric: true })),
-    )
+  let items = [...entries]
+  if (query) {
+    items = items.filter((item) => item.name.toLocaleLowerCase().includes(query))
+  }
+
+  items.sort(
+    (a, b) =>
+      Number(b.is_dir) - Number(a.is_dir) ||
+      ($("sort").value === "modified"
+        ? (Date.parse(b.modified) || 0) - (Date.parse(a.modified) || 0)
+        : a.name.localeCompare(b.name, "zh-CN", { numeric: true })),
+  )
+
   $("items").replaceChildren()
-  $("list-status").textContent =
-    `${view === "recent" ? "最近收听" : "当前目录"} · ${items.length} 项${query ? " · 已筛选" : ""}`
+  $("list-status").textContent = `${folder === ROOT ? "全部有声书" : currentDirName} · ${items.length} 项${query ? " (已筛选)" : ""}`
+
   for (const item of items) {
     const record = progress(item)
-    const button = document.createElement("button")
-
-    if (item.is_dir) {
-      button.className = "item dir-item"
-      const title = document.createElement("strong")
-      title.textContent = item.name.replace(AUDIO, "")
-      if (item.hasReadalong) {
-        const badge = document.createElement("span")
-        badge.className = "badge-readalong"
-        badge.textContent = "📖 跟读"
-        title.append(badge)
-      } else if (item.hasPdf) {
-        const badge = document.createElement("span")
-        badge.className = "badge-pdf"
-        badge.textContent = "📄 PDF"
-        title.append(badge)
-      }
-
-      const descText = getBookSummary(item.name)
-      const desc = document.createElement("p")
-      desc.className = "item-desc"
-      desc.textContent = descText || "点击浏览有声书章节与资料"
-
-      const action = document.createElement("span")
-      action.className = "row-action"
-      action.setAttribute("aria-hidden", "true")
-      action.textContent = "↗"
-
-      button.append(title, desc, action)
-    } else {
-      button.className = "item"
-      const kind = document.createElement("span")
-      kind.className = "kind"
-      kind.textContent = `♫ ${item.name.split(".").pop().toUpperCase()}`
-      const title = document.createElement("strong")
-      title.textContent = item.name.replace(AUDIO, "")
-      if (item.hasReadalong) {
-        const badge = document.createElement("span")
-        badge.className = "badge-readalong"
-        badge.textContent = "📖 跟读"
-        title.append(badge)
-      } else if (item.hasPdf) {
-        const badge = document.createElement("span")
-        badge.className = "badge-pdf"
-        badge.textContent = "📄 PDF"
-        title.append(badge)
-      }
-      const meta = document.createElement("small")
-      meta.textContent = record
-        ? `${record.completed ? "已听完" : "听至"} ${durationText(record.position)} / ${durationText(record.duration)}`
-        : `${(item.size / 1024 / 1024).toFixed(1)} MB · 开始收听`
-      const action = document.createElement("span")
-      action.className = "row-action"
-      action.setAttribute("aria-hidden", "true")
-      action.textContent = "▷"
-      button.append(kind, title, meta, action)
-      if (record) {
-        const bar = document.createElement("progress")
-        bar.max = record.duration || 1
-        bar.value = record.position
-        bar.setAttribute("aria-label", "收听进度")
-        button.append(bar)
-      }
-    }
-
-    button.onclick = attempt(() => (item.is_dir ? browse(item.path) : loadTrack(item)))
     const row = document.createElement("div")
     row.className = "item-row"
     row.setAttribute("role", "listitem")
-    row.append(button)
+
+    const card = document.createElement("div")
+    card.className = "item-card"
+
+    const info = document.createElement("div")
+    info.className = "item-main-info"
+
+    const titleRow = document.createElement("div")
+    titleRow.className = "item-title-row"
+
+    const title = document.createElement("h3")
+    title.className = "item-name"
+    title.textContent = item.name.replace(AUDIO, "")
+    titleRow.append(title)
+
+    if (item.hasReadalong) {
+      const badge = document.createElement("span")
+      badge.className = "badge-readalong"
+      badge.textContent = "📖 跟读"
+      titleRow.append(badge)
+    } else if (item.hasPdf) {
+      const badge = document.createElement("span")
+      badge.className = "badge-pdf"
+      badge.textContent = "📄 PDF"
+      titleRow.append(badge)
+    }
+    info.append(titleRow)
+
+    if (item.is_dir) {
+      const desc = document.createElement("p")
+      desc.className = "item-desc-text"
+      desc.textContent = getBookSummary(item.name) || "点击浏览有声书章节与配套讲义"
+      info.append(desc)
+    } else {
+      const meta = document.createElement("p")
+      meta.className = "item-meta-text"
+      meta.textContent = record
+        ? `${record.completed ? "已听完" : "听至"} ${durationText(record.position)} / ${durationText(record.duration)}`
+        : `${(item.size / 1024 / 1024).toFixed(1)} MB · 点击播放`
+      info.append(meta)
+    }
+
+    const action = document.createElement("div")
+    action.className = "item-action-icon"
+    action.innerHTML = item.is_dir
+      ? '<svg viewBox="0 0 24 24" class="icon-sm"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>'
+      : '<svg viewBox="0 0 24 24" class="icon-sm"><path d="M8 5v14l11-7z"/></svg>'
+
+    card.append(info, action)
+    row.append(card)
+
+    if (record && !item.is_dir) {
+      const line = document.createElement("div")
+      line.className = "item-progress-line"
+      const bar = document.createElement("div")
+      bar.className = "item-progress-bar"
+      bar.style.width = `${Math.min(100, (record.position / (record.duration || 1)) * 100)}%`
+      line.append(bar)
+      row.append(line)
+    }
+
+    card.onclick = attempt(() => (item.is_dir ? browse(item.path) : loadTrack(item)))
     $("items").append(row)
   }
+
   if (!items.length) {
-    const empty = document.createElement("p")
-    empty.className = "empty"
-    empty.textContent = query
-      ? "没有匹配的文件名。可进入其他分类查找。"
-      : view === "recent"
-        ? "还没有收听记录。选一本书，开始听吧。"
-        : "这里暂无音频；如果尚未连接，请先登录书库。"
+    const empty = document.createElement("div")
+    empty.className = "shelf-empty-state"
+    empty.textContent = query ? "没有找到符合条件的内容。" : "目录为空。"
     $("items").append(empty)
   }
-  const latest = libraryRecords().find((record) => !record.completed)
-  $("resume").hidden = !latest
-  if (latest) {
-    $("resume-title").textContent = latest.track.name.replace(AUDIO, "")
-    $("resume-meta").textContent =
-      `上次听至 ${durationText(latest.position)} / ${durationText(latest.duration)}`
-    $("resume-play").onclick = attempt(() => loadTrack(latest.track))
-  }
+
+  updateProfileStats()
+}
+
+function updateProfileStats() {
+  const recs = libraryRecords()
+  $("stat-books-count").textContent = recs.length
+  $("stat-completed-count").textContent = recs.filter((r) => r.completed).length
+  const totalSecs = recs.reduce((acc, r) => acc + (r.position || 0), 0)
+  $("stat-hours-count").textContent = (totalSecs / 3600).toFixed(1)
+  $("account-status").textContent = `账号: ${account()}`
+  $("current-endpoint-display").textContent = endpoint.startsWith(location.origin) ? "内网直连" : "公网 HTTPS"
 }
 
 async function stream(track) {
   const info = await api("fs/get", { path: track.path, password: directoryPassword })
-  // Use AList's signed /d endpoint; raw_url may contain private Docker/LAN addresses.
   return mediaUrl(endpoint, track, info.sign)
 }
 
 async function prepareNext(request) {
   preparedNext = null
-  $("next").disabled = true
+  $("btn-next").disabled = true
   try {
     const parent = current.path.slice(0, current.path.lastIndexOf("/"))
     const tracks = (parent === folder ? entries : await list(parent))
@@ -410,16 +463,16 @@ async function prepareNext(request) {
     const url = await stream(next)
     if (request === playRequest) {
       preparedNext = { track: next, url, preparedAt: Date.now() }
-      $("next").disabled = false
+      $("btn-next").disabled = false
     }
   } catch {
-    /* Next-chapter discovery must not stop the current chapter. */
+    /* Next chapter discovery failure shouldn't stop playback */
   }
 }
 
 async function loadTrack(track, preparedUrl) {
   if (!isWithinRoot(track.path) || !AUDIO.test(track.name))
-    throw new Error("不是可播放的有声书文件")
+    throw new Error("不是可播放的有声书音频文件")
   saveProgress()
   const request = ++playRequest
   audio.pause()
@@ -427,29 +480,319 @@ async function loadTrack(track, preparedUrl) {
   pendingPosition = null
   current = null
   preparedNext = null
-  $("next").disabled = true
-  $("play").disabled = true
-  $("player").hidden = false
-  $("track-title").textContent = track.name.replace(AUDIO, "")
-  $("track-folder").textContent =
-    track.path.slice(ROOT.length, track.path.lastIndexOf("/")) || "有声书"
-  $("player-status").textContent = "正在准备音频…"
+  $("btn-next").disabled = true
+
+  // Set titles in Mini and Full Player
+  const bookName = track.path.slice(ROOT.length).split("/").filter(Boolean)[1] || "有声书"
+  const trackName = track.name.replace(AUDIO, "")
+
+  $("mini-title").textContent = trackName
+  $("mini-subtitle").textContent = bookName
+  $("player-book-title").textContent = bookName
+  $("player-track-title").textContent = trackName
+  $("player-track-desc").textContent = "正在加载音频..."
+
+  $("mini-player").hidden = false
+  updatePlayButtonUI(false)
+
   const url = preparedUrl || (await stream(track))
   if (request !== playRequest) return
   const saved = progress(track)
   current = track
+  currentBookFolder = track.path.slice(0, track.path.lastIndexOf("/"))
   pendingPosition = saved && !saved.completed ? Math.max(0, saved.position - 3) : 0
+
   audio.src = url
   audio.playbackRate = Number(prefs.speed) || 1
   audio.load()
-  $("play").disabled = false
-  // Safari may reject after the API await; expose a real user-gesture play button.
+
   playAudio()
   prepareNext(request)
   setupReadalong(track, request)
   setupPdf(track, request)
+  renderDrawerTrackList()
 }
 
+function playAudio() {
+  if (!current || !audio.src) return
+  audio.play().catch((error) => {
+    notice(error.name === "NotAllowedError" ? "音频就绪，轻点播放开始收听。" : "播放失败，请重试或检查网络。")
+  })
+}
+
+function restorePosition() {
+  if (
+    !current ||
+    !Number.isFinite(audio.duration) ||
+    audio.duration <= 0 ||
+    pendingPosition === null
+  )
+    return
+  const target = Math.min(pendingPosition, Math.max(0, audio.duration - 1))
+  try {
+    audio.currentTime = target
+    pendingPosition = null
+    ready = true
+    $("player-track-desc").textContent = target > 0 ? `已续播至 ${durationText(target)} (回退3秒)` : "已准备就绪"
+  } catch {
+    /* Stream seekable */
+  }
+}
+
+function seek(seconds) {
+  if (ready && Number.isFinite(audio.duration)) {
+    audio.currentTime = Math.max(0, Math.min(audio.duration, seconds))
+  }
+}
+
+function nextTrack() {
+  if (!preparedNext) return
+  const next = preparedNext
+  loadTrack(
+    next.track,
+    Date.now() - next.preparedAt < 5 * 60 * 1000 ? next.url : undefined,
+  ).catch(fail)
+}
+
+function updatePlayButtonUI(playing) {
+  $("mini-play-icon").hidden = playing
+  $("mini-pause-icon").hidden = !playing
+  $("play-svg").hidden = playing
+  $("pause-svg").hidden = !playing
+  if (playing) {
+    $("mini-cover-thumb").classList.add("spinning")
+    $("vinyl-disc").classList.add("spinning")
+  } else {
+    $("mini-cover-thumb").classList.remove("spinning")
+    $("vinyl-disc").classList.remove("spinning")
+  }
+}
+
+function mediaSession() {
+  if (!("mediaSession" in navigator) || !current) return
+  const session = navigator.mediaSession
+  const bookName = current.path.slice(ROOT.length).split("/").filter(Boolean)[1] || "有声书"
+  session.metadata = new MediaMetadata({
+    title: current.name.replace(AUDIO, ""),
+    artist: "Rosemary Garden",
+    album: bookName,
+    artwork: [
+      {
+        src: new URL("./icon-512.png", import.meta.url).href,
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  })
+  const actions = {
+    play: playAudio,
+    pause: () => audio.pause(),
+    seekbackward: (event) => seek(audio.currentTime - (event.seekOffset || 15)),
+    seekforward: (event) => seek(audio.currentTime + (event.seekOffset || 30)),
+    seekto: (event) => seek(event.seekTime),
+    nexttrack: nextTrack,
+  }
+  for (const [action, handler] of Object.entries(actions)) {
+    try {
+      session.setActionHandler(action, handler)
+    } catch {
+      /* Safari compatibility */
+    }
+  }
+}
+
+// Scrubber Slider Handlers
+let isDraggingSlider = false
+$("seek-slider").addEventListener("input", (e) => {
+  isDraggingSlider = true
+  const pct = Number(e.target.value) / 100
+  if (Number.isFinite(audio.duration)) {
+    $("scrubber-current").textContent = durationText(audio.duration * pct)
+  }
+})
+$("seek-slider").addEventListener("change", (e) => {
+  isDraggingSlider = false
+  const pct = Number(e.target.value) / 100
+  if (Number.isFinite(audio.duration)) {
+    seek(audio.duration * pct)
+  }
+})
+
+// Audio Element Events
+audio.addEventListener("loadedmetadata", restorePosition)
+audio.addEventListener("canplay", restorePosition)
+audio.addEventListener("seeked", () => {
+  if (readalongActive) syncReadalong(true)
+})
+audio.addEventListener("timeupdate", () => {
+  if (Date.now() - lastSave >= 3000) saveProgress()
+  if (
+    ready &&
+    "mediaSession" in navigator &&
+    navigator.mediaSession.setPositionState &&
+    Number.isFinite(audio.duration)
+  ) {
+    try {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: Math.min(audio.duration, audio.currentTime),
+      })
+    } catch {
+      /* Stream duration readiness */
+    }
+  }
+
+  // Update Mini and Scrubber Progress UI
+  if (Number.isFinite(audio.duration) && audio.duration > 0) {
+    const pct = (audio.currentTime / audio.duration) * 100
+    $("mini-progress-fill").style.width = `${pct}%`
+    if (!isDraggingSlider) {
+      $("seek-slider").value = pct
+      $("scrubber-current").textContent = durationText(audio.currentTime)
+    }
+    $("scrubber-duration").textContent = durationText(audio.duration)
+  }
+
+  if (readalongActive) syncReadalong()
+})
+
+audio.addEventListener("playing", () => {
+  updatePlayButtonUI(true)
+  $("player-track-desc").textContent = "正在播放 · 进度自动保存"
+  if ("audioSession" in navigator) {
+    try {
+      navigator.audioSession.type = "playback"
+    } catch {
+      /* Optional API */
+    }
+  }
+  mediaSession()
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"
+})
+
+audio.addEventListener("pause", () => {
+  saveProgress(audio.ended)
+  updatePlayButtonUI(false)
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"
+})
+
+audio.addEventListener("ended", () => {
+  saveProgress(true)
+  if (sleepTimerMode === "track") {
+    clearSleepTimer()
+    notice("定时关闭：已播放完当前章节")
+    return
+  }
+  if (preparedNext) nextTrack()
+  else {
+    $("player-track-desc").textContent = "全书已播完"
+    render()
+  }
+})
+
+audio.addEventListener("error", () => {
+  if (current) notice("音频加载失败，请检查网络或重新选择。")
+})
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) saveProgress(audio.ended)
+})
+window.addEventListener("pagehide", () => saveProgress(audio.ended))
+
+// Speed Control
+function setSpeed(speedVal) {
+  prefs.speed = Number(speedVal)
+  audio.playbackRate = prefs.speed
+  write(localStorage, PREF, prefs)
+  $("speed-display").textContent = `${prefs.speed}×`
+  document.querySelectorAll(".speed-opt").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.speed === String(speedVal))
+  })
+}
+
+// Sleep Timer Control
+function setSleepTimer(minutes) {
+  clearSleepTimer()
+  if (minutes === "track") {
+    sleepTimerMode = "track"
+    $("timer-label").textContent = "播完关"
+    notice("已设置：当前章节播放完毕后停止")
+  } else {
+    const mins = Number(minutes)
+    if (mins > 0) {
+      sleepTimerMode = "time"
+      sleepTimerMinutes = mins
+      sleepTimerTargetTime = Date.now() + mins * 60 * 1000
+      sleepTimerId = setTimeout(() => {
+        audio.pause()
+        clearSleepTimer()
+        notice("定时关闭：时间到，已暂停播放")
+      }, mins * 60 * 1000)
+      $("timer-label").textContent = `${mins}分关`
+      notice(`已开启定时关闭：${mins} 分钟后停止播放`)
+    }
+  }
+  document.querySelectorAll(".timer-opt").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.minutes === String(minutes))
+  })
+}
+
+function clearSleepTimer() {
+  if (sleepTimerId) clearTimeout(sleepTimerId)
+  sleepTimerId = null
+  sleepTimerMode = "none"
+  sleepTimerMinutes = 0
+  $("timer-label").textContent = "定时"
+}
+
+// Drawers (BottomSheet) Management
+function openDrawer(drawerId) {
+  $("drawer-mask").hidden = false
+  $(drawerId).hidden = false
+}
+function closeAllDrawers() {
+  $("drawer-mask").hidden = true
+  $("chapter-drawer").hidden = true
+  $("timer-drawer").hidden = true
+  $("speed-drawer").hidden = true
+}
+
+// Chapter Drawer List Rendering
+async function renderDrawerTrackList() {
+  const container = $("drawer-track-list")
+  container.replaceChildren()
+  if (!currentBookFolder) return
+  const tracks = (await list(currentBookFolder))
+    .filter((i) => !i.is_dir)
+    .sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
+
+  for (const t of tracks) {
+    const row = document.createElement("div")
+    row.className = "item-row"
+    const card = document.createElement("div")
+    card.className = "item-card"
+    card.style.background = t.path === current?.path ? "var(--brand-blue-bg)" : "transparent"
+
+    const info = document.createElement("div")
+    info.className = "item-main-info"
+    const name = document.createElement("h4")
+    name.className = "item-name"
+    name.textContent = t.name.replace(AUDIO, "")
+    if (t.path === current?.path) name.style.color = "var(--brand-blue)"
+    info.append(name)
+
+    card.append(info)
+    row.append(card)
+    card.onclick = () => {
+      closeAllDrawers()
+      loadTrack(t)
+    }
+    container.append(row)
+  }
+}
+
+// Readalong / EPUB Syncing
 function findSegment(timeline, time) {
   let low = 0,
     high = timeline.length - 1
@@ -470,8 +813,7 @@ async function setupReadalong(track, request) {
   readalongTimeline = []
   currentSegment = null
   currentDocPath = ""
-  $("readalong-toggle").hidden = true
-  if (readalongActive) closeReadalong()
+  $("dock-readalong").hidden = true
 
   try {
     const parent = track.path.slice(0, track.path.lastIndexOf("/"))
@@ -501,18 +843,16 @@ async function setupReadalong(track, request) {
     const trackFiltered = timeline.filter((s) => !s.audioSourceId || s.audioSourceId === track.name)
     readalongTimeline = trackFiltered.length ? trackFiltered : timeline
     readalongParentPath = parent
-    $("readalong-toggle").hidden = false
-    $("readalong-toggle").textContent = "📖 边听边读"
+    $("dock-readalong").hidden = false
   } catch {
-    $("readalong-toggle").hidden = true
+    $("dock-readalong").hidden = true
   }
 }
 
 async function setupPdf(track, request) {
   currentPdfPath = ""
   currentPdfName = ""
-  $("pdf-toggle").hidden = true
-  if (pdfViewerActive) closePdfViewer()
+  $("dock-pdf").hidden = true
 
   try {
     const parent = track.path.slice(0, track.path.lastIndexOf("/"))
@@ -530,19 +870,16 @@ async function setupPdf(track, request) {
     if (!pdfItem || request !== playRequest) return
     currentPdfPath = `${parent}/${pdfItem.name}`
     currentPdfName = pdfItem.name
-    $("pdf-toggle").hidden = false
-    $("pdf-toggle").textContent = "📄 浏览讲义/PDF"
+    $("dock-pdf").hidden = false
   } catch {
-    $("pdf-toggle").hidden = true
+    $("dock-pdf").hidden = true
   }
 }
 
 async function openPdfViewer() {
   if (!currentPdfPath) return
-  if (readalongActive) closeReadalong()
   pdfViewerActive = true
   $("pdf-viewer").hidden = false
-  $("pdf-toggle").textContent = "收起讲义/PDF"
   $("pdf-title").textContent = currentPdfName || "配套讲义 / PDF 电子书"
   $("pdf-loading").hidden = false
 
@@ -560,19 +897,13 @@ function closePdfViewer() {
   pdfViewerActive = false
   $("pdf-viewer").hidden = true
   $("pdf-frame").removeAttribute("src")
-  if ($("pdf-toggle")) {
-    $("pdf-toggle").textContent = "📄 浏览讲义/PDF"
-  }
 }
 
 function openReadalong() {
   if (!readalongManifest || !readalongTimeline.length) return
-  if (pdfViewerActive) closePdfViewer()
   readalongActive = true
   $("readalong").hidden = false
-  $("readalong-toggle").textContent = "收起跟读"
 
-  // If no document is currently loaded, preload the first document
   if (!currentDocPath && readalongTimeline[0]) {
     currentDocPath = readalongTimeline[0].document
     loadReadalongDoc(currentDocPath).catch(() => {})
@@ -583,9 +914,6 @@ function openReadalong() {
 function closeReadalong() {
   readalongActive = false
   $("readalong").hidden = true
-  if ($("readalong-toggle")) {
-    $("readalong-toggle").textContent = "📖 边听边读"
-  }
 }
 
 async function loadReadalongDoc(docRelPath) {
@@ -606,12 +934,11 @@ async function loadReadalongDoc(docRelPath) {
   const frame = $("readalong-frame")
   frame.srcdoc = html
 
-  // Attach handlers once frame content is accessible
   setTimeout(() => {
     try {
       const doc = frame.contentDocument
       if (!doc) return
-      const size = $("readalong-size").value || "16"
+      const size = $("readalong-size").value || "17"
       if (doc.body) doc.body.style.fontSize = `${size}px`
 
       const onUserScroll = () => {
@@ -637,7 +964,7 @@ async function loadReadalongDoc(docRelPath) {
         }
       })
     } catch {
-      /* Access inside same-origin frame */
+      /* Same origin sandbox */
     }
   }, 50)
 }
@@ -679,165 +1006,59 @@ async function syncReadalong(forceScroll = false) {
   }
 }
 
-function playAudio() {
-  if (!current || !audio.src) return
-  audio.play().catch((error) => {
-    $("player-status").textContent =
-      error.name === "NotAllowedError"
-        ? "音频已准备好，轻点「播放」开始。"
-        : "播放失败，请重新选择音频刷新链接，或检查文件编码与网络。"
-  })
-}
-
-function restorePosition() {
-  if (
-    !current ||
-    !Number.isFinite(audio.duration) ||
-    audio.duration <= 0 ||
-    pendingPosition === null
-  )
-    return
-  const target = Math.min(pendingPosition, Math.max(0, audio.duration - 1))
-  try {
-    audio.currentTime = target
-    pendingPosition = null
-    ready = true
-    $("player-status").textContent =
-      target > 0
-        ? `已恢复至 ${durationText(target)}（回退 3 秒接续）`
-        : "已准备好 · 轻点播放即可收听"
-  } catch {
-    /* Retry when the stream becomes seekable. */
-  }
-}
-
-function seek(seconds) {
-  if (ready && Number.isFinite(audio.duration))
-    audio.currentTime = Math.max(0, Math.min(audio.duration, seconds))
-}
-
-function nextTrack() {
-  if (!preparedNext) return
-  const next = preparedNext
-  loadTrack(next.track, Date.now() - next.preparedAt < 5 * 60 * 1000 ? next.url : undefined).catch(
-    fail,
-  )
-}
-
-function mediaSession() {
-  if (!("mediaSession" in navigator) || !current) return
-  const session = navigator.mediaSession
-  session.metadata = new MediaMetadata({
-    title: current.name.replace(AUDIO, ""),
-    artist: "Rosemary Garden",
-    album: "花园听书",
-    artwork: [
-      { src: new URL("./icon-512.png", import.meta.url).href, sizes: "512x512", type: "image/png" },
-    ],
-  })
-  const actions = {
-    play: playAudio,
-    pause: () => audio.pause(),
-    seekbackward: (event) => seek(audio.currentTime - (event.seekOffset || 15)),
-    seekforward: (event) => seek(audio.currentTime + (event.seekOffset || 30)),
-    seekto: (event) => seek(event.seekTime),
-    nexttrack: nextTrack,
-  }
-  for (const [action, handler] of Object.entries(actions)) {
-    try {
-      session.setActionHandler(action, handler)
-    } catch {
-      /* Unsupported actions vary by iOS version. */
-    }
-  }
-}
-
-audio.addEventListener("loadedmetadata", restorePosition)
-audio.addEventListener("canplay", restorePosition)
-audio.addEventListener("seeked", () => {
-  if (readalongActive) syncReadalong(true)
-})
-audio.addEventListener("timeupdate", () => {
-  if (Date.now() - lastSave >= 3000) saveProgress()
-  if (
-    ready &&
-    "mediaSession" in navigator &&
-    navigator.mediaSession.setPositionState &&
-    Number.isFinite(audio.duration)
-  ) {
-    try {
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: Math.min(audio.duration, audio.currentTime),
-      })
-    } catch {
-      /* Some streams have not exposed a valid duration yet. */
-    }
-  }
-  if (readalongActive) syncReadalong()
-})
-audio.addEventListener("playing", () => {
-  $("play").textContent = "暂停"
-  $("player-status").textContent = "正在收听 · 进度自动保存"
-  if ("audioSession" in navigator) {
-    try {
-      navigator.audioSession.type = "playback"
-    } catch {
-      /* Optional API. */
-    }
-  }
-  mediaSession()
-  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing"
-})
-audio.addEventListener("pause", () => {
-  saveProgress(audio.ended)
-  $("play").textContent = "播放"
-  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"
-})
-audio.addEventListener("ended", () => {
-  saveProgress(true)
-  if (preparedNext) nextTrack()
-  else {
-    $("player-status").textContent = "本节已听完"
-    render()
-  }
-})
-audio.addEventListener("error", () => {
-  if (current)
-    $("player-status").textContent =
-      "音频加载失败。请重新选择刷新链接；仍失败时需检查文件编码或 AList 权限。"
-})
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) saveProgress(audio.ended)
-})
-window.addEventListener("pagehide", () => saveProgress(audio.ended))
+// User Interaction Listeners
 $("play").onclick = () => (audio.paused ? playAudio() : audio.pause())
+$("mini-play-btn").onclick = (e) => {
+  e.stopPropagation()
+  audio.paused ? playAudio() : audio.pause()
+}
 $("rewind").onclick = () => seek(audio.currentTime - 15)
 $("forward").onclick = () => seek(audio.currentTime + 30)
-$("next").onclick = nextTrack
-$("speed").onchange = () => {
-  prefs.speed = Number($("speed").value)
-  audio.playbackRate = prefs.speed
-  write(localStorage, PREF, prefs)
-  saveProgress()
+$("btn-next").onclick = nextTrack
+
+// Toggle Full Player / Mini Player
+$("mini-content-area").onclick = () => {
+  if (current) $("full-player").hidden = false
 }
-$("search").oninput = render
-$("sort").onchange = render
-$("browse-tab").onclick = () => {
-  view = "browse"
-  render()
+$("mini-list-btn").onclick = (e) => {
+  e.stopPropagation()
+  openDrawer("chapter-drawer")
 }
-$("recent-tab").onclick = () => {
-  view = "recent"
-  render()
+$("player-collapse-btn").onclick = () => {
+  $("full-player").hidden = true
 }
-$("refresh").onclick = attempt(() => browse())
-$("settings-open").onclick = () => $("settings").showModal()
-$("settings-close").onclick = () => $("settings").close()
-$("readalong-toggle").onclick = () => (readalongActive ? closeReadalong() : openReadalong())
+
+// Dock buttons in Full Player
+$("dock-chapters").onclick = () => openDrawer("chapter-drawer")
+$("dock-timer").onclick = () => openDrawer("timer-drawer")
+$("dock-readalong").onclick = openReadalong
+$("dock-pdf").onclick = openPdfViewer
+$("btn-speed").onclick = () => openDrawer("speed-drawer")
+
+// Drawer Closers
+$("drawer-mask").onclick = closeAllDrawers
+$("drawer-close").onclick = closeAllDrawers
+$("timer-close").onclick = closeAllDrawers
+$("speed-close").onclick = closeAllDrawers
+
+// Speed Drawer Option click
+document.querySelectorAll(".speed-opt").forEach((btn) => {
+  btn.onclick = () => {
+    setSpeed(btn.dataset.speed)
+    closeAllDrawers()
+  }
+})
+
+// Timer Drawer Option click
+document.querySelectorAll(".timer-opt").forEach((btn) => {
+  btn.onclick = () => {
+    setSleepTimer(btn.dataset.minutes)
+    closeAllDrawers()
+  }
+})
+
+// Readalong Top Bar
 $("readalong-close").onclick = closeReadalong
-$("pdf-toggle").onclick = () => (pdfViewerActive ? closePdfViewer() : openPdfViewer())
 $("pdf-close").onclick = closePdfViewer
 $("readalong-follow").onclick = () => {
   readalongFollowing = !readalongFollowing
@@ -858,6 +1079,39 @@ $("readalong-size").onchange = () => {
   const doc = $("readalong-frame").contentDocument
   if (doc?.body) doc.body.style.fontSize = `${size}px`
 }
+
+// Search
+$("search").oninput = (e) => {
+  $("search-clear").hidden = !e.target.value
+  render()
+}
+$("search-clear").onclick = () => {
+  $("search").value = ""
+  $("search-clear").hidden = true
+  render()
+}
+$("sort").onchange = render
+$("refresh").onclick = attempt(() => browse())
+
+// TabBar Navigation (书架 / 书库 / 我的)
+document.querySelectorAll(".tab-btn").forEach((btn) => {
+  btn.onclick = () => {
+    document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"))
+    btn.classList.add("active")
+    const targetId = btn.dataset.target
+    document.querySelectorAll(".tab-view").forEach((view) => {
+      view.hidden = view.id !== targetId
+    })
+    if (targetId === "shelf-view") renderShelf()
+    else if (targetId === "library-view") render()
+    else if (targetId === "profile-view") updateProfileStats()
+  }
+})
+
+// Dialog & Settings
+$("settings-open").onclick = () => $("settings").showModal()
+$("open-conn-btn").onclick = () => $("settings").showModal()
+$("settings-close").onclick = () => $("settings").close()
 $("network").onchange = () => {
   try {
     $("endpoint-note").textContent = resolveEndpoint($("network").value)
@@ -879,7 +1133,9 @@ $("connection-form").onsubmit = async (event) => {
     ++playRequest
     current = null
     ready = false
-    $("player").hidden = true
+    $("mini-player").hidden = true
+    $("full-player").hidden = true
+
     const username = $("username").value.trim()
     const password = $("password").value
     if (!password && (!auth || auth.username !== username || auth.endpoint !== nextEndpoint))
@@ -903,7 +1159,7 @@ $("connection-form").onsubmit = async (event) => {
     $("otp").value = ""
     await browse(ROOT)
     $("settings").close()
-    $("login-status").textContent = ""
+    notice("登录成功，书库已同步")
   } catch (error) {
     $("login-status").textContent = error.message
   } finally {
@@ -912,6 +1168,12 @@ $("connection-form").onsubmit = async (event) => {
 }
 
 $("logout").onclick = () => {
+  logout()
+  $("settings").close()
+}
+$("logout-btn").onclick = logout
+
+function logout() {
   saveProgress()
   closeReadalong()
   closePdfViewer()
@@ -930,23 +1192,23 @@ $("logout").onclick = () => {
   remove(localStorage, AUTH)
   remove(sessionStorage, AUTH)
   for (const id of ["password", "otp", "username", "folder-password"]) $(id).value = ""
-  $("player").hidden = true
-  $("connection").textContent = "已退出登录"
-  $("login-status").textContent = "已清除本机登录；收听记录保留，重新登录相同账号后可续听。"
+  $("mini-player").hidden = true
+  $("full-player").hidden = true
+  notice("已清除本机登录记录")
   render()
 }
 
-$("export").onclick = () => {
+$("export-btn").onclick = () => {
   saveProgress()
-  const url = URL.createObjectURL(
-    new Blob([JSON.stringify({ version: 1, records: libraryRecords() }, null, 2)], {
-      type: "application/json",
-    }),
+  const blob = new Blob(
+    [JSON.stringify({ version: 1, records: libraryRecords() }, null, 2)],
+    { type: "application/json" },
   )
-  const anchor = document.createElement("a")
-  anchor.href = url
-  anchor.download = `garden-listen-${new Date().toISOString().slice(0, 10)}.json`
-  anchor.click()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `garden-listen-${new Date().toISOString().slice(0, 10)}.json`
+  a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
@@ -996,52 +1258,40 @@ $("import").onchange = attempt(async () => {
     if (!existing || existing.updatedAt < record.updatedAt) persist(record)
   }
   render()
-  $("login-status").textContent = `已合并 ${candidates.length} 条收听记录。`
+  notice(`已成功合并 ${candidates.length} 条收听记录`)
   $("import").value = ""
 })
 
-async function start() {
+// Initialize App
+async function init() {
+  setSpeed(prefs.speed || 1)
   try {
     await openDatabase()
   } catch {
-    notice("当前浏览器无法打开进度数据库；本次仅保留临时记录，请导出备份。")
+    notice("无法打开本地存储，收听记录可能无法持久保存。")
   }
+
+  // Auto load recent playback from journal if present
   const journal = read(localStorage, JOURNAL, null)
-  if (journal?.key && isWithinRoot(journal.track?.path)) {
-    const existing = records.find((item) => item.key === journal.key)
-    if (!existing || journal.updatedAt > existing.updatedAt) persist(journal)
+  if (journal && journal.track) {
+    // Mini player placeholder
+    $("mini-title").textContent = journal.track.name.replace(AUDIO, "")
+    const bookName = journal.track.path.slice(ROOT.length).split("/").filter(Boolean)[1] || "有声书"
+    $("mini-subtitle").textContent = `继续听 · ${bookName}`
+    $("mini-player").hidden = false
   }
-  try {
-    endpoint = resolveEndpoint(prefs.mode)
-  } catch {
-    prefs.mode = "auto"
-    endpoint = resolveEndpoint()
-  }
-  // A token is only ever sent to the endpoint at which this app obtained it.
-  if (auth?.endpoint !== endpoint) auth = null
-  $("network").value = prefs.mode
-  $("username").value = auth?.username || prefs.username || ""
-  $("remember").checked = Boolean(read(localStorage, AUTH, null))
-  $("speed").value = String(prefs.speed || 1)
-  $("network").onchange()
-  render()
-  $("connection").textContent = "等待连接家庭书库"
-  if (auth) {
-    try {
-      await browse(ROOT)
-    } catch (error) {
-      fail(error)
-    }
+
+  if (auth?.token) {
+    browse(ROOT)
   } else {
-    notice("连接家庭 AList 账号后，即可浏览 /750HD/有声书。")
+    // Open settings if not connected
     $("settings").showModal()
   }
-  if ("serviceWorker" in navigator && window.isSecureContext) {
-    navigator.serviceWorker
-      .register("./sw.js", { scope: "./", updateViaCache: "none" })
-      .catch(() => {
-        notice("当前环境无法安装离线界面，在线浏览与播放仍可使用。")
-      })
+
+  // Register Service Worker
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {})
   }
 }
-start().catch(fail)
+
+init()

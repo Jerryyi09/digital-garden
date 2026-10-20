@@ -2,13 +2,13 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f4f0e7">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="花园听书">
+    <meta name="apple-mobile-web-app-title" content="微信读书 · 花园听书">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="referrer" content="no-referrer">
-    <title>花园听书 · Rosemary Garden</title>
+    <title>微信读书 · 花园听书</title>
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icon-180.png">
@@ -16,103 +16,416 @@
     <script type="module" src="./app.js"></script>
   </head>
   <body>
-    <header>
-      <a href="/studio/" class="back">← Studio</a>
-      <span class="wordmark">ROSEMARY GARDEN / LISTEN</span>
-      <button id="settings-open" class="subtle">连接设置</button>
-    </header>
-    <main>
-      <section class="intro">
-        <p class="eyebrow">留一点时间，给耳朵。</p>
-        <h1>听见<br><em>一本书。</em></h1>
-        <div class="intro-note"><p>把故事带在身边。<br>每次回来，从上次的那一页继续。</p><span id="connection">正在连接书库…</span></div>
-      </section>
-      <p id="notice" role="status" aria-live="polite" hidden></p>
-      <section id="resume" class="resume" hidden>
-        <div><span class="eyebrow">接着听 / CONTINUE</span><h2 id="resume-title"></h2><p id="resume-meta"></p></div>
-        <button id="resume-play" class="primary">继续收听 ↗</button>
-      </section>
-      <section class="library" aria-label="有声书书库">
-        <div class="toolbar">
-          <nav class="tabs" aria-label="浏览方式"><button id="browse-tab" aria-pressed="true">书库</button><button id="recent-tab" aria-pressed="false">最近播放</button></nav>
-          <label class="search"><span class="sr-only">搜索当前目录文件名</span><input id="search" type="search" placeholder="搜索当前目录 / 文件名" autocomplete="off"></label>
-          <label><span class="sr-only">排序</span><select id="sort"><option value="name">文件名顺序</option><option value="modified">最近更新</option></select></label>
+    <!-- App Root Viewport -->
+    <div id="app" class="wx-app">
+      <!-- Top Navigation Bar -->
+      <header class="wx-navbar">
+        <div class="navbar-content">
+          <a href="/studio/" class="nav-back-btn" title="返回 Studio">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </a>
+          <div class="search-capsule">
+            <svg viewBox="0 0 24 24" class="search-icon"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input id="search" type="search" placeholder="搜索书名 / 章节 / 作者" autocomplete="off">
+            <button id="search-clear" class="search-clear-btn" hidden aria-label="清空搜索">✕</button>
+          </div>
+          <button id="settings-open" class="nav-action-btn" title="书库设置">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </button>
         </div>
-        <div class="directory"><nav id="breadcrumbs" aria-label="书库路径"></nav><button id="refresh" class="subtle">刷新目录</button></div>
-        <div id="folder-summary" class="folder-summary" hidden>
-          <div class="summary-tag">内容简介 / OVERVIEW</div>
-          <p id="folder-summary-text"></p>
+      </header>
+
+      <!-- Main Body Container -->
+      <main class="wx-main">
+        <!-- Notification Banner -->
+        <div id="notice" class="wx-toast" role="status" aria-live="polite" hidden></div>
+
+        <!-- Shelf View (Tab: 书架/最近播放) -->
+        <section id="shelf-view" class="tab-view" hidden>
+          <div class="view-header">
+            <h2 class="view-title">我的书架</h2>
+            <span id="shelf-count" class="view-subtitle">0 本正在收听</span>
+          </div>
+          <div id="shelf-items" class="shelf-grid"></div>
+        </section>
+
+        <!-- Library View (Tab: 书库/目录) -->
+        <section id="library-view" class="tab-view active">
+          <!-- Active Breadcrumb Path -->
+          <div class="path-navigation">
+            <nav id="breadcrumbs" aria-label="书库路径" class="breadcrumb-strip"></nav>
+            <button id="refresh" class="icon-text-btn" title="刷新当前目录">
+              <svg viewBox="0 0 24 24" class="icon-sm"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              <span>刷新</span>
+            </button>
+          </div>
+
+          <!-- Book Detail Header Card (Shown when inside a book folder) -->
+          <div id="folder-summary" class="book-banner-card" hidden>
+            <div class="banner-cover-wrap">
+              <div class="book-spine-mock"></div>
+              <div id="banner-cover" class="book-cover-art">📖</div>
+            </div>
+            <div class="banner-info">
+              <h2 id="banner-title" class="banner-title">书籍名称</h2>
+              <div class="banner-tags">
+                <span id="banner-readalong-badge" class="badge-readalong" hidden>📖 英文音文跟读</span>
+                <span id="banner-pdf-badge" class="badge-pdf" hidden>📄 配套PDF讲义</span>
+              </div>
+              <p id="folder-summary-text" class="banner-desc"></p>
+            </div>
+          </div>
+
+          <!-- Section Filter & Sorter -->
+          <div class="list-meta-bar">
+            <span id="list-status" class="list-status">当前目录 · 加载中...</span>
+            <label class="sort-selector">
+              <select id="sort">
+                <option value="name">默认排序</option>
+                <option value="modified">最近更新</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- Book & Track Items List -->
+          <div id="items" class="wx-item-list" role="list"></div>
+        </section>
+
+        <!-- Profile/Settings View (Tab: 我的/设置) -->
+        <section id="profile-view" class="tab-view" hidden>
+          <div class="view-header">
+            <h2 class="view-title">个人与设置</h2>
+            <span id="account-status" class="view-subtitle">家庭书库账号</span>
+          </div>
+
+          <div class="stats-card">
+            <div class="stat-item">
+              <span class="stat-num" id="stat-books-count">--</span>
+              <span class="stat-label">收听书籍</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num" id="stat-completed-count">--</span>
+              <span class="stat-label">听完本数</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num" id="stat-hours-count">--</span>
+              <span class="stat-label">累计听书(时)</span>
+            </div>
+          </div>
+
+          <div class="settings-menu-group">
+            <button id="open-conn-btn" class="menu-item">
+              <div class="menu-label">
+                <span class="menu-icon">🌐</span>
+                <span>网络与服务连接</span>
+              </div>
+              <span id="current-endpoint-display" class="menu-val">自动连接</span>
+            </button>
+            <button id="export-btn" class="menu-item">
+              <div class="menu-label">
+                <span class="menu-icon">📤</span>
+                <span>备份收听记录</span>
+              </div>
+              <span class="menu-val">导出 JSON</span>
+            </button>
+            <label class="menu-item file-menu-item">
+              <div class="menu-label">
+                <span class="menu-icon">📥</span>
+                <span>恢复收听记录</span>
+              </div>
+              <span class="menu-val">导入备份</span>
+              <input id="import" type="file" accept="application/json,.json">
+            </label>
+          </div>
+
+          <div class="settings-menu-group">
+            <div class="menu-item placeholder-item">
+              <div class="menu-label">
+                <span class="menu-icon">🔔</span>
+                <span>每日听书目标</span>
+              </div>
+              <span class="menu-badge">未开启</span>
+            </div>
+            <div class="menu-item placeholder-item">
+              <div class="menu-label">
+                <span class="menu-icon">🎨</span>
+                <span>播放器主题</span>
+              </div>
+              <span class="menu-val">随系统 (默认纯净白)</span>
+            </div>
+          </div>
+
+          <button id="logout-btn" class="wx-btn wx-btn-danger">退出登录</button>
+        </section>
+      </main>
+
+      <!-- Bottom Mini Player Bar (Floating above TabBar) -->
+      <aside id="mini-player" class="wx-mini-player" hidden>
+        <div class="mini-progress-track">
+          <div id="mini-progress-fill" class="mini-progress-fill"></div>
         </div>
-        <p id="list-status" role="status"></p>
-        <div id="items" class="items" role="list" aria-label="书库与最近播放列表"></div>
+        <div class="mini-content" id="mini-content-area">
+          <div class="mini-cover-thumb" id="mini-cover-thumb">
+            <span id="mini-cover-icon">♫</span>
+          </div>
+          <div class="mini-info">
+            <h4 id="mini-title" class="mini-title">尚未播放</h4>
+            <p id="mini-subtitle" class="mini-subtitle">轻点开启声音的世界</p>
+          </div>
+        </div>
+        <div class="mini-controls">
+          <button id="mini-play-btn" class="mini-ctrl-btn" aria-label="播放/暂停">
+            <svg id="mini-play-icon" viewBox="0 0 24 24" class="icon"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="mini-pause-icon" viewBox="0 0 24 24" class="icon" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <button id="mini-list-btn" class="mini-ctrl-btn" aria-label="打开播放目录">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Bottom Tab Bar (WeRead Style) -->
+      <nav class="wx-tabbar">
+        <button id="tab-shelf" class="tab-btn" data-target="shelf-view">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          </div>
+          <span class="tab-text">书架</span>
+        </button>
+        <button id="tab-library" class="tab-btn active" data-target="library-view">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+          </div>
+          <span class="tab-text">书库</span>
+        </button>
+        <button id="tab-profile" class="tab-btn" data-target="profile-view">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <span class="tab-text">我的</span>
+        </button>
+      </nav>
+
+      <!-- Full-screen Immersive Audio Player Drawer (微信读书沉浸式播放页) -->
+      <section id="full-player" class="wx-full-player" hidden>
+        <!-- Pull down handle / Header -->
+        <div class="player-top-bar">
+          <button id="player-collapse-btn" class="icon-btn" aria-label="收起播放页">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+          </button>
+          <div class="player-header-title">
+            <h3 id="player-book-title">书名</h3>
+            <span id="player-author-name">Rosemary Garden</span>
+          </div>
+          <button id="player-share-btn" class="icon-btn placeholder-action" title="分享书签">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+          </button>
+        </div>
+
+        <!-- Album Vinyl / Cover Mock -->
+        <div class="player-body">
+          <div class="vinyl-container">
+            <div id="vinyl-disc" class="vinyl-disc">
+              <div class="vinyl-grooves"></div>
+              <div class="vinyl-center-art" id="vinyl-cover-art">📖</div>
+            </div>
+          </div>
+          <div class="track-details">
+            <h2 id="player-track-title" class="track-title">章节名称</h2>
+            <p id="player-track-desc" class="track-desc"></p>
+          </div>
+        </div>
+
+        <!-- Player Controls Area -->
+        <div class="player-controls-zone">
+          <!-- Time Scrubber Slider -->
+          <div class="scrubber-bar">
+            <span id="scrubber-current" class="time-label">00:00</span>
+            <div class="slider-wrapper">
+              <input id="seek-slider" type="range" min="0" max="100" value="0" step="0.1" aria-label="音频时间进度">
+            </div>
+            <span id="scrubber-duration" class="time-label">00:00</span>
+          </div>
+
+          <!-- Main Transport Buttons -->
+          <div class="transport-main">
+            <button id="btn-speed" class="pill-btn" aria-label="倍速切换">
+              <span id="speed-display">1.0×</span>
+            </button>
+            <button id="rewind" class="circle-btn" aria-label="后退15秒" title="后退 15 秒">
+              <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.2 3.16-1.93 5.12-1.93 3.91 0 7.15 2.8 7.85 6.5l1.97-.34C21.43 12.19 17.38 8 12.5 8z"/><text x="12" y="16.5" font-size="7" font-weight="bold" text-anchor="middle" fill="currentColor">15</text></svg>
+            </button>
+            <button id="play" class="primary-play-btn" aria-label="播放/暂停">
+              <svg id="play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button id="forward" class="circle-btn" aria-label="前进30秒" title="前进 30 秒">
+              <svg viewBox="0 0 24 24"><path d="M11.5 8c2.65 0 5.05.99 6.9 2.6L22 7v9h-9l3.62-3.62c-1.39-1.2-3.16-1.93-5.12-1.93-3.91 0-7.15 2.8-7.85 6.5l-1.97-.34C2.57 12.19 6.62 8 11.5 8z"/><text x="12" y="16.5" font-size="7" font-weight="bold" text-anchor="middle" fill="currentColor">30</text></svg>
+            </button>
+            <button id="btn-next" class="circle-btn" aria-label="下一节" title="下一节">
+              <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+          </div>
+
+          <!-- Bottom Utility Dock (微信读书特色功能底栏) -->
+          <div class="utility-dock">
+            <button id="dock-timer" class="dock-btn" title="定时关闭">
+              <svg viewBox="0 0 24 24" class="dock-icon"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              <span id="timer-label">定时</span>
+            </button>
+            <button id="dock-readalong" class="dock-btn" hidden title="音文同步跟读">
+              <svg viewBox="0 0 24 24" class="dock-icon"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+              <span>跟读文稿</span>
+            </button>
+            <button id="dock-pdf" class="dock-btn" hidden title="PDF 电子书/讲义">
+              <svg viewBox="0 0 24 24" class="dock-icon"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5z"/></svg>
+              <span>讲义课件</span>
+            </button>
+            <button id="dock-chapters" class="dock-btn" title="章节目录">
+              <svg viewBox="0 0 24 24" class="dock-icon"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+              <span>章节</span>
+            </button>
+          </div>
+        </div>
       </section>
-      <footer>MP3 / M4A / M4B · iPhone Safari → 分享 → 添加到主屏幕<br>进度保存在当前浏览器；可在连接设置中导出备份。</footer>
-    </main>
-    <section id="readalong" class="readalong" aria-label="音文同步跟读" hidden>
-      <div class="readalong-bar">
-        <div class="readalong-title-group">
-          <span class="readalong-badge">EPUB 跟读</span>
-          <h3 id="readalong-chapter-title">正文跟读</h3>
+
+      <!-- Chapter Drawer Sheet (章节弹窗抽屉) -->
+      <div id="drawer-mask" class="wx-mask" hidden></div>
+      <div id="chapter-drawer" class="wx-bottom-sheet" hidden>
+        <div class="sheet-head">
+          <h3>全部章节</h3>
+          <button id="drawer-close" class="sheet-close-btn" aria-label="关闭目录">✕</button>
         </div>
-        <div class="readalong-actions">
-          <button id="readalong-locate" class="primary subtle-action" title="定位当前朗读句子" hidden>📍 回到朗读</button>
-          <button id="readalong-follow" class="subtle-action">跟随：开</button>
-          <label class="size-control"><span class="sr-only">字号</span>
-            <select id="readalong-size" aria-label="正文字号">
-              <option value="14">14px</option>
-              <option value="16" selected>16px</option>
-              <option value="18">18px</option>
-              <option value="20">20px</option>
-              <option value="22">22px</option>
+        <div id="drawer-track-list" class="sheet-body"></div>
+      </div>
+
+      <!-- Sleep Timer Sheet (定时睡眠弹窗) -->
+      <div id="timer-drawer" class="wx-bottom-sheet" hidden>
+        <div class="sheet-head">
+          <h3>定时关闭</h3>
+          <button id="timer-close" class="sheet-close-btn" aria-label="关闭定时器">✕</button>
+        </div>
+        <div class="sheet-options">
+          <button class="timer-opt" data-minutes="0">不开启</button>
+          <button class="timer-opt" data-minutes="15">15 分钟后</button>
+          <button class="timer-opt" data-minutes="30">30 分钟后</button>
+          <button class="timer-opt" data-minutes="45">45 分钟后</button>
+          <button class="timer-opt" data-minutes="60">60 分钟后</button>
+          <button class="timer-opt" data-minutes="track">播完当前节</button>
+        </div>
+      </div>
+
+      <!-- Speed Selector Sheet (倍速弹窗) -->
+      <div id="speed-drawer" class="wx-bottom-sheet" hidden>
+        <div class="sheet-head">
+          <h3>播放速度</h3>
+          <button id="speed-close" class="sheet-close-btn" aria-label="关闭倍速设置">✕</button>
+        </div>
+        <div class="sheet-options speed-options">
+          <button class="speed-opt" data-speed="0.75">0.75×</button>
+          <button class="speed-opt" data-speed="1.0">1.0× (正常)</button>
+          <button class="speed-opt" data-speed="1.25">1.25×</button>
+          <button class="speed-opt" data-speed="1.5">1.5×</button>
+          <button class="speed-opt" data-speed="1.75">1.75×</button>
+          <button class="speed-opt" data-speed="2.0">2.0×</button>
+        </div>
+      </div>
+
+      <!-- Readalong Fullscreen Panel (音文跟读页面) -->
+      <section id="readalong" class="wx-readalong-page" hidden>
+        <div class="readalong-top-bar">
+          <button id="readalong-close" class="nav-back-btn" title="返回播放">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <div class="readalong-top-center">
+            <span class="readalong-capsule-badge">跟读模式</span>
+            <h3 id="readalong-chapter-title">正文</h3>
+          </div>
+          <div class="readalong-top-actions">
+            <button id="readalong-locate" class="pill-btn locate-btn" title="定位当前句" hidden>📍 回到朗读</button>
+            <button id="readalong-follow" class="pill-btn">跟随：开</button>
+            <select id="readalong-size" class="size-select" aria-label="字号">
+              <option value="15">小</option>
+              <option value="17" selected>中</option>
+              <option value="19">大</option>
+              <option value="22">特大</option>
+            </select>
+          </div>
+        </div>
+        <div class="readalong-viewport">
+          <iframe id="readalong-frame" title="电子书跟读正文" sandbox="allow-same-origin allow-scripts"></iframe>
+          <div id="readalong-loading" class="readalong-loading" hidden>正在准备电子书正文…</div>
+        </div>
+      </section>
+
+      <!-- PDF Fullscreen Viewer Panel -->
+      <section id="pdf-viewer" class="wx-readalong-page" hidden>
+        <div class="readalong-top-bar">
+          <button id="pdf-close" class="nav-back-btn" title="返回播放">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <div class="readalong-top-center">
+            <span class="readalong-capsule-badge pdf-badge">PDF 讲义</span>
+            <h3 id="pdf-title">配套文档</h3>
+          </div>
+          <div class="readalong-top-actions">
+            <a id="pdf-external" class="pill-btn" target="_blank" rel="noopener noreferrer">↗ 全屏</a>
+          </div>
+        </div>
+        <div class="readalong-viewport">
+          <iframe id="pdf-frame" title="PDF电子书预览" allow="fullscreen"></iframe>
+          <div id="pdf-loading" class="readalong-loading" hidden>正在载入 PDF 讲义…</div>
+        </div>
+      </section>
+
+      <!-- Shared Hidden Native Audio Engine -->
+      <audio id="audio" preload="metadata" playsinline></audio>
+
+      <!-- AList Connect Dialog -->
+      <dialog id="settings" class="wx-dialog">
+        <form id="connection-form">
+          <div class="dialog-head">
+            <h3>连接家庭书库</h3>
+            <button type="button" id="settings-close" class="sheet-close-btn" aria-label="关闭">✕</button>
+          </div>
+          <p class="dialog-desc">登录你已有的 AList 账号，媒体文件直接流式传输。</p>
+          <label class="input-row">
+            <span>访问模式</span>
+            <select id="network">
+              <option value="auto">自动选择（推荐）</option>
+              <option value="external">公网 · melyi.uk</option>
+              <option value="lan">内网 · 10.0.0.85</option>
             </select>
           </label>
-          <button id="readalong-close" class="subtle-action" aria-label="关闭跟读">✕</button>
-        </div>
-      </div>
-      <div class="readalong-frame-container">
-        <iframe id="readalong-frame" title="电子书跟读正文" sandbox="allow-same-origin allow-scripts"></iframe>
-        <div id="readalong-loading" class="readalong-loading" hidden>正在载入电子书内容…</div>
-      </div>
-    </section>
-    <section id="pdf-viewer" class="readalong pdf-viewer" aria-label="PDF电子书浏览" hidden>
-      <div class="readalong-bar">
-        <div class="readalong-title-group">
-          <span class="readalong-badge pdf-badge">PDF 讲义</span>
-          <h3 id="pdf-title">配套讲义 / 电子书</h3>
-        </div>
-        <div class="readalong-actions">
-          <a id="pdf-external" class="primary subtle-action" target="_blank" rel="noopener noreferrer" title="新窗口全屏浏览或下载">↗ 全屏浏览</a>
-          <button id="pdf-close" class="subtle-action" aria-label="关闭PDF">✕</button>
-        </div>
-      </div>
-      <div class="readalong-frame-container">
-        <iframe id="pdf-frame" title="PDF电子书预览" allow="fullscreen"></iframe>
-        <div id="pdf-loading" class="readalong-loading" hidden>正在准备 PDF 电子书…</div>
-      </div>
-    </section>
-    <section id="player" class="player" aria-label="正在收听" hidden>
-      <div class="now"><span class="eyebrow">NOW LISTENING</span><h2 id="track-title"></h2><p id="track-folder"></p></div>
-      <div class="playback"><audio id="audio" controls preload="metadata" playsinline></audio><div class="transport"><button id="rewind" aria-label="后退15秒">↶ 15 秒</button><button id="play" class="primary" disabled>播放</button><button id="forward" aria-label="前进30秒">30 秒 ↷</button><label>倍速 <select id="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select></label><button id="readalong-toggle" class="readalong-btn" hidden>📖 边听边读</button><button id="pdf-toggle" class="readalong-btn pdf-btn" hidden>📄 浏览讲义/PDF</button><button id="next">下一节 →</button></div><p id="player-status" role="status"></p></div>
-    </section>
-    <dialog id="settings">
-      <form id="connection-form">
-        <div class="dialog-head"><h2>连接家庭书库</h2><button type="button" id="settings-close" aria-label="关闭">✕</button></div>
-        <p>使用你已有的 AList 账号登录。有声书只从家庭服务器读取。</p>
-        <label>访问方式<select id="network"><option value="auto">自动选择（推荐）</option><option value="external">外网 · melyi.uk</option><option value="lan">内网 · NUC</option></select></label>
-        <p id="endpoint-note" class="hint"></p>
-        <label>AList 用户名<input id="username" autocomplete="username" required></label>
-        <label>密码<input id="password" type="password" autocomplete="current-password"></label>
-        <label>两步验证码（如有）<input id="otp" inputmode="numeric" autocomplete="one-time-code"></label>
-        <label>目录密码（如有）<input id="folder-password" type="password" autocomplete="off"></label>
-        <label class="check"><input id="remember" type="checkbox">在这台设备记住登录（保存访问令牌，不保存密码）</label>
-        <p id="login-status" role="status"></p>
-        <div class="actions"><button type="submit" class="primary" id="login">登录并打开书库</button><button type="button" id="logout">退出登录</button></div>
-      </form>
-      <hr>
-      <p class="hint">Cloudflare 版通过 HTTPS 访问 NUC。内网 HTTP 地址仅能从内网页面使用；HTTPS 页面不会向内网 HTTP 发送密码。</p>
-      <div class="actions"><button id="export">导出收听记录</button><label class="file-button">导入记录<input id="import" type="file" accept="application/json,.json"></label></div>
-      <p class="hint">不同域名、Safari 与主屏幕应用的存储可能各自独立。第一版不自动跨设备同步。</p>
-    </dialog>
-    <noscript>请启用 JavaScript 以浏览与播放有声书。</noscript>
+          <p id="endpoint-note" class="hint-text"></p>
+          <label class="input-row">
+            <span>用户名</span>
+            <input id="username" autocomplete="username" required placeholder="AList 用户名">
+          </label>
+          <label class="input-row">
+            <span>密码</span>
+            <input id="password" type="password" autocomplete="current-password" placeholder="密码">
+          </label>
+          <label class="input-row">
+            <span>两步验证</span>
+            <input id="otp" inputmode="numeric" autocomplete="one-time-code" placeholder="两步验证码（如有）">
+          </label>
+          <label class="input-row">
+            <span>目录密码</span>
+            <input id="folder-password" type="password" autocomplete="off" placeholder="目录访问密码（如有）">
+          </label>
+          <label class="check-row">
+            <input id="remember" type="checkbox">
+            <span>记住此设备（安全保存访问令牌）</span>
+          </label>
+          <p id="login-status" class="login-status-text" role="status"></p>
+          <div class="dialog-btn-group">
+            <button type="submit" class="wx-btn wx-btn-primary" id="login">登录书库</button>
+            <button type="button" class="wx-btn wx-btn-subtle" id="logout">退出当前登录</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+    <noscript>请启用 JavaScript 以完整体验微信读书风格的有声书播放器。</noscript>
   </body>
 </html>
