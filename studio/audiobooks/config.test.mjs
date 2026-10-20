@@ -17,8 +17,8 @@ test("NUC HTTP and HTTPS keep their own origin and mapped port", () => {
   assert.equal(resolveEndpoint("auto", location("https://melyi.uk:8089")), "https://melyi.uk:8089/alist")
 })
 
-test("HTTPS cannot select an insecure LAN endpoint", () => {
-  assert.throws(() => resolveEndpoint("lan", location("https://notes.melyi.uk")), /HTTPS/)
+test("HTTPS cannot select an insecure LAN endpoint, safely falls back to external HTTPS", () => {
+  assert.equal(resolveEndpoint("lan", location("https://notes.melyi.uk")), "https://melyi.uk/alist")
 })
 
 test("library path checks reject siblings and traversal", () => {

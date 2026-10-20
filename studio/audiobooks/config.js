@@ -3,11 +3,14 @@ export const EXTERNAL_ALIST = "https://melyi.uk/alist"
 export const LAN_ALIST = "http://10.0.0.85:8088/alist"
 
 export function resolveEndpoint(mode = "auto", location = window.location) {
+  const isHttps = location.protocol === "https:"
   const local = /^(10\.|192\.168\.|127\.|localhost$|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)
+
   if (mode === "external") return EXTERNAL_ALIST
   if (mode === "lan") {
-    if (location.protocol === "https:") {
-      throw new Error("请先通过 http://10.0.0.85:8088/studio/audiobooks/ 打开内网版；HTTPS 页面不能连接内网 HTTP。")
+    if (isHttps) {
+      // Automatic safe fallback: on HTTPS, LAN HTTP is blocked by browsers, use secure external endpoint
+      return EXTERNAL_ALIST
     }
     return LAN_ALIST
   }

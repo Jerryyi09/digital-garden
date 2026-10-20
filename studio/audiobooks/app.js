@@ -263,17 +263,26 @@ async function api(route, body = {}, token = auth?.token) {
       cache: "no-store",
       signal: AbortSignal.timeout(25000),
     })
-  } catch {
+  } catch (err) {
     throw new Error(
-      "无法连接家庭书库，请检查 NUC 是否在线及网络方式。",
+      `无法连接家庭书库（${endpoint}），请检查网络或切换访问模式。`
     )
   }
-  if (!response.ok) throw new Error(`书库请求失败（HTTP ${response.status}）`)
-  const result = await response.json()
+
+  let result
+  try {
+    result = await response.json()
+  } catch {
+    throw new Error(`书库响应格式异常（HTTP ${response.status}）`)
+  }
+
   if (result.code !== 200) {
     if (result.code === 401) {
-      $("settings").showModal()
+      $("settings")?.showModal()
       throw new Error("请使用 AList 账号登录；登录已过期。")
+    }
+    if (result.code === 400 && String(result.message).toLowerCase().includes("password")) {
+      throw new Error("AList 用户名或密码错误，请重新输入。")
     }
     throw new Error(result.message || `AList 错误 ${result.code}`)
   }
@@ -378,6 +387,19 @@ function breadcrumbs() {
   }
 }
 
+function navigateUp() {
+  if (folder === ROOT || !isWithinRoot(folder)) {
+    window.location.href = "/studio/"
+    return
+  }
+  const parent = folder.slice(0, folder.lastIndexOf("/"))
+  if (parent.length < ROOT.length || !isWithinRoot(parent)) {
+    browse(ROOT)
+  } else {
+    browse(parent)
+  }
+}
+
 function renderShelf() {
   const shelfContainer = $("shelf-items")
   shelfContainer.replaceChildren()
@@ -477,8 +499,12 @@ function render() {
 
     // Left visual: Book cover for folder, disc icon for audio track
     if (item.is_dir) {
-      const coverFile = item.coverFile || getBookCover(item.name)
-      const fullCoverPath = coverFile ? `${item.path}/${coverFile}` : ""
+      let fullCoverPath = ""
+      if (folder !== ROOT) {
+        // Inside a category folder (e.g. 文学作品, 心智成长), each sub-item is a book folder
+        const coverFile = item.coverFile || getBookCover(item.name) || "cover.jpg"
+        fullCoverPath = `${item.path}/${coverFile}`
+      }
       const coverEl = createBookCoverElement(item.name, "size-row", fullCoverPath)
       card.append(coverEl)
     } else {
@@ -1357,7 +1383,8 @@ on("readalong-size", "change", () => {
   if (doc?.body) doc.body.style.fontSize = `${size}px`
 })
 
-// Search
+// Navigation & Search
+on("nav-back-btn", "click", navigateUp)
 on("search", "input", (e) => {
   const clr = $("search-clear")
   if (clr) clr.hidden = !e.target.value
@@ -1398,14 +1425,13 @@ on("network", "change", () => {
   }
 })
 
-$("connection-form").onsubmit = async (event) => {
+on("connection-form", "submit", async (event) => {
   event.preventDefault()
-  $("login").disabled = true
+  const loginBtn = $("login")
+  if (loginBtn) loginBtn.disabled = true
   $("login-status").textContent = "正在登录…"
   try {
     const nextEndpoint = resolveEndpoint($("network").value)
-    if (location.protocol === "https:" && !nextEndpoint.startsWith("https://"))
-      throw new Error("HTTPS 页面只能连接 HTTPS 书库。")
     saveProgress()
     audio.pause()
     ++playRequest
@@ -1422,28 +1448,26 @@ $("connection-form").onsubmit = async (event) => {
     if (password) {
       const data = await api(
         "auth/login",
-        { username, password, otp_code: $("otp").value.trim() },
+        { username, password },
         "",
       )
       auth = { token: data.token, deviceKey: data.device_key, username, endpoint }
     }
-    directoryPassword = $("folder-password").value
     prefs = { ...prefs, mode: $("network").value, username }
     write(localStorage, PREF, prefs)
     remove(localStorage, AUTH)
     remove(sessionStorage, AUTH)
     write($("remember").checked ? localStorage : sessionStorage, AUTH, auth)
     $("password").value = ""
-    $("otp").value = ""
     await browse(ROOT)
-    $("settings").close()
+    $("settings")?.close()
     notice("登录成功，书库已同步")
   } catch (error) {
     $("login-status").textContent = error.message
   } finally {
-    $("login").disabled = false
+    if (loginBtn) loginBtn.disabled = false
   }
-}
+})
 
 on("logout", "click", () => {
   logout()
