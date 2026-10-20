@@ -10,6 +10,8 @@ export const BOOK_SUMMARIES = {
     "碎片化网络时代的专注力指南。提出深度工作是数字经济中的稀缺超能力，系统总结无干扰专注的四大践行法则，助你高效产出并重构心智带宽。",
   "Clear Thinking":
     "顶级决策博客Farnam Street创始人力作。深度剖析情绪、自我与群体本能如何扭曲判断，传授识别心智陷阱、保持清醒并做出高概率正确决策的系统方法。",
+  "Clear Thinking Turning Ordinary Moments":
+    "顶级决策博客Farnam Street创始人力作。深度剖析情绪、自我与群体本能如何扭曲判断，传授识别心智陷阱、保持清醒并做出高概率正确决策的系统方法。",
   "Cognitive Psychology for Dummies":
     "通俗系统的认知心理学指南。深入探讨人类大脑如何感知世界、加工信息、储存记忆并做出逻辑推断，全面破译人类日常注意与认知思考的底层机制。",
   "Critical Thinking Skills for Dummies (2nd Edition)":
@@ -76,6 +78,8 @@ export const BOOK_SUMMARIES = {
     "深度剖析人性阴暗面的心理哲学课。探究欺骗、攻击、自私、偏见与恶意行为的心理动因与进化逻辑，在理解黑暗机制中建立清醒防御与理性慈悲。",
   "Talking to Strangers What We Should Know About the People We Don’t Know Malcom Gladwell":
     "格拉德威尔洞察人际误读的力作。通过双面间谍、法庭冤案等真实案例，深度揭露人类默认诚实、透明度错觉等认知缺陷为何频频引发沟通与社会悲剧。",
+  "The Almanack of Naval Ravikant":
+    "硅谷传奇投资人纳瓦尔的心智箴言录。深刻剖析如何借助个人专长、代码资本与杠杆效应创造不靠运气的财富，并在自律与内心平静中掌控生活，体悟自主、健康与终极幸福。",
   "The Power of Habit - Charles Duhigg":
     "重塑行为模式的习惯科学全书。深入解析“暗示-惯常行为-奖赏”这一核心神经回路，提供改变顽固恶习、打造个人生活与企业文化核心习惯的落地方案。",
   "The Power of Positive Thinking":
@@ -88,6 +92,10 @@ export const BOOK_SUMMARIES = {
     "拆解复杂行为与人际心理的思维训练书。从肢体语言、潜意识动机到情绪操控防御，教你以专业心理学视角洞察人心，提升社交情商与自我洞察力。",
   "Thinking Fast or Slow":
     "诺奖得主卡尼曼颠覆认知科学的经典巨著。详解人类大脑直觉反应与深思熟虑的两套决策系统，全面梳理锚定、框架效应等认知偏差，助你理性把控人生。",
+  "Thinking in Systems and Mental Models":
+    "系统思考与超级心智模型入门指南。深入剖析复杂系统运作、反馈回路与非线性因果，传授顶级思考者的核心心智框架，助你打破思维定势与认知盲区，在复杂现实中做出高质量决策。",
+  "We Are What We Dream":
+    "意念、潜意识与心智能量实践指南。深入解构情绪管理与自我暗示心理机制，教你转变内在消极思维，以积极专注的心性能量吸引美好人际关系与成长契机，实现知行合一。",
   "Who We Are Becoming Matters":
     "巨变与混乱时代的心灵定力之作。融合古老本土智慧与现代领导力思辨，引导读者在面对社会变迁与生态挑战时，重寻内在敬畏、勇气与持久觉醒之道。",
   "一天24小时怎么过":

@@ -111,10 +111,18 @@ def find_best_matching_html(epub_path: Path, audio_words: list[dict]) -> tuple[s
                     if full_href.lower().endswith((".htm", ".html", ".xhtml")):
                         spine_htmls.append(full_href)
 
-        # Score candidates, ignoring frontmatter / backmatter
+        # Score candidates, ignoring pure frontmatter / navigation documents
+        def is_frontmatter_file(f_name: str) -> bool:
+            base = os.path.basename(f_name).lower()
+            stem = os.path.splitext(base)[0]
+            if stem in ("cover", "titlepage", "title_page", "title", "toc", "nav", "copyright", "adcard", "ad-card"):
+                return True
+            if base.startswith(("cover.", "toc.", "nav.", "titlepage.", "copyright.")):
+                return True
+            return False
+
         for html_file in spine_htmls:
-            lower_name = html_file.lower()
-            if any(k in lower_name for k in ("cover", "titlepage", "toc", "nav", "copyright", "adcard")):
+            if is_frontmatter_file(html_file):
                 continue
             try:
                 raw_html = z.read(html_file).decode("utf-8", errors="replace")
@@ -157,6 +165,13 @@ def align_single_book_universal(
     # Sort audios naturally
     audios.sort(key=lambda p: p.name)
     primary_audio = audios[0]
+
+    # If first track is a very short credit or opening audio (< 60s), pick the first substantial chapter track
+    if len(audios) > 1 and (get_audio_duration(primary_audio) < 60.0 or any(k in primary_audio.name.lower() for k in ("opening credit", "credits", "opening_credit"))):
+        for a in audios[1:]:
+            if get_audio_duration(a) >= 60.0:
+                primary_audio = a
+                break
 
     work_dir = output_dir / "work"
     text_dir = output_dir / "text"
@@ -291,11 +306,21 @@ def align_single_book_universal(
 
     # Build manifest
     book_id = re.sub(r"[^\w\s-]", "", book_dir.name.lower()).replace(" ", "-")
+    parts = book_dir.parts
+    if "寒假" in parts:
+        c_idx = parts.index("寒假") + 1
+        category = parts[c_idx]
+    elif "有声书" in parts:
+        c_idx = parts.index("有声书") + 1
+        category = parts[c_idx]
+    else:
+        category = book_dir.parent.name
+
     audio_sources = [
         {
             "id": primary_audio.name,
             "name": primary_audio.name,
-            "alistPath": f"{DEFAULT_ALIST_ROOT}/心智成长/{book_dir.name}/{primary_audio.name}",
+            "alistPath": f"{DEFAULT_ALIST_ROOT}/{category}/{book_dir.name}/{primary_audio.name}",
             "sha256": compute_sha256(primary_audio),
             "duration": get_audio_duration(primary_audio),
         }
