@@ -1,5 +1,11 @@
 import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
 import { getBookSummary, getBookCover, getJacketColors } from "./summaries.js"
+import {
+  normalizeTimeline,
+  filterTimelineForTrack,
+  findActiveSegment,
+  waitForFrameReady,
+} from "./readalong-engine.js"
 
 const $ = (id) => document.getElementById(id)
 const audio = $("audio")
@@ -36,6 +42,8 @@ let readalongActive = false
 let readalongFollowing = true
 let currentSegment = null
 let currentDocPath = ""
+let readalongDocToken = 0
+let readalongSyncToken = 0
 let currentPdfPath = ""
 let currentPdfName = ""
 let pdfViewerActive = false
@@ -1043,25 +1051,6 @@ async function renderDrawerTrackList() {
 }
 
 // Readalong / EPUB Syncing
-function findSegment(timeline, time) {
-  if (!timeline || !timeline.length) return null
-  if (time < timeline[0].start) return timeline[0]
-  if (time >= timeline[timeline.length - 1].end) return timeline[timeline.length - 1]
-
-  let low = 0,
-    high = timeline.length - 1
-  while (low <= high) {
-    const mid = (low + high) >> 1
-    const seg = timeline[mid]
-    if (time < seg.start) high = mid - 1
-    else if (time >= seg.end) low = mid + 1
-    else return seg
-  }
-  // If time falls in a gap between two sentences, stick to the sentence just finished
-  if (high >= 0) return timeline[high]
-  return timeline[0]
-}
-
 async function setupReadalong(track, request) {
   readalongManifest = null
   readalongTimeline = []
@@ -1090,18 +1079,19 @@ async function setupReadalong(track, request) {
     if (!timelineInfo || request !== playRequest) return
 
     const timelineUrl = mediaUrl(endpoint, { path: timelinePath }, timelineInfo.sign)
-    const timeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json())
-    if (request !== playRequest || !Array.isArray(timeline)) return
+    const rawTimeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json())
+    if (request !== playRequest || !Array.isArray(rawTimeline)) return
 
     readalongManifest = manifest
-    // Filter segments for this specific audio track if multi-track
-    const trackFiltered = timeline.filter((s) => !s.audioSourceId || s.audioSourceId === track.name)
-    readalongTimeline = trackFiltered.length ? trackFiltered : timeline
+    const normalized = normalizeTimeline(rawTimeline)
+    readalongTimeline = filterTimelineForTrack(normalized, track.name)
     readalongParentPath = parent
-    $("dock-readalong").hidden = false
 
-    // If readalong view is active, immediately sync to new chapter's first segment
-    if (readalongActive) {
+    // Only display EPUB dock button if there are valid segments for this track
+    $("dock-readalong").hidden = readalongTimeline.length === 0
+
+    // If readalong view is active, immediately sync to current playback position
+    if (readalongActive && readalongTimeline.length) {
       syncReadalong(true)
     }
   } catch {
@@ -1166,11 +1156,7 @@ function openReadalong() {
   $("readalong").hidden = false
   updatePlayButtonUI(!audio.paused)
 
-  // Preload first segment document if not loaded yet
-  if (!currentDocPath && readalongTimeline[0]) {
-    currentDocPath = readalongTimeline[0].document
-    loadReadalongDoc(currentDocPath).catch(() => {})
-  }
+  // Force sync immediately to current position or first segment
   syncReadalong(true)
 }
 
@@ -1180,6 +1166,7 @@ function closeReadalong() {
 }
 
 async function loadReadalongDoc(docRelPath) {
+  const token = ++readalongDocToken
   const docPath = `${readalongParentPath}/readalong/${docRelPath}`
   let html = readalongDocCache.get(docPath)
   if (!html) {
@@ -1194,59 +1181,72 @@ async function loadReadalongDoc(docRelPath) {
     }
   }
 
+  if (readalongDocToken !== token) return null
+
   const frame = $("readalong-frame")
   frame.srcdoc = html
 
-  setTimeout(() => {
-    try {
-      const doc = frame.contentDocument
-      if (!doc) return
-      const size = $("readalong-size").value || "17"
-      if (doc.body) doc.body.style.fontSize = `${size}px`
+  const doc = await waitForFrameReady(frame, 2000)
+  if (readalongDocToken !== token || !doc) return null
 
-      const onUserScroll = () => {
-        if (!readalongFollowing) return
-        readalongFollowing = false
-        $("readalong-follow").textContent = "跟随：暂停"
-        $("readalong-locate").hidden = false
-      }
+  try {
+    const size = $("readalong-size").value || "17"
+    if (doc.body) doc.body.style.fontSize = `${size}px`
 
-      frame.contentWindow?.addEventListener("wheel", onUserScroll, { passive: true })
-      frame.contentWindow?.addEventListener("touchmove", onUserScroll, { passive: true })
-
-      doc.addEventListener("click", (e) => {
-        const target = e.target.closest("[id]")
-        if (!target || !target.id) return
-        const seg = readalongTimeline.find((s) => s.fragment === target.id)
-        if (seg) {
-          seek(seg.start)
-          readalongFollowing = true
-          $("readalong-follow").textContent = "跟随：开"
-          $("readalong-locate").hidden = true
-          syncReadalong(true)
-        }
-      })
-    } catch {
-      /* Same origin sandbox */
+    const onUserScroll = () => {
+      if (!readalongFollowing) return
+      readalongFollowing = false
+      $("readalong-follow").textContent = "跟随：暂停"
+      $("readalong-locate").hidden = false
     }
-  }, 50)
+
+    frame.contentWindow?.addEventListener("wheel", onUserScroll, { passive: true })
+    frame.contentWindow?.addEventListener("touchmove", onUserScroll, { passive: true })
+
+    doc.addEventListener("click", (e) => {
+      const target = e.target.closest("[id]")
+      if (!target || !target.id) return
+      const seg = readalongTimeline.find((s) => s.fragment === target.id)
+      if (seg) {
+        seek(seg.start)
+        readalongFollowing = true
+        $("readalong-follow").textContent = "跟随：开"
+        $("readalong-locate").hidden = true
+        syncReadalong(true)
+      }
+    })
+  } catch {
+    /* Same origin sandbox */
+  }
+
+  return doc
 }
 
 async function syncReadalong(forceScroll = false) {
   if (!readalongActive || !readalongTimeline.length || !current) return
-  const seg = findSegment(readalongTimeline, audio.currentTime)
-  if (!seg) return
+  const token = ++readalongSyncToken
+  const seg = findActiveSegment(readalongTimeline, audio.currentTime)
+
+  const frame = $("readalong-frame")
+  let doc = frame.contentDocument
+
+  // If in lead-in silence or past ending, gracefully clear active highlight
+  if (!seg) {
+    if (doc) {
+      doc.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
+    }
+    currentSegment = null
+    return
+  }
+
   if (seg === currentSegment && !forceScroll) return
   currentSegment = seg
 
-  if (currentDocPath !== seg.document) {
+  if (currentDocPath !== seg.document || !doc?.getElementById(seg.fragment)) {
     currentDocPath = seg.document
-    await loadReadalongDoc(seg.document)
+    doc = await loadReadalongDoc(seg.document)
+    if (readalongSyncToken !== token || !doc) return
   }
-
-  const frame = $("readalong-frame")
-  const doc = frame.contentDocument
-  if (!doc) return
 
   doc.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
   const targetElem = doc.getElementById(seg.fragment)
@@ -1256,6 +1256,16 @@ async function syncReadalong(forceScroll = false) {
       targetElem.scrollIntoView({ block: "center", behavior: "smooth" })
     }
   }
+
+  if (readalongManifest?.chapters?.length) {
+    const chap = readalongManifest.chapters.find(
+      (c) => audio.currentTime >= c.start && audio.currentTime < c.end,
+    )
+    if (chap && chap.title) {
+      $("readalong-chapter-title").textContent = chap.title.trim()
+    }
+  }
+}
 
   if (readalongManifest?.chapters?.length) {
     const chap = readalongManifest.chapters.find(

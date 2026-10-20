@@ -9,6 +9,7 @@ function run(command, args, capture = false) {
 }
 
 // Publish only the requested Studio entry and player; do not overwrite other site content.
+run("npm", ["test"])
 run("npm", ["run", "build"])
 const stage = run("ssh", [...options, host, "mktemp -d /tmp/garden-audiobooks.XXXXXX"], true)
 if (!/^\/tmp\/garden-audiobooks\.[a-zA-Z0-9]+$/.test(stage)) throw new Error("Unexpected staging path")
