@@ -255,17 +255,23 @@ async function api(route, body = {}, token = auth?.token) {
   if (auth?.deviceKey) headers["Device-Key"] = auth.deviceKey
   let response
   try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 12000)
     response = await fetch(`${endpoint}/api/${route}`, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
       credentials: "omit",
       cache: "no-store",
-      signal: AbortSignal.timeout(25000),
+      signal: controller.signal,
     })
+    clearTimeout(timer)
   } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error(`连接书库超时（12秒未响应），请检查家庭服务器网络。`)
+    }
     throw new Error(
-      `无法连接家庭书库（${endpoint}），请检查网络或切换访问模式。`
+      `无法连接家庭书库（${endpoint}）：${err.message || "网络异常，请检查访问模式。"}`
     )
   }
 
@@ -1414,8 +1420,24 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 })
 
 // Dialog & Settings
-on("settings-open", "click", () => $("settings")?.showModal())
-on("open-conn-btn", "click", () => $("settings")?.showModal())
+function openSettingsModal() {
+  const dlg = $("settings")
+  if (!dlg) return
+  const userInp = $("username")
+  if (userInp && prefs.username) userInp.value = prefs.username
+  const netSel = $("network")
+  if (netSel && prefs.mode) netSel.value = prefs.mode
+  $("login-status").textContent = ""
+  try {
+    $("endpoint-note").textContent = resolveEndpoint($("network")?.value || "auto")
+  } catch {
+    /* fallback */
+  }
+  dlg.showModal()
+}
+
+on("settings-open", "click", openSettingsModal)
+on("open-conn-btn", "click", openSettingsModal)
 on("settings-close", "click", () => $("settings")?.close())
 on("network", "change", () => {
   try {
@@ -1459,9 +1481,9 @@ on("connection-form", "submit", async (event) => {
     remove(sessionStorage, AUTH)
     write($("remember").checked ? localStorage : sessionStorage, AUTH, auth)
     $("password").value = ""
-    await browse(ROOT)
     $("settings")?.close()
-    notice("登录成功，书库已同步")
+    notice("登录成功，正在同步书库...")
+    await browse(ROOT)
   } catch (error) {
     $("login-status").textContent = error.message
   } finally {

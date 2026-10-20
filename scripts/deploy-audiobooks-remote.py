@@ -37,6 +37,22 @@ def patch_nginx(source):
         proxy_buffering off;
         proxy_hide_header Content-Disposition;
         add_header Content-Disposition "inline";
+
+        # CORS support for cross-origin Cloudflare frontend access
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Client-Id,Device-Key' always;
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Client-Id,Device-Key' always;
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
+
         proxy_redirect / /alist/;
         proxy_redirect /alist:5244/ /alist/;
     }
@@ -50,6 +66,22 @@ def patch_nginx(source):
       block = block[:-1] + "    proxy_buffering off;\n    }"
     if "proxy_hide_header Content-Disposition;" not in block:
       block = block[:-1] + "    proxy_hide_header Content-Disposition;\n        add_header Content-Disposition \"inline\";\n    }"
+    if "Access-Control-Allow-Origin" not in block:
+      cors_chunk = """        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Client-Id,Device-Key' always;
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Client-Id,Device-Key' always;
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
+    }"""
+      block = block[:-1] + cors_chunk
     return block
 
   return re.sub(r"location /alist\s*\{[^{}]*\}", patch_alist_block, http + rest)
