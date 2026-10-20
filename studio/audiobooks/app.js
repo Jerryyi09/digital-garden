@@ -120,7 +120,23 @@ function durationText(seconds) {
   return hrs > 0 ? `${hrs}:${String(mins).padStart(2, "0")}:${secs}` : `${String(mins).padStart(2, "0")}:${secs}`
 }
 
-function createBookCoverElement(bookTitle, sizeClass = "size-row", explicitCoverUrl = "") {
+const coverSignedCache = new Map()
+
+async function getSignedCoverUrl(fullImgPath) {
+  if (!fullImgPath) return ""
+  if (coverSignedCache.has(fullImgPath)) return coverSignedCache.get(fullImgPath)
+  try {
+    const info = await api("fs/get", { path: fullImgPath, password: directoryPassword }).catch(() => null)
+    if (!info) return ""
+    const url = mediaUrl(endpoint, { path: fullImgPath }, info.sign)
+    coverSignedCache.set(fullImgPath, url)
+    return url
+  } catch {
+    return ""
+  }
+}
+
+function createBookCoverElement(bookTitle, sizeClass = "size-row", fullImgPath = "") {
   const coverWrap = document.createElement("div")
   coverWrap.className = `wx-book-cover ${sizeClass}`
 
@@ -147,17 +163,29 @@ function createBookCoverElement(bookTitle, sizeClass = "size-row", explicitCover
   fallback.append(titleText, mark)
   coverWrap.append(fallback)
 
-  // Real Cover Image
-  if (explicitCoverUrl) {
+  // Real Cover Image with Signed URL Fetch
+  if (fullImgPath) {
     const img = document.createElement("img")
     img.className = "cover-real-img"
     img.loading = "lazy"
     img.alt = bookTitle || "封面"
-    img.src = explicitCoverUrl
     img.onerror = () => {
       img.remove() // Fallback jacket immediately becomes visible underneath
     }
     coverWrap.append(img)
+
+    // Load with sign
+    if (coverSignedCache.has(fullImgPath)) {
+      img.src = coverSignedCache.get(fullImgPath)
+    } else {
+      getSignedCoverUrl(fullImgPath).then((signedUrl) => {
+        if (signedUrl) {
+          img.src = signedUrl
+        } else {
+          img.remove()
+        }
+      }).catch(() => img.remove())
+    }
   }
 
   return coverWrap
@@ -356,13 +384,13 @@ function renderShelf() {
     const pathParts = record.track.path.slice(ROOT.length).split("/").filter(Boolean)
     const bookName = pathParts.length > 1 ? pathParts[1] : record.track.name.replace(AUDIO, "")
     const coverFile = getBookCover(bookName)
-    let coverUrl = ""
+    let fullCoverPath = ""
     if (coverFile) {
       const parentDir = record.track.path.slice(0, record.track.path.lastIndexOf("/"))
-      coverUrl = `${endpoint}/d${parentDir.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
+      fullCoverPath = `${parentDir}/${coverFile}`
     }
 
-    const cover = createBookCoverElement(bookName, "size-shelf", coverUrl)
+    const cover = createBookCoverElement(bookName, "size-shelf", fullCoverPath)
 
     const title = document.createElement("div")
     title.className = "shelf-card-title"
@@ -398,11 +426,8 @@ function render() {
     if (bannerCoverWrap) {
       bannerCoverWrap.replaceChildren()
       const coverFile = getBookCover(currentDirName) || entries.find((i) => i.coverFile)?.coverFile
-      let coverUrl = ""
-      if (coverFile) {
-        coverUrl = `${endpoint}/d${folder.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
-      }
-      bannerCoverWrap.append(createBookCoverElement(currentDirName, "size-banner", coverUrl))
+      const fullCoverPath = coverFile ? `${folder}/${coverFile}` : ""
+      bannerCoverWrap.append(createBookCoverElement(currentDirName, "size-banner", fullCoverPath))
     }
     $("folder-summary").hidden = false
   } else {
@@ -438,11 +463,8 @@ function render() {
     // Left visual: Book cover for folder, disc icon for audio track
     if (item.is_dir) {
       const coverFile = item.coverFile || getBookCover(item.name)
-      let coverUrl = ""
-      if (coverFile) {
-        coverUrl = `${endpoint}/d${item.path.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
-      }
-      const coverEl = createBookCoverElement(item.name, "size-row", coverUrl)
+      const fullCoverPath = coverFile ? `${item.path}/${coverFile}` : ""
+      const coverEl = createBookCoverElement(item.name, "size-row", fullCoverPath)
       card.append(coverEl)
     } else {
       const disc = document.createElement("div")
@@ -590,30 +612,33 @@ async function loadTrack(track, preparedUrl) {
 
   // Update Disc Center Artwork with Book Cover
   const coverFile = getBookCover(bookName)
-  let coverUrl = ""
-  if (coverFile) {
-    const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
-    coverUrl = `${endpoint}/d${parentDir.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
-  }
+  const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
+  const fullCoverPath = coverFile ? `${parentDir}/${coverFile}` : ""
 
   const miniThumb = $("mini-cover-thumb")
   const vinylCenter = $("vinyl-cover-art")
   const rfCenter = document.querySelector("#readalong-floating-disc .floating-center")
   const pfCenter = document.querySelector("#pdf-floating-disc .floating-center")
 
-  if (coverUrl) {
-    const bgCss = `url("${coverUrl}") center/cover no-repeat`
-    if (miniThumb) { miniThumb.style.background = bgCss; $("mini-cover-icon").hidden = true }
-    if (vinylCenter) { vinylCenter.style.background = bgCss; vinylCenter.textContent = "" }
-    if (rfCenter) { rfCenter.style.background = bgCss; rfCenter.textContent = "" }
-    if (pfCenter) { pfCenter.style.background = bgCss; pfCenter.textContent = "" }
-  } else {
-    const [c1, c2] = getJacketColors(bookName)
-    const bgGrad = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`
-    if (miniThumb) { miniThumb.style.background = bgGrad; $("mini-cover-icon").hidden = false }
-    if (vinylCenter) { vinylCenter.style.background = bgGrad; vinylCenter.textContent = "📖" }
-    if (rfCenter) { rfCenter.style.background = bgGrad; rfCenter.textContent = "📖" }
-    if (pfCenter) { pfCenter.style.background = bgGrad; pfCenter.textContent = "📄" }
+  // Fallback defaults
+  const [c1, c2] = getJacketColors(bookName)
+  const bgGrad = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`
+  if (miniThumb) { miniThumb.style.background = bgGrad; $("mini-cover-icon").hidden = false }
+  if (vinylCenter) { vinylCenter.style.background = bgGrad; vinylCenter.textContent = "📖" }
+  if (rfCenter) { rfCenter.style.background = bgGrad; rfCenter.textContent = "📖" }
+  if (pfCenter) { pfCenter.style.background = bgGrad; pfCenter.textContent = "📄" }
+
+  // Load signed cover if exists
+  if (fullCoverPath) {
+    getSignedCoverUrl(fullCoverPath).then((signedUrl) => {
+      if (signedUrl && request === playRequest) {
+        const bgCss = `url("${signedUrl}") center/cover no-repeat`
+        if (miniThumb) { miniThumb.style.background = bgCss; $("mini-cover-icon").hidden = true }
+        if (vinylCenter) { vinylCenter.style.background = bgCss; vinylCenter.textContent = "" }
+        if (rfCenter) { rfCenter.style.background = bgCss; rfCenter.textContent = "" }
+        if (pfCenter) { pfCenter.style.background = bgCss; pfCenter.textContent = "" }
+      }
+    }).catch(() => {})
   }
 
   $("mini-player").hidden = false
@@ -700,6 +725,18 @@ function nextTrack() {
 }
 
 function updatePlayButtonUI(playing) {
+  const playBtn = $("play")
+  const miniPlayBtn = $("mini-play-btn")
+  const rfBtn = $("readalong-floating-play-btn")
+  const pfBtn = $("pdf-floating-play-btn")
+
+  // Class-based CSS toggle ensures 100% reliable SVG icon switching
+  if (playBtn) playBtn.classList.toggle("is-playing", playing)
+  if (miniPlayBtn) miniPlayBtn.classList.toggle("is-playing", playing)
+  if (rfBtn) rfBtn.classList.toggle("is-playing", playing)
+  if (pfBtn) pfBtn.classList.toggle("is-playing", playing)
+
+  // Direct SVG hidden attributes fallback
   $("mini-play-icon").hidden = playing
   $("mini-pause-icon").hidden = !playing
   $("play-svg").hidden = playing
