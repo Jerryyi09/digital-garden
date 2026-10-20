@@ -351,6 +351,13 @@ async function browse(path = folder) {
     $("search").value = ""
     $("search-clear").hidden = true
     render()
+  } catch (err) {
+    if (request === browseRequest) {
+      entries = []
+      $("list-status").textContent = "未连接书库或登录已过期，请点击右上角设置登录"
+      notice(err.message || "无法连接书库，请登录 AList。")
+      render()
+    }
   } finally {
     if (request === browseRequest) $("refresh").disabled = false
   }
@@ -1238,34 +1245,40 @@ async function syncReadalong(forceScroll = false) {
   }
 }
 
+// Safe event listener helper
+const on = (id, event, fn) => {
+  const el = $(id)
+  if (el) el.addEventListener(event, fn)
+}
+
 // User Interaction Listeners
-$("play").onclick = () => (audio.paused ? playAudio() : audio.pause())
-$("mini-play-btn").onclick = async (e) => {
+on("play", "click", () => (audio.paused ? playAudio() : audio.pause()))
+on("mini-play-btn", "click", async (e) => {
   e.stopPropagation()
   if (!current || !audio.src) {
     await ensureCurrentLoaded(true)
   } else {
     audio.paused ? playAudio() : audio.pause()
   }
-}
-$("rewind").onclick = () => seek(audio.currentTime - 15)
-$("forward").onclick = () => seek(audio.currentTime + 30)
-$("btn-next").onclick = nextTrack
+})
+on("rewind", "click", () => seek(audio.currentTime - 15))
+on("forward", "click", () => seek(audio.currentTime + 30))
+on("btn-next", "click", nextTrack)
 
 // Toggle Full Player / Mini Player
-$("mini-content-area").onclick = async () => {
+on("mini-content-area", "click", async () => {
   if (!current || !audio.src) {
     await ensureCurrentLoaded(false)
   }
   $("full-player").hidden = false
-}
-$("mini-list-btn").onclick = (e) => {
+})
+on("mini-list-btn", "click", (e) => {
   e.stopPropagation()
   openDrawer("chapter-drawer")
-}
-$("player-collapse-btn").onclick = () => {
+})
+on("player-collapse-btn", "click", () => {
   $("full-player").hidden = true
-}
+})
 
 // Floating Vinyl Player in Readalong & PDF Panels (WeRead Style: Click vinyl to play/pause)
 const toggleFloatingPlay = (e) => {
@@ -1282,28 +1295,28 @@ const openFullPlayerFromReader = () => {
   $("full-player").hidden = false
 }
 
-$("readalong-floating-player").onclick = toggleFloatingPlay
-$("readalong-floating-play-btn").onclick = toggleFloatingPlay
-$("readalong-title-btn").onclick = openFullPlayerFromReader
-$("readalong-open-player-btn").onclick = openFullPlayerFromReader
+on("readalong-floating-player", "click", toggleFloatingPlay)
+on("readalong-floating-play-btn", "click", toggleFloatingPlay)
+on("readalong-title-btn", "click", openFullPlayerFromReader)
+on("readalong-open-player-btn", "click", openFullPlayerFromReader)
 
-$("pdf-floating-player").onclick = toggleFloatingPlay
-$("pdf-floating-play-btn").onclick = toggleFloatingPlay
-$("pdf-title-btn").onclick = openFullPlayerFromReader
-$("pdf-open-player-btn").onclick = openFullPlayerFromReader
+on("pdf-floating-player", "click", toggleFloatingPlay)
+on("pdf-floating-play-btn", "click", toggleFloatingPlay)
+on("pdf-title-btn", "click", openFullPlayerFromReader)
+on("pdf-open-player-btn", "click", openFullPlayerFromReader)
 
 // Dock buttons in Full Player
-$("dock-chapters").onclick = () => openDrawer("chapter-drawer")
-$("dock-timer").onclick = () => openDrawer("timer-drawer")
-$("dock-readalong").onclick = openReadalong
-$("dock-pdf").onclick = openPdfViewer
-$("btn-speed").onclick = () => openDrawer("speed-drawer")
+on("dock-chapters", "click", () => openDrawer("chapter-drawer"))
+on("dock-timer", "click", () => openDrawer("timer-drawer"))
+on("dock-readalong", "click", openReadalong)
+on("dock-pdf", "click", openPdfViewer)
+on("btn-speed", "click", () => openDrawer("speed-drawer"))
 
 // Drawer Closers
-$("drawer-mask").onclick = closeAllDrawers
-$("drawer-close").onclick = closeAllDrawers
-$("timer-close").onclick = closeAllDrawers
-$("speed-close").onclick = closeAllDrawers
+on("drawer-mask", "click", closeAllDrawers)
+on("drawer-close", "click", closeAllDrawers)
+on("timer-close", "click", closeAllDrawers)
+on("speed-close", "click", closeAllDrawers)
 
 // Speed Drawer Option click
 document.querySelectorAll(".speed-opt").forEach((btn) => {
@@ -1322,40 +1335,41 @@ document.querySelectorAll(".timer-opt").forEach((btn) => {
 })
 
 // Readalong Top Bar
-$("readalong-close").onclick = closeReadalong
-$("pdf-close").onclick = closePdfViewer
-$("readalong-follow").onclick = () => {
+on("readalong-close", "click", closeReadalong)
+on("pdf-close", "click", closePdfViewer)
+on("readalong-follow", "click", () => {
   readalongFollowing = !readalongFollowing
   $("readalong-follow").textContent = `跟随：${readalongFollowing ? "开" : "暂停"}`
   if (readalongFollowing) {
     $("readalong-locate").hidden = true
     syncReadalong(true)
   }
-}
-$("readalong-locate").onclick = () => {
+})
+on("readalong-locate", "click", () => {
   readalongFollowing = true
   $("readalong-follow").textContent = "跟随：开"
   $("readalong-locate").hidden = true
   syncReadalong(true)
-}
-$("readalong-size").onchange = () => {
+})
+on("readalong-size", "change", () => {
   const size = $("readalong-size").value
   const doc = $("readalong-frame").contentDocument
   if (doc?.body) doc.body.style.fontSize = `${size}px`
-}
+})
 
 // Search
-$("search").oninput = (e) => {
-  $("search-clear").hidden = !e.target.value
+on("search", "input", (e) => {
+  const clr = $("search-clear")
+  if (clr) clr.hidden = !e.target.value
   render()
-}
-$("search-clear").onclick = () => {
+})
+on("search-clear", "click", () => {
   $("search").value = ""
   $("search-clear").hidden = true
   render()
-}
-$("sort").onchange = render
-$("refresh").onclick = attempt(() => browse())
+})
+on("sort", "change", render)
+on("refresh", "click", attempt(() => browse()))
 
 // TabBar Navigation (书架 / 书库 / 我的)
 document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -1373,16 +1387,16 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 })
 
 // Dialog & Settings
-$("settings-open").onclick = () => $("settings").showModal()
-$("open-conn-btn").onclick = () => $("settings").showModal()
-$("settings-close").onclick = () => $("settings").close()
-$("network").onchange = () => {
+on("settings-open", "click", () => $("settings")?.showModal())
+on("open-conn-btn", "click", () => $("settings")?.showModal())
+on("settings-close", "click", () => $("settings")?.close())
+on("network", "change", () => {
   try {
     $("endpoint-note").textContent = resolveEndpoint($("network").value)
   } catch (error) {
     $("endpoint-note").textContent = error.message
   }
-}
+})
 
 $("connection-form").onsubmit = async (event) => {
   event.preventDefault()
@@ -1431,11 +1445,11 @@ $("connection-form").onsubmit = async (event) => {
   }
 }
 
-$("logout").onclick = () => {
+on("logout", "click", () => {
   logout()
-  $("settings").close()
-}
-$("logout-btn").onclick = logout
+  $("settings")?.close()
+})
+on("logout-btn", "click", logout)
 
 function logout() {
   saveProgress()
@@ -1455,14 +1469,17 @@ function logout() {
   write(localStorage, PREF, prefs)
   remove(localStorage, AUTH)
   remove(sessionStorage, AUTH)
-  for (const id of ["password", "otp", "username", "folder-password"]) $(id).value = ""
+  for (const id of ["password", "otp", "username", "folder-password"]) {
+    const el = $(id)
+    if (el) el.value = ""
+  }
   $("mini-player").hidden = true
   $("full-player").hidden = true
   notice("已清除本机登录记录")
   render()
 }
 
-$("export-btn").onclick = () => {
+on("export-btn", "click", () => {
   saveProgress()
   const blob = new Blob(
     [JSON.stringify({ version: 1, records: libraryRecords() }, null, 2)],
@@ -1474,10 +1491,11 @@ $("export-btn").onclick = () => {
   a.download = `garden-listen-${new Date().toISOString().slice(0, 10)}.json`
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
+})
 
-$("import").onchange = attempt(async () => {
-  const file = $("import").files[0]
+on("import", "change", attempt(async () => {
+  const imp = $("import")
+  const file = imp?.files?.[0]
   if (!file) return
   if (file.size > 10 * 1024 * 1024) throw new Error("记录文件过大，请选择小于 10 MB 的备份。")
   const data = JSON.parse(await file.text())
@@ -1523,8 +1541,8 @@ $("import").onchange = attempt(async () => {
   }
   render()
   notice(`已成功合并 ${candidates.length} 条收听记录`)
-  $("import").value = ""
-})
+  if (imp) imp.value = ""
+}))
 
 // Initialize App
 async function init() {
@@ -1563,11 +1581,27 @@ async function init() {
     $("mini-player").hidden = false
   }
 
+  // First render initial shell state so UI is never stuck on "loading"
+  render()
+
   if (auth?.token) {
-    browse(ROOT)
+    browse(ROOT).catch((err) => {
+      console.warn("Initial browse failed:", err)
+      $("list-status").textContent = "未连接书库，请点击右上角设置登录"
+      render()
+    })
   } else {
-    // Open settings if not connected
-    $("settings").showModal()
+    $("list-status").textContent = "未连接家庭书库，请点击右上角设置登录"
+    render()
+    // Open settings dialog if not connected
+    const settingsDlg = $("settings")
+    if (settingsDlg && typeof settingsDlg.showModal === "function") {
+      try {
+        settingsDlg.showModal()
+      } catch {
+        /* Dialog might already be open */
+      }
+    }
   }
 
   // Register Service Worker
