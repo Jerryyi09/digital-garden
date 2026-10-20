@@ -15,7 +15,13 @@ OUTPUT_BASE = PROJECT_ROOT / "private" / "readalong-output"
 
 
 def main():
-    dirs = sorted([d for d in DESKTOP_ROOT.iterdir() if d.is_dir() and not d.name.startswith(".")])
+    import argparse
+    parser = argparse.ArgumentParser(description="Batch audiobook aligner for desktop collections")
+    parser.add_argument("--root", default=str(DESKTOP_ROOT), help="Root directory containing book subdirectories")
+    args = parser.parse_args()
+
+    root_dir = Path(args.root)
+    dirs = sorted([d for d in root_dir.iterdir() if d.is_dir() and not d.name.startswith(".")])
     books_with_epub = []
 
     for d in dirs:
@@ -23,8 +29,9 @@ def main():
         if epubs:
             books_with_epub.append(d)
 
-    print(f"Total directories: {len(dirs)}")
-    print(f"Directories with EPUB to align: {len(books_with_epub)}\n")
+    print(f"Target collection root: {root_dir}")
+    print(f"Total subdirectories: {len(dirs)}")
+    print(f"Directories with EPUB: {len(books_with_epub)}\n")
 
     results = []
     total_start = time.time()

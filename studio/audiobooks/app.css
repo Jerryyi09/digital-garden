@@ -333,25 +333,40 @@ button:active { opacity: 0.7; }
 .path-navigation {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   margin-bottom: 12px;
+  width: 100%;
+  min-width: 0;
 }
 .breadcrumb-strip {
   display: flex;
   align-items: center;
   gap: 2px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-width: 0;
+}
+.breadcrumb-strip::-webkit-scrollbar {
+  display: none;
 }
 .breadcrumb-strip button {
   font-size: 13px;
   color: var(--text-sub);
   padding: 4px 6px;
   border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .breadcrumb-strip button:last-child {
   font-weight: 600;
   color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
 }
 .icon-text-btn {
   display: inline-flex;
@@ -419,13 +434,11 @@ button:active { opacity: 0.7; }
 }
 .banner-desc {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 13.5px;
+  line-height: 1.65;
   color: var(--text-sub);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
 }
 
 /* Section Filter Bar */

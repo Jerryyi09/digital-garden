@@ -357,7 +357,8 @@ async function list(path) {
 async function browse(path = folder) {
   const request = ++browseRequest
   $("list-status").textContent = "正在读取目录..."
-  $("refresh").disabled = true
+  const refreshBtn = $("refresh")
+  if (refreshBtn) refreshBtn.disabled = true
   try {
     const result = await list(path)
     if (request !== browseRequest) return
@@ -374,7 +375,10 @@ async function browse(path = folder) {
       render()
     }
   } finally {
-    if (request === browseRequest) $("refresh").disabled = false
+    if (request === browseRequest) {
+      const refreshBtn = $("refresh")
+      if (refreshBtn) refreshBtn.disabled = false
+    }
   }
 }
 
@@ -461,8 +465,6 @@ function render() {
   if (isBookFolder) {
     $("banner-title").textContent = currentDirName
     $("folder-summary-text").textContent = currentSummary || "暂无简介，点击章节即可播放。"
-    $("banner-readalong-badge").hidden = !entries.some((i) => i.hasReadalong)
-    $("banner-pdf-badge").hidden = !entries.some((i) => i.hasPdf)
 
     // Render Banner Cover
     const bannerCoverWrap = document.querySelector(".banner-cover-wrap")
@@ -530,18 +532,6 @@ function render() {
     title.className = "item-name"
     title.textContent = item.name.replace(AUDIO, "")
     titleRow.append(title)
-
-    if (item.hasReadalong) {
-      const badge = document.createElement("span")
-      badge.className = "badge-readalong"
-      badge.textContent = "📖 跟读"
-      titleRow.append(badge)
-    } else if (item.hasPdf) {
-      const badge = document.createElement("span")
-      badge.className = "badge-pdf"
-      badge.textContent = "📄 PDF"
-      titleRow.append(badge)
-    }
     info.append(titleRow)
 
     if (item.is_dir) {
@@ -1402,7 +1392,6 @@ on("search-clear", "click", () => {
   render()
 })
 on("sort", "change", render)
-on("refresh", "click", attempt(() => browse()))
 
 // TabBar Navigation (书架 / 书库 / 我的)
 document.querySelectorAll(".tab-btn").forEach((btn) => {

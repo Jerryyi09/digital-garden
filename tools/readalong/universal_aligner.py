@@ -108,7 +108,7 @@ def find_best_matching_html(epub_path: Path, audio_words: list[dict]) -> tuple[s
                 if idref and idref in manifest:
                     href = manifest[idref]
                     full_href = f"{opf_dir}/{href}".lstrip("/") if opf_dir and opf_dir != "." else href
-                    if full_href.lower().endswith((".htm", ".html", ".xhtml")):
+                    if full_href.lower().endswith((".htm", ".html", ".xhtml", ".xml")):
                         spine_htmls.append(full_href)
 
         # Score candidates, ignoring pure frontmatter / navigation documents
@@ -216,7 +216,7 @@ def align_single_book_universal(
             dest = text_dir / name
             dest.parent.mkdir(parents=True, exist_ok=True)
             content = z.read(name)
-            if name.lower().endswith((".htm", ".html", ".xhtml")):
+            if name.lower().endswith((".htm", ".html", ".xhtml", ".xml")):
                 html_str = content.decode("utf-8", errors="replace")
                 if "</head>" in html_str and ".readalong-active" not in html_str:
                     html_str = html_str.replace("</head>", f"<style>{READALONG_CSS_INJECTION}</style></head>", 1)
@@ -306,15 +306,9 @@ def align_single_book_universal(
 
     # Build manifest
     book_id = re.sub(r"[^\w\s-]", "", book_dir.name.lower()).replace(" ", "-")
-    parts = book_dir.parts
-    if "寒假" in parts:
-        c_idx = parts.index("寒假") + 1
-        category = parts[c_idx]
-    elif "有声书" in parts:
-        c_idx = parts.index("有声书") + 1
-        category = parts[c_idx]
-    else:
-        category = book_dir.parent.name
+    category = book_dir.parent.name
+    if category in ("未命名文件夹", "寒假"):
+        category = "文学作品"
 
     audio_sources = [
         {

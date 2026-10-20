@@ -54,10 +54,6 @@
           <!-- Active Breadcrumb Path -->
           <div class="path-navigation">
             <nav id="breadcrumbs" aria-label="书库路径" class="breadcrumb-strip"></nav>
-            <button id="refresh" class="icon-text-btn" title="刷新当前目录">
-              <svg viewBox="0 0 24 24" class="icon-sm"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-              <span>刷新</span>
-            </button>
           </div>
 
           <!-- Book Detail Header Card (Shown when inside a book folder) -->
@@ -68,10 +64,6 @@
             </div>
             <div class="banner-info">
               <h2 id="banner-title" class="banner-title">书籍名称</h2>
-              <div class="banner-tags">
-                <span id="banner-readalong-badge" class="badge-readalong" hidden>📖 英文音文跟读</span>
-                <span id="banner-pdf-badge" class="badge-pdf" hidden>📄 配套PDF讲义</span>
-              </div>
               <p id="folder-summary-text" class="banner-desc"></p>
             </div>
           </div>
@@ -281,13 +273,13 @@
               <svg viewBox="0 0 24 24" class="dock-icon"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
               <span id="timer-label">定时</span>
             </button>
-            <button id="dock-readalong" class="dock-btn" hidden title="音文同步跟读">
+            <button id="dock-readalong" class="dock-btn" hidden title="EPUB 音文跟读">
               <svg viewBox="0 0 24 24" class="dock-icon"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-              <span>跟读文稿</span>
+              <span>EPUB</span>
             </button>
-            <button id="dock-pdf" class="dock-btn" hidden title="PDF 电子书/讲义">
+            <button id="dock-pdf" class="dock-btn" hidden title="PDF 讲义/电子书">
               <svg viewBox="0 0 24 24" class="dock-icon"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5z"/></svg>
-              <span>讲义课件</span>
+              <span>PDF</span>
             </button>
             <button id="dock-chapters" class="dock-btn" title="章节目录">
               <svg viewBox="0 0 24 24" class="dock-icon"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
