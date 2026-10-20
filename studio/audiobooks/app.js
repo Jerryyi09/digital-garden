@@ -482,8 +482,16 @@ async function loadTrack(track, preparedUrl) {
   preparedNext = null
   $("btn-next").disabled = true
 
+  // Immediately clear old timeline & document to avoid scanning wrong chapters
+  readalongTimeline = []
+  currentSegment = null
+  currentDocPath = ""
+  $("dock-readalong").hidden = true
+  $("dock-pdf").hidden = true
+
   // Set titles in Mini and Full Player
-  const bookName = track.path.slice(ROOT.length).split("/").filter(Boolean)[1] || "有声书"
+  const pathParts = track.path.slice(ROOT.length).split("/").filter(Boolean)
+  const bookName = pathParts.length > 1 ? pathParts[1] : (pathParts[0] || "有声书")
   const trackName = track.name.replace(AUDIO, "")
 
   $("mini-title").textContent = trackName
@@ -511,6 +519,27 @@ async function loadTrack(track, preparedUrl) {
   setupReadalong(track, request)
   setupPdf(track, request)
   renderDrawerTrackList()
+}
+
+async function ensureCurrentLoaded(autoPlay = true) {
+  if (current && audio.src) {
+    if (autoPlay && audio.paused) playAudio()
+    return
+  }
+  const journal = read(localStorage, JOURNAL, null)
+  const candidateTrack = journal?.track || libraryRecords()[0]?.track
+  if (candidateTrack) {
+    await loadTrack(candidateTrack)
+    if (autoPlay) playAudio()
+  } else if (entries.some((i) => !i.is_dir)) {
+    const firstTrack = entries.find((i) => !i.is_dir)
+    if (firstTrack) {
+      await loadTrack(firstTrack)
+      if (autoPlay) playAudio()
+    }
+  } else {
+    notice("请先在书库中选择一本有声书。")
+  }
 }
 
 function playAudio() {
@@ -559,12 +588,32 @@ function updatePlayButtonUI(playing) {
   $("mini-pause-icon").hidden = !playing
   $("play-svg").hidden = playing
   $("pause-svg").hidden = !playing
+
+  const rfPlay = $("rf-play-svg")
+  const rfPause = $("rf-pause-svg")
+  if (rfPlay && rfPause) {
+    rfPlay.hidden = playing
+    rfPause.hidden = !playing
+  }
+  const pfPlay = $("pf-play-svg")
+  const pfPause = $("pf-pause-svg")
+  if (pfPlay && pfPause) {
+    pfPlay.hidden = playing
+    pfPause.hidden = !playing
+  }
+
+  const rfDisc = $("readalong-floating-disc")
+  const pfDisc = $("pdf-floating-disc")
   if (playing) {
     $("mini-cover-thumb").classList.add("spinning")
     $("vinyl-disc").classList.add("spinning")
+    if (rfDisc) rfDisc.classList.add("spinning")
+    if (pfDisc) pfDisc.classList.add("spinning")
   } else {
     $("mini-cover-thumb").classList.remove("spinning")
     $("vinyl-disc").classList.remove("spinning")
+    if (rfDisc) rfDisc.classList.remove("spinning")
+    if (pfDisc) pfDisc.classList.remove("spinning")
   }
 }
 
@@ -794,6 +843,10 @@ async function renderDrawerTrackList() {
 
 // Readalong / EPUB Syncing
 function findSegment(timeline, time) {
+  if (!timeline || !timeline.length) return null
+  if (time < timeline[0].start) return timeline[0]
+  if (time >= timeline[timeline.length - 1].end) return timeline[timeline.length - 1]
+
   let low = 0,
     high = timeline.length - 1
   while (low <= high) {
@@ -803,9 +856,9 @@ function findSegment(timeline, time) {
     else if (time >= seg.end) low = mid + 1
     else return seg
   }
-  if (high >= 0 && time - timeline[high].end < 0.6) return timeline[high]
-  if (low < timeline.length && timeline[low].start - time < 0.6) return timeline[low]
-  return null
+  // If time falls in a gap between two sentences, stick to the sentence just finished
+  if (high >= 0) return timeline[high]
+  return timeline[0]
 }
 
 async function setupReadalong(track, request) {
@@ -840,10 +893,16 @@ async function setupReadalong(track, request) {
     if (request !== playRequest || !Array.isArray(timeline)) return
 
     readalongManifest = manifest
+    // Filter segments for this specific audio track if multi-track
     const trackFiltered = timeline.filter((s) => !s.audioSourceId || s.audioSourceId === track.name)
     readalongTimeline = trackFiltered.length ? trackFiltered : timeline
     readalongParentPath = parent
     $("dock-readalong").hidden = false
+
+    // If readalong view is active, immediately sync to new chapter's first segment
+    if (readalongActive) {
+      syncReadalong(true)
+    }
   } catch {
     $("dock-readalong").hidden = true
   }
@@ -882,6 +941,7 @@ async function openPdfViewer() {
   $("pdf-viewer").hidden = false
   $("pdf-title").textContent = currentPdfName || "配套讲义 / PDF 电子书"
   $("pdf-loading").hidden = false
+  updatePlayButtonUI(!audio.paused)
 
   try {
     const info = await api("fs/get", { path: currentPdfPath, password: directoryPassword })
@@ -903,7 +963,9 @@ function openReadalong() {
   if (!readalongManifest || !readalongTimeline.length) return
   readalongActive = true
   $("readalong").hidden = false
+  updatePlayButtonUI(!audio.paused)
 
+  // Preload first segment document if not loaded yet
   if (!currentDocPath && readalongTimeline[0]) {
     currentDocPath = readalongTimeline[0].document
     loadReadalongDoc(currentDocPath).catch(() => {})
@@ -971,9 +1033,7 @@ async function loadReadalongDoc(docRelPath) {
 
 async function syncReadalong(forceScroll = false) {
   if (!readalongActive || !readalongTimeline.length || !current) return
-  const seg =
-    findSegment(readalongTimeline, audio.currentTime) ||
-    (audio.currentTime < readalongTimeline[0].start ? readalongTimeline[0] : null)
+  const seg = findSegment(readalongTimeline, audio.currentTime)
   if (!seg) return
   if (seg === currentSegment && !forceScroll) return
   currentSegment = seg
@@ -1008,17 +1068,24 @@ async function syncReadalong(forceScroll = false) {
 
 // User Interaction Listeners
 $("play").onclick = () => (audio.paused ? playAudio() : audio.pause())
-$("mini-play-btn").onclick = (e) => {
+$("mini-play-btn").onclick = async (e) => {
   e.stopPropagation()
-  audio.paused ? playAudio() : audio.pause()
+  if (!current || !audio.src) {
+    await ensureCurrentLoaded(true)
+  } else {
+    audio.paused ? playAudio() : audio.pause()
+  }
 }
 $("rewind").onclick = () => seek(audio.currentTime - 15)
 $("forward").onclick = () => seek(audio.currentTime + 30)
 $("btn-next").onclick = nextTrack
 
 // Toggle Full Player / Mini Player
-$("mini-content-area").onclick = () => {
-  if (current) $("full-player").hidden = false
+$("mini-content-area").onclick = async () => {
+  if (!current || !audio.src) {
+    await ensureCurrentLoaded(false)
+  }
+  $("full-player").hidden = false
 }
 $("mini-list-btn").onclick = (e) => {
   e.stopPropagation()
@@ -1026,6 +1093,23 @@ $("mini-list-btn").onclick = (e) => {
 }
 $("player-collapse-btn").onclick = () => {
   $("full-player").hidden = true
+}
+
+// Floating Vinyl Player in Readalong & PDF Panels (WeRead Style)
+$("readalong-floating-play-btn").onclick = (e) => {
+  e.stopPropagation()
+  audio.paused ? playAudio() : audio.pause()
+}
+$("readalong-floating-player").onclick = () => {
+  $("full-player").hidden = false
+}
+
+$("pdf-floating-play-btn").onclick = (e) => {
+  e.stopPropagation()
+  audio.paused ? playAudio() : audio.pause()
+}
+$("pdf-floating-player").onclick = () => {
+  $("full-player").hidden = false
 }
 
 // Dock buttons in Full Player

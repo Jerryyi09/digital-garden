@@ -49,13 +49,16 @@ test("readalong paths remain strictly within library root", () => {
   assert.equal(isWithinRoot(`${ROOT}/../readalong.manifest.json`), false)
 })
 
-test("binary search accurately locates active audio segment", () => {
+test("binary search accurately locates active audio segment with gap adsorption", () => {
   const timeline = [
     { start: 16.908, end: 22.588, fragment: "seg1" },
     { start: 22.588, end: 26.788, fragment: "seg2" },
     { start: 26.788, end: 27.748, fragment: "seg3" },
   ]
   function findSegment(list, time) {
+    if (!list || !list.length) return null
+    if (time < list[0].start) return list[0]
+    if (time >= list[list.length - 1].end) return list[list.length - 1]
     let low = 0, high = list.length - 1
     while (low <= high) {
       const mid = (low + high) >> 1
@@ -64,15 +67,15 @@ test("binary search accurately locates active audio segment", () => {
       else if (time >= seg.end) low = mid + 1
       else return seg
     }
-    if (high >= 0 && time - list[high].end < 0.6) return list[high]
-    if (low < list.length && list[low].start - time < 0.6) return list[low]
-    return null
+    if (high >= 0) return list[high]
+    return list[0]
   }
-  assert.equal(findSegment(timeline, 10.0), null)
+  // During intro music (< 16.908), adsorb to first segment
+  assert.equal(findSegment(timeline, 10.0)?.fragment, "seg1")
   assert.equal(findSegment(timeline, 18.0)?.fragment, "seg1")
   assert.equal(findSegment(timeline, 22.588)?.fragment, "seg2")
   assert.equal(findSegment(timeline, 27.0)?.fragment, "seg3")
-  assert.equal(findSegment(timeline, 27.8)?.fragment, "seg3") // within 0.6s tolerance
-  assert.equal(findSegment(timeline, 50.0), null)
+  // Beyond last segment, adsorb to last segment
+  assert.equal(findSegment(timeline, 50.0)?.fragment, "seg3")
 })
 

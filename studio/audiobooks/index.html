@@ -356,6 +356,19 @@
           <iframe id="readalong-frame" title="电子书跟读正文" sandbox="allow-same-origin allow-scripts"></iframe>
           <div id="readalong-loading" class="readalong-loading" hidden>正在准备电子书正文…</div>
         </div>
+        <!-- 微信读书风格：跟读页面悬浮黑胶唱片挂件 -->
+        <div id="readalong-floating-player" class="readalong-floating-player" title="点击展开播放器">
+          <div class="floating-vinyl-wrap">
+            <div id="readalong-floating-disc" class="floating-disc">
+              <div class="floating-grooves"></div>
+              <div class="floating-center">📖</div>
+            </div>
+            <button id="readalong-floating-play-btn" class="floating-play-trigger" aria-label="播放/暂停">
+              <svg id="rf-play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="rf-pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- PDF Fullscreen Viewer Panel -->
@@ -375,6 +388,19 @@
         <div class="readalong-viewport">
           <iframe id="pdf-frame" title="PDF电子书预览" allow="fullscreen"></iframe>
           <div id="pdf-loading" class="readalong-loading" hidden>正在载入 PDF 讲义…</div>
+        </div>
+        <!-- 悬浮黑胶唱片挂件 -->
+        <div id="pdf-floating-player" class="readalong-floating-player" title="点击展开播放器">
+          <div class="floating-vinyl-wrap">
+            <div id="pdf-floating-disc" class="floating-disc">
+              <div class="floating-grooves"></div>
+              <div class="floating-center">📄</div>
+            </div>
+            <button id="pdf-floating-play-btn" class="floating-play-trigger" aria-label="播放/暂停">
+              <svg id="pf-play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="pf-pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+          </div>
         </div>
       </section>
 

@@ -1056,6 +1056,80 @@ button:active { opacity: 0.7; }
   font-size: 14px;
 }
 
+/* 微信读书风格：跟读页面悬浮黑胶旋转挂件 */
+.readalong-floating-player {
+  position: absolute;
+  right: 18px;
+  bottom: calc(24px + var(--safe-bottom));
+  z-index: 130;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.24));
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.readalong-floating-player:active {
+  transform: scale(0.92);
+}
+.floating-vinyl-wrap {
+  width: 58px;
+  height: 58px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.floating-disc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #2d3035 0%, #15171a 70%, #0d0e10 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: discSpin 14s linear infinite;
+  animation-play-state: paused;
+}
+.floating-disc.spinning {
+  animation-play-state: running;
+}
+.floating-grooves {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+.floating-center {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f0f2f5;
+  border: 2px solid #1a1c20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+.floating-play-trigger {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand-blue);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1.5px solid #ffffff;
+}
+.floating-play-trigger svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
 /* Dialog */
 .wx-dialog {
   border: 0;
