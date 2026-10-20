@@ -25,9 +25,9 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   background: var(--bg-primary);
+  -webkit-text-size-adjust: 100%;
 }
 
 [hidden] { display: none !important; }
@@ -62,13 +62,16 @@ button:active { opacity: 0.7; }
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
-  overflow: hidden;
+  background: var(--bg-primary);
 }
 
 /* Top Navigation Bar */
 .wx-navbar {
+  position: sticky;
+  top: 0;
   padding-top: max(10px, var(--safe-top));
   padding-bottom: 10px;
   padding-left: 16px;
@@ -77,7 +80,7 @@ button:active { opacity: 0.7; }
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border-bottom: 1px solid var(--line-color);
-  z-index: 20;
+  z-index: 40;
   flex-shrink: 0;
 }
 .navbar-content {
@@ -136,11 +139,13 @@ button:active { opacity: 0.7; }
 
 /* Main Scrollable Content */
 .wx-main {
-  flex: 1;
+  flex: 1 1 auto;
+  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(130px + var(--safe-bottom));
+  touch-action: pan-y;
+  padding-bottom: calc(140px + var(--safe-bottom));
 }
 
 /* Toast */
@@ -185,6 +190,97 @@ button:active { opacity: 0.7; }
   color: var(--text-muted);
 }
 
+/* Wx Book Cover Component (微信读书立体书封与优雅占位) */
+.wx-book-cover {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #3b424e;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12), inset -2px 0 3px rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.wx-book-cover.size-shelf {
+  width: 90px;
+  height: 124px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+.wx-book-cover.size-banner {
+  width: 76px;
+  height: 104px;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+}
+.wx-book-cover.size-row {
+  width: 46px;
+  height: 64px;
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.wx-book-cover .cover-spine-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: linear-gradient(to right, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.08) 60%, transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+.wx-book-cover img.cover-real-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.wx-book-cover .cover-fallback-jacket {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 6px;
+  color: #ffffff;
+  text-align: center;
+  background: linear-gradient(135deg, var(--jacket-color-1, #2c3e50) 0%, var(--jacket-color-2, #1a252f) 100%);
+  position: relative;
+}
+.cover-fallback-jacket .fallback-title {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  word-break: break-word;
+}
+.size-shelf .cover-fallback-jacket .fallback-title,
+.size-banner .cover-fallback-jacket .fallback-title {
+  font-size: 13px;
+  padding-top: 4px;
+}
+.size-row .cover-fallback-jacket {
+  padding: 6px 4px;
+}
+.size-row .cover-fallback-jacket .fallback-title {
+  font-size: 10px;
+  -webkit-line-clamp: 2;
+}
+.cover-fallback-jacket .fallback-bottom-mark {
+  font-size: 9px;
+  opacity: 0.65;
+  letter-spacing: 0.05em;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 2px;
+}
+
 /* Shelf View (Recently Played Cards) */
 .shelf-grid {
   display: grid;
@@ -205,20 +301,6 @@ button:active { opacity: 0.7; }
 }
 .shelf-card:active {
   transform: scale(0.97);
-}
-.shelf-cover-box {
-  width: 90px;
-  height: 120px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #e4e7ed 0%, #cbd0da 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  position: relative;
-  overflow: hidden;
 }
 .shelf-card-title {
   font-size: 14px;
@@ -383,12 +465,24 @@ button:active { opacity: 0.7; }
 
 .item-card {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   text-align: left;
+}
+.track-disc-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 1px solid var(--line-color);
 }
 .item-main-info {
   flex: 1;

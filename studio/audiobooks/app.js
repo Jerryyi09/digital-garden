@@ -1,10 +1,11 @@
 import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
-import { getBookSummary } from "./summaries.js"
+import { getBookSummary, getBookCover, getJacketColors } from "./summaries.js"
 
 const $ = (id) => document.getElementById(id)
 const audio = $("audio")
 const AUDIO = /\.(mp3|m4a|m4b)$/i
 const PDF = /\.pdf$/i
+const IMG = /\.(jpg|jpeg|png|webp)$/i
 const PREF = "garden-listen-prefs-v2"
 const AUTH = "garden-listen-auth-v1"
 const JOURNAL = "garden-listen-journal-v1"
@@ -119,6 +120,49 @@ function durationText(seconds) {
   return hrs > 0 ? `${hrs}:${String(mins).padStart(2, "0")}:${secs}` : `${String(mins).padStart(2, "0")}:${secs}`
 }
 
+function createBookCoverElement(bookTitle, sizeClass = "size-row", explicitCoverUrl = "") {
+  const coverWrap = document.createElement("div")
+  coverWrap.className = `wx-book-cover ${sizeClass}`
+
+  // Spine Shadow Overlay
+  const spine = document.createElement("div")
+  spine.className = "cover-spine-edge"
+  coverWrap.append(spine)
+
+  // Fallback Elegant Morandi Book Jacket
+  const [c1, c2] = getJacketColors(bookTitle)
+  const fallback = document.createElement("div")
+  fallback.className = "cover-fallback-jacket"
+  fallback.style.setProperty("--jacket-color-1", c1)
+  fallback.style.setProperty("--jacket-color-2", c2)
+
+  const titleText = document.createElement("div")
+  titleText.className = "fallback-title"
+  titleText.textContent = bookTitle || "有声书"
+
+  const mark = document.createElement("div")
+  mark.className = "fallback-bottom-mark"
+  mark.textContent = "ROSEMARY"
+
+  fallback.append(titleText, mark)
+  coverWrap.append(fallback)
+
+  // Real Cover Image
+  if (explicitCoverUrl) {
+    const img = document.createElement("img")
+    img.className = "cover-real-img"
+    img.loading = "lazy"
+    img.alt = bookTitle || "封面"
+    img.src = explicitCoverUrl
+    img.onerror = () => {
+      img.remove() // Fallback jacket immediately becomes visible underneath
+    }
+    coverWrap.append(img)
+  }
+
+  return coverWrap
+}
+
 async function openDatabase() {
   db = await new Promise((resolve, reject) => {
     const request = indexedDB.open("garden-audiobooks", 1)
@@ -205,6 +249,7 @@ async function list(path) {
   const content = []
   let hasReadalongInFolder = false
   let pdfInFolder = null
+  let imageInFolder = null
   for (let page = 1; ; page++) {
     const data = await api("fs/list", {
       path,
@@ -220,6 +265,10 @@ async function list(path) {
     const pdfItem = batch.find((item) => !item.is_dir && PDF.test(item.name))
     if (pdfItem && !pdfInFolder) {
       pdfInFolder = pdfItem.name
+    }
+    const imgItem = batch.find((item) => !item.is_dir && IMG.test(item.name) && !item.name.startsWith("._"))
+    if (imgItem && !imageInFolder) {
+      imageInFolder = imgItem.name
     }
     content.push(...batch)
     if (!batch.length || content.length >= (data.total ?? content.length)) break
@@ -238,16 +287,20 @@ async function list(path) {
       if (ignoredNames.has(item.name)) return false
       return item.is_dir || AUDIO.test(item.name)
     })
-    .map((item) => ({
-      path: `${path}/${item.name}`,
-      name: item.name,
-      is_dir: item.is_dir === true,
-      size: item.size,
-      modified: item.modified,
-      hasReadalong: hasReadalongInFolder && !item.is_dir,
-      hasPdf: Boolean(pdfInFolder) && !item.is_dir,
-      pdfName: pdfInFolder,
-    }))
+    .map((item) => {
+      const coverFile = item.is_dir ? getBookCover(item.name) : imageInFolder
+      return {
+        path: `${path}/${item.name}`,
+        name: item.name,
+        is_dir: item.is_dir === true,
+        size: item.size,
+        modified: item.modified,
+        hasReadalong: hasReadalongInFolder && !item.is_dir,
+        hasPdf: Boolean(pdfInFolder) && !item.is_dir,
+        pdfName: pdfInFolder,
+        coverFile: coverFile || null,
+      }
+    })
 }
 
 async function browse(path = folder) {
@@ -300,13 +353,20 @@ function renderShelf() {
     const card = document.createElement("div")
     card.className = "shelf-card"
 
-    const cover = document.createElement("div")
-    cover.className = "shelf-cover-box"
-    cover.textContent = "📖"
+    const pathParts = record.track.path.slice(ROOT.length).split("/").filter(Boolean)
+    const bookName = pathParts.length > 1 ? pathParts[1] : record.track.name.replace(AUDIO, "")
+    const coverFile = getBookCover(bookName)
+    let coverUrl = ""
+    if (coverFile) {
+      const parentDir = record.track.path.slice(0, record.track.path.lastIndexOf("/"))
+      coverUrl = `${endpoint}/d${parentDir.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
+    }
+
+    const cover = createBookCoverElement(bookName, "size-shelf", coverUrl)
 
     const title = document.createElement("div")
     title.className = "shelf-card-title"
-    title.textContent = record.track.name.replace(AUDIO, "")
+    title.textContent = bookName
 
     const prog = document.createElement("div")
     prog.className = "shelf-card-progress"
@@ -332,6 +392,18 @@ function render() {
     $("folder-summary-text").textContent = currentSummary || "暂无简介，点击章节即可播放。"
     $("banner-readalong-badge").hidden = !entries.some((i) => i.hasReadalong)
     $("banner-pdf-badge").hidden = !entries.some((i) => i.hasPdf)
+
+    // Render Banner Cover
+    const bannerCoverWrap = document.querySelector(".banner-cover-wrap")
+    if (bannerCoverWrap) {
+      bannerCoverWrap.replaceChildren()
+      const coverFile = getBookCover(currentDirName) || entries.find((i) => i.coverFile)?.coverFile
+      let coverUrl = ""
+      if (coverFile) {
+        coverUrl = `${endpoint}/d${folder.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
+      }
+      bannerCoverWrap.append(createBookCoverElement(currentDirName, "size-banner", coverUrl))
+    }
     $("folder-summary").hidden = false
   } else {
     $("folder-summary").hidden = true
@@ -362,6 +434,22 @@ function render() {
 
     const card = document.createElement("div")
     card.className = "item-card"
+
+    // Left visual: Book cover for folder, disc icon for audio track
+    if (item.is_dir) {
+      const coverFile = item.coverFile || getBookCover(item.name)
+      let coverUrl = ""
+      if (coverFile) {
+        coverUrl = `${endpoint}/d${item.path.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
+      }
+      const coverEl = createBookCoverElement(item.name, "size-row", coverUrl)
+      card.append(coverEl)
+    } else {
+      const disc = document.createElement("div")
+      disc.className = "track-disc-icon"
+      disc.textContent = "♫"
+      card.append(disc)
+    }
 
     const info = document.createElement("div")
     info.className = "item-main-info"
@@ -489,7 +577,7 @@ async function loadTrack(track, preparedUrl) {
   $("dock-readalong").hidden = true
   $("dock-pdf").hidden = true
 
-  // Set titles in Mini and Full Player
+  // Set titles and artwork in Mini and Full Player
   const pathParts = track.path.slice(ROOT.length).split("/").filter(Boolean)
   const bookName = pathParts.length > 1 ? pathParts[1] : (pathParts[0] || "有声书")
   const trackName = track.name.replace(AUDIO, "")
@@ -499,6 +587,34 @@ async function loadTrack(track, preparedUrl) {
   $("player-book-title").textContent = bookName
   $("player-track-title").textContent = trackName
   $("player-track-desc").textContent = "正在加载音频..."
+
+  // Update Disc Center Artwork with Book Cover
+  const coverFile = getBookCover(bookName)
+  let coverUrl = ""
+  if (coverFile) {
+    const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
+    coverUrl = `${endpoint}/d${parentDir.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(coverFile)}`
+  }
+
+  const miniThumb = $("mini-cover-thumb")
+  const vinylCenter = $("vinyl-cover-art")
+  const rfCenter = document.querySelector("#readalong-floating-disc .floating-center")
+  const pfCenter = document.querySelector("#pdf-floating-disc .floating-center")
+
+  if (coverUrl) {
+    const bgCss = `url("${coverUrl}") center/cover no-repeat`
+    if (miniThumb) { miniThumb.style.background = bgCss; $("mini-cover-icon").hidden = true }
+    if (vinylCenter) { vinylCenter.style.background = bgCss; vinylCenter.textContent = "" }
+    if (rfCenter) { rfCenter.style.background = bgCss; rfCenter.textContent = "" }
+    if (pfCenter) { pfCenter.style.background = bgCss; pfCenter.textContent = "" }
+  } else {
+    const [c1, c2] = getJacketColors(bookName)
+    const bgGrad = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`
+    if (miniThumb) { miniThumb.style.background = bgGrad; $("mini-cover-icon").hidden = false }
+    if (vinylCenter) { vinylCenter.style.background = bgGrad; vinylCenter.textContent = "📖" }
+    if (rfCenter) { rfCenter.style.background = bgGrad; rfCenter.textContent = "📖" }
+    if (pfCenter) { pfCenter.style.background = bgGrad; pfCenter.textContent = "📄" }
+  }
 
   $("mini-player").hidden = false
   updatePlayButtonUI(false)

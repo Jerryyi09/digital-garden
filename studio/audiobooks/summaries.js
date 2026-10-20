@@ -130,3 +130,79 @@ export function getBookSummary(name) {
   }
   return ""
 }
+
+export const BOOK_COVERS = {
+  "Talking to Strangers What We Should Know About the People We Don’t Know Malcom Gladwell": "Talking to Strangers What We Should Know About the People We Don’t Know.jpg",
+  "The Power of Habit - Charles Duhigg": "The Power of Habit By Charles Duhigg.art[0].png",
+  "101 Essays That Will Change The Way You Think": "cover.jpeg",
+  "A Little History of Psychology": "cover.jpeg",
+  "Barry Schwartz - Why We Work": "Why We Work.jpg",
+  "Clear Thinking": "cover.jpg",
+  "Clear Thinking Turning Ordinary Moments": "cover.jpg",
+  "DK - How Psychology Works": "cover.jpg",
+  "DK - The Psychology Book": "cover.jpeg",
+  "Emotional Intelligence": "cover.jpg",
+  "Finding Flow - Mihaly Csikszentmihalyi": "cover.jpeg",
+  "How To Win Friends and Influence People": "cover.jpeg",
+  "Influence The Psychology of Persuasion": "cover.jpeg",
+  "Kay_Peterson_-_How_You_Learn_Is_How_You_Live": "Cover.jpg",
+  "Make Your Bed": "cover.jpeg",
+  "Make Time": "cover.jpeg",
+  "Mihaly Csikzsentmihalyi - Flow - The Psychology of Optimal Experience": "9780061339202.jpg",
+  "Mindfulness_ Be Mindful, Live the Moment, 2nd Edition": "Mindfulness_ Be Mindful, Live the Moment, 2nd Edition.jpg",
+  "Mindset, The New Psychology of Success": "Folder.jpg",
+  "Practical Intelligence": "cover.jpeg",
+  "Siddhartha - Herman Hesse, Paul Ansdell [1520018711]": "cover.jpeg",
+  "Smarter Faster Better": "cover.jpg",
+  "The Power of Positive Thinking": "cover.jpeg",
+  "The Wisdom of Insecurity": "cover.jpg",
+  "Thinking Fast or Slow": "cover.jpg",
+  "Who We Are Becoming Matters": "Who We Are Becoming Matters_ The Courage, Wisdom, and Aloha We Need in a Timeplace of Collapse [B0FLKH4NFW].jpg",
+  "做你想做的人": "cover.jpeg",
+  "刻意练习": "cover.jpg",
+  "战胜拖延症": "cover.jpg",
+  "Robert B. Cialdini - Influence, New and Expanded": "cover.jpg",
+  "Do Hard Things- Why We Get Resilience Wrong and the Surprising Science of Real Toughness": "cover.jpg",
+  "Think It": "Think It_ How to Train Your Thinking to Get Everything You Want [B0GHZXZT3D].jpg",
+  "Julia Galef - The Scout Mindset": "cover.jpg",
+  "Cognitive Psychology for Dummies": "Cognitive Psychology for Dummies.jpg",
+  "Critical Thinking Skills for Dummies (2nd Edition)": "Critical Thinking Skills for Dummies (2nd Edition).jpg",
+  "The Almanack of Naval Ravikant": "cover.jpg",
+  "Jeremy_J_Baumberg_-_The_Secret_Life_of_Science": "Cover.jpg",
+  "The Blind Watchmaker": "cover.jpg",
+  "David Allen Sibley - What It's Like to Be a Bird": "What It's Like to Be a Bird.jpg"
+}
+
+export function getBookCover(name) {
+  if (!name) return ""
+  if (BOOK_COVERS[name]) return BOOK_COVERS[name]
+  const normalized = name.trim().toLowerCase()
+  for (const [key, val] of Object.entries(BOOK_COVERS)) {
+    if (key.toLowerCase() === normalized) return val
+  }
+  return ""
+}
+
+// WeChat Read elegant Morandi book jacket palettes
+const JACKET_PALETTES = [
+  ["#2f3e46", "#1c252b"], // Dark Slate / 沉稳板岩
+  ["#354f52", "#233436"], // Deep Sage / 烟波竹青
+  ["#415a77", "#1b263b"], // Moonlight Navy / 月光蓝
+  ["#4a4e69", "#22223b"], // Elegant Mauve / 暮云紫灰
+  ["#584b42", "#3a3028"], // Vintage Earth / 暖赭泥金
+  ["#3d5a80", "#293241"], // Nordic Blue / 极地深蓝
+  ["#4f5d75", "#2d3142"], // Storm Gray / 黛石深灰
+  ["#525252", "#262626"], // Charcoal Silk / 墨黑丝绒
+]
+
+export function getJacketColors(name) {
+  let hash = 0
+  const str = String(name || "Book")
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i)
+    hash |= 0
+  }
+  const idx = Math.abs(hash) % JACKET_PALETTES.length
+  return JACKET_PALETTES[idx]
+}
+
