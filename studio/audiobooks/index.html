@@ -253,14 +253,22 @@
               <span id="speed-display">1.0×</span>
             </button>
             <button id="rewind" class="circle-btn" aria-label="后退15秒" title="后退 15 秒">
-              <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.2 3.16-1.93 5.12-1.93 3.91 0 7.15 2.8 7.85 6.5l1.97-.34C21.43 12.19 17.38 8 12.5 8z"/><text x="12" y="16.5" font-size="7" font-weight="bold" text-anchor="middle" fill="currentColor">15</text></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 4a8 8 0 1 0 7.8 6.2" stroke-width="1.8"/>
+                <polyline points="12 1 12 5 8 5" stroke-width="1.8" fill="currentColor"/>
+                <text x="11.5" y="15" font-size="7.5" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none" font-family="-apple-system, sans-serif">15</text>
+              </svg>
             </button>
             <button id="play" class="primary-play-btn" aria-label="播放/暂停">
               <svg id="play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               <svg id="pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             </button>
             <button id="forward" class="circle-btn" aria-label="前进30秒" title="前进 30 秒">
-              <svg viewBox="0 0 24 24"><path d="M11.5 8c2.65 0 5.05.99 6.9 2.6L22 7v9h-9l3.62-3.62c-1.39-1.2-3.16-1.93-5.12-1.93-3.91 0-7.15 2.8-7.85 6.5l-1.97-.34C2.57 12.19 6.62 8 11.5 8z"/><text x="12" y="16.5" font-size="7" font-weight="bold" text-anchor="middle" fill="currentColor">30</text></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 4a8 8 0 1 1-7.8 6.2" stroke-width="1.8"/>
+                <polyline points="12 1 12 5 16 5" stroke-width="1.8" fill="currentColor"/>
+                <text x="12.5" y="15" font-size="7.5" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none" font-family="-apple-system, sans-serif">30</text>
+              </svg>
             </button>
             <button id="btn-next" class="circle-btn" aria-label="下一节" title="下一节">
               <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
@@ -337,11 +345,12 @@
           <button id="readalong-close" class="nav-back-btn" title="返回播放">
             <svg viewBox="0 0 24 24" class="icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
           </button>
-          <div class="readalong-top-center">
+          <div class="readalong-top-center" id="readalong-title-btn" title="点击打开播放器">
             <span class="readalong-capsule-badge">跟读模式</span>
             <h3 id="readalong-chapter-title">正文</h3>
           </div>
           <div class="readalong-top-actions">
+            <button id="readalong-open-player-btn" class="pill-btn player-expand-pill" title="打开完整播放器">🎧 播放器</button>
             <button id="readalong-locate" class="pill-btn locate-btn" title="定位当前句" hidden>📍 回到朗读</button>
             <button id="readalong-follow" class="pill-btn">跟随：开</button>
             <select id="readalong-size" class="size-select" aria-label="字号">
@@ -356,17 +365,17 @@
           <iframe id="readalong-frame" title="电子书跟读正文" sandbox="allow-same-origin allow-scripts"></iframe>
           <div id="readalong-loading" class="readalong-loading" hidden>正在准备电子书正文…</div>
         </div>
-        <!-- 微信读书风格：跟读页面悬浮黑胶唱片挂件 -->
-        <div id="readalong-floating-player" class="readalong-floating-player" title="点击展开播放器">
+        <!-- 微信读书风格：跟读页面悬浮黑胶唱片挂件（点击切换播放/暂停） -->
+        <div id="readalong-floating-player" class="readalong-floating-player" title="点击播放 / 暂停" role="button" aria-label="控制播放与暂停">
           <div class="floating-vinyl-wrap">
             <div id="readalong-floating-disc" class="floating-disc">
               <div class="floating-grooves"></div>
               <div class="floating-center">📖</div>
             </div>
-            <button id="readalong-floating-play-btn" class="floating-play-trigger" aria-label="播放/暂停">
+            <div class="floating-play-trigger" aria-hidden="true">
               <svg id="rf-play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               <svg id="rf-pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
+            </div>
           </div>
         </div>
       </section>
@@ -377,11 +386,12 @@
           <button id="pdf-close" class="nav-back-btn" title="返回播放">
             <svg viewBox="0 0 24 24" class="icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
           </button>
-          <div class="readalong-top-center">
+          <div class="readalong-top-center" id="pdf-title-btn" title="点击打开播放器">
             <span class="readalong-capsule-badge pdf-badge">PDF 讲义</span>
             <h3 id="pdf-title">配套文档</h3>
           </div>
           <div class="readalong-top-actions">
+            <button id="pdf-open-player-btn" class="pill-btn player-expand-pill" title="打开完整播放器">🎧 播放器</button>
             <a id="pdf-external" class="pill-btn" target="_blank" rel="noopener noreferrer">↗ 全屏</a>
           </div>
         </div>
@@ -389,17 +399,17 @@
           <iframe id="pdf-frame" title="PDF电子书预览" allow="fullscreen"></iframe>
           <div id="pdf-loading" class="readalong-loading" hidden>正在载入 PDF 讲义…</div>
         </div>
-        <!-- 悬浮黑胶唱片挂件 -->
-        <div id="pdf-floating-player" class="readalong-floating-player" title="点击展开播放器">
+        <!-- 悬浮黑胶唱片挂件（点击切换播放/暂停） -->
+        <div id="pdf-floating-player" class="readalong-floating-player" title="点击播放 / 暂停" role="button" aria-label="控制播放与暂停">
           <div class="floating-vinyl-wrap">
             <div id="pdf-floating-disc" class="floating-disc">
               <div class="floating-grooves"></div>
               <div class="floating-center">📄</div>
             </div>
-            <button id="pdf-floating-play-btn" class="floating-play-trigger" aria-label="播放/暂停">
+            <div class="floating-play-trigger" aria-hidden="true">
               <svg id="pf-play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               <svg id="pf-pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
+            </div>
           </div>
         </div>
       </section>

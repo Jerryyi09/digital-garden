@@ -122,6 +122,14 @@ function durationText(seconds) {
 
 const coverSignedCache = new Map()
 
+function resolveBookCoverPath(parentDir, bookName) {
+  if (!parentDir) return ""
+  const registered = getBookCover(bookName)
+  if (registered) return `${parentDir}/${registered}`
+  // Standard cover filename present in our library
+  return `${parentDir}/cover.jpg`
+}
+
 async function getSignedCoverUrl(fullImgPath) {
   if (!fullImgPath) return ""
   if (coverSignedCache.has(fullImgPath)) return coverSignedCache.get(fullImgPath)
@@ -600,8 +608,8 @@ async function loadTrack(track, preparedUrl) {
   $("dock-pdf").hidden = true
 
   // Set titles and artwork in Mini and Full Player
-  const pathParts = track.path.slice(ROOT.length).split("/").filter(Boolean)
-  const bookName = pathParts.length > 1 ? pathParts[1] : (pathParts[0] || "有声书")
+  const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
+  const bookName = parentDir.split("/").filter(Boolean).pop() || "有声书"
   const trackName = track.name.replace(AUDIO, "")
 
   $("mini-title").textContent = trackName
@@ -611,22 +619,31 @@ async function loadTrack(track, preparedUrl) {
   $("player-track-desc").textContent = "正在加载音频..."
 
   // Update Disc Center Artwork with Book Cover
-  const coverFile = getBookCover(bookName)
-  const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
-  const fullCoverPath = coverFile ? `${parentDir}/${coverFile}` : ""
+  const fullCoverPath = resolveBookCoverPath(parentDir, bookName)
 
   const miniThumb = $("mini-cover-thumb")
   const vinylCenter = $("vinyl-cover-art")
   const rfCenter = document.querySelector("#readalong-floating-disc .floating-center")
   const pfCenter = document.querySelector("#pdf-floating-disc .floating-center")
 
-  // Fallback defaults
-  const [c1, c2] = getJacketColors(bookName)
-  const bgGrad = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`
-  if (miniThumb) { miniThumb.style.background = bgGrad; $("mini-cover-icon").hidden = false }
-  if (vinylCenter) { vinylCenter.style.background = bgGrad; vinylCenter.textContent = "📖" }
-  if (rfCenter) { rfCenter.style.background = bgGrad; rfCenter.textContent = "📖" }
-  if (pfCenter) { pfCenter.style.background = bgGrad; pfCenter.textContent = "📄" }
+  // Fallback defaults: Elegant Ivory Vinyl Record Label (never pitch black!)
+  const shortTitle = bookName.slice(0, 4)
+  if (miniThumb) { miniThumb.style.background = "#32353a"; $("mini-cover-icon").hidden = false; $("mini-cover-icon").textContent = "♫" }
+  if (vinylCenter) {
+    vinylCenter.style.background = "#fbf9f4"
+    vinylCenter.style.color = "#18191b"
+    vinylCenter.textContent = shortTitle
+  }
+  if (rfCenter) {
+    rfCenter.style.background = "#fbf9f4"
+    rfCenter.style.color = "#18191b"
+    rfCenter.textContent = "📖"
+  }
+  if (pfCenter) {
+    pfCenter.style.background = "#fbf9f4"
+    pfCenter.style.color = "#18191b"
+    pfCenter.textContent = "📄"
+  }
 
   // Load signed cover if exists
   if (fullCoverPath) {
@@ -685,7 +702,9 @@ async function ensureCurrentLoaded(autoPlay = true) {
 
 function playAudio() {
   if (!current || !audio.src) return
+  updatePlayButtonUI(true)
   audio.play().catch((error) => {
+    updatePlayButtonUI(false)
     notice(error.name === "NotAllowedError" ? "音频就绪，轻点播放开始收听。" : "播放失败，请重试或检查网络。")
   })
 }
@@ -1248,22 +1267,30 @@ $("player-collapse-btn").onclick = () => {
   $("full-player").hidden = true
 }
 
-// Floating Vinyl Player in Readalong & PDF Panels (WeRead Style)
-$("readalong-floating-play-btn").onclick = (e) => {
-  e.stopPropagation()
-  audio.paused ? playAudio() : audio.pause()
+// Floating Vinyl Player in Readalong & PDF Panels (WeRead Style: Click vinyl to play/pause)
+const toggleFloatingPlay = (e) => {
+  if (e) e.stopPropagation()
+  if (audio.paused) {
+    playAudio()
+  } else {
+    audio.pause()
+    updatePlayButtonUI(false)
+  }
 }
-$("readalong-floating-player").onclick = () => {
+
+const openFullPlayerFromReader = () => {
   $("full-player").hidden = false
 }
 
-$("pdf-floating-play-btn").onclick = (e) => {
-  e.stopPropagation()
-  audio.paused ? playAudio() : audio.pause()
-}
-$("pdf-floating-player").onclick = () => {
-  $("full-player").hidden = false
-}
+$("readalong-floating-player").onclick = toggleFloatingPlay
+$("readalong-floating-play-btn").onclick = toggleFloatingPlay
+$("readalong-title-btn").onclick = openFullPlayerFromReader
+$("readalong-open-player-btn").onclick = openFullPlayerFromReader
+
+$("pdf-floating-player").onclick = toggleFloatingPlay
+$("pdf-floating-play-btn").onclick = toggleFloatingPlay
+$("pdf-title-btn").onclick = openFullPlayerFromReader
+$("pdf-open-player-btn").onclick = openFullPlayerFromReader
 
 // Dock buttons in Full Player
 $("dock-chapters").onclick = () => openDrawer("chapter-drawer")
@@ -1513,8 +1540,26 @@ async function init() {
   if (journal && journal.track) {
     // Mini player placeholder
     $("mini-title").textContent = journal.track.name.replace(AUDIO, "")
-    const bookName = journal.track.path.slice(ROOT.length).split("/").filter(Boolean)[1] || "有声书"
+    const parentDir = journal.track.path.slice(0, journal.track.path.lastIndexOf("/"))
+    const bookName = parentDir.split("/").filter(Boolean).pop() || "有声书"
     $("mini-subtitle").textContent = `继续听 · ${bookName}`
+
+    // Set artwork
+    const fullCoverPath = resolveBookCoverPath(parentDir, bookName)
+    const miniThumb = $("mini-cover-thumb")
+    if (miniThumb) {
+      miniThumb.style.background = "#32353a"
+      const miniIcon = $("mini-cover-icon")
+      if (miniIcon) { miniIcon.hidden = false; miniIcon.textContent = "♫" }
+      if (fullCoverPath) {
+        getSignedCoverUrl(fullCoverPath).then((signedUrl) => {
+          if (signedUrl) {
+            miniThumb.style.background = `url("${signedUrl}") center/cover no-repeat`
+            if (miniIcon) miniIcon.hidden = true
+          }
+        }).catch(() => {})
+      }
+    }
     $("mini-player").hidden = false
   }
 

@@ -840,8 +840,8 @@ button:active { opacity: 0.7; }
   min-height: 0;
 }
 .vinyl-container {
-  width: min(65vw, 260px);
-  height: min(65vw, 260px);
+  width: min(72vw, 280px);
+  height: min(72vw, 280px);
   position: relative;
   display: flex;
   align-items: center;
@@ -852,34 +852,58 @@ button:active { opacity: 0.7; }
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: radial-gradient(circle, #2d3035 0%, #15171a 70%, #0d0e10 100%);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28), inset 0 0 0 2px rgba(255,255,255,0.08);
+  background:
+    repeating-radial-gradient(circle at center, transparent 0, transparent 3px, rgba(255, 255, 255, 0.03) 4px, transparent 5px),
+    radial-gradient(circle at center, #2e3238 0%, #1a1c20 50%, #0d0e10 100%);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.12),
+    inset 0 0 24px rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   animation: discSpin 20s linear infinite;
   animation-play-state: paused;
+  position: relative;
 }
 .vinyl-disc.spinning {
   animation-play-state: running;
 }
 .vinyl-grooves {
   position: absolute;
-  inset: 12px;
+  inset: 10px;
   border-radius: 50%;
   border: 1px dashed rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 .vinyl-center-art {
-  width: 45%;
-  height: 45%;
+  width: 54%;
+  height: 54%;
   border-radius: 50%;
-  background: #f0f2f5;
-  border: 4px solid #1a1c20;
+  background: #fbf9f4;
+  border: 5px solid #141619;
+  box-shadow:
+    0 0 0 2px rgba(212, 175, 55, 0.4),
+    0 4px 14px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 38px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
+  font-size: 40px;
+  position: relative;
+  overflow: hidden;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.vinyl-center-art::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0d0e10;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  z-index: 5;
 }
 
 .track-details {
@@ -1174,6 +1198,12 @@ button:active { opacity: 0.7; }
   font-size: 14px;
 }
 
+.player-expand-pill {
+  background: var(--brand-blue-bg) !important;
+  color: var(--brand-blue) !important;
+  font-weight: 600;
+}
+
 /* 微信读书风格：跟读页面悬浮黑胶旋转挂件 */
 .readalong-floating-player {
   position: absolute;
@@ -1181,15 +1211,15 @@ button:active { opacity: 0.7; }
   bottom: calc(24px + var(--safe-bottom));
   z-index: 130;
   cursor: pointer;
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.24));
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.28));
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .readalong-floating-player:active {
   transform: scale(0.92);
 }
 .floating-vinyl-wrap {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
   position: relative;
   display: flex;
   align-items: center;
@@ -1199,8 +1229,11 @@ button:active { opacity: 0.7; }
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: radial-gradient(circle, #2d3035 0%, #15171a 70%, #0d0e10 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background:
+    repeating-radial-gradient(circle at center, transparent 0, transparent 2px, rgba(255, 255, 255, 0.04) 3px, transparent 4px),
+    radial-gradient(circle at center, #2e3238 0%, #1a1c20 50%, #0d0e10 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1214,18 +1247,24 @@ button:active { opacity: 0.7; }
   position: absolute;
   inset: 6px;
   border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  pointer-events: none;
 }
 .floating-center {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #f0f2f5;
+  background: #fbf9f4;
   border: 2px solid #1a1c20;
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
+  overflow: hidden;
+  background-size: cover !important;
+  background-position: center !important;
+  color: #1a1c20;
 }
 .floating-play-trigger {
   position: absolute;
@@ -1239,8 +1278,9 @@ button:active { opacity: 0.7; }
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   border: 1.5px solid #ffffff;
+  pointer-events: none; /* Let the parent vinyl handle the click seamlessly */
 }
 .floating-play-trigger svg {
   width: 12px;
