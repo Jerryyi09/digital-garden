@@ -1,5 +1,5 @@
 export const ROOT = "/750HD/有声书"
-export const EXTERNAL_ALIST = "https://melyi.uk/alist"
+export const EXTERNAL_ALIST = "https://melyi.uk:8089/alist"
 export const LAN_ALIST = "http://10.0.0.85:8088/alist"
 
 export function resolveEndpoint(mode = "auto", location = window.location) {
@@ -17,7 +17,11 @@ export function resolveEndpoint(mode = "auto", location = window.location) {
   if (local && location.hostname !== "localhost" && !location.hostname.startsWith("127.")) {
     return `${location.origin}/alist`
   }
-  return location.hostname === "melyi.uk" ? `${location.origin}/alist` : EXTERNAL_ALIST
+  if (location.hostname === "melyi.uk") {
+    const port = location.port || "8089"
+    return `${location.protocol}//${location.hostname}:${port}/alist`
+  }
+  return EXTERNAL_ALIST
 }
 
 export function isWithinRoot(path) {
