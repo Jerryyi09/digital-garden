@@ -1300,16 +1300,6 @@ async function syncReadalong(forceScroll = false) {
   }
 }
 
-  if (readalongManifest?.chapters?.length) {
-    const chap = readalongManifest.chapters.find(
-      (c) => audio.currentTime >= c.start && audio.currentTime < c.end,
-    )
-    if (chap && chap.title) {
-      $("readalong-chapter-title").textContent = chap.title.trim()
-    }
-  }
-}
-
 // Safe event listener helper
 const on = (id, event, fn) => {
   const el = $(id)
