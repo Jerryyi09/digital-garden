@@ -37,6 +37,7 @@ def patch_nginx(source):
         proxy_buffering off;
         proxy_hide_header Content-Disposition;
         add_header Content-Disposition "inline";
+        proxy_hide_header Access-Control-Allow-Origin;
 
         # CORS support for cross-origin Cloudflare frontend access
         if ($request_method = 'OPTIONS') {
@@ -66,6 +67,8 @@ def patch_nginx(source):
       block = block[:-1] + "    proxy_buffering off;\n    }"
     if "proxy_hide_header Content-Disposition;" not in block:
       block = block[:-1] + "    proxy_hide_header Content-Disposition;\n        add_header Content-Disposition \"inline\";\n    }"
+    if "proxy_hide_header Access-Control-Allow-Origin;" not in block:
+      block = block[:-1] + "    proxy_hide_header Access-Control-Allow-Origin;\n    }"
     if "Access-Control-Allow-Origin" not in block:
       cors_chunk = """        if ($request_method = 'OPTIONS') {
             add_header 'Access-Control-Allow-Origin' '*' always;
