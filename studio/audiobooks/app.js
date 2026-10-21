@@ -1052,6 +1052,26 @@ async function renderDrawerTrackList() {
 }
 
 // Readalong / EPUB Syncing
+function findNearestSegment(timeline, time) {
+  if (!timeline || !timeline.length) return null
+  if (!Number.isFinite(time) || time <= timeline[0].start) return timeline[0]
+  if (time >= timeline[timeline.length - 1].end) return timeline[timeline.length - 1]
+
+  let low = 0,
+    high = timeline.length - 1
+  while (low <= high) {
+    const mid = (low + high) >> 1
+    const seg = timeline[mid]
+    if (time < seg.start) high = mid - 1
+    else if (time >= seg.end) low = mid + 1
+    else return seg
+  }
+  if (high >= 0 && low < timeline.length) {
+    return (time - timeline[high].end < timeline[low].start - time) ? timeline[high] : timeline[low]
+  }
+  return high >= 0 ? timeline[high] : timeline[0]
+}
+
 function findSegment(timeline, time) {
   if (!timeline || !timeline.length) return null
   if (!Number.isFinite(time) || time < 0) return null
@@ -1362,6 +1382,20 @@ async function syncReadalong(forceScroll = false) {
       frame.contentDocument?.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
     } catch {}
     currentSegment = null
+
+    // If user dragged slider (seeked) or forced scroll, ensure we flip to the nearest chapter
+    if (forceScroll) {
+      const nearest = findNearestSegment(readalongTimeline, audio.currentTime)
+      if (nearest && currentDocPath !== nearest.document) {
+        currentDocPath = nearest.document
+        await loadReadalongDoc(nearest.document)
+      }
+      if (nearest) {
+        const doc = frame.contentDocument
+        const el = doc?.getElementById(nearest.fragment)
+        if (el) el.scrollIntoView({ block: "center", behavior: "smooth" })
+      }
+    }
     return
   }
   if (seg === currentSegment && !forceScroll) return
