@@ -1078,12 +1078,15 @@ function findSegment(timeline, time) {
     else if (time >= seg.end) low = mid + 1
     else return seg
   }
-  // In a pause between two sentences, hold the sentence just completed
+  // In a pause between two sentences, hold the sentence just completed (within 4 seconds)
   if (high >= 0) {
     if (low < timeline.length && timeline[low].start - time <= 0.4) {
       return timeline[low]
     }
-    return timeline[high]
+    const prev = timeline[high]
+    if (time - prev.end <= 4.0) {
+      return prev
+    }
   }
   return null
 }
@@ -1353,7 +1356,14 @@ async function syncReadalong(forceScroll = false) {
   if (!readalongTimeline.length) return
 
   const seg = findSegment(readalongTimeline, audio.currentTime)
-  if (!seg) return
+  if (!seg) {
+    const frame = $("readalong-frame")
+    try {
+      frame.contentDocument?.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
+    } catch {}
+    currentSegment = null
+    return
+  }
   if (seg === currentSegment && !forceScroll) return
   currentSegment = seg
 
