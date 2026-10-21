@@ -147,9 +147,10 @@ def find_best_matching_html(epub_path: Path, audio_words: list[dict]) -> tuple[s
 def align_single_book_universal(
     book_dir: Path,
     output_dir: Path,
-    max_sample_seconds: float = 1200.0,
+    max_sample_seconds: float = 1800.0,
+    max_tracks: int | None = None,
 ) -> dict:
-    """Universal alignment for a book, tolerant to version discrepancies."""
+    """Universal alignment for an audiobook across all chapters/tracks."""
     epubs = [e for e in book_dir.rglob("*.epub") if not e.name.startswith("._")]
     if not epubs:
         return {"status": "skipped", "reason": "no_epub"}
@@ -162,16 +163,10 @@ def align_single_book_universal(
     if not audios:
         return {"status": "skipped", "reason": "no_audio"}
 
-    # Sort audios naturally
+    # Sort audios naturally by name
     audios.sort(key=lambda p: p.name)
-    primary_audio = audios[0]
-
-    # If first track is a very short credit or opening audio (< 60s), pick the first substantial chapter track
-    if len(audios) > 1 and (get_audio_duration(primary_audio) < 60.0 or any(k in primary_audio.name.lower() for k in ("opening credit", "credits", "opening_credit"))):
-        for a in audios[1:]:
-            if get_audio_duration(a) >= 60.0:
-                primary_audio = a
-                break
+    if max_tracks:
+        audios = audios[:max_tracks]
 
     work_dir = output_dir / "work"
     text_dir = output_dir / "text"
@@ -181,34 +176,7 @@ def align_single_book_universal(
     model_path = resolve_model_path()
     os.environ["NLTK_DATA"] = str(resolve_nltk_data_path())
 
-    # 1. Prepare sample audio for alignment
-    sample_m4a = work_dir / f"sample_{primary_audio.stem}.m4a"
-    sample_duration = extract_audio_sample(primary_audio, sample_m4a, duration_seconds=max_sample_seconds)
-
-    # 2. Transcribe words
-    transcript_cache = work_dir / f"transcript_{primary_audio.stem}.json"
-    if transcript_cache.exists():
-        audio_words = json.load(transcript_cache.open(encoding="utf-8"))
-    else:
-        audio_words = transcribe_words(sample_m4a, model_path)
-        transcript_cache.write_text(json.dumps(audio_words, ensure_ascii=False, indent=2))
-
-    if not audio_words:
-        return {"status": "skipped", "reason": "transcription_empty"}
-
-    # 3. Find matching HTML in EPUB
-    matched_html, spine_htmls = find_best_matching_html(primary_epub, audio_words)
-    if not matched_html:
-        # Fall back to first non-empty content page
-        matched_html = next(
-            (h for h in spine_htmls if not any(x in h.lower() for x in ("title", "cover", "toc", "nav"))),
-            spine_htmls[0] if spine_htmls else None
-        )
-
-    if not matched_html:
-        return {"status": "failed", "reason": "no_html_found"}
-
-    # 4. Extract all EPUB assets into text/
+    # 1. Extract all original EPUB assets into text/
     with zipfile.ZipFile(primary_epub) as z:
         for name in z.namelist():
             if name.endswith("/"):
@@ -224,101 +192,132 @@ def align_single_book_universal(
             else:
                 dest.write_bytes(content)
 
-    # 5. Segment and align the target HTML
-    target_dest = text_dir / matched_html
-    raw_content = target_dest.read_text(encoding="utf-8")
-    chapter_id = re.sub(r"[^a-zA-Z0-9]", "", Path(matched_html).stem)[:8] or "ch1"
-
-    marked_html = mark_sentences(raw_content, chapter_id=chapter_id)
-    soup = BeautifulSoup(marked_html, "lxml")
-    spans = [
-        s for s in soup.find_all("span")
-        if s.get("id", "").startswith(f"c{chapter_id}-segment") or s.get("id", "").startswith(f"{chapter_id}-segment")
-    ]
-
-    audio_norms = [w["norm"] for w in audio_words]
-    segments = []
-
-    # First anchor: locate where the chapter starts in the audio stream
-    audio_ptr = 0
-    for span in spans[:10]:
-        t_tokens = [normalize_token(w) for w in span.get_text().split()]
-        t_tokens = [t for t in t_tokens if t]
-        if len(t_tokens) >= 3:
-            init_m = SequenceMatcher(None, t_tokens, audio_norms).find_longest_match(0, len(t_tokens), 0, len(audio_norms))
-            if init_m.size >= min(4, len(t_tokens)):
-                audio_ptr = max(0, init_m.b - 5)
-                break
-
-    for span in spans:
-        text = span.get_text().strip()
-        tokens = [normalize_token(w) for w in text.split()]
-        tokens = [t for t in tokens if t]
-        if not tokens:
-            continue
-
-        if len(tokens) < 2 and tokens[0] in ("1", "2", "3", "4", "5", "i", "ii", "a", "b", "c"):
-            continue
-
-        # Lookahead search in flexible sliding window (up to 1200 words)
-        window_end = min(len(audio_norms), audio_ptr + 1200)
-        sub_audio = audio_norms[audio_ptr:window_end]
-
-        matcher = SequenceMatcher(None, tokens, sub_audio)
-        match = matcher.find_longest_match(0, len(tokens), 0, len(sub_audio))
-
-        is_valid = False
-        if len(tokens) <= 3:
-            if match.size == len(tokens) and match.b < 80:
-                is_valid = True
-        else:
-            if match.b > 80:
-                is_valid = (match.size >= 4)
-            else:
-                is_valid = (match.size >= 3) or (match.size >= len(tokens) * 0.5)
-
-        if is_valid:
-            abs_start = audio_words[audio_ptr + match.b]["start"]
-            abs_end = audio_words[audio_ptr + match.b + match.size - 1]["end"]
-            if abs_end <= abs_start:
-                abs_end = round(abs_start + 0.1, 3)
-
-            segments.append({
-                "audioSourceId": primary_audio.name,
-                "start": abs_start,
-                "end": abs_end,
-                "document": f"text/{matched_html}",
-                "fragment": span["id"],
-                "text": text,
-                "reviewStatus": "unreviewed",
-            })
-            audio_ptr = audio_ptr + match.b + match.size
-
-    # Overwrite target html with spans
-    target_dest.write_text(marked_html, encoding="utf-8")
-
-    # Sort segments
-    segments.sort(key=lambda s: (s["start"], s["end"]))
-
-    # Save timeline.json
-    timeline_path = output_dir / "timeline.json"
-    timeline_path.write_text(json.dumps(segments, ensure_ascii=False, indent=2) + "\n")
-
-    # Build manifest
-    book_id = re.sub(r"[^\w\s-]", "", book_dir.name.lower()).replace(" ", "-")
+    all_segments = []
+    audio_sources = []
     category = book_dir.parent.name
     if category in ("未命名文件夹", "寒假"):
         category = "文学作品"
 
-    audio_sources = [
-        {
-            "id": primary_audio.name,
-            "name": primary_audio.name,
-            "alistPath": f"{DEFAULT_ALIST_ROOT}/{category}/{book_dir.name}/{primary_audio.name}",
-            "sha256": compute_sha256(primary_audio),
-            "duration": get_audio_duration(primary_audio),
-        }
-    ]
+    # Track-by-track alignment across all audio files in the book
+    for track_idx, audio_file in enumerate(audios):
+        print(f"  --> Aligning track [{track_idx + 1}/{len(audios)}]: {audio_file.name}")
+        sample_m4a = work_dir / f"sample_{audio_file.stem}.m4a"
+        sample_duration = extract_audio_sample(audio_file, sample_m4a, duration_seconds=max_sample_seconds)
+
+        transcript_cache = work_dir / f"transcript_{audio_file.stem}.json"
+        if transcript_cache.exists():
+            audio_words = json.load(transcript_cache.open(encoding="utf-8"))
+        else:
+            audio_words = transcribe_words(sample_m4a, model_path)
+            transcript_cache.write_text(json.dumps(audio_words, ensure_ascii=False, indent=2))
+
+        audio_sources.append({
+            "id": audio_file.name,
+            "name": audio_file.name,
+            "alistPath": f"{DEFAULT_ALIST_ROOT}/{category}/{book_dir.name}/{audio_file.name}",
+            "sha256": compute_sha256(audio_file),
+            "duration": get_audio_duration(audio_file),
+        })
+
+        if not audio_words:
+            print(f"      (No transcription words for {audio_file.name}, skipping segments)")
+            continue
+
+        # Find matching HTML in EPUB
+        matched_html, spine_htmls = find_best_matching_html(primary_epub, audio_words)
+        if not matched_html:
+            matched_html = next(
+                (h for h in spine_htmls if not any(x in h.lower() for x in ("title", "cover", "toc", "nav"))),
+                spine_htmls[0] if spine_htmls else None
+            )
+
+        if not matched_html:
+            continue
+
+        target_dest = text_dir / matched_html
+        raw_content = target_dest.read_text(encoding="utf-8")
+        chapter_id = re.sub(r"[^a-zA-Z0-9]", "", f"{Path(matched_html).stem}_{track_idx}")[:8] or f"ch{track_idx}"
+
+        # If not marked before, mark sentences
+        if "segment" not in raw_content:
+            marked_html = mark_sentences(raw_content, chapter_id=chapter_id)
+            target_dest.write_text(marked_html, encoding="utf-8")
+        else:
+            marked_html = raw_content
+
+        soup = BeautifulSoup(marked_html, "lxml")
+        spans = [s for s in soup.find_all("span") if s.get("id") and "segment" in s["id"]]
+
+        audio_norms = [w["norm"] for w in audio_words]
+        audio_ptr = 0
+
+        # Anchor search
+        for span in spans[:15]:
+            t_tokens = [normalize_token(w) for w in span.get_text().split()]
+            t_tokens = [t for t in t_tokens if t]
+            if len(t_tokens) >= 3:
+                init_m = SequenceMatcher(None, t_tokens, audio_norms).find_longest_match(0, len(t_tokens), 0, len(audio_norms))
+                if init_m.size >= min(4, len(t_tokens)):
+                    audio_ptr = max(0, init_m.b - 5)
+                    break
+
+        track_segs = []
+        for span in spans:
+            text = span.get_text().strip()
+            tokens = [normalize_token(w) for w in text.split()]
+            tokens = [t for t in tokens if t]
+            if not tokens:
+                continue
+
+            if len(tokens) < 2 and tokens[0] in ("1", "2", "3", "4", "5", "i", "ii", "a", "b", "c"):
+                continue
+
+            window_end = min(len(audio_norms), audio_ptr + 1500)
+            sub_audio = audio_norms[audio_ptr:window_end]
+
+            matcher = SequenceMatcher(None, tokens, sub_audio)
+            match = matcher.find_longest_match(0, len(tokens), 0, len(sub_audio))
+
+            is_valid = False
+            if len(tokens) <= 3:
+                if match.size == len(tokens) and match.b < 80:
+                    is_valid = True
+            else:
+                if match.b > 80:
+                    is_valid = (match.size >= 4)
+                else:
+                    is_valid = (match.size >= 3) or (match.size >= len(tokens) * 0.5)
+
+            if is_valid:
+                abs_start = audio_words[audio_ptr + match.b]["start"]
+                abs_end = audio_words[audio_ptr + match.b + match.size - 1]["end"]
+                if abs_end <= abs_start:
+                    abs_end = round(abs_start + 0.1, 3)
+
+                track_segs.append({
+                    "audioSourceId": audio_file.name,
+                    "start": abs_start,
+                    "end": abs_end,
+                    "document": f"text/{matched_html}",
+                    "fragment": span["id"],
+                    "text": text,
+                    "reviewStatus": "unreviewed",
+                })
+                audio_ptr = audio_ptr + match.b + match.size
+
+        print(f"      Matched {len(track_segs)} segments in {matched_html}")
+        all_segments.extend(track_segs)
+
+    # Sort all segments
+    all_segments.sort(key=lambda s: (s["audioSourceId"], s["start"], s["end"]))
+
+    # Save timeline.json
+    timeline_path = output_dir / "timeline.json"
+    timeline_path.write_text(json.dumps(all_segments, ensure_ascii=False, indent=2) + "\n")
+
+    # Build manifest
+    book_id = re.sub(r"[^\w\s-]", "", book_dir.name.lower()).replace(" ", "-")
+    first_doc = all_segments[0]["document"] if all_segments else ""
 
     manifest = {
         "schemaVersion": 1,
@@ -332,9 +331,9 @@ def align_single_book_universal(
         "audioSources": audio_sources,
         "timeline": "timeline.json",
         "textRoot": "text/",
-        "segmentCount": len(segments),
-        "sampleAligned": True,
-        "alignedDocument": f"text/{matched_html}",
+        "segmentCount": len(all_segments),
+        "sampleAligned": False,
+        "alignedDocument": first_doc,
     }
 
     manifest_path = output_dir / "readalong.manifest.json"
@@ -352,8 +351,7 @@ def align_single_book_universal(
     return {
         "status": "success",
         "book_id": book_id,
-        "matched_html": matched_html,
-        "segment_count": len(segments),
-        "sample_duration": sample_duration,
+        "tracks_processed": len(audios),
+        "segment_count": len(all_segments),
         "install_dir": str(install_target),
     }

@@ -43,12 +43,31 @@ def main():
         start_t = time.time()
 
         try:
-            # Check if already aligned with non-empty timeline
+            audios = [
+                a for a in b_dir.rglob("*")
+                if a.suffix.lower() in (".mp3", ".m4a", ".m4b") and not a.name.startswith("._")
+            ]
+
+            # Check if all audio tracks are already aligned in timeline
             existing_timeline = b_dir / "readalong" / "timeline.json"
+            is_fully_aligned = False
             if existing_timeline.exists() and existing_timeline.stat().st_size > 100:
-                print(f"    Already aligned, reading existing metadata...")
+                try:
+                    timeline_data = json.load(existing_timeline.open(encoding="utf-8"))
+                    tl_tracks = set(s.get("audioSourceId") for s in timeline_data if s.get("audioSourceId"))
+                    if len(audios) > 1:
+                        # For multi-track books, require coverage across all tracks
+                        if len(tl_tracks) >= len(audios):
+                            is_fully_aligned = True
+                    else:
+                        if len(timeline_data) > 0:
+                            is_fully_aligned = True
+                except Exception:
+                    is_fully_aligned = False
+
+            if is_fully_aligned:
+                print(f"    Already fully aligned across all tracks ({len(tl_tracks)}/{len(audios)}), skipping.")
                 manifest_data = json.load((b_dir / "readalong" / "readalong.manifest.json").open())
-                timeline_data = json.load(existing_timeline.open())
                 res = {
                     "status": "success",
                     "book_id": manifest_data.get("bookId"),
@@ -57,16 +76,17 @@ def main():
                     "cached": True,
                 }
             else:
+                print(f"    Incomplete alignment detected (only partial tracks). Starting full multi-track alignment...")
                 res = align_single_book_universal(
                     book_dir=b_dir,
                     output_dir=book_out,
-                    max_sample_seconds=900.0,
+                    max_sample_seconds=1800.0,
                 )
             elapsed = time.time() - start_t
             res["book_name"] = b_dir.name
             res["elapsed_seconds"] = round(elapsed, 2)
             results.append(res)
-            print(f"    Result: {res['status']} ({res.get('segment_count', 0)} segments in {elapsed:.1f}s)")
+            print(f"    Result: {res['status']} ({res.get('segment_count', 0)} segments in {elapsed:.1f}s)\n")
         except Exception as e:
             elapsed = time.time() - start_t
             err_res = {
@@ -76,7 +96,7 @@ def main():
                 "elapsed_seconds": round(elapsed, 2),
             }
             results.append(err_res)
-            print(f"    Error (skipped): {e}")
+            print(f"    Error: {e}\n")
 
     summary_file = OUTPUT_BASE / "batch_alignment_summary.json"
     summary_file.parent.mkdir(parents=True, exist_ok=True)

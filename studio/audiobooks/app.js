@@ -126,6 +126,13 @@ function resolveBookCoverPath(parentDir, bookName) {
   if (!parentDir) return ""
   const registered = getBookCover(bookName)
   if (registered) return `${parentDir}/${registered}`
+  // If parentDir is a sub-volume folder (e.g. .../Great Mental Models/Volume 1),
+  // check if grandParent has registered cover or cover.jpg
+  const grandParent = parentDir.slice(0, parentDir.lastIndexOf("/"))
+  const grandName = grandParent ? grandParent.split("/").filter(Boolean).pop() : ""
+  if (grandName && getBookCover(grandName)) {
+    return `${grandParent}/${getBookCover(grandName)}`
+  }
   // Standard cover filename present in our library
   return `${parentDir}/cover.jpg`
 }
@@ -510,7 +517,9 @@ function render() {
       let fullCoverPath = ""
       if (folder !== ROOT) {
         // Inside a category folder (e.g. 文学作品, 心智成长), each sub-item is a book folder
-        const coverFile = item.coverFile || getBookCover(item.name) || "cover.jpg"
+        // If sub-folder is a Volume (e.g. Volume 1), check parent folder's cover too
+        const parentFolderName = folder.split("/").filter(Boolean).pop() || ""
+        const coverFile = item.coverFile || getBookCover(item.name) || getBookCover(parentFolderName) || "cover.jpg"
         fullCoverPath = `${item.path}/${coverFile}`
       }
       const coverEl = createBookCoverElement(item.name, "size-row", fullCoverPath)
@@ -1088,18 +1097,39 @@ async function setupReadalong(track, request) {
 
   try {
     const parent = track.path.slice(0, track.path.lastIndexOf("/"))
-    const manifestPath = `${parent}/readalong/readalong.manifest.json`
-    const manifestInfo = await api("fs/get", {
-      path: manifestPath,
-      password: directoryPassword,
-    }).catch(() => null)
-    if (!manifestInfo || request !== playRequest) return
+    // Support multi-volume sub-directory audiobooks (e.g. Great Mental Models/Volume 1/...)
+    // Check current track directory first; if not found, fallback to parent directory
+    const candidates = [parent]
+    const grandParent = parent.slice(0, parent.lastIndexOf("/"))
+    if (grandParent && isWithinRoot(grandParent)) {
+      candidates.push(grandParent)
+    }
 
-    const manifestUrl = mediaUrl(endpoint, { path: manifestPath }, manifestInfo.sign)
-    const manifest = await fetch(manifestUrl, { cache: "no-store" }).then((r) => r.json())
-    if (request !== playRequest || !manifest || manifest.schemaVersion !== 1) return
+    let manifest = null
+    let manifestInfo = null
+    let validParent = ""
 
-    const timelinePath = `${parent}/readalong/${manifest.timeline || "timeline.json"}`
+    for (const p of candidates) {
+      const manifestPath = `${p}/readalong/readalong.manifest.json`
+      const info = await api("fs/get", {
+        path: manifestPath,
+        password: directoryPassword,
+      }).catch(() => null)
+      if (info) {
+        const manifestUrl = mediaUrl(endpoint, { path: manifestPath }, info.sign)
+        const m = await fetch(manifestUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
+        if (m && m.schemaVersion === 1) {
+          manifest = m
+          manifestInfo = info
+          validParent = p
+          break
+        }
+      }
+    }
+
+    if (!manifest || request !== playRequest) return
+
+    const timelinePath = `${validParent}/readalong/${manifest.timeline || "timeline.json"}`
     const timelineInfo = await api("fs/get", {
       path: timelinePath,
       password: directoryPassword,
@@ -1111,7 +1141,7 @@ async function setupReadalong(track, request) {
     if (request !== playRequest || !Array.isArray(timeline)) return
 
     readalongManifest = manifest
-    readalongParentPath = parent
+    readalongParentPath = validParent
 
     // Robust multi-track segment matching:
     const cleanId = (s) => (s ? String(s).toLowerCase().replace(/['"’“”\s_-]/g, "").replace(/\.[a-z0-9]+$/, "") : "")
@@ -1148,19 +1178,34 @@ async function setupPdf(track, request) {
 
   try {
     const parent = track.path.slice(0, track.path.lastIndexOf("/"))
-    let pdfItem = null
-    const data = await api("fs/list", {
-      path: parent,
-      password: directoryPassword,
-      page: 1,
-      per_page: 50,
-      refresh: false,
-    }).catch(() => null)
-    if (data?.content) {
-      pdfItem = data.content.find((item) => !item.is_dir && PDF.test(item.name))
+    const candidates = [parent]
+    const grandParent = parent.slice(0, parent.lastIndexOf("/"))
+    if (grandParent && isWithinRoot(grandParent)) {
+      candidates.push(grandParent)
     }
+
+    let pdfItem = null
+    let validParent = ""
+
+    for (const p of candidates) {
+      const data = await api("fs/list", {
+        path: p,
+        password: directoryPassword,
+        page: 1,
+        per_page: 50,
+        refresh: false,
+      }).catch(() => null)
+      if (data?.content) {
+        pdfItem = data.content.find((item) => !item.is_dir && PDF.test(item.name))
+        if (pdfItem) {
+          validParent = p
+          break
+        }
+      }
+    }
+
     if (!pdfItem || request !== playRequest) return
-    currentPdfPath = `${parent}/${pdfItem.name}`
+    currentPdfPath = `${validParent}/${pdfItem.name}`
     currentPdfName = pdfItem.name
     $("dock-pdf").hidden = false
   } catch {
