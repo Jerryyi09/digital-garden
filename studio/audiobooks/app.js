@@ -1,5 +1,9 @@
 import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
-import { getBookSummary, getBookCover, getJacketColors } from "./summaries.js"
+import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
+import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
+
+const manifestMemoryCache = new Map()
+const timelineMemoryCache = new Map()
 
 const $ = (id) => document.getElementById(id)
 const audio = $("audio")
@@ -36,6 +40,7 @@ let readalongActive = false
 let readalongFollowing = true
 let currentSegment = null
 let currentDocPath = ""
+let readalongAssetBase = ""
 let currentPdfPath = ""
 let currentPdfName = ""
 let pdfViewerActive = false
@@ -137,19 +142,66 @@ function resolveBookCoverPath(parentDir, bookName) {
   return `${parentDir}/cover.jpg`
 }
 
+const coverQueue = []
+let activeCoverRequests = 0
+const MAX_CONCURRENT_COVER_REQUESTS = 4
+
+function enqueueCoverRequest(fn) {
+  return new Promise((resolve, reject) => {
+    coverQueue.push({ fn, resolve, reject })
+    processCoverQueue()
+  })
+}
+
+function processCoverQueue() {
+  while (activeCoverRequests < MAX_CONCURRENT_COVER_REQUESTS && coverQueue.length > 0) {
+    const { fn, resolve, reject } = coverQueue.shift()
+    activeCoverRequests++
+    fn()
+      .then(resolve)
+      .catch(reject)
+      .finally(() => {
+        activeCoverRequests--
+        processCoverQueue()
+      })
+  }
+}
+
 async function getSignedCoverUrl(fullImgPath) {
   if (!fullImgPath) return ""
   if (coverSignedCache.has(fullImgPath)) return coverSignedCache.get(fullImgPath)
-  try {
-    const info = await api("fs/get", { path: fullImgPath, password: directoryPassword }).catch(() => null)
-    if (!info) return ""
-    const url = mediaUrl(endpoint, { path: fullImgPath }, info.sign)
-    coverSignedCache.set(fullImgPath, url)
-    return url
-  } catch {
-    return ""
-  }
+  return enqueueCoverRequest(async () => {
+    if (coverSignedCache.has(fullImgPath)) return coverSignedCache.get(fullImgPath)
+    try {
+      const info = await api("fs/get", { path: fullImgPath, password: directoryPassword }).catch(() => null)
+      if (!info) return ""
+      const url = mediaUrl(endpoint, { path: fullImgPath }, info.sign)
+      coverSignedCache.set(fullImgPath, url)
+      return url
+    } catch {
+      return ""
+    }
+  })
 }
+
+const coverObserver = typeof IntersectionObserver !== "undefined"
+  ? new IntersectionObserver((entries, observer) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const wrap = entry.target
+          observer.unobserve(wrap)
+          const imgPath = wrap.dataset.coverPath
+          const img = wrap.querySelector(".cover-real-img")
+          if (imgPath && img) {
+            getSignedCoverUrl(imgPath).then((signedUrl) => {
+              if (signedUrl) img.src = signedUrl
+              else img.remove()
+            }).catch(() => img.remove())
+          }
+        }
+      }
+    }, { rootMargin: "250px 0px" })
+  : null
 
 function createBookCoverElement(bookTitle, sizeClass = "size-row", fullImgPath = "") {
   const coverWrap = document.createElement("div")
@@ -192,6 +244,9 @@ function createBookCoverElement(bookTitle, sizeClass = "size-row", fullImgPath =
     // Load with sign
     if (coverSignedCache.has(fullImgPath)) {
       img.src = coverSignedCache.get(fullImgPath)
+    } else if (coverObserver) {
+      coverWrap.dataset.coverPath = fullImgPath
+      coverObserver.observe(coverWrap)
     } else {
       getSignedCoverUrl(fullImgPath).then((signedUrl) => {
         if (signedUrl) {
@@ -353,7 +408,7 @@ async function list(path) {
         is_dir: item.is_dir === true,
         size: item.size,
         modified: item.modified,
-        hasReadalong: hasReadalongInFolder && !item.is_dir,
+        hasReadalong: item.is_dir ? hasBookReadalong(item.name) : hasReadalongInFolder,
         hasPdf: Boolean(pdfInFolder) && !item.is_dir,
         pdfName: pdfInFolder,
         coverFile: coverFile || null,
@@ -449,6 +504,12 @@ function renderShelf() {
     const title = document.createElement("div")
     title.className = "shelf-card-title"
     title.textContent = bookName
+    if (hasBookReadalong(bookName)) {
+      const badge = document.createElement("span")
+      badge.className = "badge-readalong"
+      badge.textContent = "跟读"
+      title.append(" ", badge)
+    }
 
     const prog = document.createElement("div")
     prog.className = "shelf-card-progress"
@@ -471,7 +532,8 @@ function render() {
 
   if (isBookFolder) {
     $("banner-title").textContent = currentDirName
-    $("folder-summary-text").textContent = currentSummary || "暂无简介，点击章节即可播放。"
+    const hasRead = hasBookReadalong(currentDirName) || entries.some((item) => item.hasReadalong)
+    $("folder-summary-text").textContent = (hasRead ? "【已就绪 · 支持 EPUB 音文跟读】 " : "") + (currentSummary || "暂无简介，点击章节即可播放。")
 
     // Render Banner Cover
     const bannerCoverWrap = document.querySelector(".banner-cover-wrap")
@@ -541,6 +603,20 @@ function render() {
     title.className = "item-name"
     title.textContent = item.name.replace(AUDIO, "")
     titleRow.append(title)
+
+    const hasRead = item.is_dir ? (hasBookReadalong(item.name) || item.hasReadalong) : item.hasReadalong
+    if (hasRead) {
+      const readalongBadge = document.createElement("span")
+      readalongBadge.className = "badge-readalong"
+      readalongBadge.textContent = "跟读"
+      titleRow.append(readalongBadge)
+    }
+    if (item.hasPdf) {
+      const pdfBadge = document.createElement("span")
+      pdfBadge.className = "badge-pdf"
+      pdfBadge.textContent = "PDF"
+      titleRow.append(pdfBadge)
+    }
     info.append(titleRow)
 
     if (item.is_dir) {
@@ -627,6 +703,7 @@ async function prepareNext(request) {
 }
 
 async function loadTrack(track, preparedUrl) {
+  invalidateReadalong()
   if (!isWithinRoot(track.path) || !AUDIO.test(track.name))
     throw new Error("不是可播放的有声书音频文件")
   saveProgress()
@@ -767,6 +844,7 @@ function restorePosition() {
 }
 
 function seek(seconds) {
+  invalidateReadalong()
   if (ready && Number.isFinite(audio.duration)) {
     audio.currentTime = Math.max(0, Math.min(audio.duration, seconds))
   }
@@ -1053,65 +1131,22 @@ async function renderDrawerTrackList() {
 
 // Readalong / EPUB Syncing
 function findNearestSegment(timeline, time) {
-  if (!timeline || !timeline.length) return null
-  if (!Number.isFinite(time) || time <= timeline[0].start) return timeline[0]
-  if (time >= timeline[timeline.length - 1].end) return timeline[timeline.length - 1]
-
-  let low = 0,
-    high = timeline.length - 1
-  while (low <= high) {
-    const mid = (low + high) >> 1
-    const seg = timeline[mid]
-    if (time < seg.start) high = mid - 1
-    else if (time >= seg.end) low = mid + 1
-    else return seg
-  }
-  if (high >= 0 && low < timeline.length) {
-    return (time - timeline[high].end < timeline[low].start - time) ? timeline[high] : timeline[low]
-  }
-  return high >= 0 ? timeline[high] : timeline[0]
+  const res = resolvePlaybackSegment(timeline, time, 3.5)
+  return res.nearest
 }
 
 function findSegment(timeline, time) {
-  if (!timeline || !timeline.length) return null
-  if (!Number.isFinite(time) || time < 0) return null
-
-  const first = timeline[0]
-  const last = timeline[timeline.length - 1]
-
-  // Time is before the first segment (lead-in silence)
-  if (time < first.start) {
-    return first.start - time <= 5 ? first : null
-  }
-
-  // Time is after the last segment
-  if (time >= last.end) {
-    return time - last.end <= 5 ? last : null
-  }
-
-  let low = 0,
-    high = timeline.length - 1
-  while (low <= high) {
-    const mid = (low + high) >> 1
-    const seg = timeline[mid]
-    if (time < seg.start) high = mid - 1
-    else if (time >= seg.end) low = mid + 1
-    else return seg
-  }
-  // In a pause between two sentences, hold the sentence just completed (within 4 seconds)
-  if (high >= 0) {
-    if (low < timeline.length && timeline[low].start - time <= 0.4) {
-      return timeline[low]
-    }
-    const prev = timeline[high]
-    if (time - prev.end <= 4.0) {
-      return prev
-    }
-  }
-  return null
+  const res = resolvePlaybackSegment(timeline, time, 3.5)
+  return res.segment
 }
 
 async function setupReadalong(track, request) {
+  invalidateReadalong()
+  const releaseBadge = $("readalong-release-status")
+  if (releaseBadge) {
+    releaseBadge.textContent = "跟读模式"
+    releaseBadge.title = ""
+  }
   readalongManifest = null
   readalongTimeline = []
   currentSegment = null
@@ -1129,50 +1164,73 @@ async function setupReadalong(track, request) {
     }
 
     let manifest = null
-    let manifestInfo = null
     let validParent = ""
 
     for (const p of candidates) {
       const manifestPath = `${p}/readalong/readalong.manifest.json`
-      const info = await api("fs/get", {
-        path: manifestPath,
-        password: directoryPassword,
-      }).catch(() => null)
-      if (info) {
-        const manifestUrl = mediaUrl(endpoint, { path: manifestPath }, info.sign)
-        const m = await fetch(manifestUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
-        if (m && m.schemaVersion === 1) {
-          manifest = m
-          manifestInfo = info
-          validParent = p
-          break
+      let m = manifestMemoryCache.get(manifestPath)
+      if (!m) {
+        const info = await api("fs/get", {
+          path: manifestPath,
+          password: directoryPassword,
+        }).catch(() => null)
+        if (info) {
+          const manifestUrl = mediaUrl(endpoint, { path: manifestPath }, info.sign)
+          m = await fetch(manifestUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
+          if (m && m.schemaVersion === 1) {
+            manifestMemoryCache.set(manifestPath, m)
+          }
         }
+      }
+      if (m?.schemaVersion === 1 && m.readalongEnabled === false) {
+        closeReadalong()
+        $("readalong-frame").srcdoc = ""
+        return
+      }
+      if (m && m.schemaVersion === 1) {
+        manifest = m
+        validParent = p
+        break
       }
     }
 
     if (!manifest || request !== playRequest) return
 
-    const timelinePath = `${validParent}/readalong/${manifest.timeline || "timeline.json"}`
-    const timelineInfo = await api("fs/get", {
-      path: timelinePath,
-      password: directoryPassword,
-    }).catch(() => null)
-    if (!timelineInfo || request !== playRequest) return
+    const assetBase = /^[a-f0-9]{32}$/.test(manifest.assetRevision || "")
+      ? `${validParent}/.readalong_revisions/${manifest.assetRevision}`
+      : `${validParent}/readalong`
+    const timelinePath = `${assetBase}/${manifest.timeline || "timeline.json"}`
+    let timeline = timelineMemoryCache.get(timelinePath)
+    if (!timeline) {
+      const timelineInfo = await api("fs/get", {
+        path: timelinePath,
+        password: directoryPassword,
+      }).catch(() => null)
+      if (!timelineInfo || request !== playRequest) return
 
-    const timelineUrl = mediaUrl(endpoint, { path: timelinePath }, timelineInfo.sign)
-    const timeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json())
+      const timelineUrl = mediaUrl(endpoint, { path: timelinePath }, timelineInfo.sign)
+      timeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
+      if (Array.isArray(timeline)) {
+        timelineMemoryCache.set(timelinePath, timeline)
+      }
+    }
     if (request !== playRequest || !Array.isArray(timeline)) return
 
     readalongManifest = manifest
+    if (releaseBadge && manifest.practicalRelease) {
+      const release = manifest.practicalRelease
+      releaseBadge.textContent = release.decision === "PUBLISH_WITH_GAPS" ? "跟读 · 有局部缺口" : "跟读 · 实用版"
+      releaseBadge.title = "段落级个人实用版本，非逐词声学认证；未映射处不高亮，下一可靠位置恢复。"
+    }
     readalongParentPath = validParent
+    readalongAssetBase = assetBase
 
-    // Robust multi-track segment matching:
-    const cleanId = (s) => (s ? String(s).toLowerCase().replace(/['"’“”\s_-]/g, "").replace(/\.[a-z0-9]+$/, "") : "")
-    const targetTrackId = cleanId(track.name)
-
-    let matched = timeline.filter((s) => s.audioSourceId === track.name)
-    if (!matched.length && targetTrackId) {
-      matched = timeline.filter((s) => s.audioSourceId && cleanId(s.audioSourceId) === targetTrackId)
+    // Relative paths distinguish identically named tracks in separate volumes.
+    const relative = track.path.slice(validParent.length + 1)
+    const source = manifest.audioSources?.find((s) => s.id === relative || s.alistPath === track.path || s.id === track.name || s.name === track.name)
+    let matched = source ? timeline.filter((s) => s.audioSourceId === source.id || s.audioSourceId === track.name) : []
+    if (!matched.length) {
+      matched = timeline.filter((s) => s.audioSourceId === track.name || s.audioSourceId === relative)
     }
     if (!matched.length && !timeline.some((s) => s.audioSourceId)) {
       matched = timeline
@@ -1281,7 +1339,7 @@ function openReadalong() {
   const locateBtn = $("readalong-locate")
 
   if (readalongTimeline.length) {
-    if (badge) badge.textContent = "跟读模式"
+    if (badge) badge.textContent = "跟读参考 · 精度未在本机核验"
     if (followBtn) followBtn.hidden = false
   } else {
     if (badge) badge.textContent = "阅读模式"
@@ -1290,9 +1348,13 @@ function openReadalong() {
   }
 
   if (targetDoc && currentDocPath !== targetDoc) {
-    currentDocPath = targetDoc
-    loadReadalongDoc(targetDoc).then(() => {
-      syncReadalong(true)
+    invalidateReadalong()
+    const epoch = readalongLoadEpoch
+    loadReadalongDoc(targetDoc, epoch).then((ok) => {
+      if (ok && epoch === readalongLoadEpoch) {
+        currentDocPath = targetDoc
+        syncReadalong(true)
+      }
     }).catch(() => {})
   } else {
     syncReadalong(true)
@@ -1300,13 +1362,19 @@ function openReadalong() {
 }
 
 function closeReadalong() {
+  invalidateReadalong()
   readalongActive = false
   $("readalong").hidden = true
 }
 
-function loadReadalongDoc(docRelPath) {
+function loadReadalongDoc(docRelPath, expectedEpoch) {
   return new Promise(async (resolve) => {
-    const docPath = `${readalongParentPath}/readalong/${docRelPath}`
+    if (expectedEpoch !== readalongLoadEpoch) return resolve(false)
+    readalongPendingCancel?.()
+    readalongPendingCancel = () => resolve(false)
+    const base = typeof readalongAssetBase === "string" && readalongAssetBase
+      ? readalongAssetBase : `${readalongParentPath}/readalong`
+    const docPath = `${base}/${docRelPath}`
     let html = readalongDocCache.get(docPath)
     if (!html) {
       $("readalong-loading").hidden = false
@@ -1314,12 +1382,18 @@ function loadReadalongDoc(docRelPath) {
         const info = await api("fs/get", { path: docPath, password: directoryPassword })
         const url = mediaUrl(endpoint, { path: docPath }, info.sign)
         html = await fetch(url).then((r) => r.text())
+        if (expectedEpoch !== readalongLoadEpoch) return resolve(false)
         readalongDocCache.set(docPath, html)
       } catch {
         /* fetch error */
       } finally {
-        $("readalong-loading").hidden = true
+        if (expectedEpoch === readalongLoadEpoch) $("readalong-loading").hidden = true
       }
+    }
+
+    // Guard: If a newer load request arrived while fetching, abort before touching iframe DOM
+    if (expectedEpoch !== readalongLoadEpoch) {
+      return resolve(false)
     }
 
     if (!html) return resolve(false)
@@ -1330,6 +1404,9 @@ function loadReadalongDoc(docRelPath) {
     const onFrameLoad = () => {
       if (loaded) return
       loaded = true
+      if (expectedEpoch !== readalongLoadEpoch) {
+        return resolve(false)
+      }
       try {
         const doc = frame.contentDocument
         if (doc) {
@@ -1367,47 +1444,80 @@ function loadReadalongDoc(docRelPath) {
 
     frame.onload = onFrameLoad
     frame.srcdoc = html
-    setTimeout(onFrameLoad, 100)
+    const timeout = setTimeout(() => { if (!loaded) resolve(false) }, 10000)
+    timeout.unref?.()
   })
+}
+
+let readalongLoadEpoch = 0
+let readalongTargetKey = ""
+let readalongPendingCancel = null
+
+function invalidateReadalong() {
+  ++readalongLoadEpoch
+  readalongTargetKey = ""
+  readalongPendingCancel?.()
+  readalongPendingCancel = null
 }
 
 async function syncReadalong(forceScroll = false) {
   if (!readalongActive || !current) return
   if (!readalongTimeline.length) return
 
-  const seg = findSegment(readalongTimeline, audio.currentTime)
-  if (!seg) {
-    const frame = $("readalong-frame")
-    try {
-      frame.contentDocument?.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
-    } catch {}
-    currentSegment = null
+  const curTime = audio.currentTime
+  const syncResult = resolvePlaybackSegment(readalongTimeline, curTime, 3.5)
+  const isPlayingActive = (syncResult.state === SYNC_STATE.ACTIVE || syncResult.state === SYNC_STATE.SHORT_PAUSE)
+  let seg = syncResult.segment
 
-    // If user dragged slider (seeked) or forced scroll, ensure we flip to the nearest chapter
-    if (forceScroll) {
-      const nearest = findNearestSegment(readalongTimeline, audio.currentTime)
-      if (nearest && currentDocPath !== nearest.document) {
-        currentDocPath = nearest.document
-        await loadReadalongDoc(nearest.document)
-      }
-      if (nearest) {
-        const doc = frame.contentDocument
-        const el = doc?.getElementById(nearest.fragment)
-        if (el) el.scrollIntoView({ block: "center", behavior: "smooth" })
-      }
-    }
-    return
+  // New playback intent cancels pending loads even when no new document is needed.
+  const targetKey = `${readalongParentPath}|${current?.path || ""}|${seg?.document || ""}|${seg?.fragment || ""}|${syncResult.state}`
+  if (targetKey !== readalongTargetKey) {
+    invalidateReadalong()
+    readalongTargetKey = targetKey
   }
+  const epoch = readalongLoadEpoch
+
+  // If not currently in an active segment (UNMAPPED, AFTER_END, BEFORE_START, EMPTY), clear highlight
+  if (!isPlayingActive) {
+    if (!forceScroll || syncResult.state === SYNC_STATE.EMPTY) {
+      const frame = $("readalong-frame")
+      try {
+        const doc = frame?.contentDocument
+        if (doc) {
+          doc.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
+        }
+      } catch {}
+      currentSegment = null
+      return
+    } else {
+      seg = syncResult.nearest
+    }
+  }
+
+  if (!seg) return
+
   if (seg === currentSegment && !forceScroll) return
-  currentSegment = seg
 
   if (currentDocPath !== seg.document) {
+    const ok = await loadReadalongDoc(seg.document, epoch)
+    if (!ok || epoch !== readalongLoadEpoch) {
+      return
+    }
     currentDocPath = seg.document
-    await loadReadalongDoc(seg.document)
   }
+  if (epoch !== readalongLoadEpoch) return
+  if (!isPlayingActive) {
+    const doc = $("readalong-frame").contentDocument
+    doc?.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
+    doc?.getElementById(seg.fragment)?.scrollIntoView({ block: "center" })
+    currentSegment = null
+    return
+  }
+  currentSegment = seg
 
   const frame = $("readalong-frame")
   const highlightElement = () => {
+    if (epoch !== readalongLoadEpoch || !readalongActive) return false
     try {
       const doc = frame.contentDocument
       if (!doc) return false

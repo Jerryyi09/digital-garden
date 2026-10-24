@@ -49,33 +49,18 @@ test("readalong paths remain strictly within library root", () => {
   assert.equal(isWithinRoot(`${ROOT}/../readalong.manifest.json`), false)
 })
 
-test("binary search accurately locates active audio segment with gap adsorption", () => {
+test("production resolver reports unmapped intro and outro honestly", async () => {
+  const { resolvePlaybackSegment, SYNC_STATE } = await import("./readalong-sync.js")
   const timeline = [
     { start: 16.908, end: 22.588, fragment: "seg1" },
     { start: 22.588, end: 26.788, fragment: "seg2" },
     { start: 26.788, end: 27.748, fragment: "seg3" },
   ]
-  function findSegment(list, time) {
-    if (!list || !list.length) return null
-    if (time < list[0].start) return list[0]
-    if (time >= list[list.length - 1].end) return list[list.length - 1]
-    let low = 0, high = list.length - 1
-    while (low <= high) {
-      const mid = (low + high) >> 1
-      const seg = list[mid]
-      if (time < seg.start) high = mid - 1
-      else if (time >= seg.end) low = mid + 1
-      else return seg
-    }
-    if (high >= 0) return list[high]
-    return list[0]
-  }
-  // During intro music (< 16.908), adsorb to first segment
-  assert.equal(findSegment(timeline, 10.0)?.fragment, "seg1")
-  assert.equal(findSegment(timeline, 18.0)?.fragment, "seg1")
-  assert.equal(findSegment(timeline, 22.588)?.fragment, "seg2")
-  assert.equal(findSegment(timeline, 27.0)?.fragment, "seg3")
-  // Beyond last segment, adsorb to last segment
-  assert.equal(findSegment(timeline, 50.0)?.fragment, "seg3")
+  assert.equal(resolvePlaybackSegment(timeline, 10).state, SYNC_STATE.BEFORE_START)
+  assert.equal(resolvePlaybackSegment(timeline, 18).segment.fragment, "seg1")
+  assert.equal(resolvePlaybackSegment(timeline, 22.588).segment.fragment, "seg2")
+  assert.equal(resolvePlaybackSegment(timeline, 27).segment.fragment, "seg3")
+  assert.equal(resolvePlaybackSegment(timeline, 50).state, SYNC_STATE.AFTER_END)
+  assert.equal(resolvePlaybackSegment(timeline, 50).segment, null)
 })
 
