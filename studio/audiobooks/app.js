@@ -1327,12 +1327,14 @@ function openReadalong() {
   updatePlayButtonUI(!audio.paused)
 
   // Determine initial document path
-  let targetDoc = ""
-  if (readalongTimeline.length) {
-    const start = resolvePlaybackSegment(readalongTimeline, audio.currentTime, 3.5)
-    targetDoc = (start.segment || start.nearest || readalongTimeline[0])?.document || ""
+  let targetDoc = currentDocPath
+  if (!targetDoc) {
+    if (readalongTimeline.length && readalongTimeline[0].document) {
+      targetDoc = readalongTimeline[0].document
+    } else if (readalongManifest.alignedDocument) {
+      targetDoc = readalongManifest.alignedDocument
+    }
   }
-  if (!targetDoc) targetDoc = currentDocPath || readalongManifest.alignedDocument || ""
 
   const badge = document.querySelector(".readalong-capsule-badge")
   const followBtn = $("readalong-follow")
@@ -1417,16 +1419,10 @@ function loadReadalongDoc(docRelPath, expectedEpoch) {
         }
         frame.onload = () => {
           try { attachReadalongFrameHandlers(frame) } catch { /* sandbox */ }
-          readalongRevealPending = true
-          setTimeout(revealReadalongFrame, 600)
           finish(true)
         }
-        frame.style.visibility = "hidden"
         frame.srcdoc = html
-        const timeout = setTimeout(() => {
-          if (!settled) frame.style.visibility = "visible"
-          finish(false)
-        }, 10000)
+        const timeout = setTimeout(() => finish(false), 10000)
         timeout.unref?.()
       })
     }
@@ -1469,13 +1465,6 @@ let readalongLoadEpoch = 0
 let readalongTargetKey = ""
 let readalongPendingCancel = null
 let readalongFrameDocPath = ""
-let readalongRevealPending = false
-
-function revealReadalongFrame() {
-  if (!readalongRevealPending) return
-  readalongRevealPending = false
-  $("readalong-frame").style.visibility = "visible"
-}
 let readalongFrameReady = null
 
 function invalidateReadalong() {
@@ -1551,9 +1540,8 @@ async function syncReadalong(forceScroll = false) {
         doc.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
         targetElem.classList.add("readalong-active")
         if (readalongFollowing || forceScroll) {
-          targetElem.scrollIntoView({ block: "center", behavior: readalongRevealPending ? "auto" : "smooth" })
+          targetElem.scrollIntoView({ block: "center", behavior: "smooth" })
         }
-        revealReadalongFrame()
         return true
       }
       return false

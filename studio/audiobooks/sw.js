@@ -1,4 +1,4 @@
-const CACHE = "garden-audiobooks-v27-no-flash"
+const CACHE = "garden-audiobooks-v26b-rollback"
 const SHELL = ["./", "./app.js", "./readalong-sync.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 
 self.addEventListener("install", event => {
