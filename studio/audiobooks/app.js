@@ -1185,6 +1185,8 @@ async function setupReadalong(track, request) {
       if (m?.schemaVersion === 1 && m.readalongEnabled === false) {
         closeReadalong()
         $("readalong-frame").srcdoc = ""
+        readalongFrameDocPath = ""
+        readalongFrameReady = null
         return
       }
       if (m && m.schemaVersion === 1) {
@@ -1400,58 +1402,70 @@ function loadReadalongDoc(docRelPath, expectedEpoch) {
 
     const frame = $("readalong-frame")
 
-    let loaded = false
-    const onFrameLoad = () => {
-      if (loaded) return
-      loaded = true
-      if (expectedEpoch !== readalongLoadEpoch) {
-        return resolve(false)
-      }
-      try {
-        const doc = frame.contentDocument
-        if (doc) {
-          const size = $("readalong-size").value || "17"
-          if (doc.body) doc.body.style.fontSize = `${size}px`
-
-          const onUserScroll = () => {
-            if (!readalongFollowing) return
-            readalongFollowing = false
-            $("readalong-follow").textContent = "跟随：暂停"
-            $("readalong-locate").hidden = false
+    // The same document is assigned to the frame at most once. Re-assigning srcdoc aborts the
+    // in-flight render; with sync ticks every ~250ms that looped forever (v25 regression).
+    if (readalongFrameDocPath !== docPath || !readalongFrameReady) {
+      readalongFrameDocPath = docPath
+      readalongFrameReady = new Promise((done) => {
+        let settled = false
+        const finish = (ok) => {
+          if (settled) return
+          settled = true
+          if (!ok && readalongFrameDocPath === docPath) {
+            readalongFrameDocPath = ""
+            readalongFrameReady = null
           }
-
-          frame.contentWindow?.addEventListener("wheel", onUserScroll, { passive: true })
-          frame.contentWindow?.addEventListener("touchmove", onUserScroll, { passive: true })
-
-          doc.addEventListener("click", (e) => {
-            const target = e.target.closest("[id]")
-            if (!target || !target.id) return
-            const seg = readalongTimeline.find((s) => s.fragment === target.id)
-            if (seg) {
-              seek(seg.start)
-              readalongFollowing = true
-              $("readalong-follow").textContent = "跟随：开"
-              $("readalong-locate").hidden = true
-              syncReadalong(true)
-            }
-          })
+          done(ok)
         }
-      } catch {
-        /* sandbox */
-      }
-      resolve(true)
+        frame.onload = () => {
+          try { attachReadalongFrameHandlers(frame) } catch { /* sandbox */ }
+          finish(true)
+        }
+        frame.srcdoc = html
+        const timeout = setTimeout(() => finish(false), 10000)
+        timeout.unref?.()
+      })
     }
+    const ok = await readalongFrameReady
+    resolve(ok && expectedEpoch === readalongLoadEpoch)
+  })
+}
 
-    frame.onload = onFrameLoad
-    frame.srcdoc = html
-    const timeout = setTimeout(() => { if (!loaded) resolve(false) }, 10000)
-    timeout.unref?.()
+function attachReadalongFrameHandlers(frame) {
+  const doc = frame.contentDocument
+  if (!doc) return
+  const size = $("readalong-size").value || "17"
+  if (doc.body) doc.body.style.fontSize = `${size}px`
+
+  const onUserScroll = () => {
+    if (!readalongFollowing) return
+    readalongFollowing = false
+    $("readalong-follow").textContent = "跟随：暂停"
+    $("readalong-locate").hidden = false
+  }
+
+  frame.contentWindow?.addEventListener("wheel", onUserScroll, { passive: true })
+  frame.contentWindow?.addEventListener("touchmove", onUserScroll, { passive: true })
+
+  doc.addEventListener("click", (e) => {
+    const target = e.target.closest("[id]")
+    if (!target || !target.id) return
+    const seg = readalongTimeline.find((s) => s.fragment === target.id)
+    if (seg) {
+      seek(seg.start)
+      readalongFollowing = true
+      $("readalong-follow").textContent = "跟随：开"
+      $("readalong-locate").hidden = true
+      syncReadalong(true)
+    }
   })
 }
 
 let readalongLoadEpoch = 0
 let readalongTargetKey = ""
 let readalongPendingCancel = null
+let readalongFrameDocPath = ""
+let readalongFrameReady = null
 
 function invalidateReadalong() {
   ++readalongLoadEpoch
