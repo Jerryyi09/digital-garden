@@ -1327,14 +1327,14 @@ function openReadalong() {
   updatePlayButtonUI(!audio.paused)
 
   // Determine initial document path
-  let targetDoc = currentDocPath
-  if (!targetDoc) {
-    if (readalongTimeline.length && readalongTimeline[0].document) {
-      targetDoc = readalongTimeline[0].document
-    } else if (readalongManifest.alignedDocument) {
-      targetDoc = readalongManifest.alignedDocument
-    }
+  // Open on the document of the current playback position: loading the track's first
+  // document first and then switching showed an extra page on every open.
+  let targetDoc = ""
+  if (readalongTimeline.length) {
+    const start = resolvePlaybackSegment(readalongTimeline, audio.currentTime, 3.5)
+    targetDoc = (start.segment || start.nearest || readalongTimeline[0])?.document || ""
   }
+  if (!targetDoc) targetDoc = currentDocPath || readalongManifest.alignedDocument || ""
 
   const badge = document.querySelector(".readalong-capsule-badge")
   const followBtn = $("readalong-follow")
@@ -1383,7 +1383,7 @@ function loadReadalongDoc(docRelPath, expectedEpoch) {
       try {
         const info = await api("fs/get", { path: docPath, password: directoryPassword })
         const url = mediaUrl(endpoint, { path: docPath }, info.sign)
-        html = await fetch(url).then((r) => r.text())
+        html = sanitizeReadalongHtml(await fetch(url).then((r) => r.text()))
         if (expectedEpoch !== readalongLoadEpoch) return resolve(false)
         readalongDocCache.set(docPath, html)
       } catch {
@@ -1464,6 +1464,33 @@ function attachReadalongFrameHandlers(frame) {
 let readalongLoadEpoch = 0
 let readalongTargetKey = ""
 let readalongPendingCancel = null
+// EPUB pages reference stylesheets, scripts and images by paths relative to the EPUB. Inside the
+// srcdoc frame those resolve against the player's origin, where they never exist, and the frame's
+// load event waits for every one of those failing requests (seconds on Wiley-style books). They have
+// never rendered, so drop them before injection; text and fragment ids are untouched.
+function sanitizeReadalongHtml(html) {
+  try {
+    const doc = new DOMParser().parseFromString(html, "text/html")
+    doc.querySelectorAll("link, script, iframe, object, embed, video, audio, source").forEach((el) => el.remove())
+    doc.querySelectorAll("img[src]").forEach((el) => {
+      el.setAttribute("data-epub-src", el.getAttribute("src"))
+      el.removeAttribute("src")
+      el.removeAttribute("srcset")
+    })
+    doc.querySelectorAll("image").forEach((el) => {
+      for (const attr of ["href", "xlink:href"]) {
+        if (el.hasAttribute(attr)) {
+          el.setAttribute("data-epub-href", el.getAttribute(attr))
+          el.removeAttribute(attr)
+        }
+      }
+    })
+    return "<!DOCTYPE html>" + doc.documentElement.outerHTML
+  } catch {
+    return html
+  }
+}
+
 let readalongFrameDocPath = ""
 let readalongFrameReady = null
 

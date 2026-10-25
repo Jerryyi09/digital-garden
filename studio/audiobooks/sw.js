@@ -1,8 +1,15 @@
-const CACHE = "garden-audiobooks-v26b-rollback"
+const CACHE = "garden-audiobooks-v28-network-first"
 const SHELL = ["./", "./app.js", "./readalong-sync.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 
+// Precache bypasses the browser HTTP cache: app.js is served with max-age=14400, and a plain
+// cache.addAll() would store that stale copy under the new cache name, so a deploy only reached
+// devices hours later. "reload" always goes to the network for the precache.
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()))
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => cache.addAll(SHELL.map(file => new Request(file, { cache: "reload" }))))
+      .then(() => self.skipWaiting())
+  )
 })
 
 self.addEventListener("activate", event => {
@@ -19,18 +26,16 @@ self.addEventListener("fetch", event => {
   // Never intercept API calls, signed streams, Range requests, or other Garden pages.
   if (event.request.method !== "GET" || event.request.headers.has("Range") || !shell.includes(url.href)) return
 
-  // Stale-While-Revalidate for instant loading of app shell
+  // Network-first for the app shell (revalidated, 304 when unchanged), cache only when offline,
+  // so a deploy takes effect on the next load instead of after the HTTP cache expires.
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      const fetchPromise = fetch(event.request).then(networkResponse => {
-        if (networkResponse.ok && !networkResponse.redirected && networkResponse.type !== "opaque") {
-          const copy = networkResponse.clone()
-          caches.open(CACHE).then(cache => cache.put(event.request, copy))
-        }
+    fetch(url.href, { cache: "no-cache", credentials: "same-origin" }).then(networkResponse => {
+      if (networkResponse.ok && !networkResponse.redirected && networkResponse.type !== "opaque") {
+        const copy = networkResponse.clone()
+        caches.open(CACHE).then(cache => cache.put(event.request, copy))
         return networkResponse
-      }).catch(() => cachedResponse)
-
-      return cachedResponse || fetchPromise
-    })
+      }
+      return caches.match(event.request).then(cached => cached || networkResponse)
+    }).catch(() => caches.match(event.request))
   )
 })
