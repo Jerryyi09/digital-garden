@@ -1,6 +1,6 @@
 # WO-RL-SYNCER-REVIEW-20261026：代码审查发现的同步器缺陷与清理
 
-状态：待执行（用户继续跑其余分类之前完成）
+状态：代码修复已执行，实机验收待完成（NUC 直连 No route to host；详见同目录 audiobooks-readalong-syncer-review-fix-execution-20261026.md）
 执行方：开工前先读接手手册 25 §0。
 
 ## 审查范围与结论

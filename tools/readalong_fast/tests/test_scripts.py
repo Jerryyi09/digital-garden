@@ -16,6 +16,9 @@ class ScriptIntegrationTests(unittest.TestCase):
     self.addCleanup(self.temp.cleanup)
     self.root = Path(self.temp.name)
 
+  def test_publish_script_shell_syntax(self):
+    subprocess.run(["bash", "-n", str(REPO_ROOT / "scripts/readalong-publish-nuc")], check=True)
+
   def test_map_script_rejects_volumes_mount_path(self):
     script = REPO_ROOT/"scripts/readalong-map"
     res = subprocess.run([str(script), "/Volumes/750/Music/有声书"], capture_output=True, text=True)
@@ -73,8 +76,12 @@ class ScriptIntegrationTests(unittest.TestCase):
     (empty / "inventory.json").write_text('{"units": []}', encoding="utf-8")
 
     # Simulate an active process holding the flock
-    with open("/tmp/readalong-publish-nuc.lock", "w") as f:
-      fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    with open("/tmp/readalong-publish-nuc.lock", "a+") as f:
+      try:
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+      except BlockingIOError:
+        # An actual publisher already supplies the competing lock holder.
+        pass
       res = subprocess.run([str(script), str(empty)], capture_output=True, text=True)
       self.assertNotEqual(res.returncode, 0)
       self.assertIn("Another NUC publication process is currently running", res.stderr + res.stdout)

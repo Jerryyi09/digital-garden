@@ -143,10 +143,10 @@ for uid, (b_dir_str, c_path) in sorted(candidates.items()):
 
     # 3. SSH 安全同步至 NUC（单书精确集、--protect-args、--iconv、备份旧版）
     print(f'[3/3] Syncing to NUC via SSH...')
-    sync_book_to_nuc(b_dir, cat, name, remote_host=NUC_TARGET, remote_base=remote_path)
+    sync_result = sync_book_to_nuc(b_dir, cat, name, remote_host=NUC_TARGET, remote_base=remote_path)
     print(f'  [OK] Synced files and version directory to {remote_target}/{uid}')
 
-    synced_books_for_tier2.append(tier2_book_payload(cat, name, b_dir))
+    synced_books_for_tier2.append(tier2_book_payload(sync_result['category'], sync_result['book_name'], b_dir))
 
 if synced_books_for_tier2:
     # Tier 2: 单次 SSH 批量服务器文件级核验（秒级，单进程）
@@ -159,7 +159,7 @@ if synced_books_for_tier2:
     print(f'  [TIER 2 OK] All {len(synced_books_for_tier2)} books verified on server filesystem with identical tree hashes!')
 
     # Tier 3: Alist 网关抽样（整批只抽验 1 本书）
-    sample_cat, sample_book, _ = synced_books_for_tier2[0]
+    sample_cat, sample_book = synced_books_for_tier2[0][:2]
     print(f'[*] Tier 3: Sampling 1 book via Alist gateway ({sample_cat}/{sample_book})...')
     t3_ok, t3_msg = tier3_alist_sample_check(sample_cat, sample_book, remote_host=remote_host)
     if not t3_ok:
@@ -169,7 +169,5 @@ if synced_books_for_tier2:
 
 print('\n==================================================')
 print('NUC publication, sync and tiered verification completed.')
-print('==================================================')
-"
 print('==================================================')
 "

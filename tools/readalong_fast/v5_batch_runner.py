@@ -166,9 +166,9 @@ def _run_category_v5_unlocked(category: str, max_books: int = None, existing_run
       continue
 
     # 4. SSH 安全同步至 NUC
-    sync_book_to_nuc(bdir, category, book_name, remote_host=NUC_TARGET, remote_base=NUC_REMOTE_BASE)
+    sync_result = sync_book_to_nuc(bdir, category, book_name, remote_host=NUC_TARGET, remote_base=NUC_REMOTE_BASE)
     active_manifest = json.loads((bdir / "readalong" / "readalong.manifest.json").read_text(encoding="utf-8"))
-    synced_for_tier2.append(tier2_book_payload(category, book_name, bdir))
+    synced_for_tier2.append(tier2_book_payload(sync_result["category"], sync_result["book_name"], bdir))
     batch_summary.append({
       "book": uid, "status": "SYNCED", "metrics": t1_metrics,
       "decision": decision, "revision": active_manifest.get("assetRevision")
