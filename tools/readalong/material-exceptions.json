@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "unitId": "心智成长/Make Your Bed",
+      "sourceFingerprint": "33005cd00d0d97d3c2bb081ab79bcda1e5d2e908996444894d1343c1b64341d2",
+      "disposition": "QUARANTINE_BOOK",
+      "authorization": "User requested separate handling of verified material differences on 2026-10-23; not acoustic approval",
+      "classification": "AUDIO_EPUB_SCOPE_DIFFERENCE_WITH_PENDING_REORDER",
+      "materialInterval": {
+        "audioSourceId": "Make Your Bed-Part02.mp3",
+        "start": 3041.04,
+        "end": 3132.593875,
+        "type": "AUDIO_ONLY_PRODUCTION_CREDITS",
+        "evidence": "Cached ASR starts production credits at 3043.82s; last summary ends near 3040.42s. Boundary is diagnostic, not an independently certified timestamp."
+      },
+      "mappingIntervalStillUnresolved": {
+        "audioSourceId": "Make Your Bed-Part02.mp3",
+        "start": 3006.28,
+        "end": 3041.04,
+        "type": "REORDER_OR_REPEAT_REQUIRES_EXPLICIT_MAPPING"
+      },
+      "allowedAuditCodes": ["ERR_UNEXPLAINED_GAP", "ERR_TIMING_UNVERIFIED"],
+      "qualityStatusUnchanged": true,
+      "publishAllowed": false,
+      "note": "Quarantine the whole book from this mapping batch, preserve FAILED and both impacts; do not classify the summary repeat as a material defect."
+    },
+    {
+      "unitId": "心智成长/Clear Thinking",
+      "sourceFingerprint": "b9b3a629feba806e682918569fc914181d4da32d123a579b0c546d16bf83d639",
+      "disposition": "RECORD_AUDIO_ONLY_SCOPE",
+      "authorization": "User authorized recording material differences without forced remapping on 2026-10-23; not publication approval",
+      "classification": "AUDIO_ONLY_PRODUCTION_CREDITS",
+      "materialInterval": {
+        "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+        "start": 24056.12,
+        "end": 24093.126009,
+        "type": "AUDIO_ONLY_PRODUCTION_CREDITS",
+        "evidence": "Hash-keyed full-stream ASR tail identifies Will Damron, the unabridged production, director/executive producer, text and production copyright, and All rights reserved. Last mapped book sentence ends at 24051.96s. Scope boundary is diagnostic, not independently certified."
+      },
+      "qualityStatusUnchanged": true,
+      "publishAllowed": false
+    }
+  ]
+}

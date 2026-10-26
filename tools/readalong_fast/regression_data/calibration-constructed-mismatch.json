@@ -1,0 +1,161 @@
+{
+  "codeSha256": null,
+  "records": [
+    {
+      "unit_id": "文学作品/安娜卡列妮娜",
+      "epub": "/Users/jerryyi/Desktop/寒假/未命名文件夹/文学作品/复活/Resurrection (Leo Tolstoy) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.0,
+        "intervalLow": 1.0,
+        "intervalHigh": 1.0,
+        "blocks": 6,
+        "observedSeconds": 7126.840000000002,
+        "missingSeconds": 7126.840000000002
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 1.0,
+      "perBlock": [
+        {
+          "audioSourceId": "Anna Karenina - 04 - Pt 1 - Ch 21 to 27.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 589.974464,
+          "measureDuration": 1210.025536,
+          "observedSeconds": 1181.3600000000001,
+          "missingSeconds": 1181.3600000000001,
+          "tokens": 3260
+        },
+        {
+          "audioSourceId": "Anna Karenina - 09 - Pt 2 - Ch 27 to 35.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 830.2299360000001,
+          "measureDuration": 969.7700639999999,
+          "observedSeconds": 956.1399999999999,
+          "missingSeconds": 956.1399999999999,
+          "tokens": 2587
+        },
+        {
+          "audioSourceId": "Anna Karenina - 13 - Pt 3 - Ch 24 to 32.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1740.5600000000013,
+          "missingSeconds": 1740.5600000000013,
+          "tokens": 4864
+        },
+        {
+          "audioSourceId": "Anna Karenina - 18 - Pt 5 - Ch 9 to 17.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1741.9400000000014,
+          "missingSeconds": 1741.9400000000014,
+          "tokens": 4862
+        },
+        {
+          "audioSourceId": "Anna Karenina - 23 - Pt 6 - Ch 16 to 21.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 609.346864,
+          "measureDuration": 1190.653136,
+          "observedSeconds": 1160.1200000000003,
+          "missingSeconds": 1160.1200000000003,
+          "tokens": 3194
+        },
+        {
+          "audioSourceId": "Anna Karenina - 27 - Pt 7 - Ch 19 to 26.mp3",
+          "start": 3600.0,
+          "duration": 899.7484999999997,
+          "measureStart": 3600.0,
+          "measureDuration": 359.7786799999999,
+          "observedSeconds": 346.71999999999935,
+          "missingSeconds": 346.71999999999935,
+          "tokens": 960
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/傲慢与偏见",
+      "epub": "/Users/jerryyi/Desktop/寒假/未命名文件夹/文学作品/复活/Resurrection (Leo Tolstoy) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.0,
+        "intervalLow": 1.0,
+        "intervalHigh": 1.0,
+        "blocks": 6,
+        "observedSeconds": 3597.7999999999997,
+        "missingSeconds": 3597.7999999999997
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 1.0,
+      "perBlock": [
+        {
+          "audioSourceId": "Chapter 08.mp3",
+          "start": 0.0,
+          "duration": 787.7536,
+          "measureStart": 126.040576,
+          "measureDuration": 567.182592,
+          "observedSeconds": 579.88,
+          "missingSeconds": 579.88,
+          "tokens": 1419
+        },
+        {
+          "audioSourceId": "Chapter 19.mp3",
+          "start": 0.0,
+          "duration": 767.3693,
+          "measureStart": 122.779088,
+          "measureDuration": 552.505896,
+          "observedSeconds": 558.5600000000001,
+          "missingSeconds": 558.5600000000001,
+          "tokens": 1427
+        },
+        {
+          "audioSourceId": "Chapter 29.mp3",
+          "start": 0.0,
+          "duration": 943.8958,
+          "measureStart": 151.023328,
+          "measureDuration": 679.6049760000001,
+          "observedSeconds": 680.2199999999999,
+          "missingSeconds": 680.2199999999999,
+          "tokens": 1695
+        },
+        {
+          "audioSourceId": "Chapter 41.mp3",
+          "start": 0.0,
+          "duration": 901.4571,
+          "measureStart": 144.233136,
+          "measureDuration": 649.0491119999999,
+          "observedSeconds": 657.7199999999999,
+          "missingSeconds": 657.7199999999999,
+          "tokens": 1652
+        },
+        {
+          "audioSourceId": "Chapter 48.mp3",
+          "start": 0.0,
+          "duration": 860.7868,
+          "measureStart": 137.725888,
+          "measureDuration": 619.766496,
+          "observedSeconds": 646.7199999999999,
+          "missingSeconds": 646.7199999999999,
+          "tokens": 1690
+        },
+        {
+          "audioSourceId": "Chapter 57.mp3",
+          "start": 0.0,
+          "duration": 643.9523,
+          "measureStart": 103.032368,
+          "measureDuration": 463.64565600000003,
+          "observedSeconds": 474.69999999999993,
+          "missingSeconds": 474.69999999999993,
+          "tokens": 1226
+        }
+      ]
+    }
+  ]
+}

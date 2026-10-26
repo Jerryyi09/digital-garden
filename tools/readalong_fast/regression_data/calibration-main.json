@@ -1,0 +1,2100 @@
+{
+  "codeSha256": null,
+  "records": [
+    {
+      "unit_id": "心智成长/Clear Thinking",
+      "epub": "Clear Thinking Turning Ordinary Moments into Extraordinary Results (Shane Parrish) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9946787303482667,
+        "intervalLow": 0.0028171832169506,
+        "intervalHigh": 0.007602456114040472,
+        "blocks": 6,
+        "observedSeconds": 9982.580000000027,
+        "missingSeconds": 53.119999999999436
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.005321269651733248,
+      "perBlock": [
+        {
+          "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+          "start": 3600.0,
+          "duration": 1800.0,
+          "measureStart": 3854.90016,
+          "measureDuration": 1545.0998399999999,
+          "observedSeconds": 1509.8199999999965,
+          "missingSeconds": 10.379999999999654,
+          "tokens": 3890
+        },
+        {
+          "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+          "start": 5400.0,
+          "duration": 1800.0,
+          "measureStart": 5400.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1772.340000000002,
+          "missingSeconds": 0.0,
+          "tokens": 4694
+        },
+        {
+          "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+          "start": 10800.0,
+          "duration": 1800.0,
+          "measureStart": 10800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1770.9000000000087,
+          "missingSeconds": 6.3400000000001455,
+          "tokens": 4558
+        },
+        {
+          "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+          "start": 14400.0,
+          "duration": 1800.0,
+          "measureStart": 14400.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1764.7599999999966,
+          "missingSeconds": 14.780000000000655,
+          "tokens": 4508
+        },
+        {
+          "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+          "start": 18000.0,
+          "duration": 1800.0,
+          "measureStart": 18000.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1766.700000000019,
+          "missingSeconds": 10.180000000003929,
+          "tokens": 4495
+        },
+        {
+          "audioSourceId": "Shane Parrish - Clear Thinking Turning Ordinary Moments.m4b",
+          "start": 19800.0,
+          "duration": 1800.0,
+          "measureStart": 19800.0,
+          "measureDuration": 1401.9508800000003,
+          "observedSeconds": 1398.060000000005,
+          "missingSeconds": 11.439999999995052,
+          "tokens": 3615
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/安娜卡列妮娜",
+      "epub": "/Users/jerryyi/Desktop/寒假/未命名文件夹/文学作品/安娜卡列妮娜/Anna Karenina.epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.982977027686885,
+        "intervalLow": 0.011843993319376401,
+        "intervalHigh": 0.02602397407364029,
+        "blocks": 6,
+        "observedSeconds": 7126.840000000002,
+        "missingSeconds": 121.3200000000005
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.017022972313114997,
+      "perBlock": [
+        {
+          "audioSourceId": "Anna Karenina - 04 - Pt 1 - Ch 21 to 27.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 589.974464,
+          "measureDuration": 1210.025536,
+          "observedSeconds": 1181.3600000000001,
+          "missingSeconds": 17.159999999999854,
+          "tokens": 3260
+        },
+        {
+          "audioSourceId": "Anna Karenina - 09 - Pt 2 - Ch 27 to 35.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 830.2299360000001,
+          "measureDuration": 969.7700639999999,
+          "observedSeconds": 956.1399999999999,
+          "missingSeconds": 16.25999999999999,
+          "tokens": 2587
+        },
+        {
+          "audioSourceId": "Anna Karenina - 13 - Pt 3 - Ch 24 to 32.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1740.5600000000013,
+          "missingSeconds": 31.559999999999718,
+          "tokens": 4864
+        },
+        {
+          "audioSourceId": "Anna Karenina - 18 - Pt 5 - Ch 9 to 17.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1741.9400000000014,
+          "missingSeconds": 14.320000000000618,
+          "tokens": 4862
+        },
+        {
+          "audioSourceId": "Anna Karenina - 23 - Pt 6 - Ch 16 to 21.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 609.346864,
+          "measureDuration": 1190.653136,
+          "observedSeconds": 1160.1200000000003,
+          "missingSeconds": 20.740000000000123,
+          "tokens": 3194
+        },
+        {
+          "audioSourceId": "Anna Karenina - 27 - Pt 7 - Ch 19 to 26.mp3",
+          "start": 3600.0,
+          "duration": 899.7484999999997,
+          "measureStart": 3600.0,
+          "measureDuration": 359.7786799999999,
+          "observedSeconds": 346.71999999999935,
+          "missingSeconds": 21.2800000000002,
+          "tokens": 960
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/手斧男孩",
+      "epub": "Hatchet (Gary Paulsen) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9977923992997767,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.005059058443386578,
+        "blocks": 6,
+        "observedSeconds": 4638.5199999999995,
+        "missingSeconds": 10.239999999999895
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0022076007002233247,
+      "perBlock": [
+        {
+          "audioSourceId": "003.手斧男孩英文版 Hatchet chapter 2.mp3",
+          "start": 0.0,
+          "duration": 1168.1698,
+          "measureStart": 186.90716799999998,
+          "measureDuration": 841.0822559999999,
+          "observedSeconds": 851.0399999999998,
+          "missingSeconds": 0.0,
+          "tokens": 2119
+        },
+        {
+          "audioSourceId": "011.手斧男孩英文版 Hatchet chapter 6.mp3",
+          "start": 0.0,
+          "duration": 1209.835,
+          "measureStart": 193.5736,
+          "measureDuration": 871.0812000000001,
+          "observedSeconds": 879.9,
+          "missingSeconds": 0.0,
+          "tokens": 2033
+        },
+        {
+          "audioSourceId": "017.手斧男孩英文版 Hatchet chapter 9.mp3",
+          "start": 0.0,
+          "duration": 783.1248,
+          "measureStart": 125.299968,
+          "measureDuration": 563.849856,
+          "observedSeconds": 583.8,
+          "missingSeconds": 0.0,
+          "tokens": 1228
+        },
+        {
+          "audioSourceId": "025.手斧男孩英文版 Hatchet chapter 13.mp3",
+          "start": 0.0,
+          "duration": 913.5803,
+          "measureStart": 146.172848,
+          "measureDuration": 657.777816,
+          "observedSeconds": 671.2599999999998,
+          "missingSeconds": 0.0,
+          "tokens": 1572
+        },
+        {
+          "audioSourceId": "031.手斧男孩英文版 chapter 16.mp3",
+          "start": 0.0,
+          "duration": 1408.1567,
+          "measureStart": 225.305072,
+          "measureDuration": 1013.8728239999999,
+          "observedSeconds": 1011.3599999999999,
+          "missingSeconds": 7.3599999999999,
+          "tokens": 2287
+        },
+        {
+          "audioSourceId": "037.手斧男孩英文版 chapter 19.mp3",
+          "start": 0.0,
+          "duration": 886.0212,
+          "measureStart": 141.763392,
+          "measureDuration": 637.935264,
+          "observedSeconds": 641.1599999999999,
+          "missingSeconds": 2.8799999999999955,
+          "tokens": 1418
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/暮光之城I- 暮色",
+      "epub": "Twilight (Stephenie Meyer) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 1257.4399999999998,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "暮色 Twilight 019.mp3",
+          "start": 0.0,
+          "duration": 217.4955,
+          "measureStart": 34.79928,
+          "measureDuration": 156.59676,
+          "observedSeconds": 178.23999999999998,
+          "missingSeconds": 0.0,
+          "tokens": 473
+        },
+        {
+          "audioSourceId": "暮色 Twilight 053.mp3",
+          "start": 0.0,
+          "duration": 304.1959,
+          "measureStart": 48.671344,
+          "measureDuration": 219.02104799999998,
+          "observedSeconds": 246.43999999999997,
+          "missingSeconds": 0.0,
+          "tokens": 717
+        },
+        {
+          "audioSourceId": "暮色 Twilight 083.mp3",
+          "start": 0.0,
+          "duration": 321.4105,
+          "measureStart": 51.42568,
+          "measureDuration": 231.41556000000003,
+          "observedSeconds": 251.3,
+          "missingSeconds": 0.0,
+          "tokens": 645
+        },
+        {
+          "audioSourceId": "暮色 Twilight 112.mp3",
+          "start": 0.0,
+          "duration": 256.235,
+          "measureStart": 40.997600000000006,
+          "measureDuration": 184.4892,
+          "observedSeconds": 206.29999999999995,
+          "missingSeconds": 0.0,
+          "tokens": 555
+        },
+        {
+          "audioSourceId": "暮色 Twilight 145.mp3",
+          "start": 0.0,
+          "duration": 232.9077,
+          "measureStart": 37.265232000000005,
+          "measureDuration": 167.693544,
+          "observedSeconds": 180.96,
+          "missingSeconds": 0.0,
+          "tokens": 425
+        },
+        {
+          "audioSourceId": "暮色 Twilight 181.mp3",
+          "start": 0.0,
+          "duration": 225.8285,
+          "measureStart": 36.13256,
+          "measureDuration": 162.59652,
+          "observedSeconds": 194.2,
+          "missingSeconds": 0.0,
+          "tokens": 452
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/暮光之城II-新月",
+      "epub": "New Moon (Meyer Stephenie) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 1094.7,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "新月 New Moon 018.mp3",
+          "start": 0.0,
+          "duration": 196.1534,
+          "measureStart": 31.384544,
+          "measureDuration": 141.230448,
+          "observedSeconds": 167.22,
+          "missingSeconds": 0.0,
+          "tokens": 402
+        },
+        {
+          "audioSourceId": "新月 New Moon 051.mp3",
+          "start": 0.0,
+          "duration": 233.4301,
+          "measureStart": 37.348816,
+          "measureDuration": 168.06967200000003,
+          "observedSeconds": 175.4,
+          "missingSeconds": 0.0,
+          "tokens": 481
+        },
+        {
+          "audioSourceId": "新月 New Moon 087.mp3",
+          "start": 0.0,
+          "duration": 252.6301,
+          "measureStart": 40.420816,
+          "measureDuration": 181.893672,
+          "observedSeconds": 190.77999999999997,
+          "missingSeconds": 0.0,
+          "tokens": 516
+        },
+        {
+          "audioSourceId": "新月 New Moon 123.mp3",
+          "start": 0.0,
+          "duration": 288.9665,
+          "measureStart": 46.23464,
+          "measureDuration": 208.05588,
+          "observedSeconds": 233.14000000000004,
+          "missingSeconds": 0.0,
+          "tokens": 600
+        },
+        {
+          "audioSourceId": "新月 New Moon 159.mp3",
+          "start": 0.0,
+          "duration": 186.9844,
+          "measureStart": 29.917504,
+          "measureDuration": 134.62876799999998,
+          "observedSeconds": 163.39999999999998,
+          "missingSeconds": 0.0,
+          "tokens": 420
+        },
+        {
+          "audioSourceId": "新月 New Moon 195.mp3",
+          "start": 0.0,
+          "duration": 205.0873,
+          "measureStart": 32.813968,
+          "measureDuration": 147.66285599999998,
+          "observedSeconds": 164.76,
+          "missingSeconds": 0.0,
+          "tokens": 384
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/暮光之城IV-破晓",
+      "epub": "Breaking Dawn (Twilight, #4) -- Meyer, Stephenie -- Twilight 4, 2009 -- Hachette UK -- isbn13 9780748112555 -- f25131445846a20e9289ce79b318daea -- Anna’s Archive.epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 1172.78,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "破晓 Breaking Dawn 025.mp3",
+          "start": 0.0,
+          "duration": 248.346,
+          "measureStart": 39.73536,
+          "measureDuration": 178.80912,
+          "observedSeconds": 200.16,
+          "missingSeconds": 0.0,
+          "tokens": 471
+        },
+        {
+          "audioSourceId": "破晓 Breaking Dawn 073.mp3",
+          "start": 0.0,
+          "duration": 267.4416,
+          "measureStart": 42.790656,
+          "measureDuration": 192.557952,
+          "observedSeconds": 202.86,
+          "missingSeconds": 0.0,
+          "tokens": 483
+        },
+        {
+          "audioSourceId": "破晓 Breaking Dawn 120.mp3",
+          "start": 0.0,
+          "duration": 277.6555,
+          "measureStart": 44.42488,
+          "measureDuration": 199.91196000000002,
+          "observedSeconds": 224.94,
+          "missingSeconds": 0.0,
+          "tokens": 615
+        },
+        {
+          "audioSourceId": "破晓 Breaking Dawn 167.mp3",
+          "start": 0.0,
+          "duration": 213.7078,
+          "measureStart": 34.193248,
+          "measureDuration": 153.869616,
+          "observedSeconds": 159.55999999999995,
+          "missingSeconds": 0.0,
+          "tokens": 385
+        },
+        {
+          "audioSourceId": "破晓 Breaking Dawn 219.mp3",
+          "start": 0.0,
+          "duration": 268.6955,
+          "measureStart": 42.991279999999996,
+          "measureDuration": 193.46076,
+          "observedSeconds": 209.46,
+          "missingSeconds": 0.0,
+          "tokens": 633
+        },
+        {
+          "audioSourceId": "破晓 Breaking Dawn 266.mp3",
+          "start": 0.0,
+          "duration": 233.404,
+          "measureStart": 37.34464,
+          "measureDuration": 168.05088,
+          "observedSeconds": 175.79999999999995,
+          "missingSeconds": 0.0,
+          "tokens": 400
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/月亮与六便士",
+      "epub": "The Moon and Sixpence (W. Somerset Maugham) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 5,
+        "observedSeconds": 783.5799999999999,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 5,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "第06章(2).mp3",
+          "start": 0.0,
+          "duration": 177.5804,
+          "measureStart": 28.412864,
+          "measureDuration": 127.85788799999999,
+          "observedSeconds": 142.52000000000004,
+          "missingSeconds": 0.0,
+          "tokens": 422
+        },
+        {
+          "audioSourceId": "第09章.mp3",
+          "start": 0.0,
+          "duration": 189.9886,
+          "measureStart": 30.398176,
+          "measureDuration": 136.791792,
+          "observedSeconds": 159.43999999999997,
+          "missingSeconds": 0.0,
+          "tokens": 501
+        },
+        {
+          "audioSourceId": "第41章(8).mp3",
+          "start": 0.0,
+          "duration": 180.0882,
+          "measureStart": 28.814112,
+          "measureDuration": 129.66350400000002,
+          "observedSeconds": 143.64,
+          "missingSeconds": 0.0,
+          "tokens": 442
+        },
+        {
+          "audioSourceId": "第45章(2).mp3",
+          "start": 0.0,
+          "duration": 208.9796,
+          "measureStart": 33.436736,
+          "measureDuration": 150.465312,
+          "observedSeconds": 180.13999999999996,
+          "missingSeconds": 0.0,
+          "tokens": 469
+        },
+        {
+          "audioSourceId": "第53章(1).mp3",
+          "start": 0.0,
+          "duration": 181.0024,
+          "measureStart": 28.960384,
+          "measureDuration": 130.32172799999998,
+          "observedSeconds": 157.84,
+          "missingSeconds": 0.0,
+          "tokens": 460
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/杀死一只知更鸟",
+      "epub": "/Users/jerryyi/Desktop/寒假/未命名文件夹/complete/To Kill A Mockingbird/To Kill A Mockingbird (Harper Lee) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.0,
+        "intervalLow": 1.0,
+        "intervalHigh": 1.0,
+        "blocks": 6,
+        "observedSeconds": 4919.079999999999,
+        "missingSeconds": 4919.079999999999
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 1.0,
+      "perBlock": [
+        {
+          "audioSourceId": "杀死一只知更鸟 06.mp3",
+          "start": 0.0,
+          "duration": 899.9706,
+          "measureStart": 143.995296,
+          "measureDuration": 647.978832,
+          "observedSeconds": 582.1,
+          "missingSeconds": 582.1,
+          "tokens": 640
+        },
+        {
+          "audioSourceId": "杀死一只知更鸟 14.mp3",
+          "start": 0.0,
+          "duration": 1387.1282,
+          "measureStart": 221.940512,
+          "measureDuration": 998.732304,
+          "observedSeconds": 941.4999999999999,
+          "missingSeconds": 941.4999999999999,
+          "tokens": 1260
+        },
+        {
+          "audioSourceId": "杀死一只知更鸟 22.mp3",
+          "start": 0.0,
+          "duration": 1215.7127,
+          "measureStart": 194.51403200000001,
+          "measureDuration": 875.313144,
+          "observedSeconds": 828.2599999999998,
+          "missingSeconds": 828.2599999999998,
+          "tokens": 1245
+        },
+        {
+          "audioSourceId": "杀死一只知更鸟 31.mp3",
+          "start": 0.0,
+          "duration": 1206.5698,
+          "measureStart": 193.051168,
+          "measureDuration": 868.730256,
+          "observedSeconds": 827.3799999999998,
+          "missingSeconds": 827.3799999999998,
+          "tokens": 1387
+        },
+        {
+          "audioSourceId": "杀死一只知更鸟 40.mp3",
+          "start": 0.0,
+          "duration": 1216.7053,
+          "measureStart": 194.67284800000002,
+          "measureDuration": 876.0278159999999,
+          "observedSeconds": 794.0399999999997,
+          "missingSeconds": 794.0399999999997,
+          "tokens": 859
+        },
+        {
+          "audioSourceId": "杀死一只知更鸟 48.mp3",
+          "start": 0.0,
+          "duration": 1437.3878,
+          "measureStart": 229.982048,
+          "measureDuration": 1034.919216,
+          "observedSeconds": 945.8,
+          "missingSeconds": 945.8,
+          "tokens": 1224
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/欧亨利短篇小说",
+      "epub": "Short Stories (O. Henry) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MODERATE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.6394761285528516,
+        "intervalLow": 0.021853292371021685,
+        "intervalHigh": 0.6528431452695996,
+        "blocks": 6,
+        "observedSeconds": 3229.7999999999997,
+        "missingSeconds": 1164.4199999999996
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.36052387144714837,
+      "perBlock": [
+        {
+          "audioSourceId": "004.心形和箭头 Hearts and Crosses.mp3",
+          "start": 0.0,
+          "duration": 1273.9657,
+          "measureStart": 203.834512,
+          "measureDuration": 917.2553039999999,
+          "observedSeconds": 928.7799999999997,
+          "missingSeconds": 757.2799999999999,
+          "tokens": 2290
+        },
+        {
+          "audioSourceId": "011.伯爵和婚礼客人 The Count and The Wedding Guest.mp3",
+          "start": 0.0,
+          "duration": 675.6049,
+          "measureStart": 108.09678400000001,
+          "measureDuration": 486.43552800000003,
+          "observedSeconds": 500.75999999999993,
+          "missingSeconds": 360.7399999999999,
+          "tokens": 1129
+        },
+        {
+          "audioSourceId": "020.贵族公寓 Aristocracy Versus Hash.mp3",
+          "start": 0.0,
+          "duration": 372.3755,
+          "measureStart": 59.58008,
+          "measureDuration": 268.11035999999996,
+          "observedSeconds": 282.99999999999994,
+          "missingSeconds": 0.0,
+          "tokens": 574
+        },
+        {
+          "audioSourceId": "031.你想要的 What You Want.mp3",
+          "start": 0.0,
+          "duration": 811.5722,
+          "measureStart": 129.851552,
+          "measureDuration": 584.331984,
+          "observedSeconds": 586.4,
+          "missingSeconds": 28.879999999999995,
+          "tokens": 1444
+        },
+        {
+          "audioSourceId": "038.篝火旁聊纽约 New York by Camp Fire Light.mp3",
+          "start": 0.0,
+          "duration": 594.4947,
+          "measureStart": 95.119152,
+          "measureDuration": 428.03618400000005,
+          "observedSeconds": 452.13999999999993,
+          "missingSeconds": 0.0,
+          "tokens": 1232
+        },
+        {
+          "audioSourceId": "046.全世界一家亲 Makes the Whole World Kin.mp3",
+          "start": 0.0,
+          "duration": 623.7257,
+          "measureStart": 99.796112,
+          "measureDuration": 449.082504,
+          "observedSeconds": 478.72000000000014,
+          "missingSeconds": 17.519999999999982,
+          "tokens": 1178
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/理智与情感",
+      "epub": "Sense and Sensibility (Jane Austen) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9794980275570293,
+        "intervalLow": 0.004197954546647146,
+        "intervalHigh": 0.03857356945353231,
+        "blocks": 6,
+        "observedSeconds": 3498.2,
+        "missingSeconds": 71.72
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.02050197244297067,
+      "perBlock": [
+        {
+          "audioSourceId": "Chapter 07.mp3",
+          "start": 0.0,
+          "duration": 428.0947,
+          "measureStart": 68.495152,
+          "measureDuration": 308.228184,
+          "observedSeconds": 324.22,
+          "missingSeconds": 0.0,
+          "tokens": 1002
+        },
+        {
+          "audioSourceId": "Chapter 19.mp3",
+          "start": 0.0,
+          "duration": 921.0776,
+          "measureStart": 147.372416,
+          "measureDuration": 663.175872,
+          "observedSeconds": 692.28,
+          "missingSeconds": 16.0,
+          "tokens": 2239
+        },
+        {
+          "audioSourceId": "Chapter 27.mp3",
+          "start": 0.0,
+          "duration": 824.1371,
+          "measureStart": 131.86193600000001,
+          "measureDuration": 593.3787120000001,
+          "observedSeconds": 614.0600000000001,
+          "missingSeconds": 18.47999999999999,
+          "tokens": 1876
+        },
+        {
+          "audioSourceId": "Chapter 34.mp3",
+          "start": 0.0,
+          "duration": 857.1298,
+          "measureStart": 137.140768,
+          "measureDuration": 617.133456,
+          "observedSeconds": 634.54,
+          "missingSeconds": 37.24000000000001,
+          "tokens": 1985
+        },
+        {
+          "audioSourceId": "Chapter 41.mp3",
+          "start": 0.0,
+          "duration": 862.9551,
+          "measureStart": 138.07281600000002,
+          "measureDuration": 621.327672,
+          "observedSeconds": 652.9,
+          "missingSeconds": 0.0,
+          "tokens": 1961
+        },
+        {
+          "audioSourceId": "Chapter 47.mp3",
+          "start": 0.0,
+          "duration": 768.0,
+          "measureStart": 122.88,
+          "measureDuration": 552.96,
+          "observedSeconds": 580.1999999999999,
+          "missingSeconds": 0.0,
+          "tokens": 1845
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/红与黑",
+      "epub": "The Red and the Black -- Stendhal -- 1830 -- c6e972d39297eb88a6c941b4e5cef971 -- Anna’s Archive.epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.994193175602957,
+        "intervalLow": 0.0003815664280245734,
+        "intervalHigh": 0.011640506796482859,
+        "blocks": 6,
+        "observedSeconds": 9068.639999999998,
+        "missingSeconds": 52.66000000000031
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.005806824397043033,
+      "perBlock": [
+        {
+          "audioSourceId": "02 - Bk 1 Ch 06 to 10.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1798.32,
+          "missingSeconds": 0.0,
+          "tokens": 4653
+        },
+        {
+          "audioSourceId": "05 - Bk 1 Ch 21 to 23.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 909.755024,
+          "measureDuration": 890.244976,
+          "observedSeconds": 904.4799999999994,
+          "missingSeconds": 0.0,
+          "tokens": 2493
+        },
+        {
+          "audioSourceId": "07 - Bk 1 Ch 29 to 30.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1799.6999999999991,
+          "missingSeconds": 31.68000000000029,
+          "tokens": 4851
+        },
+        {
+          "audioSourceId": "09 - Bk 2 Ch 35 to 39.mp3",
+          "start": 3600.0,
+          "duration": 1590.6089000000002,
+          "measureStart": 3600.0,
+          "measureDuration": 967.7358320000003,
+          "observedSeconds": 976.2599999999993,
+          "missingSeconds": 3.119999999999891,
+          "tokens": 2611
+        },
+        {
+          "audioSourceId": "12 - Bk 2 Ch 50 to 54.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1796.6399999999992,
+          "missingSeconds": 0.0,
+          "tokens": 4835
+        },
+        {
+          "audioSourceId": "15 - Bk 2 Ch 67 to 72.mp3",
+          "start": 1800.0,
+          "duration": 1800.0,
+          "measureStart": 1800.0,
+          "measureDuration": 1800.0,
+          "observedSeconds": 1793.2399999999998,
+          "missingSeconds": 17.860000000000127,
+          "tokens": 4732
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/艰难时世",
+      "epub": "Hard Times (Charles Dickens) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9822060682680152,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0461808169853835,
+        "blocks": 6,
+        "observedSeconds": 7593.5999999999985,
+        "missingSeconds": 135.12000000000035
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.017793931731984878,
+      "perBlock": [
+        {
+          "audioSourceId": "hardtimes_03_dickens.mp3",
+          "start": 0.0,
+          "duration": 1528.6854,
+          "measureStart": 244.58966400000003,
+          "measureDuration": 1100.653488,
+          "observedSeconds": 1115.1599999999999,
+          "missingSeconds": 0.0,
+          "tokens": 3768
+        },
+        {
+          "audioSourceId": "hardtimes_07_dickens.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 324.20256,
+          "measureDuration": 1458.91152,
+          "observedSeconds": 1485.2799999999995,
+          "missingSeconds": 36.46000000000015,
+          "tokens": 3517
+        },
+        {
+          "audioSourceId": "hardtimes_10_dickens.mp3",
+          "start": 0.0,
+          "duration": 1631.0073,
+          "measureStart": 260.961168,
+          "measureDuration": 1174.3252559999999,
+          "observedSeconds": 1184.3400000000001,
+          "missingSeconds": 0.0,
+          "tokens": 3584
+        },
+        {
+          "audioSourceId": "hardtimes_13_dickens.mp3",
+          "start": 0.0,
+          "duration": 1763.1608,
+          "measureStart": 282.105728,
+          "measureDuration": 1269.4757760000002,
+          "observedSeconds": 1277.7000000000003,
+          "missingSeconds": 0.0,
+          "tokens": 3594
+        },
+        {
+          "audioSourceId": "hardtimes_17_dickens.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 340.48208,
+          "measureDuration": 1459.51792,
+          "observedSeconds": 1478.4599999999991,
+          "missingSeconds": 0.0,
+          "tokens": 4047
+        },
+        {
+          "audioSourceId": "hardtimes_21_dickens.mp3",
+          "start": 0.0,
+          "duration": 1457.7895,
+          "measureStart": 233.24632000000003,
+          "measureDuration": 1049.6084400000002,
+          "observedSeconds": 1052.66,
+          "missingSeconds": 98.6600000000002,
+          "tokens": 3180
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/茶花女",
+      "epub": "La Dame aux Camélias (Dumas, Alexandre Coward, David) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 4249.28,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "004.mp3",
+          "start": 0.0,
+          "duration": 856.764,
+          "measureStart": 137.08224,
+          "measureDuration": 616.8700799999999,
+          "observedSeconds": 634.66,
+          "missingSeconds": 0.0,
+          "tokens": 2081
+        },
+        {
+          "audioSourceId": "008.mp3",
+          "start": 0.0,
+          "duration": 710.748,
+          "measureStart": 113.71968000000001,
+          "measureDuration": 511.73856,
+          "observedSeconds": 527.5,
+          "missingSeconds": 0.0,
+          "tokens": 1563
+        },
+        {
+          "audioSourceId": "013.mp3",
+          "start": 0.0,
+          "duration": 1078.74,
+          "measureStart": 172.5984,
+          "measureDuration": 776.6928,
+          "observedSeconds": 789.78,
+          "missingSeconds": 0.0,
+          "tokens": 2379
+        },
+        {
+          "audioSourceId": "017.mp3",
+          "start": 0.0,
+          "duration": 824.436,
+          "measureStart": 131.90976,
+          "measureDuration": 593.59392,
+          "observedSeconds": 606.04,
+          "missingSeconds": 0.0,
+          "tokens": 1784
+        },
+        {
+          "audioSourceId": "022.mp3",
+          "start": 0.0,
+          "duration": 790.74,
+          "measureStart": 126.5184,
+          "measureDuration": 569.3328,
+          "observedSeconds": 588.8599999999999,
+          "missingSeconds": 0.0,
+          "tokens": 1689
+        },
+        {
+          "audioSourceId": "026.mp3",
+          "start": 0.0,
+          "duration": 1514.484,
+          "measureStart": 242.31744,
+          "measureDuration": 1090.4284799999998,
+          "observedSeconds": 1102.4399999999998,
+          "missingSeconds": 0.0,
+          "tokens": 3363
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-仲夏夜之梦",
+      "epub": "A Midsummer Night's Dream.epub",
+      "verdict": "SAMPLE_BORDERLINE",
+      "runsFullBook": true,
+      "detail": {
+        "reason": "INSUFFICIENT_ASR_TOKENS"
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.2809111371207346,
+      "perBlock": [
+        {
+          "audioSourceId": "a_midsummer_nights_dream_version_4_01_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 301.1632,
+          "measureDuration": 1355.2344,
+          "observedSeconds": 1358.22,
+          "missingSeconds": 306.15999999999974,
+          "tokens": 2359
+        },
+        {
+          "audioSourceId": "a_midsummer_nights_dream_version_4_02_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 427.0889000000002,
+          "measureStart": 1800.0,
+          "measureDuration": 159.83823200000006,
+          "observedSeconds": 158.24,
+          "missingSeconds": 56.340000000000146,
+          "tokens": 193
+        },
+        {
+          "audioSourceId": "a_midsummer_nights_dream_version_4_03_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 556.403984,
+          "measureDuration": 1243.596016,
+          "observedSeconds": 1219.9599999999991,
+          "missingSeconds": 617.4599999999992,
+          "tokens": 1751
+        },
+        {
+          "audioSourceId": "a_midsummer_nights_dream_version_4_03_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 1677.5249,
+          "measureStart": 1800.0,
+          "measureDuration": 1260.221912,
+          "observedSeconds": 1262.9199999999994,
+          "missingSeconds": 112.20000000000027,
+          "tokens": 2362
+        },
+        {
+          "audioSourceId": "a_midsummer_nights_dream_version_4_05_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 350.714352,
+          "measureDuration": 1449.285648,
+          "observedSeconds": 1419.2599999999995,
+          "missingSeconds": 452.0399999999999,
+          "tokens": 2123
+        },
+        {
+          "audioSourceId": "a_midsummer_nights_dream_version_4_05_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 391.9647,
+          "measureStart": 1800.0,
+          "measureDuration": 128.92893600000002,
+          "observedSeconds": 134.9000000000001,
+          "missingSeconds": 15.839999999999918,
+          "tokens": 185
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-哈姆雷特",
+      "epub": "Hamlet -- Penguin Classics.epub",
+      "verdict": "SAMPLE_MODERATE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.8661755876485664,
+        "intervalLow": 0.04004354694803021,
+        "intervalHigh": 0.1977266321303955,
+        "blocks": 6,
+        "observedSeconds": 3097.94,
+        "missingSeconds": 414.58000000000004
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.13382441235143355,
+      "perBlock": [
+        {
+          "audioSourceId": "Hamlet03 - Act I Scene iii.mp3",
+          "start": 0.0,
+          "duration": 431.7256,
+          "measureStart": 69.07609599999999,
+          "measureDuration": 310.842432,
+          "observedSeconds": 331.28000000000003,
+          "missingSeconds": 0.0,
+          "tokens": 842
+        },
+        {
+          "audioSourceId": "Hamlet07 - Act II Scene ii.mp3",
+          "start": 0.0,
+          "duration": 259.3436,
+          "measureStart": 41.494976,
+          "measureDuration": 186.72739199999998,
+          "observedSeconds": 204.51999999999998,
+          "missingSeconds": 0.0,
+          "tokens": 564
+        },
+        {
+          "audioSourceId": "Hamlet09 - Act III Scene i.mp3",
+          "start": 0.0,
+          "duration": 624.5094,
+          "measureStart": 99.92150400000001,
+          "measureDuration": 449.64676799999995,
+          "observedSeconds": 449.54,
+          "missingSeconds": 95.23999999999998,
+          "tokens": 1069
+        },
+        {
+          "audioSourceId": "Hamlet12 - Act III Scene iv.mp3",
+          "start": 0.0,
+          "duration": 781.0873,
+          "measureStart": 124.97396800000001,
+          "measureDuration": 562.3828560000001,
+          "observedSeconds": 562.18,
+          "missingSeconds": 61.84000000000003,
+          "tokens": 1376
+        },
+        {
+          "audioSourceId": "Hamlet19 - Act IV Scene vii.mp3",
+          "start": 0.0,
+          "duration": 672.0,
+          "measureStart": 107.52,
+          "measureDuration": 483.84000000000003,
+          "observedSeconds": 507.04,
+          "missingSeconds": 18.000000000000057,
+          "tokens": 1281
+        },
+        {
+          "audioSourceId": "Hamlet21 - Act V Scene ii.mp3",
+          "start": 0.0,
+          "duration": 1449.9787,
+          "measureStart": 231.996592,
+          "measureDuration": 1043.984664,
+          "observedSeconds": 1043.3799999999999,
+          "missingSeconds": 239.5,
+          "tokens": 2519
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-威尼斯商人",
+      "epub": "The Merchant of Venice.epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9743465163735303,
+        "intervalLow": 0.008331019161344105,
+        "intervalHigh": 0.03670674416752917,
+        "blocks": 6,
+        "observedSeconds": 5351.32,
+        "missingSeconds": 137.27999999999997
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.025653483626469728,
+      "perBlock": [
+        {
+          "audioSourceId": "merchantofvenice_01_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 289.604688,
+          "measureDuration": 1303.2210959999998,
+          "observedSeconds": 1325.88,
+          "missingSeconds": 33.600000000000136,
+          "tokens": 3162
+        },
+        {
+          "audioSourceId": "merchantofvenice_02_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 402.614448,
+          "measureDuration": 1397.385552,
+          "observedSeconds": 1406.3999999999996,
+          "missingSeconds": 58.799999999999784,
+          "tokens": 2996
+        },
+        {
+          "audioSourceId": "merchantofvenice_02_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 716.3402999999998,
+          "measureStart": 1800.0,
+          "measureDuration": 414.37946399999964,
+          "observedSeconds": 414.67999999999984,
+          "missingSeconds": 0.0,
+          "tokens": 1025
+        },
+        {
+          "audioSourceId": "merchantofvenice_03_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 524.2802999999999,
+          "measureStart": 1800.0,
+          "measureDuration": 245.3666639999999,
+          "observedSeconds": 258.03999999999996,
+          "missingSeconds": 0.0,
+          "tokens": 753
+        },
+        {
+          "audioSourceId": "merchantofvenice_04_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1609.0425,
+          "measureStart": 257.4468,
+          "measureDuration": 1158.5106,
+          "observedSeconds": 1136.3999999999999,
+          "missingSeconds": 44.88000000000005,
+          "tokens": 2848
+        },
+        {
+          "audioSourceId": "merchantofvenice_05_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1097.9432,
+          "measureStart": 175.670912,
+          "measureDuration": 790.519104,
+          "observedSeconds": 809.92,
+          "missingSeconds": 0.0,
+          "tokens": 1964
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-尤利乌斯·恺撒",
+      "epub": "Julius Caesar.epub",
+      "verdict": "SAMPLE_MODERATE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9628309378528206,
+        "intervalLow": 0.01645635429845626,
+        "intervalHigh": 0.07553627911775906,
+        "blocks": 5,
+        "observedSeconds": 6306.32,
+        "missingSeconds": 234.40000000000015
+      },
+      "sampleBlocks": 5,
+      "sampleUnmappedRatio": 0.03716906214717936,
+      "perBlock": [
+        {
+          "audioSourceId": "juliuscaesar_01_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 316.408288,
+          "measureDuration": 1423.837296,
+          "observedSeconds": 1427.48,
+          "missingSeconds": 37.680000000000064,
+          "tokens": 3643
+        },
+        {
+          "audioSourceId": "juliuscaesar_02_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 302.75336,
+          "measureDuration": 1362.39012,
+          "observedSeconds": 1364.7199999999998,
+          "missingSeconds": 37.0,
+          "tokens": 3240
+        },
+        {
+          "audioSourceId": "juliuscaesar_03_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 312.240064,
+          "measureDuration": 1405.0802879999999,
+          "observedSeconds": 1410.7399999999996,
+          "missingSeconds": 17.600000000000023,
+          "tokens": 3650
+        },
+        {
+          "audioSourceId": "juliuscaesar_04_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1452.0578,
+          "measureStart": 232.329248,
+          "measureDuration": 1045.481616,
+          "observedSeconds": 1058.24,
+          "missingSeconds": 19.720000000000027,
+          "tokens": 2418
+        },
+        {
+          "audioSourceId": "juliuscaesar_05_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1438.8928,
+          "measureStart": 230.22284800000003,
+          "measureDuration": 1036.002816,
+          "observedSeconds": 1045.14,
+          "missingSeconds": 122.40000000000003,
+          "tokens": 2150
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-暴风雨",
+      "epub": "The Tempest.epub",
+      "verdict": "SAMPLE_BORDERLINE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.8657787974775321,
+        "intervalLow": 0.09926979328550435,
+        "intervalHigh": 0.19405844578213502,
+        "blocks": 6,
+        "observedSeconds": 6206.619999999999,
+        "missingSeconds": 833.0599999999997
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.13422120252246797,
+      "perBlock": [
+        {
+          "audioSourceId": "tempest_1_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 377.04947200000004,
+          "measureDuration": 1422.9505279999998,
+          "observedSeconds": 1427.0599999999997,
+          "missingSeconds": 149.9799999999999,
+          "tokens": 3021
+        },
+        {
+          "audioSourceId": "tempest_1_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 556.5592000000001,
+          "measureStart": 1800.0,
+          "measureDuration": 273.77209600000015,
+          "observedSeconds": 278.48,
+          "missingSeconds": 88.53999999999996,
+          "tokens": 463
+        },
+        {
+          "audioSourceId": "tempest_2_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 325.709584,
+          "measureDuration": 1465.6931280000001,
+          "observedSeconds": 1457.4399999999996,
+          "missingSeconds": 174.98000000000042,
+          "tokens": 2964
+        },
+        {
+          "audioSourceId": "tempest_3_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1548.8535,
+          "measureStart": 247.81656,
+          "measureDuration": 1115.17452,
+          "observedSeconds": 1130.4199999999996,
+          "missingSeconds": 152.19999999999993,
+          "tokens": 2257
+        },
+        {
+          "audioSourceId": "tempest_4_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1151.8034,
+          "measureStart": 184.288544,
+          "measureDuration": 829.298448,
+          "observedSeconds": 844.6999999999998,
+          "missingSeconds": 197.19999999999976,
+          "tokens": 1563
+        },
+        {
+          "audioSourceId": "tempest_5_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1503.089,
+          "measureStart": 240.49424,
+          "measureDuration": 1082.22408,
+          "observedSeconds": 1068.52,
+          "missingSeconds": 70.1599999999998,
+          "tokens": 2108
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-第十二夜",
+      "epub": "Twelfth night or What you will.epub",
+      "verdict": "SAMPLE_BORDERLINE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.8188757703462872,
+        "intervalLow": 0.10969627011038169,
+        "intervalHigh": 0.24674526699292307,
+        "blocks": 6,
+        "observedSeconds": 5357.979999999998,
+        "missingSeconds": 970.4599999999999
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.18112422965371286,
+      "perBlock": [
+        {
+          "audioSourceId": "twelfthnight3_01_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 909.3674000000001,
+          "measureStart": 1800.0,
+          "measureDuration": 584.2433120000001,
+          "observedSeconds": 602.44,
+          "missingSeconds": 57.0,
+          "tokens": 1163
+        },
+        {
+          "audioSourceId": "twelfthnight3_02_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 444.651904,
+          "measureDuration": 1355.348096,
+          "observedSeconds": 1331.5799999999995,
+          "missingSeconds": 356.57999999999987,
+          "tokens": 2406
+        },
+        {
+          "audioSourceId": "twelfthnight3_02_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 979.0744,
+          "measureStart": 1800.0,
+          "measureDuration": 645.5854719999998,
+          "observedSeconds": 639.3999999999994,
+          "missingSeconds": 84.77999999999975,
+          "tokens": 1047
+        },
+        {
+          "audioSourceId": "twelfthnight3_03_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 1010.4042,
+          "measureStart": 1800.0,
+          "measureDuration": 673.1556959999998,
+          "observedSeconds": 680.4200000000001,
+          "missingSeconds": 47.080000000000155,
+          "tokens": 1371
+        },
+        {
+          "audioSourceId": "twelfthnight3_04_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1092.2057,
+          "measureStart": 174.752912,
+          "measureDuration": 786.388104,
+          "observedSeconds": 795.7599999999995,
+          "missingSeconds": 241.32000000000002,
+          "tokens": 1291
+        },
+        {
+          "audioSourceId": "twelfthnight3_05_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 291.735504,
+          "measureDuration": 1312.809768,
+          "observedSeconds": 1308.3799999999994,
+          "missingSeconds": 183.70000000000016,
+          "tokens": 2461
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-罗密欧与朱丽叶",
+      "epub": "Romeo and Juliet (William Shakespeare) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MODERATE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9573455909155499,
+        "intervalLow": 0.026192609996245692,
+        "intervalHigh": 0.061540178927392504,
+        "blocks": 6,
+        "observedSeconds": 6474.359999999999,
+        "missingSeconds": 276.1600000000002
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.04265440908445008,
+      "perBlock": [
+        {
+          "audioSourceId": "romeoandjuliet_1_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 755.5079999999998,
+          "measureStart": 1800.0,
+          "measureDuration": 448.84703999999965,
+          "observedSeconds": 457.03999999999996,
+          "missingSeconds": 16.920000000000073,
+          "tokens": 1190
+        },
+        {
+          "audioSourceId": "romeoandjuliet_2_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 360.47742400000004,
+          "measureDuration": 1439.5225759999998,
+          "observedSeconds": 1439.7799999999995,
+          "missingSeconds": 46.360000000000014,
+          "tokens": 3570
+        },
+        {
+          "audioSourceId": "romeoandjuliet_3_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 469.493728,
+          "measureDuration": 1330.506272,
+          "observedSeconds": 1326.4199999999992,
+          "missingSeconds": 55.2199999999998,
+          "tokens": 2802
+        },
+        {
+          "audioSourceId": "romeoandjuliet_3_shakespeare_64kb.mp3",
+          "start": 1800.0,
+          "duration": 1134.3357999999998,
+          "measureStart": 1800.0,
+          "measureDuration": 782.2155039999998,
+          "observedSeconds": 799.9000000000001,
+          "missingSeconds": 8.360000000000127,
+          "tokens": 1842
+        },
+        {
+          "audioSourceId": "romeoandjuliet_4_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1622.4403,
+          "measureStart": 259.590448,
+          "measureDuration": 1168.157016,
+          "observedSeconds": 1181.86,
+          "missingSeconds": 99.14000000000021,
+          "tokens": 2465
+        },
+        {
+          "audioSourceId": "romeoandjuliet_5_shakespeare_64kb.mp3",
+          "start": 0.0,
+          "duration": 1751.7986,
+          "measureStart": 280.287776,
+          "measureDuration": 1261.294992,
+          "observedSeconds": 1269.36,
+          "missingSeconds": 50.15999999999997,
+          "tokens": 2562
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚-麦克白",
+      "epub": "The Tragedy of Macbeth (William Shakespeare) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MODERATE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.9331360706353936,
+        "intervalLow": 0.056263034433764826,
+        "intervalHigh": 0.0782638290476983,
+        "blocks": 5,
+        "observedSeconds": 5907.5199999999995,
+        "missingSeconds": 394.99999999999966
+      },
+      "sampleBlocks": 5,
+      "sampleUnmappedRatio": 0.06686392936460642,
+      "perBlock": [
+        {
+          "audioSourceId": "tragedyofmacbeth_shakespeare_1_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 309.281616,
+          "measureDuration": 1391.767272,
+          "observedSeconds": 1405.04,
+          "missingSeconds": 106.3599999999999,
+          "tokens": 3152
+        },
+        {
+          "audioSourceId": "tragedyofmacbeth_shakespeare_2_64kb.mp3",
+          "start": 0.0,
+          "duration": 1343.0084,
+          "measureStart": 214.88134399999998,
+          "measureDuration": 966.9660479999999,
+          "observedSeconds": 977.8400000000001,
+          "missingSeconds": 50.92000000000007,
+          "tokens": 2059
+        },
+        {
+          "audioSourceId": "tragedyofmacbeth_shakespeare_3_64kb.mp3",
+          "start": 0.0,
+          "duration": 1730.0125,
+          "measureStart": 276.802,
+          "measureDuration": 1245.609,
+          "observedSeconds": 1253.5399999999997,
+          "missingSeconds": 72.07999999999993,
+          "tokens": 2813
+        },
+        {
+          "audioSourceId": "tragedyofmacbeth_shakespeare_4_64kb.mp3",
+          "start": 0.0,
+          "duration": 1679.0215,
+          "measureStart": 268.64344,
+          "measureDuration": 1208.89548,
+          "observedSeconds": 1224.0999999999997,
+          "missingSeconds": 73.95999999999981,
+          "tokens": 2917
+        },
+        {
+          "audioSourceId": "tragedyofmacbeth_shakespeare_5_64kb.mp3",
+          "start": 0.0,
+          "duration": 1422.0027,
+          "measureStart": 227.520432,
+          "measureDuration": 1023.841944,
+          "observedSeconds": 1047.0,
+          "missingSeconds": 91.67999999999992,
+          "tokens": 2303
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚十四行诗",
+      "epub": "Shakespeare's Sonnets (AmazonClassics Edition) -- Shakespeare, William -- AmazonClassics Edition, 2018 -- Amazon Classics -- isbn13 9781503955189 -- 844fe395eef934ff3a312ad889a4f135 -- Anna’s Archive.epub",
+      "verdict": "SAMPLE_BORDERLINE",
+      "runsFullBook": true,
+      "detail": {
+        "reason": "TOO_FEW_SAMPLE_BLOCKS",
+        "blocks": 1
+      },
+      "sampleBlocks": 1,
+      "sampleUnmappedRatio": 0.5052066898075104,
+      "perBlock": [
+        {
+          "audioSourceId": "001 十四行诗第一首.mp3",
+          "start": 0.0,
+          "duration": 167.9673,
+          "measureStart": 26.874768,
+          "measureDuration": 120.93645599999998,
+          "observedSeconds": 126.75999999999999,
+          "missingSeconds": 64.04,
+          "tokens": 194
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/达洛维夫人",
+      "epub": "Mrs. Dalloway (Virginia Woolf) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 1155.1,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "Mrs. Dalloway DISC 1 - 11.mp3",
+          "start": 0.0,
+          "duration": 259.3698,
+          "measureStart": 41.499168,
+          "measureDuration": 186.74625600000002,
+          "observedSeconds": 210.81999999999996,
+          "missingSeconds": 0.0,
+          "tokens": 514
+        },
+        {
+          "audioSourceId": "Mrs. Dalloway DISC 2 - 15.mp3",
+          "start": 0.0,
+          "duration": 300.5388,
+          "measureStart": 48.086208,
+          "measureDuration": 216.38793599999997,
+          "observedSeconds": 235.0,
+          "missingSeconds": 0.0,
+          "tokens": 533
+        },
+        {
+          "audioSourceId": "Mrs. Dalloway DISC 3 - 17.mp3",
+          "start": 0.0,
+          "duration": 170.1878,
+          "measureStart": 27.230048000000004,
+          "measureDuration": 122.53521599999999,
+          "observedSeconds": 128.32000000000002,
+          "missingSeconds": 0.0,
+          "tokens": 308
+        },
+        {
+          "audioSourceId": "Mrs. Dalloway DISC 5 - 2.mp3",
+          "start": 0.0,
+          "duration": 326.1127,
+          "measureStart": 52.178032,
+          "measureDuration": 234.801144,
+          "observedSeconds": 248.35999999999999,
+          "missingSeconds": 0.0,
+          "tokens": 583
+        },
+        {
+          "audioSourceId": "Mrs. Dalloway DISC 6 - 5.mp3",
+          "start": 0.0,
+          "duration": 167.0792,
+          "measureStart": 26.732671999999997,
+          "measureDuration": 120.29702400000001,
+          "observedSeconds": 145.94,
+          "missingSeconds": 0.0,
+          "tokens": 349
+        },
+        {
+          "audioSourceId": "Mrs. Dalloway DISC 7 - 9.mp3",
+          "start": 0.0,
+          "duration": 213.2376,
+          "measureStart": 34.118016,
+          "measureDuration": 153.531072,
+          "observedSeconds": 186.65999999999997,
+          "missingSeconds": 0.0,
+          "tokens": 458
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/飘",
+      "epub": "Gone with the Wind (Margaret Mitchell) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_BORDERLINE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.7553903726429787,
+        "intervalLow": 0.13898246365778827,
+        "intervalHigh": 0.36985338964076975,
+        "blocks": 6,
+        "observedSeconds": 4687.0599999999995,
+        "missingSeconds": 1146.5000000000002
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.24460962735702133,
+      "perBlock": [
+        {
+          "audioSourceId": "017.第一部第五章01.mp3",
+          "start": 0.0,
+          "duration": 1317.4306,
+          "measureStart": 210.788896,
+          "measureDuration": 948.5500319999999,
+          "observedSeconds": 943.7399999999999,
+          "missingSeconds": 411.01999999999975,
+          "tokens": 2192
+        },
+        {
+          "audioSourceId": "037.第二部第十三章01.mp3",
+          "start": 0.0,
+          "duration": 1214.1714,
+          "measureStart": 194.267424,
+          "measureDuration": 874.203408,
+          "observedSeconds": 893.0,
+          "missingSeconds": 55.63999999999993,
+          "tokens": 2155
+        },
+        {
+          "audioSourceId": "051.第三部第二十四章01.mp3",
+          "start": 1800.0,
+          "duration": 540.9893999999999,
+          "measureStart": 1800.0,
+          "measureDuration": 260.07067199999983,
+          "observedSeconds": 264.2600000000002,
+          "missingSeconds": 35.179999999999836,
+          "tokens": 613
+        },
+        {
+          "audioSourceId": "068.第四部第三十四章.mp3",
+          "start": 1800.0,
+          "duration": 1342.3564999999999,
+          "measureStart": 1800.0,
+          "measureDuration": 965.2737200000001,
+          "observedSeconds": 972.7399999999998,
+          "missingSeconds": 224.58000000000015,
+          "tokens": 2727
+        },
+        {
+          "audioSourceId": "080.第四部第四十二章.mp3",
+          "start": 1800.0,
+          "duration": 814.3346999999999,
+          "measureStart": 1800.0,
+          "measureDuration": 500.61453600000004,
+          "observedSeconds": 513.1199999999999,
+          "missingSeconds": 216.52000000000044,
+          "tokens": 1416
+        },
+        {
+          "audioSourceId": "093.第五部第五十五章.mp3",
+          "start": 0.0,
+          "duration": 1501.0307,
+          "measureStart": 240.16491200000002,
+          "measureDuration": 1080.7421040000002,
+          "observedSeconds": 1100.1999999999996,
+          "missingSeconds": 203.56000000000012,
+          "tokens": 2927
+        }
+      ]
+    },
+    {
+      "unit_id": "心智成长/心流",
+      "epub": "Flow The Psychology of Optimal Experience (Mihaly Csikszentmihalyi).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.0,
+        "intervalLow": 1.0,
+        "intervalHigh": 1.0,
+        "blocks": 6,
+        "observedSeconds": 1192.66,
+        "missingSeconds": 1192.66
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 1.0,
+      "perBlock": [
+        {
+          "audioSourceId": "Mihaly Csikzsentmihalyi - Flow Disc 1/03 Track 3.mp3",
+          "start": 0.0,
+          "duration": 202.6436,
+          "measureStart": 32.422976,
+          "measureDuration": 145.903392,
+          "observedSeconds": 170.76,
+          "missingSeconds": 170.76,
+          "tokens": 403
+        },
+        {
+          "audioSourceId": "Mihaly Csikzsentmihalyi - Flow Disc 2/05 Track 5.mp3",
+          "start": 0.0,
+          "duration": 251.4245,
+          "measureStart": 40.22792,
+          "measureDuration": 181.02564,
+          "observedSeconds": 201.7,
+          "missingSeconds": 201.7,
+          "tokens": 464
+        },
+        {
+          "audioSourceId": "Mihaly Csikzsentmihalyi - Flow Disc 2/08 Track 8.mp3",
+          "start": 0.0,
+          "duration": 187.2185,
+          "measureStart": 29.95496,
+          "measureDuration": 134.79732,
+          "observedSeconds": 151.38,
+          "missingSeconds": 151.38,
+          "tokens": 384
+        },
+        {
+          "audioSourceId": "Mihaly Csikzsentmihalyi - Flow Disc 2/12 Track 12.mp3",
+          "start": 0.0,
+          "duration": 233.285,
+          "measureStart": 37.3256,
+          "measureDuration": 167.96519999999998,
+          "observedSeconds": 185.22,
+          "missingSeconds": 185.22,
+          "tokens": 426
+        },
+        {
+          "audioSourceId": "Mihaly Csikzsentmihalyi - Flow Disc 2/15 Track 15.mp3",
+          "start": 0.0,
+          "duration": 362.9498,
+          "measureStart": 58.071968,
+          "measureDuration": 261.323856,
+          "observedSeconds": 268.6,
+          "missingSeconds": 268.6,
+          "tokens": 595
+        },
+        {
+          "audioSourceId": "Mihaly Csikzsentmihalyi - Flow Disc 2/18 Track 18.mp3",
+          "start": 0.0,
+          "duration": 264.1352,
+          "measureStart": 42.261632,
+          "measureDuration": 190.177344,
+          "observedSeconds": 215.0,
+          "missingSeconds": 215.0,
+          "tokens": 506
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/傲慢与偏见",
+      "epub": "Pride  Prejudice (Jane Austen) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 3597.7999999999997,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "Chapter 08.mp3",
+          "start": 0.0,
+          "duration": 787.7536,
+          "measureStart": 126.040576,
+          "measureDuration": 567.182592,
+          "observedSeconds": 579.88,
+          "missingSeconds": 0.0,
+          "tokens": 1419
+        },
+        {
+          "audioSourceId": "Chapter 19.mp3",
+          "start": 0.0,
+          "duration": 767.3693,
+          "measureStart": 122.779088,
+          "measureDuration": 552.505896,
+          "observedSeconds": 558.5600000000001,
+          "missingSeconds": 0.0,
+          "tokens": 1427
+        },
+        {
+          "audioSourceId": "Chapter 29.mp3",
+          "start": 0.0,
+          "duration": 943.8958,
+          "measureStart": 151.023328,
+          "measureDuration": 679.6049760000001,
+          "observedSeconds": 680.2199999999999,
+          "missingSeconds": 0.0,
+          "tokens": 1695
+        },
+        {
+          "audioSourceId": "Chapter 41.mp3",
+          "start": 0.0,
+          "duration": 901.4571,
+          "measureStart": 144.233136,
+          "measureDuration": 649.0491119999999,
+          "observedSeconds": 657.7199999999999,
+          "missingSeconds": 0.0,
+          "tokens": 1652
+        },
+        {
+          "audioSourceId": "Chapter 48.mp3",
+          "start": 0.0,
+          "duration": 860.7868,
+          "measureStart": 137.725888,
+          "measureDuration": 619.766496,
+          "observedSeconds": 646.7199999999999,
+          "missingSeconds": 0.0,
+          "tokens": 1690
+        },
+        {
+          "audioSourceId": "Chapter 57.mp3",
+          "start": 0.0,
+          "duration": 643.9523,
+          "measureStart": 103.032368,
+          "measureDuration": 463.64565600000003,
+          "observedSeconds": 474.69999999999993,
+          "missingSeconds": 0.0,
+          "tokens": 1226
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/复活",
+      "epub": "Resurrection (Leo Tolstoy) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_BORDERLINE",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 0.401123825689953,
+        "intervalLow": 0.5321343523287367,
+        "intervalHigh": 0.6735565723478035,
+        "blocks": 6,
+        "observedSeconds": 2733.52,
+        "missingSeconds": 1637.0399999999997
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.5988761743100471,
+      "perBlock": [
+        {
+          "audioSourceId": "Book 1, Chapter 12 Twelve Years Before - Resurrection, by Leo Tolstoy.mp3",
+          "start": 0.0,
+          "duration": 728.1252,
+          "measureStart": 116.50003199999999,
+          "measureDuration": 524.250144,
+          "observedSeconds": 536.74,
+          "missingSeconds": 315.2599999999999,
+          "tokens": 1362
+        },
+        {
+          "audioSourceId": "Book 1, Chapter 33 - The Leaven at Work - Nekhludoff-s Domestic Change.mp3",
+          "start": 0.0,
+          "duration": 569.4864,
+          "measureStart": 91.117824,
+          "measureDuration": 410.030208,
+          "observedSeconds": 420.75999999999993,
+          "missingSeconds": 188.20000000000005,
+          "tokens": 1078
+        },
+        {
+          "audioSourceId": "Book 1, Chapter 58 The Vice-Governor-s Suspicious - Resurrection, by Leo Tolstoy.mp3",
+          "start": 0.0,
+          "duration": 427.5661,
+          "measureStart": 68.410576,
+          "measureDuration": 307.847592,
+          "observedSeconds": 318.46,
+          "missingSeconds": 250.76000000000002,
+          "tokens": 822
+        },
+        {
+          "audioSourceId": "Book 2, Chapter 18 Officialdom - Resurrection, by Leo Tolstoy.mp3",
+          "start": 0.0,
+          "duration": 490.9101,
+          "measureStart": 78.545616,
+          "measureDuration": 353.45527200000004,
+          "observedSeconds": 363.62,
+          "missingSeconds": 225.06000000000003,
+          "tokens": 932
+        },
+        {
+          "audioSourceId": "Book 2, Chapter 37 Spilled Like Water on the Ground - Resurrection.mp3",
+          "start": 0.0,
+          "duration": 643.7772,
+          "measureStart": 103.004352,
+          "measureDuration": 463.51958400000007,
+          "observedSeconds": 487.06,
+          "missingSeconds": 265.24,
+          "tokens": 1389
+        },
+        {
+          "audioSourceId": "Book 3, Chapter 19 Why is it Done？ - Resurrection, by Leo Tolstoy.mp3",
+          "start": 0.0,
+          "duration": 818.7759,
+          "measureStart": 131.004144,
+          "measureDuration": 589.518648,
+          "observedSeconds": 606.8799999999999,
+          "missingSeconds": 392.51999999999975,
+          "tokens": 1380
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/莎士比亚故事集",
+      "epub": "Tales from Shakespeare.epub",
+      "verdict": "SAMPLE_PASS",
+      "runsFullBook": true,
+      "detail": {
+        "locatedRatio": 1.0,
+        "intervalLow": 0.0,
+        "intervalHigh": 0.0,
+        "blocks": 6,
+        "observedSeconds": 7067.939999999999,
+        "missingSeconds": 0.0
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.0,
+      "perBlock": [
+        {
+          "audioSourceId": "tales_from_shakespeare_03_lamb_64kb.mp3",
+          "start": 0.0,
+          "duration": 1271.3792,
+          "measureStart": 203.42067200000002,
+          "measureDuration": 915.3930240000002,
+          "observedSeconds": 933.5999999999999,
+          "missingSeconds": 0.0,
+          "tokens": 3038
+        },
+        {
+          "audioSourceId": "tales_from_shakespeare_06_lamb_64kb.mp3",
+          "start": 0.0,
+          "duration": 1375.7645,
+          "measureStart": 220.12232,
+          "measureDuration": 990.55044,
+          "observedSeconds": 1001.3399999999999,
+          "missingSeconds": 0.0,
+          "tokens": 3552
+        },
+        {
+          "audioSourceId": "tales_from_shakespeare_10_lamb_64kb.mp3",
+          "start": 0.0,
+          "duration": 1231.2813,
+          "measureStart": 197.00500800000003,
+          "measureDuration": 886.522536,
+          "observedSeconds": 913.78,
+          "missingSeconds": 0.0,
+          "tokens": 3160
+        },
+        {
+          "audioSourceId": "tales_from_shakespeare_14_lamb_64kb.mp3",
+          "start": 0.0,
+          "duration": 1761.3841,
+          "measureStart": 281.821456,
+          "measureDuration": 1268.1965519999999,
+          "observedSeconds": 1296.8799999999997,
+          "missingSeconds": 0.0,
+          "tokens": 4271
+        },
+        {
+          "audioSourceId": "tales_from_shakespeare_17_lamb_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 317.222608,
+          "measureDuration": 1427.501736,
+          "observedSeconds": 1455.04,
+          "missingSeconds": 0.0,
+          "tokens": 5005
+        },
+        {
+          "audioSourceId": "tales_from_shakespeare_20_lamb_64kb.mp3",
+          "start": 0.0,
+          "duration": 1800.0,
+          "measureStart": 319.667664,
+          "measureDuration": 1438.504488,
+          "observedSeconds": 1467.2999999999995,
+          "missingSeconds": 0.0,
+          "tokens": 4752
+        }
+      ]
+    }
+  ]
+}

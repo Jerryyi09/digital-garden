@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON="$REPO_ROOT/tools/readalong/.venv/bin/python"
+export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
+
+echo "=================================================="
+echo "Starting read-only audit of NUC audiobooks library"
+echo "=================================================="
+
+"$PYTHON" - "$REPO_ROOT" "$@" <<'PY'
+import runpy
+import subprocess
+import sys
+from pathlib import Path
+
+repo = Path(sys.argv[1])
+args = sys.argv[2:]
+from tools.readalong.nuc_target import NUC_SCP, NUC_TARGET, nuc_publication_lock
+
+lock = nuc_publication_lock()
+lock.__enter__()
+subprocess.run(NUC_SCP + [str(repo / "tools/readalong/nuc_verifier.py"), f"{NUC_TARGET}:/tmp/nuc_verifier.py"], check=True)
+sys.argv = ["tools.readalong.nuc_audit_runner", *args]
+runpy.run_module("tools.readalong.nuc_audit_runner", run_name="__main__")
+PY

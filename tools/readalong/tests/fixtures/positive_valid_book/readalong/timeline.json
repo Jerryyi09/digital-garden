@@ -1,0 +1,20 @@
+[
+  {
+    "audioSourceId": "track_01.mp3",
+    "start": 2.0,
+    "end": 8.0,
+    "document": "text/chapter1.html",
+    "fragment": "c01-segment01",
+    "text": "First sentence in text.",
+    "timingStatus": "VERIFIED"
+  },
+  {
+    "audioSourceId": "track_01.mp3",
+    "start": 8.5,
+    "end": 15.0,
+    "document": "text/chapter1.html",
+    "fragment": "c01-segment02",
+    "text": "Second sentence in text.",
+    "timingStatus": "VERIFIED"
+  }
+]

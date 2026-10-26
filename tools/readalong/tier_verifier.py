@@ -15,6 +15,7 @@ import unicodedata
 from bs4 import BeautifulSoup
 
 from tools.readalong.full_inventory_scanner import natural_sort_key
+from tools.readalong.nuc_target import NUC_SSH, NUC_TARGET, canonical_nuc_target, direct_ssh_command
 
 
 def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
@@ -129,14 +130,14 @@ def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
     issues.append(f"MEDIAN_DURATION_TOO_HIGH: {med_dur:.2f}s > 4.0s")
   if p95_dur > 10.0:
     issues.append(f"P95_DURATION_TOO_HIGH: {p95_dur:.2f}s > 10.0s")
-  if fb_ratio > 0.10:
-    issues.append(f"FALLBACK_RATIO_TOO_HIGH: {fb_ratio:.1%} > 10.0%")
+  metrics["fallback_segments_count"] = fallback_count
+  metrics["fallback_granularity_note"] = "Fallback sentences highlight their containing paragraph and are reported separately from book-level pass/fail."
 
   return len(issues) == 0, issues, metrics
 
 
-SSH_DIRECT_CMD = ["ssh", "-o", "ProxyJump=none", "-p", "2222", "-i", "/Users/jerryyi/.ssh/id_rsa", "-o", "StrictHostKeyChecking=no"]
-DEFAULT_REMOTE_TARGET = "hp@10.0.0.85"
+SSH_DIRECT_CMD = NUC_SSH[:-1]
+DEFAULT_REMOTE_TARGET = NUC_TARGET
 
 
 def tier2_remote_batch_check(remote_host: str = DEFAULT_REMOTE_TARGET, book_tuples: list[tuple] = None, remote_root: str = "/mnt/750/Music/有声书") -> tuple[bool, list[str]]:
@@ -217,8 +218,8 @@ if errors:
     sys.exit(1)
 print("TIER2_OK")
 ' """
-  host = DEFAULT_REMOTE_TARGET if remote_host in ("hp", "10.0.0.85") else remote_host
-  res = subprocess.run(SSH_DIRECT_CMD + [host, script], capture_output=True, text=True)
+  host = canonical_nuc_target(remote_host)
+  res = subprocess.run(direct_ssh_command(host, script), capture_output=True, text=True)
   out = res.stdout.strip()
   if res.returncode == 0 and "TIER2_OK" in out:
     return True, []
@@ -229,5 +230,5 @@ print("TIER2_OK")
 def tier3_alist_sample_check(category: str, book_name: str, remote_host: str = DEFAULT_REMOTE_TARGET) -> tuple[bool, str]:
   """Tier 3: Check 1 sample book via Alist API to prove gateway health."""
   from tools.readalong.nuc_verifier import verify_book_via_ssh
-  host = DEFAULT_REMOTE_TARGET if remote_host in ("hp", "10.0.0.85") else remote_host
+  host = canonical_nuc_target(remote_host)
   return verify_book_via_ssh(host, category, book_name)

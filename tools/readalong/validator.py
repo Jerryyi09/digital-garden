@@ -2,6 +2,7 @@
 
 from collections import Counter
 import hashlib
+import math
 import json
 from pathlib import Path
 import posixpath
@@ -101,7 +102,7 @@ def validate_overlay_epub(
                 if not fragment:
                     issues.append({"smil": smil, "issue": "missing_text_fragment_id", "src": text_src})
                     continue
-                if clip_end <= clip_begin or clip_begin < 0:
+                if not math.isfinite(clip_begin) or not math.isfinite(clip_end) or clip_end <= clip_begin or clip_begin < 0:
                     issues.append({
                         "smil": smil,
                         "issue": "invalid_clip_interval",
@@ -176,15 +177,13 @@ def validate_overlay_epub(
                 if actual_hash != expected_hash:
                     source_hashes_match = False
                     issues.append({"issue": "source_file_hash_mismatch", "file": path_str})
+            else:
+                source_hashes_match = False
+                issues.append({"issue": "source_file_missing", "file": path_str})
 
+    # Every structural issue blocks; only an explicit coverage diagnostic is non-structural.
     structural_pass = bool(segments) and not any(
-        i["issue"] in (
-            "file_not_found", "no_smil_overlays_found", "malformed_smil_xml",
-            "missing_text_or_audio_in_par", "text_document_not_in_epub",
-            "missing_fragment_in_document", "invalid_clip_interval",
-            "audio_order_reversal", "time_order_reversal", "overlapping_clips"
-        )
-        for i in issues
+        i["issue"] != "interior_coverage_gap" for i in issues
     ) and source_hashes_match
 
     return {

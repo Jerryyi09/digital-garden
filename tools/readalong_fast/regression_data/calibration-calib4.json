@@ -1,0 +1,345 @@
+{
+  "codeSha256": null,
+  "records": [
+    {
+      "unit_id": "文学作品/彼得潘 Peter Pan",
+      "epub": "Peter Pan (J. M. Barrie) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.07241134934069682,
+        "intervalLow": 0.847879375004587,
+        "intervalHigh": 0.9849508676413249,
+        "blocks": 6,
+        "observedSeconds": 1361.665,
+        "missingSeconds": 1263.065,
+        "maxBlockLocatedRatio": 0.2578494767015531,
+        "locatedUpper": 0.152120624995413
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.9275886506593032,
+      "perBlock": [
+        {
+          "audioSourceId": "04_Changes in the Nursery.mp3",
+          "start": 0.0,
+          "duration": 269.7404,
+          "measureStart": 43.158464,
+          "measureDuration": 194.213088,
+          "observedSeconds": 196.665,
+          "missingSeconds": 196.665,
+          "tokens": 472
+        },
+        {
+          "audioSourceId": "10_Captain Hook-s Story.mp3",
+          "start": 0.0,
+          "duration": 319.5298,
+          "measureStart": 51.124768,
+          "measureDuration": 230.06145600000002,
+          "observedSeconds": 236.14500000000007,
+          "missingSeconds": 216.60000000000008,
+          "tokens": 618
+        },
+        {
+          "audioSourceId": "15_Adventure at the Lagoon.mp3",
+          "start": 0.0,
+          "duration": 307.8008,
+          "measureStart": 49.248128,
+          "measureDuration": 221.61657599999995,
+          "observedSeconds": 248.625,
+          "missingSeconds": 248.625,
+          "tokens": 582
+        },
+        {
+          "audioSourceId": "21_Saying Good-bye.mp3",
+          "start": 0.0,
+          "duration": 299.8073,
+          "measureStart": 47.969168,
+          "measureDuration": 215.861256,
+          "observedSeconds": 229.525,
+          "missingSeconds": 215.325,
+          "tokens": 524
+        },
+        {
+          "audioSourceId": "26_Walking the Plank.mp3",
+          "start": 0.0,
+          "duration": 297.2996,
+          "measureStart": 47.567936,
+          "measureDuration": 214.055712,
+          "observedSeconds": 225.68999999999997,
+          "missingSeconds": 218.855,
+          "tokens": 515
+        },
+        {
+          "audioSourceId": "32_The Offer.mp3",
+          "start": 0.0,
+          "duration": 297.822,
+          "measureStart": 47.65152,
+          "measureDuration": 214.43184000000002,
+          "observedSeconds": 225.015,
+          "missingSeconds": 166.995,
+          "tokens": 523
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/德伯家的苔丝",
+      "epub": "Tess of the DUrbervilles (Thomas Hardy) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.016439110000594837,
+        "intervalLow": 0.9631511166888149,
+        "intervalHigh": 1.0,
+        "blocks": 6,
+        "observedSeconds": 3361.8,
+        "missingSeconds": 3306.5350000000003,
+        "maxBlockLocatedRatio": 0.05941409437677314,
+        "locatedUpper": 0.03684888331118508
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.9835608899994053,
+      "perBlock": [
+        {
+          "audioSourceId": "03.mp3",
+          "start": 0.0,
+          "duration": 801.3844,
+          "measureStart": 128.221504,
+          "measureDuration": 576.9967680000001,
+          "observedSeconds": 572.6600000000002,
+          "missingSeconds": 572.6600000000002,
+          "tokens": 1164
+        },
+        {
+          "audioSourceId": "05.mp3",
+          "start": 0.0,
+          "duration": 793.3649,
+          "measureStart": 126.93838400000001,
+          "measureDuration": 571.222728,
+          "observedSeconds": 581.395,
+          "missingSeconds": 581.395,
+          "tokens": 1229
+        },
+        {
+          "audioSourceId": "08.mp3",
+          "start": 0.0,
+          "duration": 682.7624,
+          "measureStart": 109.241984,
+          "measureDuration": 491.588928,
+          "observedSeconds": 504.55,
+          "missingSeconds": 488.96500000000003,
+          "tokens": 1109
+        },
+        {
+          "audioSourceId": "12.mp3",
+          "start": 0.0,
+          "duration": 906.2139,
+          "measureStart": 144.994224,
+          "measureDuration": 652.4740079999999,
+          "observedSeconds": 667.8549999999998,
+          "missingSeconds": 628.175,
+          "tokens": 1426
+        },
+        {
+          "audioSourceId": "14.mp3",
+          "start": 0.0,
+          "duration": 805.8514,
+          "measureStart": 128.936224,
+          "measureDuration": 580.213008,
+          "observedSeconds": 599.36,
+          "missingSeconds": 599.36,
+          "tokens": 1307
+        },
+        {
+          "audioSourceId": "17.mp3",
+          "start": 0.0,
+          "duration": 565.551,
+          "measureStart": 90.48816000000001,
+          "measureDuration": 407.19672,
+          "observedSeconds": 435.98,
+          "missingSeconds": 435.98,
+          "tokens": 958
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/红字",
+      "epub": "The Scarlet Letter (Nathaniel Hawthorne) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.04098956401970644,
+        "intervalLow": 0.9283167637155585,
+        "intervalHigh": 0.9803208539230749,
+        "blocks": 6,
+        "observedSeconds": 2359.625,
+        "missingSeconds": 2262.905,
+        "maxBlockLocatedRatio": 0.1256624638873476,
+        "locatedUpper": 0.07168323628444151
+      },
+      "sampleBlocks": 6,
+      "sampleUnmappedRatio": 0.9590104359802936,
+      "perBlock": [
+        {
+          "audioSourceId": "hz03.mp3",
+          "start": 0.0,
+          "duration": 582.3739,
+          "measureStart": 93.17982400000001,
+          "measureDuration": 419.30920800000007,
+          "observedSeconds": 414.675,
+          "missingSeconds": 414.675,
+          "tokens": 898
+        },
+        {
+          "audioSourceId": "hz06.mp3",
+          "start": 0.0,
+          "duration": 638.5633,
+          "measureStart": 102.170128,
+          "measureDuration": 459.765576,
+          "observedSeconds": 467.90500000000003,
+          "missingSeconds": 454.745,
+          "tokens": 1113
+        },
+        {
+          "audioSourceId": "hz10.mp3",
+          "start": 0.0,
+          "duration": 685.4008,
+          "measureStart": 109.664128,
+          "measureDuration": 493.48857599999997,
+          "observedSeconds": 506.95000000000005,
+          "missingSeconds": 486.95000000000005,
+          "tokens": 1036
+        },
+        {
+          "audioSourceId": "hz14.mp3",
+          "start": 0.0,
+          "duration": 415.1379,
+          "measureStart": 66.422064,
+          "measureDuration": 298.89928799999996,
+          "observedSeconds": 309.68499999999995,
+          "missingSeconds": 293.0849999999999,
+          "tokens": 642
+        },
+        {
+          "audioSourceId": "hz18.mp3",
+          "start": 0.0,
+          "duration": 362.24,
+          "measureStart": 57.958400000000005,
+          "measureDuration": 260.81280000000004,
+          "observedSeconds": 261.33500000000004,
+          "missingSeconds": 228.49500000000006,
+          "tokens": 635
+        },
+        {
+          "audioSourceId": "hz23.mp3",
+          "start": 0.0,
+          "duration": 554.3705,
+          "measureStart": 88.69928,
+          "measureDuration": 399.14676000000003,
+          "observedSeconds": 399.075,
+          "missingSeconds": 384.955,
+          "tokens": 865
+        }
+      ]
+    },
+    {
+      "unit_id": "文学作品/远大前程",
+      "epub": "Great Expectations (Charles Dickens) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "verdict": "SAMPLE_MISMATCH",
+      "runsFullBook": false,
+      "detail": {
+        "locatedRatio": 0.03745374038425053,
+        "intervalLow": 0.8861864571474494,
+        "intervalHigh": 1.0,
+        "blocks": 8,
+        "observedSeconds": 525.4481875,
+        "missingSeconds": 505.7681875,
+        "maxBlockLocatedRatio": 0.24474567839820904,
+        "locatedUpper": 0.11381354285255063
+      },
+      "sampleBlocks": 8,
+      "sampleUnmappedRatio": 0.9625462596157495,
+      "perBlock": [
+        {
+          "audioSourceId": "011. 第2章 抓住一名罪犯(3).mp3",
+          "start": 0.0,
+          "duration": 91.2979,
+          "measureStart": 0.0,
+          "measureDuration": 91.2979,
+          "observedSeconds": 90.65,
+          "missingSeconds": 90.65,
+          "tokens": 190
+        },
+        {
+          "audioSourceId": "031.04 A present from a stranger(3).mp3",
+          "start": 0.0,
+          "duration": 65.0187,
+          "measureStart": 0.0,
+          "measureDuration": 65.0187,
+          "observedSeconds": 63.89,
+          "missingSeconds": 63.89,
+          "tokens": 170
+        },
+        {
+          "audioSourceId": "062.06 Great expectations(5).mp3",
+          "start": 0.0,
+          "duration": 55.2489,
+          "measureStart": 0.0,
+          "measureDuration": 55.2489,
+          "observedSeconds": 52.955,
+          "missingSeconds": 52.955,
+          "tokens": 125
+        },
+        {
+          "audioSourceId": "101.09 A visit from Joe(7).mp3",
+          "start": 0.0,
+          "duration": 47.2032,
+          "measureStart": 0.0,
+          "measureDuration": 47.2032,
+          "observedSeconds": 47.2031875,
+          "missingSeconds": 47.2031875,
+          "tokens": 122
+        },
+        {
+          "audioSourceId": "137.13 Planning Magwitch-s future and hearing about his past(8).mp3",
+          "start": 0.0,
+          "duration": 52.1142,
+          "measureStart": 0.0,
+          "measureDuration": 52.1142,
+          "observedSeconds": 51.925,
+          "missingSeconds": 51.925,
+          "tokens": 120
+        },
+        {
+          "audioSourceId": "167.18 The end of Magwitch-s story(2).mp3",
+          "start": 0.0,
+          "duration": 52.0881,
+          "measureStart": 0.0,
+          "measureDuration": 52.0881,
+          "observedSeconds": 51.265,
+          "missingSeconds": 51.265,
+          "tokens": 136
+        },
+        {
+          "audioSourceId": "001.  第1章 匹普与一位陌生人相遇(1).mp3",
+          "start": 0.0,
+          "duration": 92.0032,
+          "measureStart": 0.0,
+          "measureDuration": 92.0032,
+          "observedSeconds": 87.14999999999999,
+          "missingSeconds": 87.14999999999999,
+          "tokens": 205
+        },
+        {
+          "audioSourceId": "002.  第1章 匹普与一位陌生人相遇(2).mp3",
+          "start": 0.0,
+          "duration": 80.5355,
+          "measureStart": 0.0,
+          "measureDuration": 80.5355,
+          "observedSeconds": 80.41,
+          "missingSeconds": 60.730000000000004,
+          "tokens": 162
+        }
+      ]
+    }
+  ]
+}

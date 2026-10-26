@@ -63,6 +63,9 @@ def execute_installation(
     dry_run: bool = False,
 ) -> dict:
     """Execute the installation plan."""
+    if not dry_run:
+        from tools.readalong.candidate_safety import retired_write_entrypoint
+        retired_write_entrypoint()
     target_dir = Path(plan["target_dir"])
     if dry_run:
         return {

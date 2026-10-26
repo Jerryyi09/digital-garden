@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 铁律检查：严禁在 /Volumes/ 下执行扫描与映射
+if [[ "$#" -lt 1 ]]; then
+  echo "Usage: $0 <path-to-category-or-book-dir>"
+  exit 1
+fi
+
+RAW_TARGET="$1"
+if [[ "$RAW_TARGET" == /Volumes/* ]]; then
+  echo "ERROR: Target directory is on /Volumes/. Strictly forbidden!"
+  echo "Processing source must be on local SSD (/Users/jerryyi/Desktop/寒假/未命名文件夹/)."
+  exit 1
+fi
+
+if [[ ! -d "$RAW_TARGET" ]]; then
+  echo "ERROR: Directory not found: $RAW_TARGET"
+  exit 1
+fi
+
+TARGET="$(cd "$RAW_TARGET" && pwd)"
+
+if [[ "$TARGET" == /Volumes/* ]]; then
+  echo "ERROR: Target directory is on /Volumes/. Strictly forbidden!"
+  echo "Processing source must be on local SSD (/Users/jerryyi/Desktop/寒假/未命名文件夹/)."
+  exit 1
+fi
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON="$REPO_ROOT/tools/readalong/.venv/bin/python"
+CACHE_ROOT="$REPO_ROOT/private/readalong-cache"
+export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
+
+TIMESTAMP="$(date +%Y%m%dT%H%M)"
+CATEGORY="$(basename "$(dirname "$TARGET")")"
+NAME="$(basename "$TARGET")"
+
+# 判断参数是单本书还是分类目录
+if [[ -f "$TARGET/readalong.manifest.json" ]] || ls "$TARGET"/*.epub >/dev/null 2>&1 || ls "$TARGET"/*.mp3 >/dev/null 2>&1 || ls "$TARGET"/*.m4b >/dev/null 2>&1; then
+  # 单本书模式
+  IS_SINGLE_BOOK=true
+  UNIT_ID="$CATEGORY/$NAME"
+  BATCH_NAME="${CATEGORY}-${NAME}-${TIMESTAMP}"
+  SCAN_ROOT="$(dirname "$TARGET")"
+else
+  # 分类目录模式
+  IS_SINGLE_BOOK=false
+  CATEGORY="$NAME"
+  BATCH_NAME="${CATEGORY}-${TIMESTAMP}"
+  SCAN_ROOT="$TARGET"
+fi
+
+RUN_DIR="$REPO_ROOT/private/readalong-library-runs/$BATCH_NAME"
+mkdir -p "$RUN_DIR"
+
+echo "=================================================="
+echo "Starting readalong mapping:"
+echo "  Target: $TARGET"
+echo "  Run dir: $RUN_DIR"
+echo "  Cache root: $CACHE_ROOT"
+echo "=================================================="
+
+# 1. 扫描生成库存
+echo "[1/2] Scanning physical inventory..."
+"$PYTHON" -m tools.readalong.full_inventory_scanner "$RUN_DIR" --root "$SCAN_ROOT" > /dev/null
+
+INV_PATH="$RUN_DIR/inventory.json"
+if [[ ! -f "$INV_PATH" ]]; then
+  echo "ERROR: Inventory scan failed to generate $INV_PATH"
+  exit 1
+fi
+
+# 2. 收集需要运行的 units
+declare -a UNITS_ARGS=()
+if [ "$IS_SINGLE_BOOK" = true ]; then
+  UNITS_ARGS+=(--unit "$UNIT_ID")
+else
+  # 提取该分类下的全部 units
+  while IFS= read -r uid; do
+    UNITS_ARGS+=(--unit "$uid")
+  done < <("$PYTHON" -c "
+import json
+inv = json.load(open('$INV_PATH'))
+import sys
+for u in inv['units']:
+    if u.get('audio_tracks') and u.get('epubs'):
+        print(u['unit_id'])
+    else:
+        print('  跳过（缺音频或 EPUB）：' + u['unit_id'], file=sys.stderr)
+")
+fi
+
+if [ "${#UNITS_ARGS[@]}" -eq 0 ]; then
+  echo "ERROR: No units found to map in $TARGET"
+  exit 1
+fi
+
+# 3. 执行基准映射（默认采用逐句时间戳引擎 mlx-batch-silence-words-v1）
+echo "[2/2] Running candidate generation with default words engine..."
+"$PYTHON" -m tools.readalong_fast.benchmark \
+  --inventory "$INV_PATH" \
+  --output "$RUN_DIR/run" \
+  --cache-read-root "$CACHE_ROOT" \
+  --allow-new-asr \
+  --asr-engine words \
+  "${UNITS_ARGS[@]}"
+
+# 4. 汇总展示结果
+echo ""
+echo "=================================================="
+echo "                Mapping Summary                   "
+echo "=================================================="
+"$PYTHON" -c "
+import json
+from pathlib import Path
+
+run_dir = Path('$RUN_DIR')
+bench_path = run_dir / 'run' / 'benchmark.json'
+if not bench_path.exists():
+    print('No benchmark.json found')
+    exit(0)
+
+data = json.load(bench_path.open())
+print(f'{'Unit ID':<40} {'Screen Decision':<18} {'Unmapped':<10} {'Aligned':<10} {'Time(s)':<8} {'Status'}')
+print('-' * 95)
+for r in data.get('records', []):
+    uid = r.get('unit_id')
+    metrics = r.get('metrics') or {}
+    unmapped = metrics.get('unmappedSpeechUnitRatio')
+    unm_str = f'{unmapped*100:.2f}%' if unmapped is not None else 'N/A'
+    aligned = f\"{metrics.get('alignedTrackCount', 0)}/{metrics.get('alignedTrackCount', 0) + metrics.get('unalignedTrackCount', 0)}\"
+    t = round(r.get('timings', {}).get('totalSeconds', 0), 1)
+    status = r.get('readalongUsability', 'UNKNOWN')
+    screen = r.get('screenDecision') or ('PASS' if r.get('fullAudioProcessed') else 'N/A')
+    print(f'{uid:<40} {screen:<18} {unm_str:<10} {aligned:<10} {t:<8} {status}')
+
+print('=' * 95)
+print('请将以下提示发送给执行方进行审核与发布：')
+print(f'>>> 发布批次 {run_dir} <<<')
+"

@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -lt 1 ]]; then
+  echo "Usage: $0 <path-to-batch-or-run-dir> [--target-base hp@10.0.0.85:/mnt/750/Music/有声书]"
+  echo "  Example:"
+  echo "    $0 private/readalong-library-runs/文学理论-20261025T1555"
+  exit 1
+fi
+
+# 检查危险参数
+for arg in "$@"; do
+  if [[ "$arg" == *"--delete"* ]] || [[ "$arg" == "-d" ]] || [[ "$arg" == *"--remove-source-files"* ]]; then
+    echo "ERROR: Dangerous argument rejected: $arg"
+    exit 1
+  fi
+done
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON="$REPO_ROOT/tools/readalong/.venv/bin/python"
+export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
+EXPECTED_TARGET_BASE=$("$PYTHON" -c 'from tools.readalong.nuc_target import NUC_TARGET, NUC_REMOTE_BASE; print(f"{NUC_TARGET}:{NUC_REMOTE_BASE}")')
+BATCH_DIR="$(cd "$1" && pwd)"
+shift
+
+TARGET_BASE="$EXPECTED_TARGET_BASE"
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --target-base)
+      TARGET_BASE="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# 铁律：必须走 SSH 远程协议，严禁走本地挂载点
+if [[ "$TARGET_BASE" != "$EXPECTED_TARGET_BASE" ]]; then
+  echo "ERROR: Target base must be an SSH remote path using the configured direct LAN NUC target, got: $TARGET_BASE"
+  exit 1
+fi
+
+INV_PATH="$BATCH_DIR/inventory.json"
+if [[ ! -f "$INV_PATH" ]]; then
+  echo "ERROR: Missing inventory.json in $BATCH_DIR"
+  exit 1
+fi
+
+echo "=================================================="
+echo "Starting atomic NUC publish for batch:"
+echo "  Batch dir:   $BATCH_DIR"
+echo "  Remote base: $TARGET_BASE"
+echo "=================================================="
+
+"$PYTHON" -c "
+import json, subprocess, sys
+from pathlib import Path
+from tools.readalong.nuc_syncer import sync_book_to_nuc
+from tools.readalong.tier_verifier import tier1_local_static_check, tier2_remote_batch_check, tier3_alist_sample_check
+from tools.readalong.nuc_target import nuc_publication_lock, NUC_TARGET
+from tools.readalong.release_integrity import tier2_book_payload
+
+# Hold the same lock as V5 batch runs until this process exits.
+_publication_lock = nuc_publication_lock()
+try:
+    _publication_lock.__enter__()
+except RuntimeError as exc:
+    print(f'ERROR: Another NUC publication process is currently running. {exc}', file=sys.stderr)
+    sys.exit(1)
+
+run_dir = Path('$BATCH_DIR')
+inv = json.load(open(run_dir / 'inventory.json'))
+py = '$PYTHON'
+remote_target = '$TARGET_BASE'
+remote_host, remote_path = remote_target.split(':', 1)
+
+candidates = {}
+if (run_dir / 'benchmark.json').exists():
+    bm = json.load(open(run_dir / 'benchmark.json'))
+    for u in inv['units']:
+        from tools.readalong.batch_candidate_remapper import sanitize_slug
+        slug = sanitize_slug(u['unit_id'])
+        c_path = run_dir / slug
+        if (c_path / 'timeline.json').exists():
+            candidates[u['unit_id']] = (u['book_dir'], c_path)
+elif (run_dir / 'run' / 'benchmark.json').exists():
+    bm = json.load(open(run_dir / 'run' / 'benchmark.json'))
+    for u in inv['units']:
+        from tools.readalong.batch_candidate_remapper import sanitize_slug
+        slug = sanitize_slug(u['unit_id'])
+        c_path = run_dir / 'run' / slug
+        if (c_path / 'timeline.json').exists():
+            candidates[u['unit_id']] = (u['book_dir'], c_path)
+elif (run_dir / 'results.json').exists():
+    res = json.load(open(run_dir / 'results.json'))
+    for uid, r in res.get('records', {}).items():
+        if r.get('candidatePath') and Path(r['candidatePath']).exists():
+            u = next(x for x in inv['units'] if x['unit_id'] == uid)
+            candidates[uid] = (u['book_dir'], Path(r['candidatePath']))
+
+print(f'Found {len(candidates)} candidate(s) ready for audit, publish & sync')
+
+synced_books_for_tier2 = []
+
+for uid, (b_dir_str, c_path) in sorted(candidates.items()):
+    cat, name = uid.split('/', 1)
+    b_dir = Path(b_dir_str)
+    print(f'\n--- Processing {uid} ---')
+
+    # 1. 本地物理审核
+    print(f'[1/3] Auditing candidate practical...')
+    res = subprocess.run([py, '-m', 'tools.readalong.readalong_cli', 'audit-practical', str(b_dir), str(c_path)], capture_output=True, text=True)
+    if res.returncode != 0:
+        print(f'  [FAIL] Audit errored: {res.stderr}')
+        continue
+    ad = json.loads(res.stdout)
+    if not ad.get('publishAllowed'):
+        print(f'  [SKIP] Candidate not publishable: decision={ad.get(\"decision\")}, errors={ad.get(\"hardErrors\")}')
+        continue
+
+    # 2. 本地原子发布
+    print(f'[2/3] Publishing locally to book directory...')
+    pub_res = subprocess.run([py, '-m', 'tools.readalong.readalong_cli', 'publish-practical', str(b_dir), str(c_path)], capture_output=True, text=True)
+    if pub_res.returncode != 0:
+        print(f'  [FAIL] Local publish error: {pub_res.stderr}')
+        continue
+    pd = json.loads(pub_res.stdout)
+    if not pd.get('success'):
+        print(f'  [FAIL] Local publish failed: {pd}')
+        continue
+    print(f'  [OK] Local revision: {pd.get(\"revision\")}')
+
+    # Tier 1 本地静态全面检验（秒级零网络：锚点、CSS、自然排序、分卷路径、粒度指标）
+    print(f'[*] Tier 1: Local static verification...')
+    t1_ok, t1_issues, t1_metrics = tier1_local_static_check(b_dir)
+    if not t1_ok:
+        print(f'  [TIER 1 FAILED] {uid}: {t1_issues}')
+        sys.exit(1)
+    print(f'  [TIER 1 OK] Segments={t1_metrics[\"segments_count\"]}, Median={t1_metrics[\"median_duration\"]}s, P95={t1_metrics[\"p95_duration\"]}s, Fallback={t1_metrics[\"fallback_ratio\"]:.1%}')
+
+    # 3. SSH 安全同步至 NUC（单书精确集、--protect-args、--iconv、备份旧版）
+    print(f'[3/3] Syncing to NUC via SSH...')
+    sync_book_to_nuc(b_dir, cat, name, remote_host=NUC_TARGET, remote_base=remote_path)
+    print(f'  [OK] Synced files and version directory to {remote_target}/{uid}')
+
+    synced_books_for_tier2.append(tier2_book_payload(cat, name, b_dir))
+
+if synced_books_for_tier2:
+    # Tier 2: 单次 SSH 批量服务器文件级核验（秒级，单进程）
+    print(f'\n==================================================')
+    print(f'[*] Tier 2: Server-side batch filesystem audit ({len(synced_books_for_tier2)} books)...')
+    t2_ok, t2_errs = tier2_remote_batch_check(remote_host, synced_books_for_tier2, remote_root=remote_path)
+    if not t2_ok:
+        print(f'  [TIER 2 FAILED] Remote batch audit failed:\n' + '\n'.join(f'    - {e}' for e in t2_errs))
+        sys.exit(1)
+    print(f'  [TIER 2 OK] All {len(synced_books_for_tier2)} books verified on server filesystem with identical tree hashes!')
+
+    # Tier 3: Alist 网关抽样（整批只抽验 1 本书）
+    sample_cat, sample_book, _ = synced_books_for_tier2[0]
+    print(f'[*] Tier 3: Sampling 1 book via Alist gateway ({sample_cat}/{sample_book})...')
+    t3_ok, t3_msg = tier3_alist_sample_check(sample_cat, sample_book, remote_host=remote_host)
+    if not t3_ok:
+        print(f'  [TIER 3 FAILED] Alist sample gateway failed: {t3_msg}')
+        sys.exit(1)
+    print(f'  [TIER 3 OK] Alist gateway verified functional on {sample_cat}/{sample_book}!')
+
+print('\n==================================================')
+print('NUC publication, sync and tiered verification completed.')
+print('==================================================')
+"
+print('==================================================')
+"

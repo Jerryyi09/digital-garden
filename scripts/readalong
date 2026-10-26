@@ -24,4 +24,11 @@ export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 export TOKENIZERS_PARALLELISM="false"
 export OMP_NUM_THREADS="4"
 
-exec "$PYTHON" -m tools.readalong.cli "$@"
+case "${1:-}" in
+  inspect|audit|certify|publish|rollback|audit-practical|publish-practical|rollback-practical|exclude-practical)
+    exec "$PYTHON" -m tools.readalong.readalong_cli "$@"
+    ;;
+  *)
+    exec "$PYTHON" -m tools.readalong.cli "$@"
+    ;;
+esac

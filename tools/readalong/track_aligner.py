@@ -156,6 +156,8 @@ def align_talking_to_strangers(
     book_dir: Path,
     output_dir: Path | None = None,
 ) -> dict:
+    from tools.readalong.candidate_safety import retired_write_entrypoint
+    retired_write_entrypoint()
     """End-to-end alignment specifically for Talking to Strangers with 13 audio tracks."""
     os.environ["NLTK_DATA"] = str(resolve_nltk_data_path())
     out_base = output_dir or (DEFAULT_OUTPUT_DIR / "talking-to-strangers-what-we-should-know-about-the-people-we-dont-know-malcom-gladwell")

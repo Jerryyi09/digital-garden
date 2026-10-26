@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "bookId": "test_book",
+  "status": "PASS",
+  "timestamp": "2026-10-22T23:47:14Z",
+  "staging_fingerprint": "504560049edaf4ed488c000f146f8c223695d10c3745fbce0eb9b6b424f2bc89",
+  "signature": "fec9d0ddf09940ec58833e7a74a1d70d22bc79220f3c2f0244f3f7e4345746b4",
+  "quality_layers": {
+    "schema": true,
+    "inventory": true,
+    "monotonicity": true,
+    "dom_integrity": true,
+    "coverage_and_gaps": true,
+    "density": true,
+    "timing_verified": true
+  },
+  "errors": [],
+  "warnings": [],
+  "uncovered_intervals": []
+}

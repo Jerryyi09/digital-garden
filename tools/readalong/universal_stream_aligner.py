@@ -8,12 +8,14 @@ and stitches the final timeline seamlessly.
 from collections import defaultdict
 from difflib import SequenceMatcher
 import json
+import math
 import os
 from pathlib import Path
 import re
 import shutil
 import subprocess
 import time
+from typing import Any
 import xml.etree.ElementTree as ET
 import zipfile
 from bs4 import BeautifulSoup
@@ -31,6 +33,8 @@ from tools.readalong.config import (
 from tools.readalong.engine.mark_sentence import mark_sentences
 from tools.readalong.exporter import READALONG_CSS_INJECTION
 from tools.readalong.validator import compute_sha256
+from tools.readalong.universal_aligner import safe_unzip
+from tools.readalong.input_inventory import natural_sort_key, compute_strong_cache_key, model_fingerprint
 
 
 def normalize_token(w: str) -> str:
@@ -54,6 +58,21 @@ def extract_audio_chunk(input_audio: Path, output_audio: Path, start_s: float, d
     if output_audio.exists() and output_audio.stat().st_size > 1000:
         return get_audio_duration(output_audio)
 
+    # Fast path: stream copy when input and output containers match
+    if input_audio.suffix.lower() == output_audio.suffix.lower():
+        proc = subprocess.run([
+            "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+            "-ss", str(start_s),
+            "-i", str(input_audio),
+            "-t", str(duration_s),
+            "-map", "0:a:0",
+            "-c", "copy",
+            str(output_audio),
+        ])
+        if proc.returncode == 0 and output_audio.exists() and output_audio.stat().st_size > 1000:
+            return get_audio_duration(output_audio)
+
+    # Fallback: re-encode to mono AAC
     subprocess.run([
         "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
         "-ss", str(start_s),
@@ -74,7 +93,22 @@ def transcribe_words_cached(chunk_audio: Path, model_path: Path, cache_json: Pat
         except Exception:
             pass
 
-    from mlx_whisperx.backend.mlx_whisper.transcribe import transcribe as mlx_transcribe
+    from tools.readalong.config import resolve_transcripts_cache_dir, transcript_cache_candidates
+    shared_cache = resolve_transcripts_cache_dir() / cache_json.name
+    for candidate_cache in transcript_cache_candidates(cache_json.name):
+      if candidate_cache.exists() and candidate_cache.stat().st_size > 50:
+        try:
+            words = json.loads(candidate_cache.read_text(encoding="utf-8"))
+            cache_json.write_text(json.dumps(words, ensure_ascii=False, indent=2))
+            return words
+        except Exception:
+            pass
+
+    if os.environ.get("READALONG_CACHE_ONLY") == "1":
+        raise RuntimeError(f"CACHE_MISS: {cache_json.name}")
+
+    from tools.readalong.asr_runtime import transcription_backend
+    mlx_transcribe = transcription_backend()
     res = mlx_transcribe(
         str(chunk_audio),
         path_or_hf_repo=str(model_path),
@@ -97,7 +131,12 @@ def transcribe_words_cached(chunk_audio: Path, model_path: Path, cache_json: Pat
                     "end": round(base_time_s + float(w.get("end", 0.0)), 3),
                 })
 
-    cache_json.write_text(json.dumps(words, ensure_ascii=False, indent=2))
+    content = json.dumps(words, ensure_ascii=False, indent=2)
+    cache_json.write_text(content)
+    try:
+        shared_cache.write_text(content)
+    except Exception:
+        pass
     return words
 
 
@@ -126,21 +165,27 @@ def align_volume_full_stream(
     book_dir: Path,
     output_dir: Path,
     block_duration_s: float = 1800.0,
+    confirmed_reorders: Any = None,
 ) -> dict:
     """Full-length continuous stream alignment for multi-hour audiobooks."""
+    from tools.readalong.candidate_safety import require_candidate_output
+    require_candidate_output(book_dir, output_dir)
+    if not math.isfinite(block_duration_s) or block_duration_s <= 0:
+        raise ValueError("Block duration must be positive and finite")
     t_start = time.time()
-    epubs = [e for e in book_dir.rglob("*.epub") if not e.name.startswith("._")]
+    from tools.readalong.candidate_safety import source_files, alist_audio_path
+    epubs = source_files(book_dir, {".epub"})
     if not epubs:
         return {"status": "skipped", "reason": "no_epub"}
     primary_epub = epubs[0]
+    if len(epubs) != 1:
+        return {"status": "NEEDS_REVIEW", "reason": "ambiguous_epub_pairing"}
+    epub_sha = compute_sha256(primary_epub)
 
-    audios = [
-        a for a in book_dir.rglob("*")
-        if a.suffix.lower() in (".mp3", ".m4a", ".m4b") and not a.name.startswith("._")
-    ]
+    audios = source_files(book_dir, {".mp3", ".m4a", ".m4b"})
     if not audios:
         return {"status": "skipped", "reason": "no_audio"}
-    audios.sort(key=lambda p: p.name)
+    audios.sort(key=lambda p: natural_sort_key(p.relative_to(book_dir).as_posix()))
 
     work_dir = output_dir / "work"
     text_dir = output_dir / "text"
@@ -148,23 +193,11 @@ def align_volume_full_stream(
     text_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = resolve_model_path()
+    model_sha = model_fingerprint(model_path)
     os.environ["NLTK_DATA"] = str(resolve_nltk_data_path())
 
-    # 1. Unzip EPUB assets into text/
-    with zipfile.ZipFile(primary_epub) as z:
-        for name in z.namelist():
-            if name.endswith("/"):
-                continue
-            dest = text_dir / name
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            content = z.read(name)
-            if name.lower().endswith((".htm", ".html", ".xhtml", ".xml")):
-                html_str = content.decode("utf-8", errors="replace")
-                if "</head>" in html_str and ".readalong-active" not in html_str:
-                    html_str = html_str.replace("</head>", f"<style>{READALONG_CSS_INJECTION}</style></head>", 1)
-                dest.write_text(html_str, encoding="utf-8")
-            else:
-                dest.write_bytes(content)
+    # 1. Safely extract EPUB assets into text/ preventing Zip Slip
+    safe_unzip(primary_epub, text_dir, css_injection=READALONG_CSS_INJECTION)
 
     spine_htmls = get_spine_htmls(primary_epub)
 
@@ -174,162 +207,77 @@ def align_volume_full_stream(
     if category in ("未命名文件夹", "寒假"):
         category = "文学作品"
 
-    # Pre-index tokens for all candidate spine HTMLs
-    html_token_cache = {}
-    with zipfile.ZipFile(primary_epub) as z:
-        for h in spine_htmls:
-            try:
-                raw_html = z.read(h).decode("utf-8", errors="replace")
-                soup = BeautifulSoup(raw_html, "html.parser")
-                text = " ".join(soup.get_text().split())
-                tokens = [normalize_token(w) for w in text.split()]
-                tokens = [t for t in tokens if t]
-                if len(tokens) >= 10:
-                    html_token_cache[h] = tokens
-            except Exception:
-                pass
-
-    print(f"\n=======================================================")
-    print(f"Aligning Full Stream: {book_dir.name}")
-    print(f"Total audio tracks: {len(audios)} | Total EPUB spine HTMLs: {len(html_token_cache)}")
-    print(f"=======================================================")
+    # Segment original documents once, independent of track boundaries.
+    from tools.readalong.stream_projection import prepare_documents, project_stream
+    documents, fragments, book_tokens = prepare_documents(text_dir, spine_htmls, mark_sentences)
+    ordered_audio_words = []
 
     for track_idx, audio_file in enumerate(audios):
         total_dur = get_audio_duration(audio_file)
+        if not math.isfinite(total_dur) or total_dur <= 0:
+            return {"status": "FAILED", "reason": "audio_probe_failed"}
+        audio_sha = compute_sha256(audio_file)
         audio_sources.append({
-            "id": audio_file.name,
+            "id": audio_file.relative_to(book_dir).as_posix(),
             "name": audio_file.name,
-            "alistPath": f"{DEFAULT_ALIST_ROOT}/{category}/{book_dir.parent.name}/{book_dir.name}/{audio_file.name}" if book_dir.parent.name.startswith("Great Mental") else f"{DEFAULT_ALIST_ROOT}/{category}/{book_dir.name}/{audio_file.name}",
+            "alistPath": alist_audio_path(book_dir, audio_file, DEFAULT_ALIST_ROOT),
             "sha256": compute_sha256(audio_file),
             "duration": total_dur,
         })
 
-        num_blocks = max(1, int(total_dur // block_duration_s) + (1 if total_dur % block_duration_s > 30 else 0))
+        # Ensure 100% full temporal coverage without remainder truncation
+        from tools.readalong.candidate_safety import plan_audio_blocks
+        blocks = list(plan_audio_blocks(total_dur, block_duration_s))
+
+        num_blocks = len(blocks)
         print(f"\nTrack [{track_idx + 1}/{len(audios)}]: {audio_file.name}")
-        print(f"Duration: {total_dur:.1f}s ({total_dur / 3600:.2f}h) -> {num_blocks} blocks of {block_duration_s/60:.0f} mins")
+        print(f"Duration: {total_dur:.1f}s ({total_dur / 3600:.2f}h) -> {num_blocks} blocks covering 0.0s to {total_dur:.1f}s")
 
         # Step 1: Transcribe and stitch into continuous global word stream
         global_words = []
-        for b_idx in range(num_blocks):
-            start_s = b_idx * block_duration_s
-            dur_s = min(block_duration_s, total_dur - start_s)
-            if dur_s < 10.0:
-                continue
-
-            chunk_stem = f"{audio_file.stem}_blk{b_idx:03d}_{int(start_s)}"
-            chunk_m4a = work_dir / f"{chunk_stem}.m4a"
+        for b_idx, (start_s, dur_s) in enumerate(blocks):
+            chunk_stem = compute_strong_cache_key(audio_sha, {
+                "modelSha256": model_sha, "start": start_s, "duration": dur_s,
+                "language": "en", "word_timestamps": True, "sampleRate": 24000})
+            chunk_ext = audio_file.suffix.lower() if audio_file.suffix.lower() in ('.mp3', '.m4a', '.m4b', '.aac') else '.m4a'
+            chunk_audio_file = work_dir / f"{chunk_stem}{chunk_ext}"
             cache_json = work_dir / f"{chunk_stem}.json"
 
             t_blk = time.time()
-            extract_audio_chunk(audio_file, chunk_m4a, start_s, dur_s)
-            chunk_words = transcribe_words_cached(chunk_m4a, model_path, cache_json, base_time_s=start_s)
+            from tools.readalong.config import transcript_cache_candidates
+            cached = cache_json.is_file() or any(p.is_file() for p in transcript_cache_candidates(cache_json.name))
+            if not cached and os.environ.get("READALONG_CACHE_ONLY") != "1":
+                extract_audio_chunk(audio_file, chunk_audio_file, start_s, dur_s)
+            chunk_words = transcribe_words_cached(chunk_audio_file, model_path, cache_json, base_time_s=start_s)
             global_words.extend(chunk_words)
 
-        # Sort global words strictly by start time
-        global_words.sort(key=lambda w: w["start"])
-        global_norms = [normalize_token(w["word"]) for w in global_words if normalize_token(w["word"])]
-        global_word_objs = [w for w in global_words if normalize_token(w["word"])]
+        # Preserve natural track order; timestamps remain local to their source.
+        global_words.sort(key=lambda word: word["start"])
+        for word in global_words:
+            if normalize_token(word.get("word", "")):
+                ordered_audio_words.append({
+                    **word, "audioSourceId": audio_file.relative_to(book_dir).as_posix(),
+                })
 
-        print(f"  Stitched global word stream: {len(global_word_objs)} words from {global_word_objs[0]['start']/60:.1f}m to {global_word_objs[-1]['end']/60:.1f}m")
+    # One monotone book/audio correspondence, supporting unambiguous re-read occurrences.
+    final_segments, projection_stats = project_stream(
+        book_tokens, fragments, ordered_audio_words, confirmed_reorders=confirmed_reorders
+    )
+    from tools.readalong.authoritative_validator import safe_path
+    for name, soup in documents.items():
+        safe_path(text_dir, name).write_text(str(soup), encoding="utf-8")
+    (output_dir / "projection.json").write_text(
+        json.dumps(projection_stats, ensure_ascii=False, indent=2) + "\n")
 
-        # Step 2: Monotonically anchor chapters and align sentences across full stream
-        audio_ptr = 0
-        chapter_anchors = []
-
-        # Find chapter starting anchors along the audio stream
-        for h_idx, h_name in enumerate(spine_htmls):
-            h_tokens = html_token_cache.get(h_name)
-            if not h_tokens or len(h_tokens) < 15:
-                continue
-
-            window_end = min(len(global_norms), audio_ptr + 12000)
-            sub_audio = global_norms[audio_ptr:window_end]
-
-            matcher = SequenceMatcher(None, h_tokens[:80], sub_audio)
-            match = matcher.find_longest_match(0, min(len(h_tokens), 80), 0, len(sub_audio))
-
-            if match.size >= 8:
-                ch_start = audio_ptr + match.b
-                chapter_anchors.append((h_name, ch_start))
-                audio_ptr = ch_start + match.size
-
-        print(f"  Anchored {len(chapter_anchors)} distinct chapters in continuous reading order")
-
-        # Step 3: Align sentences in each chapter within its bounded audio window
-        track_segments = []
-        for c_idx in range(len(chapter_anchors)):
-            h_name, ch_start = chapter_anchors[c_idx]
-            ch_end = chapter_anchors[c_idx + 1][1] if c_idx + 1 < len(chapter_anchors) else len(global_norms)
-
-            target_dest = text_dir / h_name
-            raw_content = target_dest.read_text(encoding="utf-8")
-            doc_id = re.sub(r"[^a-zA-Z0-9]", "", f"{Path(h_name).stem}")[:8] or "doc"
-
-            marked_html = mark_sentences(raw_content, chapter_id=doc_id)
-            target_dest.write_text(marked_html, encoding="utf-8")
-
-            soup = BeautifulSoup(marked_html, "html.parser")
-            spans = [s for s in soup.find_all("span") if s.get("id") and "segment" in s["id"]]
-
-            ch_norms = global_norms[ch_start:ch_end]
-            ch_words = global_word_objs[ch_start:ch_end]
-            ptr = 0
-            aligned_in_ch = 0
-
-            for span in spans:
-                text = span.get_text().strip()
-                tokens = [normalize_token(w) for w in text.split() if normalize_token(w)]
-                if len(tokens) < 2:
-                    continue
-
-                sub_audio = ch_norms[ptr:min(len(ch_norms), ptr + 800)]
-                matcher = SequenceMatcher(None, tokens, sub_audio)
-                match = matcher.find_longest_match(0, len(tokens), 0, len(sub_audio))
-
-                is_valid = False
-                if len(tokens) <= 3:
-                    if match.size == len(tokens) and match.b < 40:
-                        is_valid = True
-                else:
-                    if match.b > 50:
-                        is_valid = (match.size >= 4)
-                    else:
-                        is_valid = (match.size >= 3) or (match.size >= len(tokens) * 0.5)
-
-                if is_valid:
-                    abs_start = ch_words[ptr + match.b]["start"]
-                    abs_end = ch_words[ptr + match.b + match.size - 1]["end"]
-                    if abs_end <= abs_start:
-                        abs_end = round(abs_start + 0.1, 3)
-
-                    track_segments.append({
-                        "audioSourceId": audio_file.name,
-                        "start": abs_start,
-                        "end": abs_end,
-                        "document": f"text/{h_name}",
-                        "fragment": span["id"],
-                        "text": text,
-                        "reviewStatus": "unreviewed",
-                    })
-                    ptr = ptr + match.b + match.size
-                    aligned_in_ch += 1
-
-            t_st = ch_words[0]["start"] / 60.0 if ch_words else 0
-            t_en = ch_words[-1]["end"] / 60.0 if ch_words else 0
-            print(f"   [{c_idx+1:2d}/{len(chapter_anchors)}] {h_name:30} -> {aligned_in_ch:3d} segs ({t_st:5.1f}m ~ {t_en:5.1f}m)")
-
-        all_segments.extend(track_segments)
-
-    # De-duplicate any segments by fragment and sort monotonically
-    dedup_map = {}
-    for s in all_segments:
-        key = (s["audioSourceId"], s["fragment"])
-        if key not in dedup_map or s["start"] < dedup_map[key]["start"]:
-            dedup_map[key] = s
-
-    final_segments = sorted(dedup_map.values(), key=lambda s: (s["audioSourceId"], s["start"], s["end"]))
+    from tools.readalong.timeline_boundaries import resolve_boundaries
+    final_segments, boundary_repairs = resolve_boundaries(final_segments)
+    projection_stats["boundaryRepairs"] = boundary_repairs
+    (output_dir / "projection.json").write_text(
+        json.dumps(projection_stats, ensure_ascii=False, indent=2) + "\n")
 
     # Save timeline.json
+    if compute_sha256(primary_epub) != epub_sha or model_fingerprint(model_path) != model_sha:
+        raise RuntimeError("EPUB or model changed during generation")
     timeline_path = output_dir / "timeline.json"
     timeline_path.write_text(json.dumps(final_segments, ensure_ascii=False, indent=2) + "\n")
 
@@ -341,10 +289,11 @@ def align_volume_full_stream(
         "schemaVersion": 1,
         "bookId": book_id,
         "language": "en",
-        "sourceEpubSha256": compute_sha256(primary_epub),
+        "sourceEpubSha256": epub_sha,
         "timing": {
-            "engine": "whisper-word",
-            "model": "tiny.en",
+            "engine": "whisper-word-global-monotone-exact-v1",
+            "model": model_path.name,
+            "modelSha256": model_sha,
         },
         "audioSources": audio_sources,
         "timeline": "timeline.json",
@@ -357,22 +306,21 @@ def align_volume_full_stream(
     manifest_path = output_dir / "readalong.manifest.json"
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
-    # Install directly into book directory's readalong/ folder
-    install_target = book_dir / "readalong"
-    install_target.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(manifest_path, install_target / "readalong.manifest.json")
-    shutil.copyfile(timeline_path, install_target / "timeline.json")
-    if (install_target / "text").exists():
-        shutil.rmtree(install_target / "text")
-    shutil.copytree(text_dir, install_target / "text")
+    # Authoritative certification of staging candidate (never overwrite active directly)
+    from tools.readalong.controlled_publisher import certify_staging_candidate
+    cert = certify_staging_candidate(output_dir, book_dir=book_dir)
+    print(f"\nCandidate certification verdict: {cert.get('status')}")
+    print(f"[Controlled Staging] Output preserved in isolated staging: {output_dir}")
 
     elapsed_total = time.time() - t_start
-    print(f"\n✓ Completed {book_dir.name}: {len(final_segments)} segments across {total_dur/3600:.1f}h in {elapsed_total:.1f}s ({elapsed_total/60:.1f} mins)!\n")
+    total_hours = sum(source["duration"] for source in audio_sources) / 3600
+    print(f"\nCandidate generated: {book_dir.name}: {len(final_segments)} segments across {total_hours:.1f}h; verdict={cert['status']}; elapsed={elapsed_total:.1f}s\n")
 
     return {
-        "status": "success",
+        "status": cert["status"],
         "book_id": book_id,
         "segment_count": len(final_segments),
         "elapsed_seconds": round(elapsed_total, 2),
-        "install_dir": str(install_target),
+        "staging_dir": str(output_dir),
+        "certification": cert,
     }

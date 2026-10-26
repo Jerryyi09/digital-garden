@@ -193,7 +193,14 @@ _PUNKT_LANGUAGE_MAP = {
 def _get_nltk_cache_dir() -> Path:
     if "NLTK_DATA" in os.environ:
         return Path(os.environ["NLTK_DATA"])
-    snapshot_dir = Path(__file__).resolve().parents[2] / "private/audiobook-validation/power-of-habit/runtime-snapshot/nltk_data"
+    try:
+        from tools.readalong.config import resolve_nltk_data_path
+        p = resolve_nltk_data_path()
+        if p.exists():
+            return p
+    except Exception:
+        pass
+    snapshot_dir = Path(__file__).resolve().parents[3] / "private/audiobook-validation/power-of-habit/runtime-snapshot/nltk_data"
     if snapshot_dir.exists():
         return snapshot_dir
     return Path.home() / ".cache" / "digital-garden" / "nltk_data"
@@ -565,33 +572,13 @@ def mark_sentences(
     if referenced_classes is not None and referenced_ids is not None:
         _clean_soup(soup, referenced_classes, referenced_ids)
 
-    global_counter = 1
-
-    # Stage 2: process only block elements that are effectively leaves in block space.
-    block_tags = [
-        "p",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "li",
-        "blockquote",
-        "div",
-        "dd",
-        "dt",
-        "figcaption",
-        "td",
-        "th",
-        "caption",
-    ]
-
-    for elem in soup.find_all(block_tags):
-        if not _has_block_children(elem) and _has_meaningful_text(elem):
-            global_counter = _process_element_preserve_structure(
-                elem, chapter_id, global_counter, language, min_words
-            )
+    # Stage 2: process inline runs in document order, including text beside
+    # nested blocks. Never flatten a child block or revisit an existing segment.
+    prefix = re.compile(r"^c" + re.escape(chapter_id) + r"-segment(\d+)$")
+    existing = [int(match.group(1)) for node in soup.find_all(id=True)
+                if (match := prefix.fullmatch(node["id"]))]
+    _mark_flow_content(soup.body or soup, chapter_id, max(existing, default=0) + 1,
+                       language, min_words)
 
     # Stage 3: attach the read-aloud stylesheet. A <link> contributes no text, so it
     # is added before validation without affecting the comparison.
@@ -607,6 +594,59 @@ def mark_sentences(
         raise ValueError(f"Text integrity check failed for {chapter_id}")
 
     return str(soup)
+
+
+FLOW_BLOCKS = {
+  "body", "main", "section", "article", "nav", "aside", "header", "footer",
+  "p", "h1", "h2", "h3", "h4", "h5", "h6", "div", "li", "ul", "ol",
+  "blockquote", "dl", "dd", "dt", "figure", "figcaption", "table", "thead",
+  "tbody", "tfoot", "tr", "td", "th", "caption", "pre", "address",
+  "details", "summary", "form", "fieldset",
+}
+SEGMENT_PATTERN = re.compile(r"segment\d+$")
+
+
+def _mark_flow_content(element, chapter_id, counter, language, min_words):
+  """Segment maximal inline runs without changing their block containers."""
+  if element.name in {"head", "script", "style", "noscript"} or element.has_attr("hidden"):
+    return counter
+  if re.search(r"display\s*:\s*none|visibility\s*:\s*hidden", element.get("style", ""), re.I):
+    return counter
+  if element.name == "span" and SEGMENT_PATTERN.search(element.get("id", "")):
+    return counter
+  run = []
+
+  def flush(next_counter):
+    if not run:
+      return next_counter
+    holder = Tag(name="span")
+    run[0].insert_before(holder)
+    for node in run:
+      holder.append(node.extract())
+    if _has_meaningful_text(holder):
+      next_counter = _process_element_preserve_structure(
+        holder, chapter_id, next_counter, language, min_words)
+    holder.unwrap()
+    run.clear()
+    return next_counter
+
+  for child in list(element.children):
+    if isinstance(child, (Comment, Declaration, ProcessingInstruction)):
+      counter = flush(counter)
+      continue
+    boundary = isinstance(child, Tag) and (
+      child.name in FLOW_BLOCKS or child.name in {"head", "script", "style", "noscript"}
+      or child.has_attr("hidden")
+      or re.search(r"display\s*:\s*none|visibility\s*:\s*hidden", child.get("style", ""), re.I)
+      or child.find(list(FLOW_BLOCKS)) is not None
+      or (child.name == "span" and SEGMENT_PATTERN.search(child.get("id", "")))
+      or child.find("span", id=SEGMENT_PATTERN) is not None)
+    if boundary:
+      counter = flush(counter)
+      counter = _mark_flow_content(child, chapter_id, counter, language, min_words)
+    else:
+      run.append(child)
+  return flush(counter)
 
 
 def _has_block_children(element: Tag) -> bool:
@@ -756,11 +796,30 @@ def _clone_tag_shell(node: Tag) -> Tag:
     return Tag(name=node.name, attrs=dict(node.attrs))
 
 
-def _wrap_with_format_stack(node: Union[Tag, NavigableString], fmt_stack: List[Tag]):
+def _wrap_with_format_stack(
+    node: Union[Tag, NavigableString],
+    fmt_stack: List[Tag],
+    emitted_ids: set | None = None,
+):
     # `fmt_stack` is stored outermost -> innermost, so wrap in reverse order.
     wrapped_node = node
+    if isinstance(wrapped_node, Tag) and emitted_ids is not None:
+        tag_id = wrapped_node.get("id")
+        if tag_id:
+            if tag_id in emitted_ids:
+                del wrapped_node.attrs["id"]
+            else:
+                emitted_ids.add(tag_id)
+
     for fmt in reversed(fmt_stack):
-        wrapper = Tag(name=fmt.name, attrs=dict(fmt.attrs))
+        attrs = dict(fmt.attrs)
+        tag_id = attrs.get("id")
+        if tag_id and emitted_ids is not None:
+            if tag_id in emitted_ids:
+                attrs = {k: v for k, v in attrs.items() if k != "id"}
+            else:
+                emitted_ids.add(tag_id)
+        wrapper = Tag(name=fmt.name, attrs=attrs)
         wrapper.append(wrapped_node)
         wrapped_node = wrapper
     return wrapped_node
@@ -779,6 +838,7 @@ def _create_segment_spans(
     new_content: List[Tag] = []
     counter = start_counter
     zero_width_lookup = {}
+    emitted_ids = set()
     for position, node, fmt_stack in zero_width_nodes:
         zero_width_lookup.setdefault(position, []).append((node, fmt_stack))
 
@@ -794,13 +854,13 @@ def _create_segment_spans(
         while current_idx < end:
             # Emit zero-width nodes before consuming the visible item at this offset.
             for node, fmt_stack in zero_width_lookup.get(current_idx, []):
-                segment_span.append(_wrap_with_format_stack(node, fmt_stack))
+                segment_span.append(_wrap_with_format_stack(node, fmt_stack, emitted_ids))
 
             item, fmt_stack = char_map[current_idx]
 
             # Case A: restore an atomic non-text node from its placeholder position.
             if isinstance(item, Tag):
-                segment_span.append(_wrap_with_format_stack(item, fmt_stack))
+                segment_span.append(_wrap_with_format_stack(item, fmt_stack, emitted_ids))
                 current_idx += 1
                 continue
 
@@ -822,7 +882,7 @@ def _create_segment_spans(
 
             text_str = "".join(text_buffer)
             if text_str.strip():
-                wrapped_node = _wrap_with_format_stack(NavigableString(text_str), fmt_stack)
+                wrapped_node = _wrap_with_format_stack(NavigableString(text_str), fmt_stack, emitted_ids)
             else:
                 # Keep pure whitespace raw. Wrapping whitespace-only content in inline
                 # tags tends to create serializer-dependent junk.
@@ -840,7 +900,7 @@ def _create_segment_spans(
     # append and left an empty formatting wrapper behind in the earlier segment.)
     if new_content:
         for node, fmt_stack in zero_width_lookup.get(len(char_map), []):
-            new_content[-1].append(_wrap_with_format_stack(node, fmt_stack))
+            new_content[-1].append(_wrap_with_format_stack(node, fmt_stack, emitted_ids))
 
     return new_content
 
