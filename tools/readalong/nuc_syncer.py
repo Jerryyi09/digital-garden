@@ -10,7 +10,7 @@ import tempfile
 import unicodedata
 
 from tools.readalong.nuc_verifier import AlistClient, verify_book_on_alist
-from tools.readalong.nuc_target import NUC_RSYNC_E, NUC_SSH, NUC_TARGET, canonical_nuc_target, direct_ssh_command
+from tools.readalong.nuc_target import NUC_RSYNC_E, NUC_SSH, NUC_TARGET, canonical_nuc_target, direct_ssh_command, run_nuc
 
 
 def build_book_sync_manifest(book_dir: Path):
@@ -133,7 +133,7 @@ matches = [c for c in categories if norm(c) == norm(category)]
 books = {c: [p.name for p in (root / c).iterdir() if p.is_dir() and not p.is_symlink()] for c in matches}
 print(json.dumps({'categories': categories, 'books': books}))
 """
-  result = subprocess.run(direct_ssh_command(remote_host, "python3 -c " + shlex.quote(script)),
+  result = run_nuc(direct_ssh_command(remote_host, "python3 -c " + shlex.quote(script)), runner=subprocess.run,
     input=json.dumps([remote_base, category]), capture_output=True, text=True, check=True)
   listing = json.loads(result.stdout)
   remote_category = choose_remote_name(category, listing["categories"])
@@ -164,5 +164,5 @@ def sync_book_to_nuc(book_dir: Path, category: str, book_name: str, remote_host=
         continue
       command = build_book_rsync_command(staging, remote_dest, backup_dir, sync_info,
         source_group=source_group, relative_prefix=f"{category}/{book_name}/", dry_run=dry_run)
-      subprocess.run(command, check=True)
+      run_nuc(command, check=True, runner=subprocess.run)
   return {"category": category, "book_name": book_name, "dry_run": dry_run}
