@@ -7,7 +7,8 @@ Guarantees:
 4. Monotone time projection via words within the paragraph's acoustic interval.
 5. Inherits speechUnitId so audit metrics strictly preserve high localization ratios.
 """
-from collections import defaultdict
+from collections import Counter, defaultdict
+from bisect import bisect_left, bisect_right
 from difflib import SequenceMatcher
 import hashlib
 from pathlib import Path
@@ -56,6 +57,37 @@ def refine_timeline_by_dom(
     track_words[w.get("audioSourceId", "")].append(w)
   dom_text_cache = {}
   paragraph_rows_cache = {}
+  paragraph_match_cache = {}
+  sentence_cache = {}
+  node_text_cache = {}
+  document_ids = {}
+  global_ids = {}
+  for key, soup in documents.items():
+    ids = {}
+    for element in soup.find_all(id=True):
+      ids.setdefault(element["id"], element)
+      global_ids.setdefault(element["id"], (key, soup, element))
+    document_ids[id(soup)] = ids
+  track_intervals = {}
+  for sid, words in track_words.items():
+    starts = [word["start"] for word in words]
+    if starts == sorted(starts):
+      max_ends = []
+      latest = float("-inf")
+      for word in words:
+        latest = max(latest, word["end"])
+        max_ends.append(latest)
+      track_intervals[sid] = (starts, max_ends)
+
+  def remember_id(soup, node, fragment):
+    node["id"] = fragment
+    document_ids[id(soup)].setdefault(fragment, node)
+    # Preserve document iteration order when a recovered ID already exists elsewhere.
+    for key, candidate_soup in documents.items():
+      candidate = document_ids[id(candidate_soup)].get(fragment)
+      if candidate is not None:
+        global_ids[fragment] = (key, candidate_soup, candidate)
+        break
 
   def paragraph_rows(soup):
     cache_key = id(soup)
@@ -102,83 +134,91 @@ def refine_timeline_by_dom(
       continue
 
     # Locate paragraph node by fragment ID
-    node = soup.find(id=frag_id)
-    if not node:
-      # A recovered coarse paragraph ID is stronger evidence than a stale
-      # document path from split EPUB spine metadata; resolve the ID globally.
-      for candidate_key, candidate_soup in documents.items():
-        candidate_node = candidate_soup.find(id=frag_id)
-        if candidate_node:
-          node = candidate_node
-          doc_key = f"text/{candidate_key}"
-          soup = candidate_soup
-          break
+    node = document_ids[id(soup)].get(frag_id)
+    if node is None and frag_id in global_ids:
+      candidate_key, soup, node = global_ids[frag_id]
+      doc_key = f"text/{candidate_key}"
     if not node and p_text:
-      wanted = tokens(p_text)
-      rows = paragraph_rows(soup)
-      candidates = [element for element, candidate_tokens in rows if candidate_tokens == wanted]
-      if candidates:
-        node = min(candidates, key=lambda element: len(element.find_all(["p", "div", "li", "blockquote"])))
-        if not node.get("id"):
-          node["id"] = frag_id
-        else:
-          frag_id = node["id"]
+      match_key = (id(soup), p_text)
+      if match_key in paragraph_match_cache:
+        node = paragraph_match_cache[match_key]
       else:
-        # Sentence marking can replace the synthetic paragraph wrapper. Recover
-        # its paragraph container by a strict token-window match in the marked DOM.
-        best = None
-        for element, candidate_tokens in rows:
-          if not candidate_tokens or len(wanted) < 3:
-            continue
-          min_window_size = max(3, len(wanted)-2)
-          for start in range(max(0, len(candidate_tokens)-min_window_size+1)):
-            joined, next_token = "", start
-            while next_token < len(candidate_tokens) and len(joined) < len(wanted[0]):
-              joined += candidate_tokens[next_token]
-              next_token += 1
-            if joined != wanted[0]:
+        wanted = tokens(p_text)
+        rows = paragraph_rows(soup)
+        candidates = [element for element, candidate_tokens in rows if candidate_tokens == wanted]
+        if candidates:
+          node = min(candidates, key=lambda element: len(element.find_all(["p", "div", "li", "blockquote"])))
+        else:
+          # Sentence marking can replace the synthetic paragraph wrapper. Recover
+          # its paragraph container by a strict token-window match in the marked DOM.
+          best = None
+          fuzzy_threshold = .89 if len(wanted) >= 10 else (.98 if len(wanted) >= 5 else .999)
+          wanted_counts = Counter(wanted)
+          window_scores = {}
+          for element, candidate_tokens in rows:
+            if not candidate_tokens or len(wanted) < 3:
               continue
-            consumed = next_token - start
-            for window_size in range(min_window_size, len(wanted)+3):
-              window = [wanted[0], *candidate_tokens[next_token:next_token+window_size-consumed]]
-              if len(window) < max(3, int(len(wanted)*.9)):
+            min_window_size = max(3, len(wanted)-2)
+            for start in range(max(0, len(candidate_tokens)-min_window_size+1)):
+              joined, next_token = "", start
+              while next_token < len(candidate_tokens) and len(joined) < len(wanted[0]):
+                joined += candidate_tokens[next_token]
+                next_token += 1
+              if joined != wanted[0]:
                 continue
-              ratio = SequenceMatcher(None, wanted, window, autojunk=False).ratio()
-              if best is None or ratio > best[0]:
-                best = (ratio, element)
-        fuzzy_threshold = .89 if len(wanted) >= 10 else (.98 if len(wanted) >= 5 else .999)
-        if best and best[0] >= fuzzy_threshold:
-          node = best[1]
-          if node.get("id"):
-            frag_id = node["id"]
-          else:
-            node["id"] = frag_id
+              consumed = next_token - start
+              for window_size in range(min_window_size, len(wanted)+3):
+                window = [wanted[0], *candidate_tokens[next_token:next_token+window_size-consumed]]
+                if len(window) < max(3, int(len(wanted)*.9)):
+                  continue
+                window_key = tuple(window)
+                if window_key not in window_scores:
+                  # Multiset overlap is an upper bound on ordered matching.
+                  # A rejected window cannot reach the unchanged acceptance threshold.
+                  overlap = sum(min(count, wanted_counts[word]) for word, count in Counter(window).items())
+                  upper = 2.0 * overlap / (len(wanted) + len(window))
+                  window_scores[window_key] = (SequenceMatcher(None, wanted, window, autojunk=False).ratio()
+                    if upper >= fuzzy_threshold and (best is None or upper > best[0]) else -1.0)
+                ratio = window_scores[window_key]
+                if ratio >= fuzzy_threshold and (best is None or ratio > best[0]):
+                  best = (ratio, element)
+          fuzzy_threshold = .89 if len(wanted) >= 10 else (.98 if len(wanted) >= 5 else .999)
+          if best and best[0] >= fuzzy_threshold:
+            node = best[1]
+        paragraph_match_cache[match_key] = node
+      if node is not None:
+        if node.get("id"):
+          frag_id = node["id"]
+        else:
+          remember_id(soup, node, frag_id)
     if not node:
       sentence_timeline.append({**p_seg, "document": doc_key, "fragment": frag_id,
         "start": p_start, "end": p_end, "text": p_text,
         "occurrenceId": fallback_occurrence, "timingStatus": "SENTENCE_FROM_PARAGRAPH"})
       continue
-    paragraph_text = authoritative_dom_text(soup, frag_id) or _build_char_map(node)[1].strip() or p_text
+    paragraph_text = authoritative_dom_text(soup, frag_id)
+    if not paragraph_text:
+      if id(node) not in node_text_cache:
+        node_text_cache[id(node)] = _build_char_map(node)[1].strip()
+      paragraph_text = node_text_cache[id(node)] or p_text
 
-    # Find all sentence spans within this paragraph
-    spans = node.find_all("span", id=re.compile(r"segment\d+"))
-    if not spans:
+    # DOM contents are stable throughout refinement; reuse extracted sentence rows.
+    cache_key = id(node)
+    if cache_key not in sentence_cache:
+      spans = node.find_all("span", id=re.compile(r"segment\d+"))
+      sub_sentences = []
+      for s_node in spans:
+        _, s_text, _ = _build_char_map(s_node)
+        s_tokens = tokens(s_text)
+        if s_tokens:
+          sub_sentences.append({"fragment": s_node["id"], "text": s_text.strip(), "tokens": s_tokens})
+      sentence_cache[cache_key] = (bool(spans), sub_sentences)
+    has_spans, sub_sentences = sentence_cache[cache_key]
+    if not has_spans:
       sentence_timeline.append({**p_seg, "document": doc_key, "fragment": frag_id,
         "start": p_start, "end": p_end, "text": paragraph_text,
         "occurrenceId": fallback_occurrence, "timingStatus": "SENTENCE_FROM_PARAGRAPH"})
       continue
-
-    # Extract sentences
-    sub_sentences = []
-    for s_node in spans:
-      _, s_text, _ = _build_char_map(s_node)
-      s_tokens = tokens(s_text)
-      if s_tokens:
-        sub_sentences.append({
-          "fragment": s_node["id"],
-          "text": s_text.strip(),
-          "tokens": s_tokens
-        })
 
     if len(sub_sentences) <= 1:
       # A one-sentence paragraph has no fine-grained timing evidence here;
@@ -197,7 +237,11 @@ def refine_timeline_by_dom(
       continue
 
     # Multi-sentence paragraph: align words in [p_start - 0.5, p_end + 0.5]
-    cand_words = [w for w in track_words.get(sid, [])
+    candidates = track_words.get(sid, [])
+    if sid in track_intervals:
+      starts, max_ends = track_intervals[sid]
+      candidates = candidates[bisect_left(max_ends, p_start - 0.5):bisect_right(starts, p_end + 0.5)]
+    cand_words = [w for w in candidates
                   if w["end"] >= p_start - 0.5 and w["start"] <= p_end + 0.5]
 
     book_tokens = []
@@ -299,13 +343,22 @@ def merge_stream_projection_with_paragraph_fallback(projected, paragraph_refinem
   # A global hit can land inside an independently located paragraph's coarse
   # interval. Preserve that observed interval but use the coarse paragraph DOM
   # anchor, avoiding both a false fine anchor and overlapping timeline rows.
+  fallback_tracks = defaultdict(list)
+  for idx, fallback in enumerate(fallbacks):
+    fallback_tracks[fallback.get("audioSourceId")].append((idx, fallback))
+  fallback_intervals = {
+    sid: ([row.get("start", 0) for _, row in rows], [row.get("end", 0) for _, row in rows])
+    for sid, rows in fallback_tracks.items()
+  }
   consumed = set()
   merged = []
   for seg_idx, seg in enumerate(projected):
-    overlaps = [(idx, fallback) for idx, fallback in enumerate(fallbacks)
-      if seg.get("audioSourceId") == fallback.get("audioSourceId")
-      and seg.get("end", 0) > fallback.get("start", 0)
-      and seg.get("start", 0) < fallback.get("end", 0)]
+    sid = seg.get("audioSourceId")
+    starts, ends = fallback_intervals.get(sid, ([], []))
+    # Fallbacks are already disjoint and sorted within each track. Preserve
+    # their original order so equal-overlap ties still choose the first row.
+    overlaps = fallback_tracks.get(sid, [])[bisect_right(ends, seg.get("start", 0)):
+                                             bisect_left(starts, seg.get("end", 0))]
     if overlaps:
       idx, fallback = max(overlaps, key=lambda row: min(seg["end"], row[1]["end"])-max(seg["start"], row[1]["start"]))
       consumed.update(index for index, _ in overlaps)

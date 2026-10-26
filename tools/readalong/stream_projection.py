@@ -1,5 +1,6 @@
 """Monotone lexical projection; never certify lexical matches as acoustic truth."""
-from difflib import SequenceMatcher
+from difflib import Match, SequenceMatcher
+from bisect import bisect_left
 from collections import defaultdict
 import hashlib
 import math
@@ -94,6 +95,48 @@ def prepare_documents(text_dir, spine_htmls, marker):
   return documents, fragments, tokens
 
 
+def indexed_matching_blocks(book_tokens, audio_tokens, ngrams, min_size=7):
+  """Return exactly the non-junk SequenceMatcher blocks of at least min_size.
+
+  Every accepted block contains a seven-token seed. Dynamic programming on
+  seed positions finds the same longest contiguous match, including the
+  earliest book/audio tie break. Subregions without a qualifying seed cannot
+  contain an accepted block and need no whole-book token search.
+  """
+  if min_size < 7:
+    raise ValueError("Indexed projection requires a minimum block of seven tokens")
+  seeds = [ngrams.get(tuple(audio_tokens[j:j + 7]), ())
+           for j in range(max(0, len(audio_tokens) - 6))]
+  queue = [(0, len(book_tokens), 0, len(audio_tokens))]
+  blocks = []
+  while queue:
+    alo, ahi, blo, bhi = queue.pop()
+    best_a, best_b, best_size = alo, blo, 0
+    previous = {}
+    for j in range(blo, bhi - 6):
+      current = {}
+      positions = seeds[j]
+      start = bisect_left(positions, alo)
+      stop = bisect_left(positions, ahi - 6)
+      for i in positions[start:stop]:
+        run = previous.get(i - 1, 0) + 1
+        current[i] = run
+        size = run + 6
+        a, b = i - run + 1, j - run + 1
+        if size > best_size or (size == best_size and (a, b) < (best_a, best_b)):
+          best_a, best_b, best_size = a, b, size
+      previous = current
+    if best_size < min_size:
+      continue
+    blocks.append(Match(best_a, best_b, best_size))
+    if best_a - alo >= min_size and best_b - blo >= min_size:
+      queue.append((alo, best_a, blo, best_b))
+    a_end, b_end = best_a + best_size, best_b + best_size
+    if ahi - a_end >= min_size and bhi - b_end >= min_size:
+      queue.append((a_end, ahi, b_end, bhi))
+  return sorted(blocks)
+
+
 def find_reorder_matches(book_tokens, audio_tokens, audio_words, unmapped_ranges, ngrams, min_block_size=10):
   """Identify unambiguous reading-order variations and candidate occurrences.
 
@@ -130,8 +173,7 @@ def find_reorder_matches(book_tokens, audio_tokens, audio_words, unmapped_ranges
         if s_end - s_start < min_block_size:
           continue
         slice_tokens = sub_tokens[s_start:s_end]
-        matcher = SequenceMatcher(None, book_tokens, slice_tokens, autojunk=False)
-        blocks = [b for b in matcher.get_matching_blocks() if b.size >= min_block_size]
+        blocks = indexed_matching_blocks(book_tokens, slice_tokens, ngrams, min_block_size)
         for b in blocks:
           abs_sub_b = s_start + b.b
           abs_sub_e = abs_sub_b + b.size
@@ -260,8 +302,7 @@ def project_stream(book_tokens, fragments, audio_words, confirmed_reorders=None)
     ngrams[tuple(book_tokens[index:index + 7])].append(index)
 
   # Phase 1: Primary global monotone alignment
-  matches = SequenceMatcher(None, book_tokens, audio_tokens, autojunk=False)
-  raw_blocks = [b for b in matches.get_matching_blocks() if b.size >= 7]
+  raw_blocks = indexed_matching_blocks(book_tokens, audio_tokens, ngrams)
 
   # Filter out ambiguous blocks that lack context evidence (R03-03)
   valid_blocks = []
