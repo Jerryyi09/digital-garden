@@ -1233,6 +1233,41 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
       sentence_timeline = merge_stream_projection_with_paragraph_fallback(projected_timeline, paragraph_refinement)
       sentence_timeline, repairs = resolve_boundaries(sentence_timeline)
 
+      # A paragraph fallback can retain the coarse ``fast-*`` anchor after
+      # sentence marking replaced that wrapper with sentence spans. Rebind only
+      # when the serialized DOM contains exactly one fragment with the same
+      # canonical text; ambiguous text remains a fallback and is audited.
+      dom_fragment_cache = {}
+      track_durations = {sid: duration for _, sid, _, duration in specs}
+      repaired_sentence_timeline = []
+      for seg in sentence_timeline:
+        sid = seg.get("audioSourceId")
+        if sid in track_durations:
+          seg["start"] = max(0.0, min(float(seg["start"]), track_durations[sid]))
+          seg["end"] = max(0.0, min(float(seg["end"]), track_durations[sid]))
+        doc_key = seg.get("document", "")
+        doc_name = doc_key.removeprefix("text/")
+        soup = sent_docs.get(doc_name) or sent_docs.get(doc_key)
+        if soup is not None:
+          cache_key = id(soup)
+          if cache_key not in dom_fragment_cache:
+            parser = DOMFragmentExtractor()
+            parser.feed(str(soup))
+            parser.close()
+            by_text = defaultdict(list)
+            for fragment, text in parser.id_to_text.items():
+              by_text[canonical_text(text)].append(fragment)
+            dom_fragment_cache[cache_key] = (parser, by_text)
+          parser, by_text = dom_fragment_cache[cache_key]
+          current = canonical_text(parser.id_to_text.get(seg.get("fragment", ""), ""))
+          wanted = canonical_text(seg.get("text", ""))
+          if current != wanted and wanted and len(by_text.get(wanted, [])) == 1:
+            seg["fragment"] = by_text[wanted][0]
+            seg["text"] = parser.id_to_text[seg["fragment"]]
+        if seg.get("end", 0) > seg.get("start", 0):
+          repaired_sentence_timeline.append(seg)
+      sentence_timeline = repaired_sentence_timeline
+
       for s in sentence_timeline:
         s.setdefault("occurrenceId", "0")
         s.setdefault("speechUnitId", f"{s['audioSourceId']}:{s['start']}")

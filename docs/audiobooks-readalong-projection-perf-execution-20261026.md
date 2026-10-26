@@ -50,4 +50,16 @@ profile 文件、日志、旧版函数快照和对照产物均在 `private/reada
 - 最近修改时间：2026-10-26 12:43:36 UTC（新加坡时间 20:43:36）。
 - `/home/hp/readalong-manifest-backup-20261025/` 的完整结果见 `private/readalong-projection-perf-20261026/nuc-backup-report.json`。
 
-本轮只读 NUC，没有删除、覆盖、改名、同步或发布。
+## 发布补充与《千面英雄》拒绝原因
+
+按后续工单要求，十本对照书均未发布。`ten-comparison.json` 中十本书的 timeline SHA-256、逐句 JSON、审核指标和未定位率均完全一致，因此无需发布；不存在需要逐本解释的差异。
+
+《千面英雄》初次句级候选被 `publish_practical` 拒绝，触发的是候选 `practical-audit.json` 的 `DOM_REFERENCE_BROKEN`（20 条）和 `INVALID_INTERVAL`（1 条），发布层因此归类为 `STRUCTURAL_OR_PHYSICAL_SOURCE_ERROR`。20 条坏锚点集中在 Chapter-2 的三个句子（The Void 7 条、The God 5 条、The Thunderbolt 8 条）；另 1 条是第 56 轨末尾 `698.99–699.01` 超出物理时长 `699.0072s` 的舍入越界。它们不是片尾/附录三轨造成的结构拒绝。
+
+修复逻辑改为按文档缓存规范化文本，唯一匹配时重绑到真实 DOM fragment，并将句子区间裁剪到物理时长、丢弃零长度区间。`ZERO_DURATION` 仍作为 ASR 诊断保留 1 条，但不是 practical publisher 的 hard error，也不构成拒绝原因。第 60、61、62 轨（片尾音乐/附录）仍分别为 UNALIGNED，未人为填充映射；这是允许带 gap 发布的预期结果。
+
+修复后本地发布成功，revision 为 `08e36182096a460faf04dea5bb41b811`，审核决策 `PUBLISH_WITH_GAPS`。随后通过 `hp@10.0.0.85:2222` 直连同步到 `/mnt/750/Music/有声书/文学理论/The Hero with a Thousand Faces`。远端 manifest revision 与本地一致；本地关键哈希为 manifest `c69c442d…2401b`、timeline `5338131a…a78c4`、text tree `99505e9c…14bd`。十本对照书没有同步或发布。
+
+三层核验中，本地静态核验通过（22,051 segments，median 1.34s，p95 4.90s）；远端目录、revision 和音轨文件已通过直连只读检查。Alist 样本检查命令在当前 NUC 网关响应超时，未将超时冒充成功；目录和 manifest 已由 SSH 直接确认存在。原段落级版本保持不变并留在 NUC 上，句级版本作为新 revision 发布。
+
+耗时对比：旧句级基线 **1393.47s（23.22 分钟）**；修复后无 profile 实测 **59.43s**（约 0.99 分钟），约 **23.4×** 加速，满足 ≤3 分钟目标。带 profile 的一次实测为 85.91s，仅含分析器开销，不作为正式验收数字。
