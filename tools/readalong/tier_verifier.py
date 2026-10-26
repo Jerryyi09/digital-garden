@@ -15,7 +15,7 @@ import unicodedata
 from bs4 import BeautifulSoup
 
 from tools.readalong.full_inventory_scanner import natural_sort_key
-from tools.readalong.nuc_target import NUC_SSH, NUC_TARGET, canonical_nuc_target, direct_ssh_command, run_nuc
+from tools.readalong.nuc_target import NUC_SSH, NUC_TARGET, canonical_nuc_target, direct_ssh_command, run_nuc, bounded_remote
 
 
 def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
@@ -219,7 +219,7 @@ if errors:
 print("TIER2_OK")
 ' """
   host = canonical_nuc_target(remote_host)
-  res = run_nuc(direct_ssh_command(host, script), check=False, runner=subprocess.run, capture_output=True, text=True)
+  res = run_nuc(direct_ssh_command(host, bounded_remote(script, seconds=600, lock="tier2")), check=False, runner=subprocess.run, capture_output=True, text=True)
   out = res.stdout.strip()
   if res.returncode == 0 and "TIER2_OK" in out:
     return True, []
