@@ -1,0 +1,492 @@
+"""Monotone lexical projection; never certify lexical matches as acoustic truth."""
+from difflib import SequenceMatcher
+from collections import defaultdict
+import hashlib
+import math
+import re
+
+from bs4 import BeautifulSoup, Comment
+from tools.readalong.engine.mark_sentence import _build_char_map, _create_segment_spans
+from tools.readalong.authoritative_validator import safe_path, DOMFragmentExtractor
+
+
+def normalize_token(word):
+  return re.sub(r"[^a-z0-9]", "", word.lower())
+
+
+SEGMENT_ID = re.compile(r"segment\d+$")
+
+
+def uncovered_text_nodes(soup):
+  """Require every visible text node, not a percentage of document length."""
+  body = soup.body if soup.body else soup
+  uncovered = []
+  for node in body.find_all(string=True):
+    if isinstance(node, Comment) or not node.strip():
+      continue
+    parents = list(node.parents)
+    if any(p.name in {"head", "script", "style", "noscript"} or p.has_attr("hidden")
+           or re.search(r"display\s*:\s*none|visibility\s*:\s*hidden", p.get("style", ""), re.I)
+           for p in parents):
+      continue
+    if not any(p.name == "span" and SEGMENT_ID.search(p.get("id", "")) for p in parents):
+      uncovered.append(node)
+  return uncovered
+
+
+def is_document_already_marked(raw_html):
+  soup = BeautifulSoup(raw_html, "html.parser")
+  return bool(soup.find("span", id=SEGMENT_ID)) and not uncovered_text_nodes(soup)
+
+
+def complete_document_marking(raw, marker, doc_id):
+  soup = BeautifulSoup(raw, "html.parser")
+  if is_document_already_marked(raw):
+    return raw
+  # The marker now understands mixed block content and protects existing spans.
+  marked = marker(raw, chapter_id=doc_id)
+  if uncovered_text_nodes(BeautifulSoup(marked, "html.parser")):
+    raise ValueError("Visible body text remains unmarked; refusing partial token inventory")
+  return marked
+
+
+def prepare_documents(text_dir, spine_htmls, marker):
+  """Mark each original document once and retain its immutable token positions."""
+  documents, fragments, tokens = {}, [], []
+  for name in spine_htmls:
+    if name in documents:
+      continue
+    path = safe_path(text_dir, name)
+    raw = path.read_text(encoding="utf-8")
+    doc_id = hashlib.sha256(name.encode()).hexdigest()[:16]
+    marked = complete_document_marking(raw, marker, doc_id)
+    soup = BeautifulSoup(marked, "html.parser")
+    # Disambiguate duplicate source IDs (calibre split artifacts) so DOMFragmentExtractor is clean
+    used_ids = set()
+    for node in soup.find_all(id=True):
+      nid = node["id"]
+      if nid in used_ids:
+        if SEGMENT_ID.search(nid):
+          raise ValueError(f"Sentence marking produced duplicate DOM IDs: {name}#{nid}")
+        new_id = f"{nid}-dup"
+        suffix = 2
+        while new_id in used_ids:
+          new_id = f"{nid}-dup-{suffix}"
+          suffix += 1
+        node["id"] = new_id
+      used_ids.add(node["id"])
+    segment_ids = [node["id"] for node in soup.find_all(id=re.compile(r"segment\d+"))]
+    if len(segment_ids) != len(set(segment_ids)):
+      raise ValueError(f"Sentence marking produced duplicate DOM IDs: {name}")
+    documents[name] = soup
+    for span in soup.find_all("span", id=re.compile(r"segment\d+$")):
+      if span.find_parent("span", id=re.compile(r"segment\d+$")):
+        raise ValueError(f"Nested sentence markers: {name}")
+      char_map, text, zero_nodes = _build_char_map(span)
+      words = [(m.start(), m.end(), normalize_token(m.group()))
+               for m in re.finditer(r"\S+", text) if normalize_token(m.group())]
+      if not words:
+        continue
+      fragments.append({"document": f"text/{name}", "node": span,
+                        "offset": len(tokens), "words": words, "text": text,
+                        "char_map": char_map, "zero_nodes": zero_nodes})
+      tokens.extend(word[2] for word in words)
+  return documents, fragments, tokens
+
+
+def find_reorder_matches(book_tokens, audio_tokens, audio_words, unmapped_ranges, ngrams, min_block_size=10):
+  """Identify unambiguous reading-order variations and candidate occurrences.
+
+  Enforces strict disambiguation contracts per LIB-VERIFY-03 (R03-02, R03-03):
+  - Iterative sub-interval search: preserves every independent re-reading occurrence (e.g. A B A B A B).
+  - Strict disambiguation: size >= 16 NEVER bypasses ambiguity check. Lists all competing book positions.
+  - Context constraint: ambiguity is only resolved when prior/next anchors uniquely isolate the position.
+  - Maintains strictly monotonic, non-overlapping audio timestamps.
+  """
+  reorder_candidates = []
+  unmapped_diagnostics = []
+
+  for rng in unmapped_ranges:
+    begin, end = rng["begin"], rng["end"]
+    source_id = audio_words[begin]["audioSourceId"]
+    sub_tokens = audio_tokens[begin:end]
+
+    # Iterative non-overlapping search within this unmapped audio range
+    matched_audio_subranges = []
+    candidate_blocks = []
+
+    for _iteration in range(20):
+      uncovered = []
+      curr = 0
+      for ms, me in sorted(matched_audio_subranges):
+        if ms > curr:
+          uncovered.append((curr, ms))
+        curr = max(curr, me)
+      if curr < len(sub_tokens):
+        uncovered.append((curr, len(sub_tokens)))
+
+      new_blocks_found = False
+      for s_start, s_end in uncovered:
+        if s_end - s_start < min_block_size:
+          continue
+        slice_tokens = sub_tokens[s_start:s_end]
+        matcher = SequenceMatcher(None, book_tokens, slice_tokens, autojunk=False)
+        blocks = [b for b in matcher.get_matching_blocks() if b.size >= min_block_size]
+        for b in blocks:
+          abs_sub_b = s_start + b.b
+          abs_sub_e = abs_sub_b + b.size
+          candidate_blocks.append({
+            "book_offset": b.a,
+            "sub_b": abs_sub_b,
+            "size": b.size,
+          })
+          matched_audio_subranges.append((abs_sub_b, abs_sub_e))
+          new_blocks_found = True
+
+      if not new_blocks_found:
+        break
+
+    candidate_blocks.sort(key=lambda b: b["sub_b"])
+
+    accepted_blocks = []
+    has_ambiguity = False
+    all_competing_offsets = set()
+
+    for b in candidate_blocks:
+      book_off = b["book_offset"]
+      size = b["size"]
+      matched_tokens = book_tokens[book_off:book_off + size]
+      phrase_ngram = tuple(matched_tokens[:min(7, len(matched_tokens))])
+      possible_starts = ngrams.get(phrase_ngram, [])
+
+      # Strict full lexical comparison across entire block size
+      competing = [
+        cand_start for cand_start in possible_starts
+        if cand_start + size <= len(book_tokens) and book_tokens[cand_start:cand_start + size] == matched_tokens
+      ]
+      if not competing and book_off not in competing:
+        competing = [book_off]
+      all_competing_offsets.update(competing)
+
+      # R03-03: Length >= 16 NEVER automatically bypasses ambiguity!
+      is_ambiguous = False
+      disambiguation = {}
+
+      if len(competing) > 1:
+        is_ambiguous = True
+        has_ambiguity = True
+        disambiguation = {
+          "status": "AMBIGUOUS_COMPETING_POSITIONS",
+          "competing_offsets": sorted(competing),
+        }
+      else:
+        disambiguation = {
+          "status": "UNAMBIGUOUS_UNIQUE_LEXICAL",
+          "competing_offsets": sorted(competing),
+        }
+
+      cand_info = {
+        "book_offset": book_off,
+        "audio_begin": begin + b["sub_b"],
+        "audio_end": begin + b["sub_b"] + size,
+        "size": size,
+        "audioSourceId": source_id,
+        "start": audio_words[begin + b["sub_b"]]["start"],
+        "end": audio_words[begin + b["sub_b"] + size - 1]["end"],
+        "is_ambiguous": is_ambiguous,
+        "competing_offsets": sorted(competing),
+        "disambiguation": disambiguation,
+      }
+      reorder_candidates.append(cand_info)
+      if not is_ambiguous:
+        accepted_blocks.append(cand_info)
+
+    if not all_competing_offsets:
+      for index in range(begin, end - 6):
+        all_competing_offsets.update(ngrams.get(tuple(audio_tokens[index:index + 7]), []))
+
+    if accepted_blocks and not has_ambiguity:
+      unmapped_diagnostics.append({
+        "audioSourceId": source_id,
+        "start": audio_words[begin]["start"],
+        "end": audio_words[end - 1]["end"],
+        "wordCount": end - begin,
+        "reason": "POSSIBLE_REORDER_OR_REPEAT",
+        "candidateBookTokenOffsets": sorted(all_competing_offsets)[:30],
+        "candidateOccurrences": len(accepted_blocks),
+      })
+    else:
+      reason = "AMBIGUOUS_REORDER_OR_REPEAT" if has_ambiguity else (
+        "POSSIBLE_REORDER_OR_REPEAT" if all_competing_offsets else "NO_LEXICAL_CORRESPONDENCE"
+      )
+      unmapped_diagnostics.append({
+        "audioSourceId": source_id,
+        "start": audio_words[begin]["start"],
+        "end": audio_words[end - 1]["end"],
+        "wordCount": end - begin,
+        "reason": reason,
+        "candidateBookTokenOffsets": sorted(all_competing_offsets)[:30],
+        "candidateOccurrences": len(accepted_blocks),
+      })
+
+  return reorder_candidates, unmapped_diagnostics
+
+
+def project_stream(book_tokens, fragments, audio_words, confirmed_reorders=None):
+  """Align the entire ordered book/track stream, supporting re-reading occurrences.
+
+  Matching blocks are lexical evidence only. Short isolated coincidences are
+  discarded; unmatched text/audio remains unmatched, never interpolated.
+  Multi-occurrence identity: occurrence_key = (audioSourceId, document, fragment, occurrenceId).
+  """
+  usable_words, zero_duration_words = [], []
+  for index, word in enumerate(audio_words):
+    start, end = word["start"], word["end"]
+    if (isinstance(start, bool) or isinstance(end, bool)
+        or not isinstance(start, (int, float)) or not isinstance(end, (int, float))
+        or not math.isfinite(start) or not math.isfinite(end) or start < 0 or end < start):
+      raise ValueError("Invalid ASR word interval; refusing fabricated timestamps")
+    if start == end:
+      zero_duration_words.append({"index": index, "audioSourceId": word["audioSourceId"],
+                                  "time": start, "reason": "ZERO_DURATION_WORD"})
+      continue
+    usable_words.append(word)
+  audio_words = usable_words
+  audio_tokens = [normalize_token(w["word"]) for w in audio_words]
+
+  # Index ngrams across book tokens for disambiguation
+  ngrams = defaultdict(list)
+  for index in range(max(0, len(book_tokens) - 6)):
+    ngrams[tuple(book_tokens[index:index + 7])].append(index)
+
+  # Phase 1: Primary global monotone alignment
+  matches = SequenceMatcher(None, book_tokens, audio_tokens, autojunk=False)
+  raw_blocks = [b for b in matches.get_matching_blocks() if b.size >= 7]
+
+  # Filter out ambiguous blocks that lack context evidence (R03-03)
+  valid_blocks = []
+  for idx, b in enumerate(raw_blocks):
+    matched_tokens = book_tokens[b.a : b.a + b.size]
+    phrase_ngram = tuple(matched_tokens[:min(7, len(matched_tokens))])
+    competing = [
+      cand_start for cand_start in ngrams.get(phrase_ngram, [])
+      if cand_start + b.size <= len(book_tokens) and book_tokens[cand_start:cand_start + b.size] == matched_tokens
+    ]
+    if len(competing) > 1:
+      has_prior_anchor = any(other.a + other.size <= b.a and other.b + other.size <= b.b for other in raw_blocks if other != b)
+      has_next_anchor = any(b.a + b.size <= other.a and b.b + b.size <= other.b for other in raw_blocks if other != b)
+      if not (has_prior_anchor or has_next_anchor):
+        # Isolated block with multiple competing positions: cannot arbitrarily pick the first one
+        continue
+    valid_blocks.append(b)
+
+  primary_positions = {}
+  fuzzy_positions = set()
+  for b in valid_blocks:
+    for i in range(b.size):
+      primary_positions[b.a + i] = b.b + i
+
+  # Phase 1.5: Local anchor-guided monotone refinement between consecutive anchors
+  for idx in range(len(valid_blocks) - 1):
+    curr_b, next_b = valid_blocks[idx], valid_blocks[idx + 1]
+    a_gap = next_b.a - (curr_b.a + curr_b.size)
+    b_gap = next_b.b - (curr_b.b + curr_b.size)
+    if 0 < a_gap <= 300 and 0 < b_gap <= 300:
+      sub_book = book_tokens[curr_b.a + curr_b.size : next_b.a]
+      sub_audio = audio_tokens[curr_b.b + curr_b.size : next_b.b]
+      sub_m = SequenceMatcher(None, sub_book, sub_audio, autojunk=False)
+      for sb in sub_m.get_matching_blocks():
+        if sb.size >= 2:
+          for i in range(sb.size):
+            b_pos = curr_b.a + curr_b.size + sb.a + i
+            a_pos = curr_b.b + curr_b.size + sb.b + i
+            if b_pos not in primary_positions:
+              primary_positions[b_pos] = a_pos
+      # Only recover small 1:1 ASR spelling errors between established anchors.
+      # Do not interpolate insertions/deletions or search the whole book fuzzily.
+      for tag, a1, a2, b1, b2 in sub_m.get_opcodes():
+        if tag != "replace" or a2-a1 != b2-b1 or not 0 < a2-a1 <= 3:
+          continue
+        for i, (text_word, heard_word) in enumerate(zip(sub_book[a1:a2], sub_audio[b1:b2])):
+          if (min(len(text_word), len(heard_word)) >= 5
+              and SequenceMatcher(None, text_word, heard_word, autojunk=False).ratio() >= .88):
+            b_pos = curr_b.a + curr_b.size + a1+i
+            a_pos = curr_b.b + curr_b.size + b1+i
+            # Never bridge track boundaries with a guessed spelling correction.
+            if audio_words[curr_b.b]["audioSourceId"] == audio_words[next_b.b]["audioSourceId"]:
+              primary_positions[b_pos] = a_pos
+              fuzzy_positions.add(b_pos)
+
+  # Phase 2: Identify unmapped audio intervals
+  used_primary_audio = set(primary_positions.values())
+  unmapped_ranges = []
+  begin = 0
+  while begin < len(audio_words):
+    if begin in used_primary_audio:
+      begin += 1
+      continue
+    end = begin + 1
+    while (end < len(audio_words) and end not in used_primary_audio
+           and audio_words[end]["audioSourceId"] == audio_words[begin]["audioSourceId"]):
+      end += 1
+    if end - begin >= 7:
+      unmapped_ranges.append({"begin": begin, "end": end})
+    begin = end
+
+  # Phase 3: Secondary disambiguated re-reading / reading-order alignment
+  reorder_candidates, unmapped_diagnostics = find_reorder_matches(
+    book_tokens, audio_tokens, audio_words, unmapped_ranges, ngrams, min_block_size=10
+  )
+
+  # Check if confirmed reorders should be instantiated
+  # Enforces R03-03: confirmed_reorders=True cannot bypass ambiguity check
+  instantiated_candidates = []
+  if confirmed_reorders == "auto_unique":
+    instantiated_candidates = [c for c in reorder_candidates
+      if not c.get("is_ambiguous") and c.get("size", 0) >= 10]
+  elif confirmed_reorders is True:
+    # Only unambiguous candidates are automatically instantiated when True is passed
+    instantiated_candidates = [c for c in reorder_candidates if not c.get("is_ambiguous")]
+  elif isinstance(confirmed_reorders, (list, tuple, set)):
+    for cand in reorder_candidates:
+      exact_key = (cand.get("audioSourceId"), cand.get("start"), cand.get("end"), cand.get("book_offset"))
+      interval_key = (cand.get("start"), cand.get("end"))
+      if (cand.get("audioSourceId") in confirmed_reorders
+          or interval_key in confirmed_reorders
+          or exact_key in confirmed_reorders):
+        if not cand.get("is_ambiguous"):
+          instantiated_candidates.append(cand)
+  else:
+    instantiated_candidates = []
+
+  # Collect all aligned segments (primary and re-read occurrences)
+  raw_segments = []
+
+  # Process primary segments
+  for frag in fragments:
+    words, offset = frag["words"], frag["offset"]
+    runs = []
+    for i in range(len(words)):
+      pos = primary_positions.get(offset + i)
+      source = audio_words[pos]["audioSourceId"] if pos is not None else None
+      if (runs and source == runs[-1][2]
+          and (source is None or (pos == primary_positions[offset + i - 1] + 1
+               and audio_words[pos]["start"] - audio_words[pos-1]["end"] <= 3.5))):
+        runs[-1][1] = i + 1
+      else:
+        runs.append([i, i + 1, source])
+    span = frag["node"]
+    if len(runs) == 1 and runs[0][2] is not None:
+      nodes = [span]
+    elif all(run[2] is None for run in runs):
+      continue
+    else:
+      boundaries = [(0 if a == 0 else words[a][0],
+                     len(frag["text"]) if b == len(words) else words[b][0])
+                    for a, b, _ in runs]
+      nodes = _create_segment_spans(boundaries, frag["char_map"],
+                                    frag["zero_nodes"], "projection", 0)
+      for i, node in enumerate(nodes):
+        node["id"] = f"{span['id']}-part{i}"
+      span.clear()
+      for node in nodes:
+        span.append(node)
+    for (a, b, source), node in zip(runs, nodes):
+      if source is None:
+        continue
+      first, last = audio_words[primary_positions[offset + a]], audio_words[primary_positions[offset + b - 1]]
+      parser = DOMFragmentExtractor()
+      parser.feed(str(node))
+      parser.close()
+      raw_segments.append({
+        "audioSourceId": source, "start": first["start"], "end": last["end"],
+        "document": frag["document"], "fragment": node["id"],
+        "text": parser.id_to_text.get(node["id"], frag["text"]),
+        "matchedWordRatio": 1.0 - sum(offset+i in fuzzy_positions for i in range(a, b))/(b-a),
+        "reviewStatus": "unreviewed", "timingStatus": "TIMING_UNVERIFIED",
+      })
+
+  # Process secondary re-reading segments (each candidate occurrence independently)
+  # Preserves multi-occurrence identity without overwriting earlier re-reads (R03-02)
+  instantiated_audio_indices = set()
+  for cand in instantiated_candidates:
+    cand_b_start = cand["book_offset"]
+    cand_b_end = cand_b_start + cand["size"]
+    cand_a_start = cand["audio_begin"]
+
+    for frag in fragments:
+      frag_offset = frag["offset"]
+      frag_len = len(frag["words"])
+      if frag_offset >= cand_b_start and (frag_offset + frag_len) <= cand_b_end:
+        rel_offset = frag_offset - cand_b_start
+        word_start_idx = cand_a_start + rel_offset
+        word_end_idx = word_start_idx + frag_len - 1
+        first_w = audio_words[word_start_idx]
+        last_w = audio_words[word_end_idx]
+        instantiated_audio_indices.update(range(word_start_idx, word_end_idx+1))
+        span = frag["node"]
+        parser = DOMFragmentExtractor()
+        parser.feed(str(span))
+        parser.close()
+        raw_segments.append({
+          "audioSourceId": cand["audioSourceId"],
+          "start": first_w["start"],
+          "end": last_w["end"],
+          "document": frag["document"],
+          "fragment": span["id"],
+          "text": parser.id_to_text.get(span["id"], frag["text"]),
+          "matchedWordRatio": 1.0,
+          "reviewStatus": "unreviewed",
+          "timingStatus": "TIMING_UNVERIFIED",
+        })
+
+  # Sort all segments strictly by audio physical playback time: (audioSourceId, start, end)
+  raw_segments.sort(key=lambda s: (s["audioSourceId"], s["start"], s["end"]))
+
+  # Assign unambiguous occurrenceId to each unique (audioSourceId, document, fragment)
+  occurrence_counters = defaultdict(int)
+  final_segments = []
+  for seg in raw_segments:
+    key = (seg["audioSourceId"], seg["document"], seg["fragment"])
+    occ_idx = occurrence_counters[key]
+    occurrence_counters[key] += 1
+    cleaned_seg = {
+      "audioSourceId": seg["audioSourceId"],
+      "start": seg["start"],
+      "end": seg["end"],
+      "document": seg["document"],
+      "fragment": seg["fragment"],
+      "text": seg["text"],
+      "matchedWordRatio": seg["matchedWordRatio"],
+      "occurrenceId": str(occ_idx),
+      "reviewStatus": seg["reviewStatus"],
+      "timingStatus": seg["timingStatus"],
+    }
+    final_segments.append(cleaned_seg)
+
+  # Filter out unmapped diagnostics for intervals that were instantiated
+  if instantiated_audio_indices:
+    filtered_diagnostics = []
+    for diag in unmapped_diagnostics:
+      diag_words = [i for i, w in enumerate(audio_words)
+                    if w["audioSourceId"] == diag["audioSourceId"] and diag["start"] <= w["start"] and w["end"] <= diag["end"]]
+      if not diag_words or not all(idx in instantiated_audio_indices for idx in diag_words):
+        filtered_diagnostics.append(diag)
+    unmapped_diagnostics = filtered_diagnostics
+
+  total_matched_tokens = len(primary_positions) + len(instantiated_audio_indices)
+  matched_audio_indices = set(primary_positions.values()) | instantiated_audio_indices
+  return final_segments, {
+    "bookTokens": len(book_tokens),
+    "audioTokens": len(audio_tokens),
+    "matchedTokens": total_matched_tokens,
+    "primaryMatchedTokens": len(primary_positions),
+    "reorderMatchedTokens": len(instantiated_audio_indices),
+    "fuzzyMatchedTokens": len(fuzzy_positions),
+    "tokenIntervals": [[w["audioSourceId"], w["start"], w["end"], int(i in matched_audio_indices)]
+                       for i, w in enumerate(audio_words)],
+    "candidateReorders": reorder_candidates,
+    "algorithm": "global-monotone-exact-v2-with-occurrence",
+    "unusableWordIntervals": zero_duration_words,
+    "unmappedAudioRanges": unmapped_diagnostics,
+  }
