@@ -7,8 +7,26 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 
+def load_alist_credentials():
+  import os
+  user, pwd = os.environ.get("READALONG_ALIST_USER"), os.environ.get("READALONG_ALIST_PASSWORD")
+  if user and pwd:
+    return user, pwd
+  cfg = Path.home() / ".config" / "readalong" / "alist.json"
+  if cfg.is_file():
+    data = json.loads(cfg.read_text(encoding="utf-8"))
+    if data.get("username") and data.get("password"):
+      return data["username"], data["password"]
+  raise RuntimeError("Alist credentials not configured: set READALONG_ALIST_USER/READALONG_ALIST_PASSWORD "
+                     f"or create {cfg} with {{\"username\": ..., \"password\": ...}} (chmod 600)")
+
+
 class AlistClient:
-  def __init__(self, base_url="http://127.0.0.1:5244/alist", username="hp", password="hp", timeout=15):
+  def __init__(self, base_url="http://127.0.0.1:5244/alist", username=None, password=None, timeout=10):
+    # Credentials are never stored in code: env vars or ~/.config/readalong/alist.json on the host
+    # that runs the client (the NUC, for Tier 3). Missing credentials fail loudly; no fallback.
+    if username is None or password is None:
+      username, password = load_alist_credentials()
     self.base_url = base_url.rstrip("/")
     self.username = username
     self.password = password
@@ -21,13 +39,13 @@ class AlistClient:
     if token:
       headers["Authorization"] = token
     data = json.dumps(payload).encode("utf-8")
-    for attempt in range(3):
+    for attempt in range(2):
       try:
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         with urllib.request.urlopen(req, timeout=self.timeout) as resp:
           return json.loads(resp.read().decode("utf-8"))
       except Exception:
-        if attempt == 2:
+        if attempt == 1:
           raise
         import time
         time.sleep(1)
@@ -288,12 +306,24 @@ def verify_book_on_alist(client: AlistClient, category: str, book_name: str, ali
   return ok, msg, details
 
 
+REMOTE_TOOLS_DIR = "/home/hp/.readalong-tools"
+
+
 def verify_book_via_ssh(remote_host: str, category: str, book_name: str, alist_root: str = "/750HD/有声书"):
   """Run verification remotely via direct SSH using /tmp/remote_checker.py."""
+  import shlex
   import subprocess
-  from tools.readalong.nuc_target import direct_ssh_command
-  cmd = direct_ssh_command(remote_host, f'python3 /tmp/remote_checker.py "{category}" "{book_name}"')
-  res = subprocess.run(cmd, capture_output=True, text=True)
+  from tools.readalong.nuc_target import NUC_SCP, bounded_remote, canonical_nuc_target, direct_ssh_command, run_nuc
+  here = Path(__file__).resolve().parent
+  target = canonical_nuc_target(remote_host)
+  # Always run the version-controlled checker, never a hand-placed /tmp copy that may be stale.
+  run_nuc(direct_ssh_command(target, "mkdir -p " + REMOTE_TOOLS_DIR), runner=subprocess.run,
+          capture_output=True, text=True)
+  run_nuc(NUC_SCP + [str(here / "nuc_verifier.py"), str(here / "remote_checker.py"), f"{target}:{REMOTE_TOOLS_DIR}/"],
+          runner=subprocess.run, capture_output=True, text=True)
+  remote = bounded_remote(f"python3 -u {REMOTE_TOOLS_DIR}/remote_checker.py {shlex.quote(category)} {shlex.quote(book_name)}",
+                          seconds=180, lock="tier3")
+  res = run_nuc(direct_ssh_command(target, remote), check=False, runner=subprocess.run, capture_output=True, text=True)
   out = res.stdout.strip()
   if res.returncode == 0 and "VERIFY:True" in out:
     return True, "OK"

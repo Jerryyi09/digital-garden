@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(0, "/tmp")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nuc_verifier import AlistClient, verify_book_on_alist
 
 if len(sys.argv) < 3:
