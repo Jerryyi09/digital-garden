@@ -45,14 +45,11 @@ def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
   else:
     source_base = ra_dir
 
-  tl_path = source_base / (manifest.get("timeline") or "timeline.json")
-  if not tl_path.is_file():
-    return False, [f"TIMELINE_FILE_MISSING: {tl_path}"], {}
-
   try:
-    timeline = json.loads(tl_path.read_text(encoding="utf-8"))
+    from tools.readalong.timeline_shards import load_timeline_payload
+    timeline = load_timeline_payload(source_base, manifest)
   except Exception as e:
-    return False, [f"TIMELINE_JSON_INVALID: {e}"], {}
+    return False, [f"TIMELINE_PAYLOAD_INVALID: {e}"], {}
 
   if not isinstance(timeline, list) or len(timeline) == 0:
     issues.append("TIMELINE_EMPTY")
@@ -186,7 +183,19 @@ for target in targets:
         remote_timeline_hash = hashlib.sha256(tl_path.read_bytes()).hexdigest()
         if remote_timeline_hash != local_timeline_hash:
             errors.append(f"TIMELINE_HASH_MISMATCH: {{cat}}/{{name}} local={{local_timeline_hash[:8]}} rem={{remote_timeline_hash[:8]}}")
-    tl = json.loads(tl_path.read_text(encoding="utf-8"))
+    tl_obj = json.loads(tl_path.read_text(encoding="utf-8"))
+    if m.get("timelineFormat") == "per-audio-source-v1":
+        tl = []
+        for rel in (tl_obj.get("files") or {{}}).values():
+            shard = s_base / rel
+            if not shard.is_file():
+                errors.append(f"TIMELINE_SHARD_MISSING: {{cat}}/{{name}}/{{rel}}")
+                continue
+            tl.extend(json.loads(shard.read_text(encoding="utf-8"))[:50])
+            if len(tl) >= 50:
+                break
+    else:
+        tl = tl_obj
 
     # 音源文件与音轨 ID 校验
     sources = m.get("audioSources", [])

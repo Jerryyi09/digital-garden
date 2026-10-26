@@ -1303,10 +1303,11 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
         exact_text = fallback_text_cache[cache_key].get(seg.get("fragment"), "")
         if exact_text:
           seg["text"] = exact_text
-      atomic_json(output/"timeline.json", sentence_timeline)
+      from tools.readalong.timeline_shards import write_timeline_payload
+      timeline_fields = write_timeline_payload(output, sentence_timeline)
       atomic_json(output/"readalong.manifest.json", {"schemaVersion": 1,
         "bookId": book.name, "language": "en", "audioSources": list(sources.values()),
-        "timeline": "timeline.json", "textRoot": "text/", "sampleAligned": False,
+        **timeline_fields, "textRoot": "text/", "sampleAligned": False,
         "sourceEpubSha256": unit["epubs"][0]["sha256"], "segmentCount": len(sentence_timeline),
         "timing": {"engine": "mlx-batch-silence-words-v1", "granularity": "sentence"}})
       final_timeline = sentence_timeline
@@ -1314,10 +1315,11 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
     else:
       for name, soup in docs.items():
         safe_path(text_root, name).write_text(str(soup), encoding="utf-8")
-      atomic_json(output/"timeline.json", timeline)
+      from tools.readalong.timeline_shards import write_timeline_payload
+      timeline_fields = write_timeline_payload(output, timeline)
       atomic_json(output/"readalong.manifest.json", {"schemaVersion": 1,
         "bookId": book.name, "language": "en", "audioSources": list(sources.values()),
-        "timeline": "timeline.json", "textRoot": "text/", "sampleAligned": False,
+        **timeline_fields, "textRoot": "text/", "sampleAligned": False,
         "sourceEpubSha256": unit["epubs"][0]["sha256"], "segmentCount": len(timeline),
         "timing": {"engine": "fast-paragraph-v1", "granularity": "paragraph-context"}})
       final_timeline = timeline

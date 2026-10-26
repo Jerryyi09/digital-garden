@@ -1,6 +1,7 @@
 import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
 import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
+import { timelinePathForSource } from "./timeline-loader.js"
 
 const manifestMemoryCache = new Map()
 const timelineMemoryCache = new Map()
@@ -1201,23 +1202,6 @@ async function setupReadalong(track, request) {
     const assetBase = /^[a-f0-9]{32}$/.test(manifest.assetRevision || "")
       ? `${validParent}/.readalong_revisions/${manifest.assetRevision}`
       : `${validParent}/readalong`
-    const timelinePath = `${assetBase}/${manifest.timeline || "timeline.json"}`
-    let timeline = timelineMemoryCache.get(timelinePath)
-    if (!timeline) {
-      const timelineInfo = await api("fs/get", {
-        path: timelinePath,
-        password: directoryPassword,
-      }).catch(() => null)
-      if (!timelineInfo || request !== playRequest) return
-
-      const timelineUrl = mediaUrl(endpoint, { path: timelinePath }, timelineInfo.sign)
-      timeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
-      if (Array.isArray(timeline)) {
-        timelineMemoryCache.set(timelinePath, timeline)
-      }
-    }
-    if (request !== playRequest || !Array.isArray(timeline)) return
-
     readalongManifest = manifest
     if (releaseBadge && manifest.practicalRelease) {
       const release = manifest.practicalRelease
@@ -1230,6 +1214,36 @@ async function setupReadalong(track, request) {
     // Relative paths distinguish identically named tracks in separate volumes.
     const relative = track.path.slice(validParent.length + 1)
     const source = manifest.audioSources?.find((s) => s.id === relative || s.alistPath === track.path || s.id === track.name || s.name === track.name)
+    // The manifest is sufficient to expose the EPUB button. Large books may
+    // load their current track timeline shard asynchronously below.
+    $("dock-readalong").hidden = !Boolean(manifest.alignedDocument || manifest.textRoot)
+
+    let timelinePath = `${assetBase}/${manifest.timeline || "timeline.json"}`
+    if (manifest.timelineFormat === "per-audio-source-v1") {
+      const indexPath = `${assetBase}/${manifest.timelineIndex || manifest.timeline || "timeline-index.json"}`
+      let index = timelineMemoryCache.get(indexPath)
+      if (!index) {
+        const indexInfo = await api("fs/get", { path: indexPath, password: directoryPassword }).catch(() => null)
+        if (!indexInfo || request !== playRequest) return
+        const indexUrl = mediaUrl(endpoint, { path: indexPath }, indexInfo.sign)
+        index = await fetch(indexUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
+        if (index?.files) timelineMemoryCache.set(indexPath, index)
+      }
+      const shard = source && timelinePathForSource(manifest, index, source.id)
+      if (!shard) return
+      timelinePath = `${assetBase}/${shard}`
+    }
+
+    let timeline = timelineMemoryCache.get(timelinePath)
+    if (!timeline) {
+      const timelineInfo = await api("fs/get", { path: timelinePath, password: directoryPassword }).catch(() => null)
+      if (!timelineInfo || request !== playRequest) return
+      const timelineUrl = mediaUrl(endpoint, { path: timelinePath }, timelineInfo.sign)
+      timeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
+      if (Array.isArray(timeline)) timelineMemoryCache.set(timelinePath, timeline)
+    }
+    if (request !== playRequest || !Array.isArray(timeline)) return
+
     let matched = source ? timeline.filter((s) => s.audioSourceId === source.id || s.audioSourceId === track.name) : []
     if (!matched.length) {
       matched = timeline.filter((s) => s.audioSourceId === track.name || s.audioSourceId === relative)

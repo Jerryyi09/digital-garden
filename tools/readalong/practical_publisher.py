@@ -111,7 +111,8 @@ def _audit_practical(book_dir, candidate_dir, material, evidence):
       if (not all(finite(v) for v in (spoken, missing, ratio, unavailable)) or spoken <= 0
           or not 0 <= missing <= spoken or unavailable < 0 or abs(ratio-missing/spoken) > 1e-8):
         raise ValueError('Invalid generator coverage measurements')
-      timeline = json.loads(safe_path(assets, manifest['timeline']).read_text())
+      from tools.readalong.timeline_shards import load_timeline_payload
+      timeline = load_timeline_payload(assets, manifest)
       if metrics.get('timelineSegments') != len(timeline):
         raise ValueError('Report and physical timeline segment counts differ')
       source_fp = generated['sourceFingerprint']

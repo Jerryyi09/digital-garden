@@ -171,8 +171,9 @@ def _audit(target, book_dir, exemptions, reference_path, report, source_evidence
       not isinstance(manifest["assetRevision"], str)
       or not re.fullmatch("[0-9a-f]{32}", manifest["assetRevision"])):
     raise ValueError("Invalid asset revision identity")
+  from tools.readalong.timeline_shards import load_timeline_payload
   timeline_path = safe_path(assets, manifest.get("timeline", "timeline.json"))
-  timeline = json.loads(timeline_path.read_text())
+  timeline = load_timeline_payload(assets, manifest)
   sources = manifest.get("audioSources")
   if not isinstance(timeline, list) or not timeline or not all(isinstance(s, dict) for s in timeline):
     raise ValueError("Timeline must be a non-empty list of segment objects")
