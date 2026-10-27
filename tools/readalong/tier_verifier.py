@@ -237,7 +237,7 @@ print("TIER2_OK")
 
 
 def tier3_alist_sample_check(category: str, book_name: str, remote_host: str = DEFAULT_REMOTE_TARGET) -> tuple[bool, str]:
-  """Tier 3: Check 1 sample book via Alist API to prove gateway health."""
+  """Tier 3: bounded Alist gateway smoke check; Tier 2 is the full audit."""
   from tools.readalong.nuc_verifier import verify_book_via_ssh
   host = canonical_nuc_target(remote_host)
-  return verify_book_via_ssh(host, category, book_name)
+  return verify_book_via_ssh(host, category, book_name, sample_only=True)

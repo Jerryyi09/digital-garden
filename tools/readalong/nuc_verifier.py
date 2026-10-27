@@ -142,8 +142,13 @@ def simulate_client_track_matching(manifest: dict, timeline: list, book_path: st
   return matched_tracks, unmatched_tracks
 
 
-def verify_book_on_alist(client: AlistClient, category: str, book_name: str, alist_root: str = "/750HD/有声书"):
-  """Comprehensive audit of a book through Alist matching client app.js rules."""
+def verify_book_on_alist(client: AlistClient, category: str, book_name: str,
+                         alist_root: str = "/750HD/有声书", sample_only: bool = False):
+  """Audit a book through Alist matching app.js rules.
+
+  ``sample_only`` keeps the gateway smoke check bounded; Tier 2 remains the
+  complete NUC filesystem/hash audit.
+  """
   book_path = f"{alist_root.rstrip('/')}/{category}/{book_name}"
   issues = []
   details = {}
@@ -206,7 +211,10 @@ def verify_book_on_alist(client: AlistClient, category: str, book_name: str, ali
     index, err = client.fetch_json(f"{asset_base}/{manifest.get('timelineIndex') or timeline_name}")
     timeline = []
     if isinstance(index, dict):
-      for rel in (index.get("files") or {}).values():
+      shard_paths = list((index.get("files") or {}).values())
+      if sample_only and len(shard_paths) > 3:
+        shard_paths = [shard_paths[0], shard_paths[len(shard_paths) // 2], shard_paths[-1]]
+      for rel in shard_paths:
         shard, shard_err = client.fetch_json(f"{asset_base}/{rel}")
         if not isinstance(shard, list):
           err = shard_err
@@ -231,10 +239,11 @@ def verify_book_on_alist(client: AlistClient, category: str, book_name: str, ali
     issues.append("AUDIO_SOURCES_EMPTY")
 
   known_source_ids = set()
-  for s in audio_sources:
-    sid = s.get("id") or s.get("name")
-    if sid:
-      known_source_ids.add(sid)
+  known_source_ids = {s.get("id") or s.get("name") for s in audio_sources if s.get("id") or s.get("name")}
+  source_rows = audio_sources
+  if sample_only and len(source_rows) > 3:
+    source_rows = [source_rows[0], source_rows[len(source_rows) // 2], source_rows[-1]]
+  for s in source_rows:
     alist_path = s.get("alistPath")
     if not alist_path:
       issues.append(f"AUDIO_SOURCE_MISSING_ALIST_PATH: {s}")
@@ -322,7 +331,8 @@ def verify_book_on_alist(client: AlistClient, category: str, book_name: str, ali
 REMOTE_TOOLS_DIR = "/home/hp/.readalong-tools"
 
 
-def verify_book_via_ssh(remote_host: str, category: str, book_name: str, alist_root: str = "/750HD/有声书"):
+def verify_book_via_ssh(remote_host: str, category: str, book_name: str,
+                        alist_root: str = "/750HD/有声书", sample_only: bool = False):
   """Run verification remotely via direct SSH using /tmp/remote_checker.py."""
   import shlex
   import subprocess
@@ -334,7 +344,8 @@ def verify_book_via_ssh(remote_host: str, category: str, book_name: str, alist_r
           capture_output=True, text=True)
   run_nuc(NUC_SCP + [str(here / "nuc_verifier.py"), str(here / "remote_checker.py"), f"{target}:{REMOTE_TOOLS_DIR}/"],
           runner=subprocess.run, capture_output=True, text=True)
-  remote = bounded_remote(f"python3 -u {REMOTE_TOOLS_DIR}/remote_checker.py {shlex.quote(category)} {shlex.quote(book_name)}",
+  sample_arg = " --sample" if sample_only else ""
+  remote = bounded_remote(f"python3 -u {REMOTE_TOOLS_DIR}/remote_checker.py {shlex.quote(category)} {shlex.quote(book_name)}{sample_arg}",
                           seconds=180, lock="tier3")
   res = run_nuc(direct_ssh_command(target, remote), check=False, runner=subprocess.run, capture_output=True, text=True)
   out = res.stdout.strip()

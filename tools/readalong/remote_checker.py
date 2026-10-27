@@ -8,8 +8,9 @@ if len(sys.argv) < 3:
   sys.exit(1)
 
 cat, book = sys.argv[1], sys.argv[2]
+sample_only = "--sample" in sys.argv[3:]
 c = AlistClient()
-res = verify_book_on_alist(c, cat, book)
+res = verify_book_on_alist(c, cat, book, sample_only=sample_only)
 ok, msg = res[0], res[1]
 print(f"VERIFY:{ok}:{msg}")
 if not ok:

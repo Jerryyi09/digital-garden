@@ -276,7 +276,10 @@ def _audit(target, book_dir, exemptions, reference_path, report, source_evidence
       docs[name] = parser
       if parser.duplicate_ids:
         error(ERROR_DUPLICATE_DOM_ID, f"Duplicate DOM IDs: {name}: {parser.duplicate_ids}")
-    text = docs[name].id_to_text.get(frag)
+    text_fragment = segment.get("sourceSentenceFragment") or frag
+    text = docs[name].id_to_text.get(text_fragment)
+    if text is None and text_fragment != frag:
+      text = docs[name].id_to_text.get(frag)
     if text is None or not text or not isinstance(segment.get("text"), str) or canonical_text(segment["text"]) != canonical_text(text):
       error(ERROR_DOM_REFERENCE_BROKEN, f"Segment {i}: missing/empty/mismatched DOM text")
   report["quality_layers"]["monotonicity"] = not any(e["code"] in

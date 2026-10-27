@@ -728,7 +728,11 @@ def audit_candidate(timeline, units, sources, docs, paragraphs, material=None, s
       errors.append("TIMESTAMP_OVERLAP")
     previous[sid] = seg["end"]
     parser = parsed.get(seg["document"])
-    if not parser or canonical_text(parser.id_to_text.get(seg["fragment"], "")) != canonical_text(seg["text"]):
+    text_fragment = seg.get("sourceSentenceFragment") or seg["fragment"]
+    dom_text = parser.id_to_text.get(text_fragment, "") if parser else ""
+    if not dom_text and text_fragment != seg["fragment"] and parser:
+      dom_text = parser.id_to_text.get(seg["fragment"], "")
+    if not parser or canonical_text(dom_text) != canonical_text(seg["text"]):
       errors.append("DOM_REFERENCE_BROKEN")
     identity = (sid, seg["document"], seg["fragment"], seg["occurrenceId"])
     if identity in seen:
