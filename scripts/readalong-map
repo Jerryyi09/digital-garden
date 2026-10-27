@@ -106,36 +106,6 @@ echo "[2/2] Running candidate generation with default words engine..."
   --asr-engine words \
   "${UNITS_ARGS[@]}"
 
-# 4. 汇总展示结果
+# 4. 汇总展示报告与换版本建议
 echo ""
-echo "=================================================="
-echo "                Mapping Summary                   "
-echo "=================================================="
-"$PYTHON" -c "
-import json
-from pathlib import Path
-
-run_dir = Path('$RUN_DIR')
-bench_path = run_dir / 'run' / 'benchmark.json'
-if not bench_path.exists():
-    print('No benchmark.json found')
-    exit(0)
-
-data = json.load(bench_path.open())
-print(f'{'Unit ID':<40} {'Screen Decision':<18} {'Unmapped':<10} {'Aligned':<10} {'Time(s)':<8} {'Status'}')
-print('-' * 95)
-for r in data.get('records', []):
-    uid = r.get('unit_id')
-    metrics = r.get('metrics') or {}
-    unmapped = metrics.get('unmappedSpeechUnitRatio')
-    unm_str = f'{unmapped*100:.2f}%' if unmapped is not None else 'N/A'
-    aligned = f\"{metrics.get('alignedTrackCount', 0)}/{metrics.get('alignedTrackCount', 0) + metrics.get('unalignedTrackCount', 0)}\"
-    t = round(r.get('timings', {}).get('totalSeconds', 0), 1)
-    status = r.get('readalongUsability', 'UNKNOWN')
-    screen = r.get('screenDecision') or ('PASS' if r.get('fullAudioProcessed') else 'N/A')
-    print(f'{uid:<40} {screen:<18} {unm_str:<10} {aligned:<10} {t:<8} {status}')
-
-print('=' * 95)
-print('请将以下提示发送给执行方进行审核与发布：')
-print(f'>>> 发布批次 {run_dir} <<<')
-"
+"$PYTHON" -m tools.readalong.mapping_reporter "$RUN_DIR" "$TARGET"
