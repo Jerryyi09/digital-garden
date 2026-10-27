@@ -66,7 +66,7 @@ class SentenceAlignerTests(unittest.TestCase):
     refined = refine_timeline_by_dom(paragraph, {"ch1.xhtml": soup}, words)
     fallback = next(row for row in refined if row["timingStatus"] == "SENTENCE_FROM_PARAGRAPH")
     self.assertEqual(fallback["fragment"], "p1")
-    self.assertEqual(fallback["text"], "First sentence here. Second sentence follows.")
+    self.assertEqual(fallback["text"], "Second sentence follows.")
     self.assertEqual(fallback["speechUnitId"], "coarse-1")
 
   def test_stream_match_replaces_only_its_paragraph_fallback(self):

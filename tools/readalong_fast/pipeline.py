@@ -1300,8 +1300,11 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
           parser.feed(str(soup))
           parser.close()
           fallback_text_cache[cache_key] = parser.id_to_text
+        # A sentence fallback intentionally keeps the paragraph DOM anchor,
+        # while its payload is the bounded sentence text. Do not overwrite it
+        # with the complete paragraph during DOM normalization.
         exact_text = fallback_text_cache[cache_key].get(seg.get("fragment"), "")
-        if exact_text:
+        if exact_text and seg.get("sourceSentenceFragment") in (None, seg.get("fragment")):
           seg["text"] = exact_text
       from tools.readalong.timeline_shards import write_timeline_payload
       timeline_fields = write_timeline_payload(output, sentence_timeline)

@@ -303,7 +303,10 @@ def refine_timeline_by_dom(
           "document": doc_key,
           "fragment": frag_id,
           "sourceSentenceFragment": sent["fragment"],
-          "text": paragraph_text,
+          # Keep the sentence payload bounded. The DOM anchor remains the
+          # paragraph fallback, but copying the whole paragraph into every
+          # sentence row can multiply a long block into a gigabyte timeline.
+          "text": sent["text"],
           "occurrenceId": f"{fallback_occurrence}:{s_i}",
           "speechUnitId": unit_id,
           "timingStatus": "SENTENCE_FROM_PARAGRAPH"
