@@ -1265,6 +1265,15 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
           parser, by_text = dom_fragment_cache[cache_key]
           current = canonical_text(parser.id_to_text.get(seg.get("fragment", ""), ""))
           wanted = canonical_text(seg.get("text", ""))
+          # The DOM sentence anchor is authoritative.  ASR projection may add
+          # an editorial ellipsis or other display-only punctuation to the
+          # payload; retaining it makes the audit reject an otherwise valid
+          # sourceSentenceFragment.
+          source_fragment = seg.get("sourceSentenceFragment")
+          source_text = parser.id_to_text.get(source_fragment, "") if source_fragment else ""
+          if source_text:
+            seg["text"] = source_text
+            wanted = canonical_text(source_text)
           if current != wanted and wanted and len(by_text.get(wanted, [])) == 1:
             seg["fragment"] = by_text[wanted][0]
             seg["text"] = parser.id_to_text[seg["fragment"]]
