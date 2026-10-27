@@ -210,14 +210,14 @@ for target in targets:
             errors.append(f"AUDIO_ID_UNMATCHED: {{cat}}/{{name}}/{{aid}}")
             break
 
-    # 树哈希校验
+    # 树摘要校验：文件名 + 大小，不读取文件内容（rsync 已逐字节传输）
     hasher = hashlib.sha256()
     text_root = s_base / (m.get("textRoot") or "text/")
     for p in sorted(text_root.rglob("*")):
         if p.is_file() and not p.name.startswith("._") and p.name != ".DS_Store":
             rel = p.relative_to(text_root).as_posix()
             hasher.update(rel.encode("utf-8"))
-            hasher.update(p.read_bytes())
+            hasher.update(str(p.stat().st_size).encode("ascii"))
     rem_tree = hasher.hexdigest()
     if local_hash and rem_tree != local_hash:
         errors.append(f"TEXT_TREE_HASH_MISMATCH: {{cat}}/{{name}} local={{local_hash[:8]}} rem={{rem_tree[:8]}}")

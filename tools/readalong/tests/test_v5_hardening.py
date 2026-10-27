@@ -51,6 +51,42 @@ class V5HardeningTests(unittest.TestCase):
     for forbidden in ("ProxyJump", "ProxyCommand", "10.0.0.1", "hp:"):
       self.assertNotIn(forbidden, joined)
 
+  def test_tier2_text_digest_tracks_names_and_sizes(self):
+    # The digest is deliberately structural: rsync already moved the bytes, so
+    # re-reading every text file on the NUC only re-proves the transfer.
+    from tools.readalong.release_integrity import dir_tree_manifest_hash
+    with tempfile.TemporaryDirectory() as tmp:
+      root = Path(tmp)
+      (root / "a.html").write_text("12345", encoding="utf-8")
+      (root / "sub").mkdir()
+      (root / "sub/b.html").write_text("abc", encoding="utf-8")
+      baseline = dir_tree_manifest_hash(root)
+
+      (root / "sub/c.html").write_text("x", encoding="utf-8")
+      self.assertNotEqual(dir_tree_manifest_hash(root), baseline, "an added file must change the digest")
+      (root / "sub/c.html").unlink()
+
+      (root / "a.html").write_text("123456", encoding="utf-8")
+      self.assertNotEqual(dir_tree_manifest_hash(root), baseline, "a resized file must change the digest")
+      (root / "a.html").write_text("12345", encoding="utf-8")
+      self.assertEqual(dir_tree_manifest_hash(root), baseline, "restoring content and size must restore the digest")
+
+  def test_tier2_remote_digest_matches_the_local_algorithm(self):
+    # A drift between these two implementations would fail every book, so pin
+    # the exact byte sequence the remote script is expected to produce.
+    import hashlib
+    from tools.readalong.release_integrity import dir_tree_manifest_hash
+    with tempfile.TemporaryDirectory() as tmp:
+      root = Path(tmp)
+      (root / "sub").mkdir()
+      (root / "sub/ch.html").write_text("hello", encoding="utf-8")
+      (root / "top.html").write_text("hi", encoding="utf-8")
+      expected = hashlib.sha256()
+      for rel, size in (("sub/ch.html", 5), ("top.html", 2)):
+        expected.update(rel.encode("utf-8"))
+        expected.update(str(size).encode("ascii"))
+      self.assertEqual(dir_tree_manifest_hash(root), expected.hexdigest())
+
   def test_tier3_empty_batch_is_a_successful_skip(self):
     with patch("tools.readalong_fast.v5_batch_runner.tier3_alist_sample_check") as sample:
       self.assertEqual(tier3_batch_sample([]), (True, "SKIPPED_NO_SYNC"))

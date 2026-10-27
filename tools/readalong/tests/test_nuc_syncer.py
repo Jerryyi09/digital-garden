@@ -9,7 +9,8 @@ import unicodedata
 import unittest
 
 from tools.readalong.nuc_syncer import (assert_safe_sync_args, build_book_rsync_command,
-  build_book_sync_manifest, choose_remote_name, resolve_remote_book, sync_book_to_nuc)
+  build_book_sync_manifest, choose_remote_name, clear_remote_listing_cache,
+  resolve_remote_book, sync_book_to_nuc)
 from tools.readalong.nuc_target import NUC_TARGET, NUC_SSH, direct_ssh_command
 
 
@@ -18,6 +19,8 @@ class NucSyncerSafetyTests(unittest.TestCase):
     self.temp = tempfile.TemporaryDirectory()
     self.addCleanup(self.temp.cleanup)
     self.root = Path(self.temp.name)
+    clear_remote_listing_cache()
+    self.addCleanup(clear_remote_listing_cache)
 
   def test_rejects_delete_arguments(self):
     dangerous = ["--delete", "--delete-after", "--delete-during", "--delete-excluded", "--remove-source-files", "-d"]
@@ -150,16 +153,51 @@ class NucSyncerSafetyTests(unittest.TestCase):
       self.assertNotIn("mkdir", args[0][-1])
       self.assertEqual(json.loads(kwargs["input"])[1], "Cat")
 
+  def test_remote_listing_is_fetched_once_per_category(self):
+    # A whole batch resolves against one remote read; per-book re-listing is
+    # pure SSH round-trip cost (43 books used to mean 43 listings).
+    listing = {"categories": ["Cat"], "books": {"Cat": ["A", "B"]}}
+    with patch("tools.readalong.nuc_syncer.subprocess.run") as run:
+      run.return_value.stdout = json.dumps(listing)
+      self.assertEqual(resolve_remote_book("Cat", "A"), ("Cat", "A"))
+      self.assertEqual(resolve_remote_book("Cat", "B"), ("Cat", "B"))
+      self.assertEqual(resolve_remote_book("Cat", "C"), ("Cat", "C"))
+      self.assertEqual(run.call_count, 1)
+
+  def test_clearing_cache_forces_a_fresh_remote_read(self):
+    listing = {"categories": ["Cat"], "books": {"Cat": ["A"]}}
+    with patch("tools.readalong.nuc_syncer.subprocess.run") as run:
+      run.return_value.stdout = json.dumps(listing)
+      resolve_remote_book("Cat", "A")
+      clear_remote_listing_cache()
+      resolve_remote_book("Cat", "A")
+      self.assertEqual(run.call_count, 2)
+
+  def test_explicit_listing_skips_the_remote_read(self):
+    listing = {"categories": ["Cat"], "books": {"Cat": ["A"]}}
+    with patch("tools.readalong.nuc_syncer.subprocess.run") as run:
+      self.assertEqual(resolve_remote_book("Cat", "A", listing=listing), ("Cat", "A"))
+      self.assertEqual(run.call_count, 0)
+
   def test_source_group_never_backs_up_or_overwrites(self):
     info = {"sources": ["a.mp3", "b.epub"], "files": ["cover.jpg"], "dirs": ["readalong"]}
     cmd = build_book_rsync_command(self.root, "dest", "backup", info, source_group=True)
     self.assertIn("--ignore-existing", cmd)
+    self.assertIn("--size-only", cmd)
     self.assertNotIn("--backup", cmd)
     self.assertFalse(any(x.startswith("--backup-dir") for x in cmd))
     self.assertFalse(any(x.endswith("/cover.jpg") or x.endswith("/readalong") for x in cmd))
     managed = build_book_rsync_command(self.root, "dest", "backup", info)
     self.assertIn("--backup", managed)
+    self.assertNotIn("--size-only", managed)
     self.assertFalse(any(x.endswith(".mp3") or x.endswith(".epub") for x in managed))
+
+  def test_size_only_does_not_weaken_delete_protection(self):
+    # --size-only changes the comparison basis, never what may be removed.
+    info = {"sources": ["a.mp3"], "files": [], "dirs": []}
+    cmd = build_book_rsync_command(self.root, "dest", "backup", info, source_group=True)
+    assert_safe_sync_args(cmd)
+    self.assertFalse(any(x.startswith("--delete") or x == "-d" for x in cmd))
 
   def test_sync_uses_resolved_path_for_both_groups_and_dry_run(self):
     source = self.root / "Book "

@@ -79,7 +79,10 @@ def build_book_rsync_command(book_dir: Path, remote_dest: str, backup_dir: str, 
     "-e", NUC_RSYNC_E, "--stats", "--itemize-changes",
     "--exclude=._*", "--exclude=.DS_Store"]
   if source_group:
-    rsync_cmd.append("--ignore-existing")
+    # Sources are immutable published media: identity is the manifest-declared
+    # name plus byte size. Comparing mtimes would re-send and re-back-up
+    # multi-GB audio whenever a copy/resync touched the local timestamp.
+    rsync_cmd.extend(["--ignore-existing", "--size-only"])
     names = sync_info["sources"]
   else:
     rsync_cmd.extend(["--backup", f"--backup-dir={backup_dir}"])
@@ -116,11 +119,10 @@ def choose_remote_name(name, existing):
   return matches[0] if matches else normalized
 
 
-def resolve_remote_book(category, book_name, remote_host=DEFAULT_REMOTE_TARGET,
-                        remote_base="/mnt/750/Music/有声书"):
+def fetch_remote_listing(category, remote_host=DEFAULT_REMOTE_TARGET,
+                         remote_base="/mnt/750/Music/有声书"):
   """Read both directory levels in one SSH call; paths are JSON stdin data."""
   normalized_directory_name(category)
-  normalized_directory_name(book_name)
   script = """
 import json, sys, unicodedata
 from pathlib import Path
@@ -135,7 +137,35 @@ print(json.dumps({'categories': categories, 'books': books}))
 """
   result = run_nuc(direct_ssh_command(remote_host, bounded_remote("python3 -c " + shlex.quote(script), seconds=60)), runner=subprocess.run,
     input=json.dumps([remote_base, category]), capture_output=True, text=True, check=True)
-  listing = json.loads(result.stdout)
+  return json.loads(result.stdout)
+
+
+# One remote listing per category per process: every book in a batch resolves
+# against the same remote tree, so re-listing it per book is pure round-trip cost.
+_REMOTE_LISTING_CACHE = {}
+
+
+def clear_remote_listing_cache():
+  """Drop cached remote listings after out-of-band changes to the NUC tree."""
+  _REMOTE_LISTING_CACHE.clear()
+
+
+def resolve_remote_book(category, book_name, remote_host=DEFAULT_REMOTE_TARGET,
+                        remote_base="/mnt/750/Music/有声书", listing=None):
+  """Resolve local names to their existing remote counterparts.
+
+  Pass ``listing`` (from fetch_remote_listing) to resolve a whole batch against
+  one remote read; otherwise the result is fetched once and cached per category.
+  """
+  normalized_directory_name(category)
+  normalized_directory_name(book_name)
+  host = canonical_nuc_target(remote_host)
+  if listing is None:
+    cache_key = (host, remote_base, category)
+    listing = _REMOTE_LISTING_CACHE.get(cache_key)
+    if listing is None:
+      listing = fetch_remote_listing(category, host, remote_base)
+      _REMOTE_LISTING_CACHE[cache_key] = listing
   remote_category = choose_remote_name(category, listing["categories"])
   return remote_category, choose_remote_name(book_name, listing["books"].get(remote_category, []))
 
