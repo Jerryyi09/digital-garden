@@ -58,6 +58,18 @@ def _run_category_v5_unlocked(category: str, max_books: int = None, existing_run
 
   stamp = datetime.datetime.now().strftime("%Y%m%dT%H%M")
   batch_out = existing_run_dir.parent if existing_run_dir else (RUNS_BASE / f"{category}-{stamp}")
+  # A benchmark can stop after writing several candidate books but before its
+  # completion ledger is emitted (for example when the source-code identity
+  # guard trips).  Never reopen that half-written directory: benchmark.py
+  # correctly rejects an existing output root, and reusing it would mix stale
+  # candidates with a new run.  Allocate a deterministic retry directory;
+  # explicit continuation runs retain their requested path and safety checks.
+  if existing_run_dir is None:
+    base_out = batch_out
+    retry = 1
+    while batch_out.exists():
+      batch_out = Path(f"{base_out}-retry{retry}")
+      retry += 1
   batch_out.mkdir(parents=True, exist_ok=True)
 
   print(f"\n==================================================")
