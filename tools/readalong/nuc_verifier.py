@@ -200,8 +200,21 @@ def verify_book_on_alist(client: AlistClient, category: str, book_name: str, ali
   timeline_name = manifest.get("timeline") or "timeline.json"
   timeline_path = f"{asset_base}/{timeline_name}"
 
-  # 4. 获取 timeline 并检查非空数组
-  timeline, err = client.fetch_json(timeline_path)
+  # 4. 获取 timeline 并检查非空数组. Large releases use one shard per
+  # audio source; load the index and shards through the same Alist API.
+  if manifest.get("timelineFormat") == "per-audio-source-v1":
+    index, err = client.fetch_json(f"{asset_base}/{manifest.get('timelineIndex') or timeline_name}")
+    timeline = []
+    if isinstance(index, dict):
+      for rel in (index.get("files") or {}).values():
+        shard, shard_err = client.fetch_json(f"{asset_base}/{rel}")
+        if not isinstance(shard, list):
+          err = shard_err
+          timeline = []
+          break
+        timeline.extend(shard)
+  else:
+    timeline, err = client.fetch_json(timeline_path)
   if not isinstance(timeline, list) or len(timeline) == 0:
     issues.append(f"TIMELINE_UNREADABLE: {timeline_path} ({err})")
     timeline = []
