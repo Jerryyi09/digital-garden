@@ -1141,6 +1141,16 @@ function findSegment(timeline, time) {
   return res.segment
 }
 
+// Sentence-level fallback rows keep the containing paragraph as their primary
+// anchor for compatibility, but expose the refined sentence anchor when one
+// exists. Prefer that smaller DOM node for visual highlighting.
+function readalongFragmentForSegment(seg, doc) {
+  if (!seg) return ""
+  const preferred = seg.sourceSentenceFragment || seg.fragment || ""
+  if (doc?.getElementById(preferred)) return preferred
+  return seg.fragment || preferred
+}
+
 async function setupReadalong(track, request) {
   invalidateReadalong()
   const releaseBadge = $("readalong-release-status")
@@ -1464,7 +1474,7 @@ function attachReadalongFrameHandlers(frame) {
   doc.addEventListener("click", (e) => {
     const target = e.target.closest("[id]")
     if (!target || !target.id) return
-    const seg = readalongTimeline.find((s) => s.fragment === target.id)
+    const seg = readalongTimeline.find((s) => s.fragment === target.id || s.sourceSentenceFragment === target.id)
     if (seg) {
       seek(seg.start)
       readalongFollowing = true
@@ -1525,7 +1535,7 @@ async function syncReadalong(forceScroll = false) {
   let seg = syncResult.segment
 
   // New playback intent cancels pending loads even when no new document is needed.
-  const targetKey = `${readalongParentPath}|${current?.path || ""}|${seg?.document || ""}|${seg?.fragment || ""}|${syncResult.state}`
+  const targetKey = `${readalongParentPath}|${current?.path || ""}|${seg?.document || ""}|${seg?.sourceSentenceFragment || seg?.fragment || ""}|${syncResult.state}`
   if (targetKey !== readalongTargetKey) {
     invalidateReadalong()
     readalongTargetKey = targetKey
@@ -1564,7 +1574,7 @@ async function syncReadalong(forceScroll = false) {
   if (!isPlayingActive) {
     const doc = $("readalong-frame").contentDocument
     doc?.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
-    doc?.getElementById(seg.fragment)?.scrollIntoView({ block: "center" })
+    doc?.getElementById(readalongFragmentForSegment(seg, doc))?.scrollIntoView({ block: "center" })
     currentSegment = null
     return
   }
@@ -1576,7 +1586,7 @@ async function syncReadalong(forceScroll = false) {
     try {
       const doc = frame.contentDocument
       if (!doc) return false
-      const targetElem = doc.getElementById(seg.fragment)
+      const targetElem = doc.getElementById(readalongFragmentForSegment(seg, doc))
       if (targetElem) {
         doc.querySelectorAll(".readalong-active").forEach((el) => el.classList.remove("readalong-active"))
         targetElem.classList.add("readalong-active")
