@@ -33,3 +33,14 @@
 ## 外网收益
 
 公网首次只需下载当前音轨 shard，而不是约 1 GB 的整本 JSON；EPUB 按钮在 manifest/index 成功后即可显示。下一步可再加入下一音轨预加载和 immutable revision 缓存策略。
+
+## 发布与核验补充
+
+用户确认后已正式发布并同步《千面英雄》分片版本：
+
+- 本地 revision：`7e73a301a31b421aa3b5210eba8118c9`
+- 决策：`PUBLISH_WITH_GAPS`，`hardErrors=[]`
+- NUC：通过 `hp@10.0.0.85:2222` 直连同步；未删除文件，已有音频仅复用，新增分片与版本正文完成传输。
+- Tier 1 本地静态核验：通过，22,051 segments，median 1.34s，p95 4.90s。
+- Tier 2 NUC 文件级核验：通过，manifest、timeline index、版本正文树和音轨匹配均一致。
+- Tier 3 Alist 抽检：通过，返回 `OK`；分片版本的 Alist 核验已补充支持。
