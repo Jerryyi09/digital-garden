@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import time
 from typing import Any
+from urllib.parse import unquote
 import xml.etree.ElementTree as ET
 import zipfile
 from bs4 import BeautifulSoup
@@ -141,7 +142,15 @@ def transcribe_words_cached(chunk_audio: Path, model_path: Path, cache_json: Pat
 
 
 def get_spine_htmls(epub_path: Path) -> list[str]:
-    """Get content documents in proper reading order from OPF spine."""
+    """Get content documents in proper reading order from OPF spine.
+
+    The returned paths are the ZIP entry names, not the raw OPF ``href``.  An
+    OPF may legally percent-encode an ``href`` (calibre does this for titles
+    containing spaces), and the timeline's ``document`` field is handed to the
+    front end, which requests the file from Alist verbatim.  Resolving against
+    the archive here keeps every consumer on one real path instead of leaving
+    each read point to decode for itself.
+    """
     with zipfile.ZipFile(epub_path) as z:
         c_xml = z.read("META-INF/container.xml")
         root = ET.fromstring(c_xml)
@@ -150,14 +159,21 @@ def get_spine_htmls(epub_path: Path) -> list[str]:
         opf = ET.fromstring(z.read(opf_path))
         manifest = {item.attrib["id"]: item.attrib["href"] for item in opf.findall(".//{*}manifest/{*}item")}
         spine = [item.attrib["idref"] for item in opf.findall(".//{*}spine/{*}itemref")]
+        # Map every spelling of an entry name onto the name the archive stores,
+        # so a percent-encoded href resolves to the same file as its literal form.
+        entry_names = {}
+        for name in z.namelist():
+            entry_names.setdefault(unquote(name), name)
+            entry_names.setdefault(name, name)
 
         spine_htmls = []
         for idref in spine:
             if idref in manifest:
                 href = manifest[idref]
                 full_href = f"{opf_dir}/{href}".lstrip("/") if opf_dir and opf_dir != "." else href
-                if full_href.lower().endswith((".htm", ".html", ".xhtml", ".xml")):
-                    spine_htmls.append(full_href)
+                resolved = entry_names.get(unquote(full_href), full_href)
+                if resolved.lower().endswith((".htm", ".html", ".xhtml", ".xml")):
+                    spine_htmls.append(resolved)
         return spine_htmls
 
 

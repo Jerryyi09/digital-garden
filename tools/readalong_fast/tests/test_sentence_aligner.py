@@ -3,20 +3,9 @@ import unittest
 from bs4 import BeautifulSoup
 
 from tools.readalong_fast.sentence_aligner import refine_timeline_by_dom, merge_stream_projection_with_paragraph_fallback
-from tools.readalong.stream_projection import complete_document_marking
-from tools.readalong.engine.mark_sentence import mark_sentences
 
 
 class SentenceAlignerTests(unittest.TestCase):
-  def test_coarse_projection_wrappers_are_resegmented(self):
-    raw = """<html><body><p><span id="cfast-long-ab12--segment0">First sentence here. Second sentence follows.</span></p></body></html>"""
-    marked = complete_document_marking(raw, mark_sentences, "chapter")
-    soup = BeautifulSoup(marked, "html.parser")
-    ids = [node["id"] for node in soup.find_all("span", id=True)]
-    self.assertFalse(any(node.startswith("cfast-long-") for node in ids))
-    self.assertGreaterEqual(len(ids), 2)
-    self.assertEqual(" ".join(soup.get_text(" ", strip=True).split()), "First sentence here. Second sentence follows.")
-
   def test_refine_paragraph_into_sentences(self):
     html = """
     <html><body>

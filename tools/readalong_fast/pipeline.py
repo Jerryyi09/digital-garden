@@ -994,6 +994,21 @@ def auto_exclude_mismatch(book, detail, verdict):
           "reason": reason, "result": result}
 
 
+def prepare_coarse_documents(text_root, spine, diagnostics=None):
+  """Coarse paragraph pass, persisted so sentence marking can honour its ids.
+
+  ``prepare_paragraphs`` assigns ``fast-*`` ids to block elements the EPUB left
+  unlabelled.  Sentence marking runs later, from disk, so unless those ids land
+  on disk first ``mark_sentences`` cannot preserve them and the paragraph-wide
+  fallback anchors end up pointing at ids that no longer exist.  Persisting the
+  coarse DOM here keeps both passes agreeing on every anchor.
+  """
+  docs, paragraphs, book_tokens = prepare_paragraphs(text_root, spine, diagnostics)
+  for doc_name, doc_soup in docs.items():
+    safe_path(text_root, doc_name).write_text(str(doc_soup), encoding="utf-8")
+  return docs, paragraphs, book_tokens
+
+
 def generate(unit, output, cache, inputs, material=None, screen=True):
   start = time.perf_counter()
   if not unit.get("epubs") or not unit.get("audio_tracks"):
@@ -1031,7 +1046,7 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
     safe_extract_epub(epub, text_root)
     spine = get_spine_htmls(epub)
     document_diagnostics = []
-    docs, paragraphs, book_tokens = prepare_paragraphs(text_root, spine, document_diagnostics)
+    docs, paragraphs, book_tokens = prepare_coarse_documents(text_root, spine, document_diagnostics)
     index = ParagraphIndex(book_tokens, paragraphs)
     timings["epubAndIndexSeconds"] = time.perf_counter()-t0
     sources, speech = {}, []
@@ -1210,7 +1225,7 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
       ]
     if cache.asr_engine == "words":
       from tools.readalong.stream_projection import prepare_documents, project_stream
-      from tools.readalong_fast.sentence_aligner import refine_timeline_by_dom, merge_stream_projection_with_paragraph_fallback
+      from tools.readalong_fast.sentence_aligner import refine_timeline_by_dom, merge_stream_projection_with_paragraph_fallback, locate_gap_blocks
       from tools.readalong.engine.mark_sentence import mark_sentences
       from tools.readalong.timeline_boundaries import resolve_boundaries
       # Collect all recognized words across tracks
@@ -1235,12 +1250,19 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
       raw_segments, projection_stats = project_stream(sent_tokens, sent_fragments, all_audio_words)
       projected_timeline, repairs = resolve_boundaries(raw_segments)
       sentence_timeline = merge_stream_projection_with_paragraph_fallback(projected_timeline, paragraph_refinement)
+      # A heading or a bare URL line never earns a coarse match of its own, so
+      # nothing times it and the reader never highlights it.  Place those blocks
+      # inside the silence their neighbours leave for them, then restore the
+      # per-track chronological order the boundary resolver walks.
+      sentence_timeline += locate_gap_blocks(sentence_timeline, sent_docs, all_audio_words)
+      sentence_timeline.sort(key=lambda seg: (track_order.get(seg.get("audioSourceId", ""), 999),
+                                              seg.get("start", 0), seg.get("end", 0)))
       sentence_timeline, repairs = resolve_boundaries(sentence_timeline)
 
-      # A paragraph fallback can retain the coarse ``fast-*`` anchor after
-      # sentence marking replaced that wrapper with sentence spans. Rebind only
-      # when the serialized DOM contains exactly one fragment with the same
-      # canonical text; ambiguous text remains a fallback and is audited.
+      # A paragraph fallback keeps its paragraph anchor: that is its design
+      # meaning ("highlight the whole paragraph").  The anchor survives sentence
+      # marking because the coarse pass persists its ids before marking runs, so
+      # there is nothing to rebind here.
       dom_fragment_cache = {}
       track_durations = {sid: duration for _, sid, _, duration in specs}
       repaired_sentence_timeline = []
@@ -1258,13 +1280,8 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
             parser = DOMFragmentExtractor()
             parser.feed(str(soup))
             parser.close()
-            by_text = defaultdict(list)
-            for fragment, text in parser.id_to_text.items():
-              by_text[canonical_text(text)].append(fragment)
-            dom_fragment_cache[cache_key] = (parser, by_text)
-          parser, by_text = dom_fragment_cache[cache_key]
-          current = canonical_text(parser.id_to_text.get(seg.get("fragment", ""), ""))
-          wanted = canonical_text(seg.get("text", ""))
+            dom_fragment_cache[cache_key] = parser
+          parser = dom_fragment_cache[cache_key]
           # The DOM sentence anchor is authoritative.  ASR projection may add
           # an editorial ellipsis or other display-only punctuation to the
           # payload; retaining it makes the audit reject an otherwise valid
@@ -1273,10 +1290,6 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
           source_text = parser.id_to_text.get(source_fragment, "") if source_fragment else ""
           if source_text:
             seg["text"] = source_text
-            wanted = canonical_text(source_text)
-          if current != wanted and wanted and len(by_text.get(wanted, [])) == 1:
-            seg["fragment"] = by_text[wanted][0]
-            seg["text"] = parser.id_to_text[seg["fragment"]]
         if seg.get("end", 0) > seg.get("start", 0):
           repaired_sentence_timeline.append(seg)
       sentence_timeline = repaired_sentence_timeline
@@ -1319,6 +1332,28 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
         exact_text = fallback_text_cache[cache_key].get(seg.get("fragment"), "")
         if exact_text and seg.get("sourceSentenceFragment") in (None, seg.get("fragment")):
           seg["text"] = exact_text
+      # Every anchor the timeline hands to the reader must exist in the DOM that
+      # ships beside it.  Enforce it at generation time: a dangling anchor means
+      # the two passes disagreed, which is a script error rather than something
+      # to repair downstream.
+      anchored = {}
+      for doc_name, doc_soup in sent_docs.items():
+        parser = DOMFragmentExtractor()
+        parser.feed(str(doc_soup))
+        parser.close()
+        anchored[doc_name] = parser.id_to_text
+      dangling = []
+      for seg in sentence_timeline:
+        doc_key = seg.get("document", "")
+        doc_name = doc_key.removeprefix("text/")
+        dom_ids = anchored.get(doc_name) or anchored.get(doc_key) or {}
+        for key in ("fragment", "sourceSentenceFragment"):
+          anchor = seg.get(key)
+          if anchor and anchor not in dom_ids:
+            dangling.append(f"{doc_key}#{anchor} ({key}, audio={seg.get('audioSourceId')} @{seg.get('start')})")
+      if dangling:
+        raise RuntimeError(
+          f"Timeline anchors missing from the published DOM ({len(dangling)}): " + "; ".join(dangling[:10]))
       from tools.readalong.timeline_shards import write_timeline_payload
       timeline_fields = write_timeline_payload(output, sentence_timeline)
       atomic_json(output/"readalong.manifest.json", {"schemaVersion": 1,

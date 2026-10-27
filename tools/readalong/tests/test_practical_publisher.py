@@ -174,3 +174,43 @@ class PracticalPublicationTests(unittest.TestCase):
     self.manifest.write_text(json.dumps(manifest))
     self.assertTrue(publish_practical(self.book, self.candidate)['success'])
     self.assertTrue(json.loads((self.book/'readalong/readalong.manifest.json').read_text())['readalongEnabled'])
+
+  def test_flat_publication_replaces_the_active_tree_instead_of_merging(self):
+    # A file-by-file copy only ever added, so documents from an older release
+    # survived every publish and the reader could resolve an anchor against a
+    # stale body.  The active tree must match the published revision exactly.
+    stale = self.book/'readalong/text/chapter1 2.html'
+    stale.write_text('<html><body><span id="ghost">stale</span></body></html>')
+    stale_root = self.book/'readalong/text/retired'
+    stale_root.mkdir()
+    (stale_root/'old.html').write_text('<html><body>retired</body></html>')
+
+    published = publish_practical(self.book, self.candidate)
+    self.assertTrue(published['success'], published)
+    revision = self.book/'.readalong_revisions'/json.loads(
+      (self.book/'readalong/readalong.manifest.json').read_text())['assetRevision']
+
+    active_files = {p.relative_to(self.book/'readalong').as_posix()
+      for p in (self.book/'readalong').rglob('*') if p.is_file()}
+    # ``projection.json`` is audit input, not a published asset, so the active
+    # tree is the revision minus the audit-only and bookkeeping files.
+    revision_files = {p.relative_to(revision).as_posix()
+      for p in revision.rglob('*') if p.is_file()
+      if p.name not in {'release-receipt.json', 'previous-entry-manifest.json', 'projection.json'}}
+    self.assertEqual(active_files, revision_files)
+    self.assertNotIn('text/chapter1 2.html', active_files)
+    self.assertFalse(stale_root.exists())
+
+  def test_flat_publication_rollback_restores_the_replaced_tree(self):
+    previous_payload = {p.relative_to(self.book/'readalong').as_posix(): p.read_bytes()
+      for p in (self.book/'readalong').rglob('*') if p.is_file()}
+    published = publish_practical(self.book, self.candidate)
+    self.assertTrue(published['success'], published)
+    revision_id = json.loads((self.book/'readalong/readalong.manifest.json').read_text())['assetRevision']
+    (self.book/'readalong/text/added-by-release.html').write_text('published')
+
+    self.assertTrue(rollback_practical(self.book, revision_id)['success'])
+    restored = {p.relative_to(self.book/'readalong').as_posix(): p.read_bytes()
+      for p in (self.book/'readalong').rglob('*') if p.is_file()}
+    self.assertEqual(restored, previous_payload)
+    self.assertFalse((self.book/'readalong/text/added-by-release.html').exists())

@@ -316,6 +316,267 @@ def refine_timeline_by_dom(
   return sentence_timeline
 
 
+def locate_gap_blocks(sentence_timeline, documents, ordered_words):
+  """Time the unlocated anchors that sit between two located ones.
+
+  A heading, a one-line dedication or a bare URL line carries no coarse match of
+  its own, so nothing ever assigns it a time and the reader never highlights it.
+  The same is true of a sentence inside a paragraph whose other sentences did
+  match.  The audio that speaks it does exist: it occupies the silence between
+  the last segment before it and the first segment after it.
+
+  The search window is exactly that gap.  Widening it would let a short anchor
+  match a coincidental phrase elsewhere on the track, which is the failure mode
+  that makes an unbounded search unusable on a multi-hour recording.
+  """
+  by_track = defaultdict(list)
+  for seg in sentence_timeline:
+    by_track[seg.get("audioSourceId", "")].append(seg)
+  # Sorted starts with a running maximum of ends, so a window query can binary
+  # search both bounds and still be exact for overlapping segments.
+  occupied_by_track = {}
+  for track, rows in by_track.items():
+    rows.sort(key=lambda row: row.get("start", 0))
+    starts, running, latest = [], [], float("-inf")
+    for row in rows:
+      starts.append(row.get("start", 0))
+      latest = max(latest, row.get("end", 0))
+      running.append(latest)
+    occupied_by_track[track] = (starts, running)
+
+  located = defaultdict(set)
+  rows_by_anchor = defaultdict(list)
+  for seg in sentence_timeline:
+    for key in ("fragment", "sourceSentenceFragment"):
+      anchor = seg.get(key)
+      if anchor:
+        located[seg.get("document", "")].add(anchor)
+        rows_by_anchor[anchor].append(seg)
+  for rows in rows_by_anchor.values():
+    rows.sort(key=lambda row: row.get("start", 0))
+
+  words_by_track = defaultdict(list)
+  for word in ordered_words:
+    words_by_track[word.get("audioSourceId", "")].append(word)
+  word_starts_by_track = {}
+  for track, rows in words_by_track.items():
+    rows.sort(key=lambda row: row.get("start", 0))
+    word_starts_by_track[track] = [row["start"] for row in rows]
+
+  # DOM reading order, so an anchor's neighbours are the ones the listener hears
+  # next to it.  Keys are the ``text/<spine entry>`` spelling the timeline uses
+  # in its ``document`` field, which is what ``prepare_documents`` records on
+  # every fragment; ``documents`` itself is keyed by the bare spine entry.
+  # ``prepare_documents`` walks the spine in reading order, so its dict order is
+  # the order a listener hears these documents in.
+  #
+  # One pass builds everything the loop below needs: the anchors in order, each
+  # anchor's sibling anchors, and the nearest located anchor on either side.
+  # Scanning per anchor instead is quadratic on a book with tens of thousands of
+  # segments, which is what a long novel looks like.
+  flat = []
+  siblings_of = {}
+  for doc_index, (name, soup) in enumerate(documents.items()):
+    doc_key = f"text/{name}"
+    doc_located = located.get(doc_key, set())
+    for element in soup.find_all(True, id=True):
+      ident = element["id"]
+      if not (SEGMENT_SPAN_ID.search(ident) or BLOCK_ANCHOR_ID.match(ident)):
+        continue
+      parent = element.parent
+      if parent is not None and parent.name in BLOCK_TAGS:
+        siblings_of.setdefault(id(parent), []).append(ident)
+      # A wrapper around other anchors is a container, not an anchor itself --
+      # unless the timeline addresses it directly, in which case it is both.
+      if ident not in doc_located and any(
+          SEGMENT_SPAN_ID.search(child["id"]) or BLOCK_ANCHOR_ID.match(child["id"])
+          for child in element.find_all(True, id=True, recursive=False)):
+        continue
+      flat.append((doc_index, doc_key, len(flat), ident, element,
+                   id(parent) if parent is not None else None))
+
+  previous_located = [None] * len(flat)
+  following_located = [None] * len(flat)
+  last = None
+  for index, (_, doc_key, _, ident, _, _) in enumerate(flat):
+    previous_located[index] = last
+    if ident in located.get(doc_key, ()):
+      last = ident
+  last = None
+  for index in range(len(flat) - 1, -1, -1):
+    _, doc_key, _, ident, _, _ = flat[index]
+    following_located[index] = last
+    if ident in located.get(doc_key, ()):
+      last = ident
+
+  additions = []
+  claimed = {}
+  for flat_index, (doc_index, doc_key, position, ident, element, parent_id) in enumerate(flat):
+    if ident in located.get(doc_key, set()):
+      continue
+    element_text = element.get_text(" ", strip=True)
+    anchor_tokens = tokens(element_text)
+    if len(anchor_tokens) < MIN_GAP_MATCH_WORDS:
+      continue
+    norm_anchor = {normalize_token(t) for t in anchor_tokens if normalize_token(t)}
+    if len(norm_anchor) < MIN_GAP_MATCH_WORDS:
+      continue
+    # A sentence whose siblings inside the same block did match is bounded by
+    # that block's own span, not by the surrounding anchors: the block already
+    # owns those seconds and the sentence is spoken inside them.  Otherwise fall
+    # back to the silence between the nearest located anchors on either side.
+    candidates = []
+    siblings = [row for sibling in siblings_of.get(parent_id, ()) if sibling != ident
+                for row in rows_by_anchor.get(sibling, [])]
+    if siblings:
+      tracks = {row.get("audioSourceId", "") for row in siblings}
+      if len(tracks) == 1:
+        candidates.append((tracks.pop(),
+                           min(row.get("start", 0) for row in siblings),
+                           max(row.get("end", 0) for row in siblings)))
+    previous = rows_by_anchor.get(previous_located[flat_index] or "", [])
+    following = rows_by_anchor.get(following_located[flat_index] or "", [])
+    track = previous[0].get("audioSourceId", "") if previous else ""
+    if previous and following and all(row.get("audioSourceId", "") == track for row in following):
+      candidates.append((track,
+                         max(row.get("end", 0) for row in previous),
+                         min(row.get("start", 0) for row in following)))
+    if previous and all(row.get("audioSourceId", "") == track for row in previous):
+      # The next located anchor can sit earlier on the track: end matter such as
+      # an index or a colophon is read back at the front of the book, so the
+      # following document is not necessarily the following audio.  Whenever the
+      # neighbour window is empty or reversed, fall back to a bounded distance
+      # past the predecessor -- bounded so a stray match is never hunted for
+      # across the whole recording.
+      trailing_start = max(row.get("end", 0) for row in previous)
+      neighbour_end = min((row.get("start", 0) for row in following), default=None)
+      if neighbour_end is None or neighbour_end <= trailing_start:
+        candidates.append((track, trailing_start, trailing_start + MAX_TRAILING_GAP_SECONDS))
+
+    matched = None
+    for track, gap_start, gap_end in candidates:
+      if gap_end <= gap_start:
+        continue
+      # The bounds come from the page, but a segment belonging to some other
+      # document can still occupy part of that stretch.  Trim the window to the
+      # free intervals so the anchor can only land in real silence.
+      windows = _free_windows(occupied_by_track.get(track, ((), ())), gap_start, gap_end,
+                              claimed.get(track, ()))
+      if not windows:
+        continue
+      track_words = words_by_track.get(track, [])
+      word_starts = word_starts_by_track.get(track, [])
+      words = []
+      for lo, hi in windows:
+        lo_index = bisect_left(word_starts, lo)
+        hi_index = bisect_right(word_starts, hi)
+        for word in track_words[lo_index:hi_index]:
+          if lo < word["end"] and word["start"] < hi:
+            words.append(word)
+      if not words:
+        continue
+      norm_words = {normalize_token(w.get("word") or "") for w in words}
+      if len(norm_anchor & norm_words) < MIN_GAP_MATCH_WORDS:
+        continue
+      matched = _align_anchor_within(element, words, windows, anchor_tokens=anchor_tokens)
+      if matched is not None:
+        break
+    if matched is None:
+      continue
+    start, end, matched_words = matched
+    addition = {
+      "audioSourceId": track,
+      "start": round(start, 2),
+      "end": round(end, 2),
+      "document": doc_key,
+      "fragment": ident,
+      "sourceSentenceFragment": ident,
+      "text": element_text,
+      "occurrenceId": f"gap:{doc_index}:{position}",
+      "timingStatus": "SENTENCE_EXACT" if matched_words >= 2 else "SENTENCE_PARTIAL",
+    }
+    additions.append(addition)
+    # Claim the stretch at once, so two anchors inside one long silence cannot
+    # both be handed the same seconds.
+    claimed.setdefault(track, []).append((start, end))
+  return additions
+
+
+BLOCK_TAGS = frozenset(("p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "blockquote", "figcaption"))
+SEGMENT_SPAN_ID = re.compile(r"segment\d+$")
+BLOCK_ANCHOR_ID = re.compile(r"^(?:c?fast-|_idContainer)")
+MIN_GAP_MATCH_RATIO = 0.75
+MIN_GAP_MATCH_WORDS = 2
+SHORT_ANCHOR_WORDS = 3
+MAX_TRAILING_GAP_SECONDS = 30.0
+
+
+def _free_windows(spans, low, high, extra=()):
+  """Intervals inside [low, high] that no existing segment occupies.
+
+  ``spans`` is a per-track ``(starts, ends)`` index sorted by start, so a lookup
+  touches only the segments near the window instead of the whole track.  Books
+  with tens of thousands of segments otherwise spend minutes here.
+  """
+  starts, ends = spans
+  first = bisect_left(ends, low)
+  last = bisect_right(starts, high)
+  occupied = sorted(zip(starts[first:last], ends[first:last]))
+  for start, end in extra:
+    if end > low and start < high:
+      occupied.append((max(low, start), min(high, end)))
+  occupied.sort()
+  windows = []
+  cursor = low
+  for start, end in occupied:
+    if end <= cursor:
+      continue
+    if start > cursor:
+      windows.append((cursor, start))
+    cursor = end
+    if cursor >= high:
+      break
+  if cursor < high:
+    windows.append((cursor, high))
+  return windows
+
+
+def _align_anchor_within(element, words, windows, anchor_tokens=None):
+  """Locate an anchor inside the free windows using the same lexical evidence.
+
+  The match is accepted only when every word it claims sits inside one window;
+  a match that reaches across an occupied stretch is a coincidence, not the
+  anchor's own audio.
+  """
+  if anchor_tokens is None:
+    text = element.get_text(" ", strip=True)
+    anchor_tokens = tokens(text)
+  if len(anchor_tokens) < MIN_GAP_MATCH_WORDS:
+    return None
+  audio_tokens = [normalize_token(word.get("word") or "") for word in words]
+  matcher = SequenceMatcher(None, anchor_tokens, audio_tokens, autojunk=False)
+  matched = [block for block in matcher.get_matching_blocks() if block.size]
+  if not matched:
+    return None
+  covered = sum(block.size for block in matched)
+  # A three-word anchor -- a URL line, a short heading -- has no room for a
+  # ratio test: ASR misspells one proper noun and the ratio collapses below any
+  # threshold worth setting.  Those anchors are accepted on the absolute count
+  # their neighbours already establish; longer ones must also clear the ratio.
+  if covered < MIN_GAP_MATCH_WORDS:
+    return None
+  if len(anchor_tokens) > SHORT_ANCHOR_WORDS and covered / len(anchor_tokens) < MIN_GAP_MATCH_RATIO:
+    return None
+  first = min(block.b for block in matched)
+  last = max(block.b + block.size - 1 for block in matched)
+  start, end = words[first]["start"], words[last]["end"]
+  if end <= start:
+    return None
+  if not any(lo <= start and end <= hi for lo, hi in windows):
+    return None
+  return start, end, covered
+
+
 def merge_stream_projection_with_paragraph_fallback(projected, paragraph_refinement):
   """Keep global lexical hits and add only paragraph-local sentence fallbacks."""
   projected_by_sentence = defaultdict(list)

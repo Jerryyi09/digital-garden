@@ -14,6 +14,7 @@ import sys
 import unicodedata
 from bs4 import BeautifulSoup
 
+from tools.readalong.authoritative_validator import safe_path
 from tools.readalong.full_inventory_scanner import natural_sort_key
 from tools.readalong.nuc_target import NUC_SSH, NUC_TARGET, canonical_nuc_target, direct_ssh_command, run_nuc, bounded_remote
 
@@ -55,17 +56,24 @@ def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
     issues.append("TIMELINE_EMPTY")
 
   # 2. 正文文件与 fragment 锚点存在性、%xx URL 编码检测
-  text_root = source_base / (manifest.get("textRoot") or "text/")
   checked_docs = {}
   parsed_spans = {}
   for seg in timeline:
     doc_rel = seg.get("document", "")
+    # The timeline's ``document`` is a front-end output: the reader requests it
+    # from Alist verbatim, so a percent-encoded path resolves to nothing.  The
+    # mapping step now resolves every path to a real file name, which makes this
+    # a regression sentinel rather than a false positive.
     if "%" in doc_rel:
       issues.append(f"DOCUMENT_PATH_URL_ENCODED: {doc_rel}")
-      break
 
     if doc_rel not in checked_docs:
-      doc_p = source_base / doc_rel
+      try:
+        doc_p = safe_path(source_base, doc_rel)
+      except ValueError as exc:
+        issues.append(f"DOCUMENT_PATH_UNSAFE: {doc_rel} ({exc})")
+        checked_docs[doc_rel] = False
+        continue
       if not doc_p.is_file():
         issues.append(f"DOCUMENT_FILE_MISSING: {doc_rel}")
         checked_docs[doc_rel] = False
@@ -80,8 +88,6 @@ def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
     frag = seg.get("fragment")
     if checked_docs.get(doc_rel) and frag not in parsed_spans.get(doc_rel, set()):
       issues.append(f"FRAGMENT_ANCHOR_MISSING: {doc_rel}#{frag}")
-      if len(issues) > 10:
-        break
 
   # 3. 音频源存在性、alistPath 一致性、自然排序检测
   audio_sources = manifest.get("audioSources", [])

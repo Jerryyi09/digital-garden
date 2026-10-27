@@ -2,6 +2,13 @@
 
 日期：2026-10-19。源码：`studio/audiobooks/`。入口由 `studio/downloads-index.json` 生成，独立应用链接使用 `data-router-ignore`，避免 Quartz SPA 接管。
 
+## §0 NUC 发布规范
+
+- NUC 文件操作只允许直连局域网 `hp@10.0.0.85` 的 SSH 端口 `2222`，密钥为 `~/.ssh/id_rsa`。必须使用 `-F /dev/null` 忽略用户 SSH 配置；禁止 `hp` 别名、ProxyJump/ProxyCommand 和经过 `10.0.0.1` 的路由。rsync 使用相同连接参数，并带 `-s` 与 `--iconv=UTF-8-MAC,UTF-8`。
+- 每次发布通过共享的 `/tmp/readalong-publish-nuc.lock` 单实例锁；同步精确包含活动 manifest、其引用的版本目录和列明的源文件。严禁任何 `--delete*`、`-d` 或删除 NUC 内容的操作。
+- V5 顺序为候选准入 → `publish_practical` → Tier 1 本地静态检验（失败立即调用发布器回滚）→ 单书批量 rsync → Tier 2 单次 SSH 批量核验正文树、manifest、timeline 三个哈希 → Tier 3 单本 Alist 抽检。没有同步书目时跳过 Tier 3。
+- 默认保留已有 `AUDIO_ONLY` 收据，不识别、不发布这些书；只有显式传入 `--include-excluded` 才覆盖该排除决定。报告须逐本列出排除/复核/失败原因和未定位率，并汇总新增 ASR 秒数。
+
 后续完整开发任务见 [Claude Code 交接文档](audiobooks-claude-code-handoff.md)。现已交付通用映射工具 `./scripts/readalong`（支持 scan/align/batch/validate/install）以及应用内英文 EPUB 跟读功能。
 已完成心智成长分类下全部 35 本含 EPUB 电子书的有声书端到端音文映射与独立核验，并对全量 42 个有声书子目录同步安装至书库 `/Volumes/750/Music/有声书/心智成长/`。
 支持版本差异容错机制：当有声书为删节版、序言不同或存在未朗读附录/注释时，管线平滑跳过未朗读内容，确保逐句匹配精准且不中断。

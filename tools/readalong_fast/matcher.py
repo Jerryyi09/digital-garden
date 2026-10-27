@@ -133,12 +133,29 @@ def prepare_paragraphs(root, spine, diagnostics=None):
                      word_matches[i+80].start() if i+80 < len(word_matches) else len(linear))
                     for i in range(0, len(word_matches), 80)]
       spans = _create_segment_spans(boundaries, char_map, zero_nodes, prefix, 0)
-      owner.clear()
-      for span in spans:
-        owner.append(span)
-        context_ids.add(id(span))
-        used_ids.add(span["id"])
-      context_ids.remove(id(owner))
+      can_split_siblings = owner.name in {"p", "div", "blockquote", "li"} and owner.parent is not None
+      tag_name = owner.name if owner.name in BLOCKS else "p"
+      blocks = []
+      for idx, span in enumerate(spans):
+        block = soup.new_tag(tag_name, attrs=dict(owner.attrs))
+        block["id"] = f"{prefix}{idx}"
+        for child in list(span.children):
+          block.append(child.extract())
+        blocks.append(block)
+      if can_split_siblings:
+        for block in blocks:
+          owner.insert_before(block)
+          context_ids.add(id(block))
+          used_ids.add(block["id"])
+        context_ids.remove(id(owner))
+        owner.decompose()
+      else:
+        owner.clear()
+        for block in blocks:
+          owner.append(block)
+          context_ids.add(id(block))
+          used_ids.add(block["id"])
+        context_ids.remove(id(owner))
     for node in list((soup.body or soup).find_all(string=True)):
       if not visible(node):
         continue

@@ -247,18 +247,31 @@ def publish_practical(book_dir, candidate_dir, *, dry_run=False, material=None):
     if active.is_symlink():
       _switch(book, revision)
     else:
-      active.mkdir(exist_ok=True)
-      atomic_json(active/'readalong.manifest.json', manifest)
-      for fname in ('timeline.json', 'practical-audit.json'):
-        if (revision/fname).is_file():
-          shutil.copy2(revision/fname, active/fname)
-      if (revision/'text').is_dir():
-        (active/'text').mkdir(exist_ok=True)
-        for p in (revision/'text').rglob('*'):
-          if p.is_file():
-            dst = active/'text'/p.relative_to(revision/'text')
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(p, dst)
+      # Build the replacement beside the live directory and swap it in whole.
+      # Copying file by file only ever added: a file the previous release had
+      # and this one does not stayed behind, so the active tree accumulated
+      # documents from several revisions at once and the reader could resolve
+      # an anchor against a stale body.  The version directory keeps the full
+      # payload, so rollback still restores whatever this replaces.
+      staged = book/('.readalong_stage_'+uuid.uuid4().hex)
+      staged.mkdir(parents=True)
+      try:
+        atomic_json(staged/'readalong.manifest.json', manifest)
+        for fname in ('timeline.json', 'practical-audit.json'):
+          if (revision/fname).is_file():
+            shutil.copy2(revision/fname, staged/fname)
+        if (revision/'text').is_dir():
+          shutil.copytree(revision/'text', staged/'text')
+        replaced = book/'.readalong_rollback'/revision_id/'replaced-active'
+        replaced.parent.mkdir(parents=True, exist_ok=True)
+        if replaced.exists():
+          raise ValueError('Replaced active payload already exists; refusing to overwrite it')
+        if active.exists():
+          os.replace(active, replaced)
+        os.replace(staged, active)
+      except BaseException:
+        shutil.rmtree(staged, ignore_errors=True)
+        raise
     return {'success': True, 'active_dir': str(active), 'revision_dir': str(revision),
       'receipt': str(revision/'release-receipt.json'), 'audit': result}
 
