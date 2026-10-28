@@ -523,6 +523,228 @@ function renderShelf() {
   }
 }
 
+const CATEGORY_SPINE_PALETTES = {
+  "心智成长": ["#6b2d2d", "#8c3b3b", "#4a1e1e"],
+  "文学作品": ["#1f3a52", "#2c4f6f", "#152737"],
+  "文学理论": ["#2d4a3e", "#3d6454", "#1e322a"],
+  "计算机与AI": ["#223147", "#324867", "#172231"],
+  "艺术": ["#704214", "#8d531b", "#53310f"],
+  "教育": ["#5a3d28", "#785237", "#412c1d"],
+  "音乐": ["#4b3056", "#664275", "#36223e"],
+  "英文读写": ["#2f4858", "#3f6176", "#21333e"],
+  "传记": ["#6e3b3b", "#8b4d4d", "#502b2b"],
+  "历史": ["#5c4033", "#7a5544", "#432f25"],
+  "哲学": ["#2e4053", "#3d566e", "#1f2c3a"],
+  "自然博物": ["#2e5339", "#3e6e4d", "#1f3827"],
+  "政治": ["#5d2e46", "#7b3d5d", "#402030"],
+  "社会文化": ["#4a4036", "#635649", "#342d26"],
+  "科学技术": ["#1b4f72", "#246693", "#133852"],
+  "数理化": ["#1a5276", "#226b9c", "#123a54"],
+  "商业经济": ["#515a5a", "#6b7777", "#3a4040"],
+}
+
+function getCategoryPalette(name) {
+  for (const [key, val] of Object.entries(CATEGORY_SPINE_PALETTES)) {
+    if (name.includes(key)) return val
+  }
+  const hash = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const defaultColors = [
+    ["#4a3b32", "#634f43", "#352a24"],
+    ["#2c3e50", "#3a5169", "#1f2c39"],
+    ["#34495e", "#445f7a", "#253443"],
+    ["#4a235a", "#633079", "#351941"],
+    ["#145a32", "#1b7843", "#0e3f23"],
+    ["#78281f", "#9d3529", "#551d16"]
+  ]
+  return defaultColors[hash % defaultColors.length]
+}
+
+function renderHomeDashboard(categoryItems) {
+  const container = $("items")
+  container.replaceChildren()
+
+  const dashboard = document.createElement("div")
+  dashboard.className = "home-dashboard"
+
+  // ----------------------------------------------------
+  // 上栏：最近三个播放的有声书（一行 3 个并排，显示进度，点击播放）
+  // ----------------------------------------------------
+  const recentSection = document.createElement("section")
+  recentSection.className = "home-section recent-listen-section"
+
+  const recentHeader = document.createElement("div")
+  recentHeader.className = "home-section-header"
+  const recentTitle = document.createElement("h3")
+  recentTitle.className = "home-section-title"
+  recentTitle.textContent = "最近在听"
+  const recentSub = document.createElement("span")
+  recentSub.className = "home-section-sub"
+  recentSub.textContent = "点击继续播放"
+  recentHeader.append(recentTitle, recentSub)
+  recentSection.append(recentHeader)
+
+  // 收集最近 3 本不同书籍的记录
+  const allRecords = libraryRecords()
+  const recentCardsData = []
+  const seenBooks = new Set()
+  for (const rec of allRecords) {
+    const pathParts = rec.track.path.slice(ROOT.length).split("/").filter(Boolean)
+    const bookName = pathParts.length > 1 ? pathParts[1] : rec.track.name.replace(AUDIO, "")
+    if (!seenBooks.has(bookName)) {
+      seenBooks.add(bookName)
+      recentCardsData.push({ ...rec, bookName })
+      if (recentCardsData.length >= 3) break
+    }
+  }
+
+  const recentGrid = document.createElement("div")
+  recentGrid.className = "recent-listen-grid"
+
+  if (recentCardsData.length > 0) {
+    for (const item of recentCardsData) {
+      const card = document.createElement("div")
+      card.className = "recent-book-card"
+      card.title = `继续收听：${item.bookName}`
+
+      const coverWrap = document.createElement("div")
+      coverWrap.className = "recent-cover-wrap"
+
+      const coverFile = getBookCover(item.bookName)
+      let fullCoverPath = ""
+      if (coverFile) {
+        const parentDir = item.track.path.slice(0, item.track.path.lastIndexOf("/"))
+        fullCoverPath = `${parentDir}/${coverFile}`
+      }
+      const coverEl = createBookCoverElement(item.bookName, "size-shelf", fullCoverPath)
+
+      const playBadge = document.createElement("div")
+      playBadge.className = "recent-play-badge"
+      playBadge.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`
+
+      coverWrap.append(coverEl, playBadge)
+
+      const title = document.createElement("div")
+      title.className = "recent-book-title"
+      title.textContent = item.bookName
+
+      const progWrap = document.createElement("div")
+      progWrap.className = "recent-progress-wrap"
+
+      const percent = Math.min(100, Math.floor((item.position / (item.duration || 1)) * 100))
+      const barBg = document.createElement("div")
+      barBg.className = "recent-progress-bar-bg"
+      const barFill = document.createElement("div")
+      barFill.className = "recent-progress-bar-fill"
+      barFill.style.width = `${percent}%`
+      barBg.append(barFill)
+
+      const progText = document.createElement("div")
+      progText.className = "recent-progress-text"
+      progText.textContent = item.completed ? "已读完" : `已听 ${percent}%`
+
+      progWrap.append(barBg, progText)
+      card.append(coverWrap, title, progWrap)
+
+      // 点击直接播放！
+      card.onclick = attempt(() => loadTrack(item.track))
+      recentGrid.append(card)
+    }
+  } else {
+    const emptyTip = document.createElement("div")
+    emptyTip.className = "shelf-empty-state"
+    emptyTip.style.padding = "24px 10px"
+    emptyTip.textContent = "从下方挑选一个心仪的分类，开启你的有声漫游吧 🎧"
+    recentGrid.append(emptyTip)
+  }
+  recentSection.append(recentGrid)
+  dashboard.append(recentSection)
+
+  // ----------------------------------------------------
+  // 下栏：书库分类（一行放 3 个并排图标，几本书侧面竖放，书脊竖写分类名）
+  // ----------------------------------------------------
+  const catSection = document.createElement("section")
+  catSection.className = "home-section categories-shelf-section"
+
+  const catHeader = document.createElement("div")
+  catHeader.className = "home-section-header"
+  const catTitle = document.createElement("h3")
+  catTitle.className = "home-section-title"
+  catTitle.textContent = "书库分类"
+  const catCount = document.createElement("span")
+  catCount.className = "home-section-sub"
+  catCount.textContent = `${categoryItems.length} 个专栏`
+  catHeader.append(catTitle, catCount)
+  catSection.append(catHeader)
+
+  const catGrid = document.createElement("div")
+  catGrid.className = "category-spines-grid"
+
+  for (const catItem of categoryItems) {
+    const card = document.createElement("div")
+    card.className = "category-shelf-card"
+    card.title = `浏览分类：${catItem.name}`
+
+    // 书架上错落竖立的几本书脊（Bookshelf Spines Group）
+    const spinesGroup = document.createElement("div")
+    spinesGroup.className = "bookshelf-spines-group"
+
+    // 颜色搭配
+    const palette = getCategoryPalette(catItem.name)
+
+    // 1. 左侧伴书脊
+    const leftSpine = document.createElement("div")
+    leftSpine.className = "spine-book side-left"
+    leftSpine.style.background = `linear-gradient(90deg, ${palette[2]} 0%, #3a4b5d 60%, ${palette[2]} 100%)`
+
+    // 2. 主书脊（中央竖立，烫金装饰，竖排分类名称）
+    const mainSpine = document.createElement("div")
+    mainSpine.className = "spine-book main-spine"
+    mainSpine.style.setProperty("--spine-color-1", palette[0])
+    mainSpine.style.setProperty("--spine-color-2", palette[1])
+
+    const topRib = document.createElement("div")
+    topRib.className = "spine-rib-line"
+    const topOrnament = document.createElement("div")
+    topOrnament.className = "spine-top-ornament"
+    topOrnament.textContent = "❖"
+
+    const vertText = document.createElement("div")
+    vertText.className = "spine-vertical-text"
+    vertText.textContent = catItem.name
+
+    const bottomOrnament = document.createElement("div")
+    bottomOrnament.className = "spine-top-ornament"
+    bottomOrnament.textContent = "•"
+    const bottomRib = document.createElement("div")
+    bottomRib.className = "spine-rib-line"
+
+    mainSpine.append(topRib, topOrnament, vertText, bottomOrnament, bottomRib)
+
+    // 3. 右侧伴书脊
+    const rightSpine = document.createElement("div")
+    rightSpine.className = "spine-book side-right"
+    rightSpine.style.background = `linear-gradient(90deg, #2b332c 0%, ${palette[1]} 50%, #1f2620 100%)`
+
+    spinesGroup.append(leftSpine, mainSpine, rightSpine)
+
+    // 分类文字（卡片底部展示）
+    const catName = document.createElement("div")
+    catName.className = "category-card-name"
+    catName.textContent = catItem.name
+
+    card.append(spinesGroup, catName)
+
+    // 点击进入该分类
+    card.onclick = attempt(() => browse(catItem.path))
+    catGrid.append(card)
+  }
+
+  catSection.append(catGrid)
+  dashboard.append(catSection)
+
+  container.append(dashboard)
+}
+
 function render() {
   breadcrumbs()
 
@@ -562,6 +784,16 @@ function render() {
         ? (Date.parse(b.modified) || 0) - (Date.parse(a.modified) || 0)
         : a.name.localeCompare(b.name, "zh-CN", { numeric: true })),
   )
+
+  // 当处于首页且非搜索状态时，展现全新双栏仪表盘：上栏最近在听3本，下栏并排3列书架书脊分类
+  if (folder === ROOT && !query) {
+    $("list-status").parentElement.hidden = true
+    const dirItems = items.filter((item) => item.is_dir)
+    renderHomeDashboard(dirItems)
+    return
+  } else {
+    $("list-status").parentElement.hidden = false
+  }
 
   $("items").replaceChildren()
   $("list-status").textContent = `${folder === ROOT ? "全部有声书" : currentDirName} · ${items.length} 项${query ? " (已筛选)" : ""}`

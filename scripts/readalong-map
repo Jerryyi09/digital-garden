@@ -37,18 +37,26 @@ CATEGORY="$(basename "$(dirname "$TARGET")")"
 NAME="$(basename "$TARGET")"
 
 # 判断参数是单本书还是分类目录
-if [[ -f "$TARGET/readalong.manifest.json" ]] || ls "$TARGET"/*.epub >/dev/null 2>&1 || ls "$TARGET"/*.mp3 >/dev/null 2>&1 || ls "$TARGET"/*.m4b >/dev/null 2>&1; then
-  # 单本书模式
-  IS_SINGLE_BOOK=true
-  UNIT_ID="$CATEGORY/$NAME"
-  BATCH_NAME="${CATEGORY}-${NAME}-${TIMESTAMP}"
-  SCAN_ROOT="$(dirname "$TARGET")"
-else
+has_book_subdirs=false
+for sub in "$TARGET"/*; do
+  if [[ -d "$sub" ]] && [[ ! "$(basename "$sub")" =~ ^\. ]] && [[ "$(basename "$sub")" != "readalong" ]]; then
+    has_book_subdirs=true
+    break
+  fi
+done
+
+if [ "$has_book_subdirs" = true ]; then
   # 分类目录模式
   IS_SINGLE_BOOK=false
   CATEGORY="$NAME"
   BATCH_NAME="${CATEGORY}-${TIMESTAMP}"
   SCAN_ROOT="$TARGET"
+else
+  # 单本书模式
+  IS_SINGLE_BOOK=true
+  UNIT_ID="$CATEGORY/$NAME"
+  BATCH_NAME="${CATEGORY}-${NAME}-${TIMESTAMP}"
+  SCAN_ROOT="$(dirname "$TARGET")"
 fi
 
 RUN_DIR="$REPO_ROOT/private/readalong-library-runs/$BATCH_NAME"
@@ -98,6 +106,7 @@ fi
 
 # 3. 执行基准映射（默认采用逐句时间戳引擎 mlx-batch-silence-words-v1）
 echo "[2/2] Running candidate generation with default words engine..."
+set +e
 "$PYTHON" -m tools.readalong_fast.benchmark \
   --inventory "$INV_PATH" \
   --output "$RUN_DIR/run" \
@@ -105,6 +114,8 @@ echo "[2/2] Running candidate generation with default words engine..."
   --allow-new-asr \
   --asr-engine words \
   "${UNITS_ARGS[@]}"
+BENCH_STATUS=$?
+set -e
 
 # 4. 汇总展示报告与换版本建议
 echo ""

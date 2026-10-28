@@ -142,18 +142,22 @@ def analyze_unit_quality(run_dir: Path, record: dict, asr_cache_root: Path = Non
   total_segments = len(timeline) or metrics.get("timelineSegments", 0)
 
   # Problem categorization
-  is_mismatch = (screen_decision == "SAMPLE_MISMATCH"
+  is_error = usability == "SCRIPT_ERROR" or screen_decision == "SAMPLE_ERROR"
+  err_msg = str(record.get("error", ""))
+
+  is_mismatch = (not is_error and (
+                 screen_decision == "SAMPLE_MISMATCH"
                  or record.get("materialMismatchConfirmed") is True
                  or usability in ("REVIEW_MAPPING", "EXCLUDE_PRACTICAL_CANDIDATE")
-                 or (unmapped_ratio is not None and unmapped_ratio > 0.15))
+                 or (unmapped_ratio is not None and unmapped_ratio > 0.15)))
 
-  is_paragraph_chunked = (not is_mismatch and (
+  is_paragraph_chunked = (not is_error and not is_mismatch and (
     median_duration > 3.8
     or (total_segments > 0 and (fallback_count / (total_segments - unverified_count + 1e-9)) > 0.50
         and median_duration > 2.8)
   ))
 
-  is_drift_or_gapped = (not is_mismatch and not is_paragraph_chunked and (
+  is_drift_or_gapped = (not is_error and not is_mismatch and not is_paragraph_chunked and (
     (unmapped_ratio is not None and unmapped_ratio > 0.03)
     or (metrics.get("unalignedTrackCount", 0) > 0)
     or (len(audit_data.get("longUnexplainedIntervals", [])) > 2)
@@ -205,7 +209,22 @@ def analyze_unit_quality(run_dir: Path, record: dict, asr_cache_root: Path = Non
 
   clues_block = "\n".join(f"     {line}" for line in clues_summary) if clues_summary else "     (未提取到明显的音频元数据标签)"
 
-  if is_mismatch:
+  if is_error:
+    level = "ERROR"
+    tag = "[生成失败 建议核对]"
+    if "PAIRING" in err_msg or "multiple EPUB" in err_msg:
+      reason = "该图书目录下存在多个不同版本的 EPUB 电子书，自动配对算法未能确定唯一对应版本。"
+      advisory = (
+        f"1. 【排查指引】: 请打开本地书籍目录 `/Users/jerryyi/Desktop/寒假/未命名文件夹/{uid}`。\n"
+        f"2. 【操作建议】: 移出或删除多余的 EPUB 文件，只保留与当前有声书录音对应的 1 本 EPUB，然后重新映射。"
+      )
+    else:
+      reason = f"单书处理异常: {err_msg[:120]}"
+      advisory = (
+        f"1. 【排查指引】: 请检查该书籍目录下的音频或电子书是否存在文件损坏或特殊编码。\n"
+        f"2. 【操作建议】: 重新获取该书籍的规范 EPUB 或重新下载音频。"
+      )
+  elif is_mismatch:
     level = "MISMATCH"
     tag = "[严重错配 需换底本]"
     reason = "音频朗读文本与电子书底本不属于同一出版版本（译本差异、古典改写本或有声书为删节版本）。"
