@@ -66,7 +66,26 @@ def main():
   for uid in args.unit:
     unit = units[uid]
     dest = args.output/sanitize_slug(uid)
-    report = generate(unit, dest, cache, inputs, policy.get(uid))
+    try:
+      report = generate(unit, dest, cache, inputs, policy.get(uid))
+    except Exception as exc:
+      import traceback, sys
+      print(f"ERROR: generate() failed for {uid}: {exc}", file=sys.stderr)
+      traceback.print_exc()
+      summary["records"].append({
+        "unit_id": uid,
+        "readalongUsability": "SCRIPT_ERROR",
+        "screenDecision": "SAMPLE_ERROR",
+        "error": str(exc),
+        "metrics": {"unmappedSpeechUnitRatio": 1.0, "timelineSegments": 0},
+        "timings": {"totalSeconds": 0.0},
+        "matchingStats": {},
+        "speechCacheStats": {},
+        "fullAudioProcessed": False,
+      })
+      atomic_json(args.output/"benchmark.json", summary)
+      print(json.dumps(summary["records"][-1], ensure_ascii=False), flush=True)
+      continue
     if args.compare_global:
       spine = get_spine_htmls(Path(unit["book_dir"])/unit["epubs"][0]["rel_to_book"])
       _, _, book_tokens = prepare_paragraphs(dest/"text", spine)
