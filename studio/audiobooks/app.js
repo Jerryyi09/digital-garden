@@ -2220,9 +2220,18 @@ async function init() {
     }
   }
 
-  // Register Service Worker
+  // Register Service Worker with cache busting & auto-reload on update
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(() => {})
+    navigator.serviceWorker.register("./sw.js?v=29").then((reg) => {
+      reg.update().catch(() => {})
+    }).catch(() => {})
+    let refreshing = false
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!refreshing) {
+        refreshing = true
+        window.location.reload()
+      }
+    })
   }
 }
 
