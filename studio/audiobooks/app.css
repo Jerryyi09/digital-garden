@@ -1357,83 +1357,55 @@ button:active { opacity: 0.7; }
 /* ==========================================================================
    Home View: Two-Row Section Layout (3 Columns per row)
    ========================================================================== */
-.home-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding-bottom: 24px;
-}
-
-.home-section-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding: 0 4px;
-}
-
-.home-section-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.01em;
-}
-
-.home-section-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
 /* ==========================================================================
-   Home View: Clean Minimalist Single-Screen Layout (简洁设计 · 手机一屏尽览)
+   Home View: Top Recent 3 Cards + Bottom Category Pills Layout
    ========================================================================== */
 .home-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 0 0 12px;
+  gap: 20px;
+  padding-bottom: 20px;
 }
 
-.home-section-header {
+.section-title-bar {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 8px;
-  padding: 0 2px;
+  margin-bottom: 10px;
+  padding: 0 4px;
 }
 
-.home-section-title {
+.section-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.01em;
 }
 
-.home-section-sub {
-  font-size: 11px;
+.section-more, .section-sub {
+  font-size: 12px;
   color: var(--text-muted);
 }
 
-/* Row 1: Recent 3 Audiobooks (上一版经典图标风格，一行 3 个) */
-.recent-listen-grid {
+/* Row 1: Recent 3 Audiobooks (自适应 3 列，优雅大书封，显示进度，点击播放) */
+.recent-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .recent-book-card {
   background: var(--bg-card);
   border: 1px solid var(--line-color);
-  border-radius: 10px;
-  padding: 8px 6px;
+  border-radius: 12px;
+  padding: 10px 8px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-  transition: transform 0.12s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -1446,102 +1418,103 @@ button:active { opacity: 0.7; }
 
 .recent-cover-wrap {
   position: relative;
-  width: 50px;
-  height: 68px;
-  margin-bottom: 6px;
+  width: 100%;
+  aspect-ratio: 1 / 1.38;
+  max-width: 100px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .recent-cover-wrap .wx-book-cover {
-  width: 50px;
-  height: 68px;
+  width: 100%;
+  height: 100%;
   margin-bottom: 0;
-  border-radius: 4px;
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.16);
 }
 
 .recent-play-badge {
   position: absolute;
-  right: -3px;
-  bottom: -3px;
-  width: 19px;
-  height: 19px;
+  right: 4px;
+  bottom: 4px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: rgba(24, 119, 242, 0.95);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   z-index: 5;
 }
 
 .recent-play-badge svg {
-  width: 10px;
-  height: 10px;
+  width: 13px;
+  height: 13px;
   fill: currentColor;
   margin-left: 1px;
 }
 
 .recent-book-title {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.25;
-  width: 100%;
-  white-space: nowrap;
+  line-height: 1.35;
+  height: 35px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   color: var(--text-main);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  word-break: break-word;
 }
 
 .recent-progress-wrap {
   width: 100%;
-  padding: 0 2px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
-.recent-progress-bar-bg {
+.recent-progress-bar {
   width: 100%;
-  height: 3px;
+  height: 4px;
   background: var(--bg-subtle);
-  border-radius: 1.5px;
+  border-radius: 2px;
   overflow: hidden;
+  position: relative;
 }
 
 .recent-progress-bar-fill {
   height: 100%;
   background: var(--brand-blue);
-  border-radius: 1.5px;
+  border-radius: 2px;
 }
 
 .recent-progress-text {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
-  line-height: 1;
 }
 
-/* Row 2: Category Pills (极简轻盈胶囊，并排 3 列，无多余书架) */
+/* Row 2: Category Pills (下栏极简轻盈胶囊，保持不变，并排 3 列) */
 .category-pills-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
+  gap: 8px;
 }
 
 .category-pill-card {
   background: var(--bg-card);
   border: 1px solid var(--line-color);
-  border-radius: 8px;
-  height: 38px;
-  padding: 0 8px;
+  border-radius: 9px;
+  height: 40px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   transition: transform 0.12s ease, background 0.12s ease;

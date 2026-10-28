@@ -594,10 +594,21 @@ function renderHomeDashboard(categoryItems) {
   dashboard.className = "home-dashboard"
 
   // ----------------------------------------------------
-  // 上栏：最近三个播放的有声书（一行 3 个并排图标，纯净无多余文字，点击播放）
+  // 上栏：最近三个播放的有声书（恢复经典设计，一行 3 个并排大图标，显示进度，点击播放）
   // ----------------------------------------------------
   const recentSection = document.createElement("section")
   recentSection.className = "home-section recent-listen-section"
+
+  const recentHeader = document.createElement("div")
+  recentHeader.className = "section-title-bar"
+  const recentTitle = document.createElement("h3")
+  recentTitle.className = "section-title"
+  recentTitle.textContent = "最近在听"
+  const recentMore = document.createElement("span")
+  recentMore.className = "section-more"
+  recentMore.textContent = "历史记录"
+  recentHeader.append(recentTitle, recentMore)
+  recentSection.append(recentHeader)
 
   // 1. 优先从用户真实听书历史中提取
   const allRecords = libraryRecords()
@@ -619,7 +630,7 @@ function renderHomeDashboard(categoryItems) {
     }
   }
 
-  // 2. 若不足 3 本（如新打开、未听满 3 本），从书库经典已上线图书中补齐满 3 本！
+  // 2. 若不足 3 本，从书库经典已上线图书中补齐满 3 本！
   if (recentCardsData.length < 3) {
     const fallbackFeatured = [
       { bookName: "思考快与慢", cat: "心智成长", trackName: "01 Chapter 1.mp3", pos: 350, dur: 1200 },
@@ -646,7 +657,7 @@ function renderHomeDashboard(categoryItems) {
   }
 
   const recentGrid = document.createElement("div")
-  recentGrid.className = "recent-listen-grid"
+  recentGrid.className = "recent-grid-3"
 
   for (const item of recentCardsData) {
     const card = document.createElement("div")
@@ -662,8 +673,8 @@ function renderHomeDashboard(categoryItems) {
       const parentDir = item.track.path.slice(0, item.track.path.lastIndexOf("/"))
       fullCoverPath = `${parentDir}/${coverFile}`
     }
-    // 使用紧凑的原图标尺寸 size-row (46px x 64px)
-    const coverEl = createBookCoverElement(item.bookName, "size-row", fullCoverPath)
+    // 恢复立体大书封设计
+    const coverEl = createBookCoverElement(item.bookName, "size-shelf", fullCoverPath)
 
     const playBadge = document.createElement("div")
     playBadge.className = "recent-play-badge"
@@ -680,7 +691,7 @@ function renderHomeDashboard(categoryItems) {
 
     const percent = Math.min(100, Math.floor((item.position / (item.duration || 1)) * 100))
     const barBg = document.createElement("div")
-    barBg.className = "recent-progress-bar-bg"
+    barBg.className = "recent-progress-bar"
     const barFill = document.createElement("div")
     barFill.className = "recent-progress-bar-fill"
     barFill.style.width = `${percent}%`
