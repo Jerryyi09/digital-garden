@@ -1385,7 +1385,38 @@ button:active { opacity: 0.7; }
   color: var(--text-muted);
 }
 
-/* Row 1: Recent 3 Audiobooks (3 Columns, Compact Native Size) */
+/* ==========================================================================
+   Home View: Clean Minimalist Single-Screen Layout (简洁设计 · 手机一屏尽览)
+   ========================================================================== */
+.home-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 0 12px;
+}
+
+.home-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.home-section-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.home-section-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Row 1: Recent 3 Audiobooks (上一版经典图标风格，一行 3 个) */
 .recent-listen-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1396,7 +1427,7 @@ button:active { opacity: 0.7; }
   background: var(--bg-card);
   border: 1px solid var(--line-color);
   border-radius: 10px;
-  padding: 8px 4px 6px;
+  padding: 8px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1415,8 +1446,8 @@ button:active { opacity: 0.7; }
 
 .recent-cover-wrap {
   position: relative;
-  width: 46px;
-  height: 64px;
+  width: 50px;
+  height: 68px;
   margin-bottom: 6px;
   display: flex;
   align-items: center;
@@ -1425,19 +1456,19 @@ button:active { opacity: 0.7; }
 }
 
 .recent-cover-wrap .wx-book-cover {
-  width: 46px;
-  height: 64px;
+  width: 50px;
+  height: 68px;
   margin-bottom: 0;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.15);
 }
 
 .recent-play-badge {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 18px;
-  height: 18px;
+  right: -3px;
+  bottom: -3px;
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
   background: rgba(24, 119, 242, 0.95);
   color: #ffffff;
@@ -1465,12 +1496,11 @@ button:active { opacity: 0.7; }
   text-overflow: ellipsis;
   color: var(--text-main);
   margin-bottom: 4px;
-  padding: 0 2px;
 }
 
 .recent-progress-wrap {
   width: 100%;
-  padding: 0 4px;
+  padding: 0 2px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1480,14 +1510,14 @@ button:active { opacity: 0.7; }
   width: 100%;
   height: 3px;
   background: var(--bg-subtle);
-  border-radius: 2px;
+  border-radius: 1.5px;
   overflow: hidden;
 }
 
 .recent-progress-bar-fill {
   height: 100%;
   background: var(--brand-blue);
-  border-radius: 2px;
+  border-radius: 1.5px;
 }
 
 .recent-progress-text {
@@ -1496,142 +1526,49 @@ button:active { opacity: 0.7; }
   line-height: 1;
 }
 
-/* Row 2: Category Spines Shelf (3 Columns, Exact Size of Original Icons) */
-.category-spines-grid {
+/* Row 2: Category Pills (极简轻盈胶囊，并排 3 列，无多余书架) */
+.category-pills-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 7px;
 }
 
-.category-shelf-card {
+.category-pill-card {
   background: var(--bg-card);
   border: 1px solid var(--line-color);
-  border-radius: 10px;
-  padding: 8px 4px 6px;
+  border-radius: 8px;
+  height: 38px;
+  padding: 0 8px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  gap: 6px;
   cursor: pointer;
-  position: relative;
-  transition: transform 0.12s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.12s ease, background 0.12s ease;
   user-select: none;
+  min-width: 0;
 }
 
-.category-shelf-card:active {
+.category-pill-card:active {
   transform: scale(0.96);
   background: var(--bg-subtle);
 }
 
-/* Realistic Bookshelf Spines Aesthetic (几本书侧面竖放，保持 64px 原始高度) */
-.bookshelf-spines-group {
-  position: relative;
-  width: 48px;
-  height: 64px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin-bottom: 4px;
-  padding-bottom: 3px;
+.category-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cat-dot-color, #1877f2);
   flex-shrink: 0;
 }
 
-/* Shelf plank at bottom */
-.bookshelf-spines-group::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(180deg, #d3b898 0%, #a68460 100%);
-  border-radius: 1px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* Individual Book Spines standing vertically */
-.spine-book {
-  position: relative;
-  border-radius: 2px 2px 1px 1px;
-  box-shadow: -1px 1px 3px rgba(0,0,0,0.2), inset -1px 0 2px rgba(0,0,0,0.25);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 3px 1px;
-  overflow: hidden;
-}
-
-/* Companion Left Spine */
-.spine-book.side-left {
-  width: 10px;
-  height: 54px;
-  background: linear-gradient(90deg, #2b3a4a 0%, #3e5268 70%, #2b3a4a 100%);
-  transform: rotate(-2deg) translateX(2px);
-  z-index: 1;
-  opacity: 0.85;
-}
-
-/* Main Spine (Hero with Vertical Chinese Category Title) */
-.spine-book.main-spine {
-  width: 26px;
-  height: 62px;
-  background: linear-gradient(90deg, var(--spine-color-1, #6b2d2d) 0%, var(--spine-color-2, #8c3b3b) 50%, var(--spine-color-1, #5c2424) 100%);
-  z-index: 3;
-  box-shadow: -2px 2px 5px rgba(0,0,0,0.25), inset -2px 0 3px rgba(0,0,0,0.3);
-}
-
-/* Companion Right Spine */
-.spine-book.side-right {
-  width: 11px;
-  height: 56px;
-  background: linear-gradient(90deg, #33443a 0%, #485f52 70%, #2c3a32 100%);
-  transform: rotate(1deg) translateX(-2px);
-  z-index: 2;
-  opacity: 0.88;
-}
-
-/* Gold foil embossed ribbing lines */
-.spine-rib-line {
-  width: calc(100% - 2px);
-  height: 1px;
-  background: rgba(255, 230, 140, 0.85);
-  border-radius: 1px;
-}
-
-.spine-top-ornament {
-  font-size: 6px;
-  color: #f7d58b;
-  line-height: 1;
-  opacity: 0.85;
-}
-
-/* Vertical Text on Spine: Compact 2-character Chinese */
-.spine-vertical-text {
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #fffaf0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  padding: 1px 0;
-  flex: 1;
-}
-
-.category-card-name {
-  font-size: 11px;
+.category-pill-title {
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-main);
-  text-align: center;
-  margin-top: 2px;
-  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
+  flex: 1;
+  letter-spacing: -0.01em;
 }

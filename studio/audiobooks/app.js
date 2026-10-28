@@ -594,21 +594,10 @@ function renderHomeDashboard(categoryItems) {
   dashboard.className = "home-dashboard"
 
   // ----------------------------------------------------
-  // 上栏：最近三个播放的有声书（一行 3 个并排图标，显示进度，点击播放）
+  // 上栏：最近三个播放的有声书（一行 3 个并排图标，纯净无多余文字，点击播放）
   // ----------------------------------------------------
   const recentSection = document.createElement("section")
   recentSection.className = "home-section recent-listen-section"
-
-  const recentHeader = document.createElement("div")
-  recentHeader.className = "home-section-header"
-  const recentTitle = document.createElement("h3")
-  recentTitle.className = "home-section-title"
-  recentTitle.textContent = "最近在听"
-  const recentSub = document.createElement("span")
-  recentSub.className = "home-section-sub"
-  recentSub.textContent = "点击恢复播放"
-  recentHeader.append(recentTitle, recentSub)
-  recentSection.append(recentHeader)
 
   // 1. 优先从用户真实听书历史中提取
   const allRecords = libraryRecords()
@@ -712,74 +701,38 @@ function renderHomeDashboard(categoryItems) {
   dashboard.append(recentSection)
 
   // ----------------------------------------------------
-  // 下栏：书库分类（一行放 3 个并排图标，几本书侧面竖放，书脊竖写分类名）
-  // 保持与原来图标一样大小 (64px 高度)，文字缩减为 2 个汉字
+  // 下栏：书库分类（极简轻盈胶囊，一行 3 个并排，简洁设计一屏尽览）
   // ----------------------------------------------------
   const catSection = document.createElement("section")
-  catSection.className = "home-section categories-shelf-section"
+  catSection.className = "home-section categories-pills-section"
 
   const catHeader = document.createElement("div")
   catHeader.className = "home-section-header"
-  const catTitle = document.createElement("h3")
-  catTitle.className = "home-section-title"
-  catTitle.textContent = "书库分类"
-  const catCount = document.createElement("span")
-  catCount.className = "home-section-sub"
-  catCount.textContent = `${categoryItems.length} 个专栏`
-  catHeader.append(catTitle, catCount)
+  catHeader.style.marginBottom = "6px"
+  const catTitle = document.createElement("span")
+  catTitle.style.cssText = "font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.05em;"
+  catTitle.textContent = "分类专栏"
+  catHeader.append(catTitle)
   catSection.append(catHeader)
 
   const catGrid = document.createElement("div")
-  catGrid.className = "category-spines-grid"
+  catGrid.className = "category-pills-grid"
 
   for (const catItem of categoryItems) {
     const card = document.createElement("div")
-    card.className = "category-shelf-card"
+    card.className = "category-pill-card"
     card.title = `浏览分类：${catItem.name}`
 
-    // 书架上错落竖立的几本书脊（保持 64px 紧凑原图标尺寸）
-    const spinesGroup = document.createElement("div")
-    spinesGroup.className = "bookshelf-spines-group"
-
     const palette = getCategoryPalette(catItem.name)
+    const dot = document.createElement("span")
+    dot.className = "category-pill-dot"
+    dot.style.setProperty("--cat-dot-color", palette[1])
 
-    // 1. 左侧伴书脊 (矮、微倾斜)
-    const leftSpine = document.createElement("div")
-    leftSpine.className = "spine-book side-left"
-    leftSpine.style.background = `linear-gradient(90deg, ${palette[2]} 0%, #3a4b5d 70%, ${palette[2]} 100%)`
+    const nameEl = document.createElement("span")
+    nameEl.className = "category-pill-title"
+    nameEl.textContent = catItem.name
 
-    // 2. 主书脊（中央竖立，烫金装饰，文字缩减为精炼 2 字）
-    const mainSpine = document.createElement("div")
-    mainSpine.className = "spine-book main-spine"
-    mainSpine.style.setProperty("--spine-color-1", palette[0])
-    mainSpine.style.setProperty("--spine-color-2", palette[1])
-
-    const topRib = document.createElement("div")
-    topRib.className = "spine-rib-line"
-
-    // 文字缩减显示（如“计算机与AI”缩减为“计算”，“自然博物”缩减为“博物”）
-    const vertText = document.createElement("div")
-    vertText.className = "spine-vertical-text"
-    vertText.textContent = getCategoryShortName(catItem.name)
-
-    const bottomRib = document.createElement("div")
-    bottomRib.className = "spine-rib-line"
-
-    mainSpine.append(topRib, vertText, bottomRib)
-
-    // 3. 右侧伴书脊
-    const rightSpine = document.createElement("div")
-    rightSpine.className = "spine-book side-right"
-    rightSpine.style.background = `linear-gradient(90deg, #2b332c 0%, ${palette[1]} 50%, #1f2620 100%)`
-
-    spinesGroup.append(leftSpine, mainSpine, rightSpine)
-
-    // 分类完整名称（卡片底部展示）
-    const catName = document.createElement("div")
-    catName.className = "category-card-name"
-    catName.textContent = catItem.name
-
-    card.append(spinesGroup, catName)
+    card.append(dot, nameEl)
 
     // 点击进入该分类
     card.onclick = attempt(() => browse(catItem.path))
@@ -832,13 +785,15 @@ function render() {
         : a.name.localeCompare(b.name, "zh-CN", { numeric: true })),
   )
 
-  // 当处于首页且非搜索状态时，展现全新双栏仪表盘：上栏最近在听3本，下栏并排3列书架书脊分类
+  // 当处于首页且非搜索状态时，展现极简双栏仪表盘：彻底取消顶栏分类/状态栏，手机一屏尽收眼底
   if (folder === ROOT && !query) {
+    $("breadcrumbs").parentElement.hidden = true
     $("list-status").parentElement.hidden = true
     const dirItems = items.filter((item) => item.is_dir)
     renderHomeDashboard(dirItems)
     return
   } else {
+    $("breadcrumbs").parentElement.hidden = false
     $("list-status").parentElement.hidden = false
   }
 
