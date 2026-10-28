@@ -363,6 +363,7 @@ async function list(path) {
   const content = []
   let hasReadalongInFolder = false
   let pdfInFolder = null
+  let epubInFolder = null
   let imageInFolder = null
   for (let page = 1; ; page++) {
     const data = await api("fs/list", {
@@ -379,6 +380,10 @@ async function list(path) {
     const pdfItem = batch.find((item) => !item.is_dir && PDF.test(item.name))
     if (pdfItem && !pdfInFolder) {
       pdfInFolder = pdfItem.name
+    }
+    const epubItem = batch.find((item) => !item.is_dir && /\.epub$/i.test(item.name))
+    if (epubItem && !epubInFolder) {
+      epubInFolder = epubItem.name
     }
     const imgItem = batch.find((item) => !item.is_dir && IMG.test(item.name) && !item.name.startsWith("._"))
     if (imgItem && !imageInFolder) {
@@ -412,6 +417,8 @@ async function list(path) {
         hasReadalong: item.is_dir ? hasBookReadalong(item.name) : hasReadalongInFolder,
         hasPdf: Boolean(pdfInFolder) && !item.is_dir,
         pdfName: pdfInFolder,
+        hasEpub: Boolean(epubInFolder) && !item.is_dir,
+        epubName: epubInFolder,
         coverFile: coverFile || null,
       }
     })
@@ -856,6 +863,11 @@ function render() {
       readalongBadge.className = "badge-readalong"
       readalongBadge.textContent = "跟读"
       titleRow.append(readalongBadge)
+    } else if (item.hasEpub) {
+      const epubBadge = document.createElement("span")
+      epubBadge.className = "badge-pdf"
+      epubBadge.textContent = "EPUB"
+      titleRow.append(epubBadge)
     }
     if (item.hasPdf) {
       const pdfBadge = document.createElement("span")
@@ -1443,6 +1455,23 @@ async function setupReadalong(track, request) {
         $("readalong-frame").srcdoc = ""
         readalongFrameDocPath = ""
         readalongFrameReady = null
+        if (releaseBadge) releaseBadge.hidden = true
+
+        // 纯听书如果不跟读，但目录下有 EPUB，播放界面依然显示 EPUB 按钮供浏览！
+        const listData = await api("fs/list", { path: p, password: directoryPassword, page: 1, per_page: 50 }).catch(() => null)
+        const epubItem = listData?.content?.find((item) => !item.is_dir && /\.epub$/i.test(item.name))
+        if (epubItem) {
+          $("dock-readalong").hidden = false
+          const label = $("dock-readalong").querySelector("span")
+          if (label) label.textContent = "EPUB"
+          $("dock-readalong").title = "EPUB 电子书浏览"
+          $("dock-readalong").onclick = () => {
+            const epubUrl = mediaUrl(endpoint, { path: `${p}/${epubItem.name}` }, epubItem.sign)
+            window.open(epubUrl, "_blank")
+          }
+        } else {
+          $("dock-readalong").hidden = true
+        }
         return
       }
       if (m && m.schemaVersion === 1) {
@@ -1513,6 +1542,12 @@ async function setupReadalong(track, request) {
     // As long as the book has readalong documents, keep the EPUB dock button accessible
     const hasEpubDocument = Boolean(manifest.alignedDocument || readalongTimeline.length || manifest.textRoot)
     $("dock-readalong").hidden = !hasEpubDocument
+    if (hasEpubDocument) {
+      $("dock-readalong").onclick = openReadalong
+      const label = $("dock-readalong").querySelector("span")
+      if (label) label.textContent = "跟读"
+      $("dock-readalong").title = "EPUB 音文跟读"
+    }
 
     // If readalong view is active, immediately sync to new chapter's first segment
     if (readalongActive) {
