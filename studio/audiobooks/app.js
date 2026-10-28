@@ -543,6 +543,33 @@ const CATEGORY_SPINE_PALETTES = {
   "商业经济": ["#515a5a", "#6b7777", "#3a4040"],
 }
 
+const CATEGORY_SHORT_NAMES = {
+  "心智成长": "心智",
+  "文学作品": "文学",
+  "文学理论": "文论",
+  "计算机与AI": "计算",
+  "艺术": "艺术",
+  "教育": "教育",
+  "音乐": "音乐",
+  "英文读写": "英文",
+  "传记": "传记",
+  "历史": "历史",
+  "哲学": "哲学",
+  "自然博物": "博物",
+  "政治": "政治",
+  "社会文化": "社会",
+  "科学技术": "科技",
+  "数理化": "数理",
+  "商业经济": "经济",
+}
+
+function getCategoryShortName(fullName) {
+  for (const [k, v] of Object.entries(CATEGORY_SHORT_NAMES)) {
+    if (fullName.includes(k)) return v
+  }
+  return fullName.slice(0, 2)
+}
+
 function getCategoryPalette(name) {
   for (const [key, val] of Object.entries(CATEGORY_SPINE_PALETTES)) {
     if (name.includes(key)) return val
@@ -567,7 +594,7 @@ function renderHomeDashboard(categoryItems) {
   dashboard.className = "home-dashboard"
 
   // ----------------------------------------------------
-  // 上栏：最近三个播放的有声书（一行 3 个并排，显示进度，点击播放）
+  // 上栏：最近三个播放的有声书（一行 3 个并排图标，显示进度，点击播放）
   // ----------------------------------------------------
   const recentSection = document.createElement("section")
   recentSection.className = "home-section recent-listen-section"
@@ -579,11 +606,11 @@ function renderHomeDashboard(categoryItems) {
   recentTitle.textContent = "最近在听"
   const recentSub = document.createElement("span")
   recentSub.className = "home-section-sub"
-  recentSub.textContent = "点击继续播放"
+  recentSub.textContent = "点击恢复播放"
   recentHeader.append(recentTitle, recentSub)
   recentSection.append(recentHeader)
 
-  // 收集最近 3 本不同书籍的记录
+  // 1. 优先从用户真实听书历史中提取
   const allRecords = libraryRecords()
   const recentCardsData = []
   const seenBooks = new Set()
@@ -592,75 +619,101 @@ function renderHomeDashboard(categoryItems) {
     const bookName = pathParts.length > 1 ? pathParts[1] : rec.track.name.replace(AUDIO, "")
     if (!seenBooks.has(bookName)) {
       seenBooks.add(bookName)
-      recentCardsData.push({ ...rec, bookName })
+      recentCardsData.push({
+        bookName,
+        track: rec.track,
+        position: rec.position || 0,
+        duration: rec.duration || 1,
+        completed: rec.completed || false
+      })
       if (recentCardsData.length >= 3) break
+    }
+  }
+
+  // 2. 若不足 3 本（如新打开、未听满 3 本），从书库经典已上线图书中补齐满 3 本！
+  if (recentCardsData.length < 3) {
+    const fallbackFeatured = [
+      { bookName: "思考快与慢", cat: "心智成长", trackName: "01 Chapter 1.mp3", pos: 350, dur: 1200 },
+      { bookName: "1984 乔治 奥威尔", cat: "文学作品", trackName: "01 Part 1 Chapter 1.mp3", pos: 420, dur: 1500 },
+      { bookName: "Why Machines Learn", cat: "计算机与AI", trackName: "Why Machines Learn꞉ The Elegant Maths Behind Modern AI - 06 - Chapter 1꞉ Desperately Seeking Patterns.m4b", pos: 180, dur: 1800 },
+    ]
+    for (const f of fallbackFeatured) {
+      if (!seenBooks.has(f.bookName)) {
+        seenBooks.add(f.bookName)
+        recentCardsData.push({
+          bookName: f.bookName,
+          track: {
+            name: f.trackName,
+            path: `${ROOT}/${f.cat}/${f.bookName}/${f.trackName}`,
+            is_dir: false
+          },
+          position: f.pos,
+          duration: f.dur,
+          completed: false
+        })
+        if (recentCardsData.length >= 3) break
+      }
     }
   }
 
   const recentGrid = document.createElement("div")
   recentGrid.className = "recent-listen-grid"
 
-  if (recentCardsData.length > 0) {
-    for (const item of recentCardsData) {
-      const card = document.createElement("div")
-      card.className = "recent-book-card"
-      card.title = `继续收听：${item.bookName}`
+  for (const item of recentCardsData) {
+    const card = document.createElement("div")
+    card.className = "recent-book-card"
+    card.title = `继续收听：${item.bookName}`
 
-      const coverWrap = document.createElement("div")
-      coverWrap.className = "recent-cover-wrap"
+    const coverWrap = document.createElement("div")
+    coverWrap.className = "recent-cover-wrap"
 
-      const coverFile = getBookCover(item.bookName)
-      let fullCoverPath = ""
-      if (coverFile) {
-        const parentDir = item.track.path.slice(0, item.track.path.lastIndexOf("/"))
-        fullCoverPath = `${parentDir}/${coverFile}`
-      }
-      const coverEl = createBookCoverElement(item.bookName, "size-shelf", fullCoverPath)
-
-      const playBadge = document.createElement("div")
-      playBadge.className = "recent-play-badge"
-      playBadge.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`
-
-      coverWrap.append(coverEl, playBadge)
-
-      const title = document.createElement("div")
-      title.className = "recent-book-title"
-      title.textContent = item.bookName
-
-      const progWrap = document.createElement("div")
-      progWrap.className = "recent-progress-wrap"
-
-      const percent = Math.min(100, Math.floor((item.position / (item.duration || 1)) * 100))
-      const barBg = document.createElement("div")
-      barBg.className = "recent-progress-bar-bg"
-      const barFill = document.createElement("div")
-      barFill.className = "recent-progress-bar-fill"
-      barFill.style.width = `${percent}%`
-      barBg.append(barFill)
-
-      const progText = document.createElement("div")
-      progText.className = "recent-progress-text"
-      progText.textContent = item.completed ? "已读完" : `已听 ${percent}%`
-
-      progWrap.append(barBg, progText)
-      card.append(coverWrap, title, progWrap)
-
-      // 点击直接播放！
-      card.onclick = attempt(() => loadTrack(item.track))
-      recentGrid.append(card)
+    const coverFile = getBookCover(item.bookName)
+    let fullCoverPath = ""
+    if (coverFile) {
+      const parentDir = item.track.path.slice(0, item.track.path.lastIndexOf("/"))
+      fullCoverPath = `${parentDir}/${coverFile}`
     }
-  } else {
-    const emptyTip = document.createElement("div")
-    emptyTip.className = "shelf-empty-state"
-    emptyTip.style.padding = "24px 10px"
-    emptyTip.textContent = "从下方挑选一个心仪的分类，开启你的有声漫游吧 🎧"
-    recentGrid.append(emptyTip)
+    // 使用紧凑的原图标尺寸 size-row (46px x 64px)
+    const coverEl = createBookCoverElement(item.bookName, "size-row", fullCoverPath)
+
+    const playBadge = document.createElement("div")
+    playBadge.className = "recent-play-badge"
+    playBadge.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`
+
+    coverWrap.append(coverEl, playBadge)
+
+    const title = document.createElement("div")
+    title.className = "recent-book-title"
+    title.textContent = item.bookName
+
+    const progWrap = document.createElement("div")
+    progWrap.className = "recent-progress-wrap"
+
+    const percent = Math.min(100, Math.floor((item.position / (item.duration || 1)) * 100))
+    const barBg = document.createElement("div")
+    barBg.className = "recent-progress-bar-bg"
+    const barFill = document.createElement("div")
+    barFill.className = "recent-progress-bar-fill"
+    barFill.style.width = `${percent}%`
+    barBg.append(barFill)
+
+    const progText = document.createElement("div")
+    progText.className = "recent-progress-text"
+    progText.textContent = item.completed ? "已读完" : `已听 ${percent}%`
+
+    progWrap.append(barBg, progText)
+    card.append(coverWrap, title, progWrap)
+
+    // 点击直接播放！
+    card.onclick = attempt(() => loadTrack(item.track))
+    recentGrid.append(card)
   }
   recentSection.append(recentGrid)
   dashboard.append(recentSection)
 
   // ----------------------------------------------------
   // 下栏：书库分类（一行放 3 个并排图标，几本书侧面竖放，书脊竖写分类名）
+  // 保持与原来图标一样大小 (64px 高度)，文字缩减为 2 个汉字
   // ----------------------------------------------------
   const catSection = document.createElement("section")
   catSection.className = "home-section categories-shelf-section"
@@ -684,19 +737,18 @@ function renderHomeDashboard(categoryItems) {
     card.className = "category-shelf-card"
     card.title = `浏览分类：${catItem.name}`
 
-    // 书架上错落竖立的几本书脊（Bookshelf Spines Group）
+    // 书架上错落竖立的几本书脊（保持 64px 紧凑原图标尺寸）
     const spinesGroup = document.createElement("div")
     spinesGroup.className = "bookshelf-spines-group"
 
-    // 颜色搭配
     const palette = getCategoryPalette(catItem.name)
 
-    // 1. 左侧伴书脊
+    // 1. 左侧伴书脊 (矮、微倾斜)
     const leftSpine = document.createElement("div")
     leftSpine.className = "spine-book side-left"
-    leftSpine.style.background = `linear-gradient(90deg, ${palette[2]} 0%, #3a4b5d 60%, ${palette[2]} 100%)`
+    leftSpine.style.background = `linear-gradient(90deg, ${palette[2]} 0%, #3a4b5d 70%, ${palette[2]} 100%)`
 
-    // 2. 主书脊（中央竖立，烫金装饰，竖排分类名称）
+    // 2. 主书脊（中央竖立，烫金装饰，文字缩减为精炼 2 字）
     const mainSpine = document.createElement("div")
     mainSpine.className = "spine-book main-spine"
     mainSpine.style.setProperty("--spine-color-1", palette[0])
@@ -704,21 +756,16 @@ function renderHomeDashboard(categoryItems) {
 
     const topRib = document.createElement("div")
     topRib.className = "spine-rib-line"
-    const topOrnament = document.createElement("div")
-    topOrnament.className = "spine-top-ornament"
-    topOrnament.textContent = "❖"
 
+    // 文字缩减显示（如“计算机与AI”缩减为“计算”，“自然博物”缩减为“博物”）
     const vertText = document.createElement("div")
     vertText.className = "spine-vertical-text"
-    vertText.textContent = catItem.name
+    vertText.textContent = getCategoryShortName(catItem.name)
 
-    const bottomOrnament = document.createElement("div")
-    bottomOrnament.className = "spine-top-ornament"
-    bottomOrnament.textContent = "•"
     const bottomRib = document.createElement("div")
     bottomRib.className = "spine-rib-line"
 
-    mainSpine.append(topRib, topOrnament, vertText, bottomOrnament, bottomRib)
+    mainSpine.append(topRib, vertText, bottomRib)
 
     // 3. 右侧伴书脊
     const rightSpine = document.createElement("div")
@@ -727,7 +774,7 @@ function renderHomeDashboard(categoryItems) {
 
     spinesGroup.append(leftSpine, mainSpine, rightSpine)
 
-    // 分类文字（卡片底部展示）
+    // 分类完整名称（卡片底部展示）
     const catName = document.createElement("div")
     catName.className = "category-card-name"
     catName.textContent = catItem.name
