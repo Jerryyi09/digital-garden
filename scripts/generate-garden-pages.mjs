@@ -168,7 +168,6 @@ async function getStudioItems() {
   const items = JSON.parse(raw)
 
   return [
-    alist,
     ...items.map((item) => ({
       title: item.title,
       type: item.type || "Download",
@@ -177,6 +176,7 @@ async function getStudioItems() {
       room: "Studio",
       standalone: item.standalone === true,
     })),
+    alist,
   ]
 }
 

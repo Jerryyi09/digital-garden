@@ -18,14 +18,14 @@ cssclasses:
 </section>
 
 <section class="garden-section">
-  <div class="garden-card-grid"><a class="garden-card" href="https://melyi.uk/alist/" data-router-ignore>
-  <span class="garden-card-kicker">Studio / Resource Hub</span>
-  <strong>Alist Resource Library</strong>
-  <span>Browse extended files, media, and long-term resources.</span>
-</a>
-<a class="garden-card" href="/studio/audiobooks/" data-router-ignore>
+  <div class="garden-card-grid"><a class="garden-card" href="/studio/audiobooks/" data-router-ignore>
   <span class="garden-card-kicker">Studio / Audiobooks</span>
   <strong>有声书 · 听见一本书</strong>
   <span>分类浏览家庭书库，继续上次收听。支持 MP3、M4A、M4B、倍速与最近播放。</span>
+</a>
+<a class="garden-card" href="https://melyi.uk/alist/" data-router-ignore>
+  <span class="garden-card-kicker">Studio / Resource Hub</span>
+  <strong>Alist Resource Library</strong>
+  <span>Browse extended files, media, and long-term resources.</span>
 </a></div>
 </section>
