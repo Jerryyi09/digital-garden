@@ -1,4 +1,4 @@
-const CACHE = "garden-audiobooks-v33-network-first"
+const CACHE = "garden-audiobooks-v34-network-first"
 const SHELL = ["./", "./app.js", "./readalong-sync.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 
 // Precache bypasses the browser HTTP cache: app.js is served with max-age=14400, and a plain
@@ -22,14 +22,15 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url)
-  const shell = SHELL.map(file => new URL(file, self.registration.scope).href)
+  const cleanHref = url.origin + url.pathname
+  const shell = SHELL.map(file => new URL(file, self.registration.scope).href.split("?")[0])
   // Never intercept API calls, signed streams, Range requests, or other Garden pages.
-  if (event.request.method !== "GET" || event.request.headers.has("Range") || !shell.includes(url.href)) return
+  if (event.request.method !== "GET" || event.request.headers.has("Range") || !shell.includes(cleanHref)) return
 
   // Network-first for the app shell (revalidated, 304 when unchanged), cache only when offline,
   // so a deploy takes effect on the next load instead of after the HTTP cache expires.
   event.respondWith(
-    fetch(url.href, { cache: "no-cache", credentials: "same-origin" }).then(networkResponse => {
+    fetch(event.request, { cache: "no-cache", credentials: "same-origin" }).then(networkResponse => {
       if (networkResponse.ok && !networkResponse.redirected && networkResponse.type !== "opaque") {
         const copy = networkResponse.clone()
         caches.open(CACHE).then(cache => cache.put(event.request, copy))
