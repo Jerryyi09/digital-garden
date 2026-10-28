@@ -550,6 +550,30 @@ const CATEGORY_SPINE_PALETTES = {
   "商业经济": ["#515a5a", "#6b7777", "#3a4040"],
 }
 
+// Memory cache for asynchronously loaded summary.txt from AList
+const asyncSummaryMemoryCache = new Map()
+
+async function loadAsyncSummary(bookPath, textElement) {
+  if (asyncSummaryMemoryCache.has(bookPath)) {
+    const cached = asyncSummaryMemoryCache.get(bookPath)
+    if (cached && textElement) textElement.textContent = cached
+    return
+  }
+  try {
+    const sumPath = `${bookPath}/summary.txt`
+    const info = await api("fs/get", { path: sumPath, password: directoryPassword }).catch(() => null)
+    if (info && !info.is_dir) {
+      const url = mediaUrl(endpoint, { path: sumPath }, info.sign)
+      const text = await fetch(url).then(r => r.text()).catch(() => "")
+      if (text && text.trim()) {
+        const clean = text.trim()
+        asyncSummaryMemoryCache.set(bookPath, clean)
+        if (textElement) textElement.textContent = clean
+      }
+    }
+  } catch {}
+}
+
 const CATEGORY_SHORT_NAMES = {
   "心智成长": "心智",
   "文学作品": "文学",
@@ -689,27 +713,8 @@ function renderHomeDashboard(categoryItems) {
 
     coverWrap.append(coverEl, playBadge)
 
-    const title = document.createElement("div")
-    title.className = "recent-book-title"
-    title.textContent = item.bookName
-
-    const progWrap = document.createElement("div")
-    progWrap.className = "recent-progress-wrap"
-
-    const percent = Math.min(100, Math.floor((item.position / (item.duration || 1)) * 100))
-    const barBg = document.createElement("div")
-    barBg.className = "recent-progress-bar"
-    const barFill = document.createElement("div")
-    barFill.className = "recent-progress-bar-fill"
-    barFill.style.width = `${percent}%`
-    barBg.append(barFill)
-
-    const progText = document.createElement("div")
-    progText.className = "recent-progress-text"
-    progText.textContent = item.completed ? "已读完" : `已听 ${percent}%`
-
-    progWrap.append(barBg, progText)
-    card.append(coverWrap, title, progWrap)
+    // 只留图片和播放小图标（无白框、无进度条、无文字书名）
+    card.append(coverWrap)
 
     // 点击直接播放！
     card.onclick = attempt(() => loadTrack(item.track))
@@ -773,8 +778,13 @@ function render() {
 
   if (isBookFolder) {
     $("banner-title").textContent = currentDirName
-    const hasRead = hasBookReadalong(currentDirName) || entries.some((item) => item.hasReadalong)
-    $("folder-summary-text").textContent = (hasRead ? "【已就绪 · 支持 EPUB 音文跟读】 " : "") + (currentSummary || "暂无简介，点击章节即可播放。")
+    const sumEl = $("folder-summary-text")
+    sumEl.textContent = ""
+    if (currentSummary) {
+      sumEl.textContent = currentSummary
+    } else {
+      loadAsyncSummary(folder, sumEl)
+    }
 
     // Render Banner Cover
     const bannerCoverWrap = document.querySelector(".banner-cover-wrap")
@@ -838,6 +848,20 @@ function render() {
         fullCoverPath = `${item.path}/${coverFile}`
       }
       const coverEl = createBookCoverElement(item.name, "size-row", fullCoverPath)
+
+      // 在左侧图片右上角加小图标：可以跟读加跟读，不可跟读但有pdf加pdf，没有pdf或epub不加
+      const hasRead = hasBookReadalong(item.name) || item.hasReadalong
+      if (hasRead) {
+        const badge = document.createElement("span")
+        badge.className = "cover-corner-badge badge-readalong"
+        badge.textContent = "跟读"
+        coverEl.append(badge)
+      } else if (item.hasPdf) {
+        const badge = document.createElement("span")
+        badge.className = "cover-corner-badge badge-pdf"
+        badge.textContent = "PDF"
+        coverEl.append(badge)
+      }
       card.append(coverEl)
     } else {
       const disc = document.createElement("div")
@@ -856,31 +880,18 @@ function render() {
     title.className = "item-name"
     title.textContent = item.name.replace(AUDIO, "")
     titleRow.append(title)
-
-    const hasRead = item.is_dir ? (hasBookReadalong(item.name) || item.hasReadalong) : item.hasReadalong
-    if (hasRead) {
-      const readalongBadge = document.createElement("span")
-      readalongBadge.className = "badge-readalong"
-      readalongBadge.textContent = "跟读"
-      titleRow.append(readalongBadge)
-    } else if (item.hasEpub) {
-      const epubBadge = document.createElement("span")
-      epubBadge.className = "badge-pdf"
-      epubBadge.textContent = "EPUB"
-      titleRow.append(epubBadge)
-    }
-    if (item.hasPdf) {
-      const pdfBadge = document.createElement("span")
-      pdfBadge.className = "badge-pdf"
-      pdfBadge.textContent = "PDF"
-      titleRow.append(pdfBadge)
-    }
     info.append(titleRow)
 
     if (item.is_dir) {
       const desc = document.createElement("p")
       desc.className = "item-desc-text"
-      desc.textContent = getBookSummary(item.name) || "点击浏览有声书章节与配套讲义"
+      const staticSum = getBookSummary(item.name)
+      if (staticSum) {
+        desc.textContent = staticSum
+      } else {
+        desc.textContent = ""
+        loadAsyncSummary(item.path, desc)
+      }
       info.append(desc)
     } else {
       const meta = document.createElement("p")

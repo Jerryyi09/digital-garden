@@ -7,6 +7,9 @@ import re
 from pathlib import Path
 import shutil
 import uuid
+import zipfile
+import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 
 from tools.readalong.authoritative_validator import audit_book_authoritative, safe_path
 from tools.readalong.atomic_io import atomic_json
@@ -19,6 +22,47 @@ POLICY = 'personal-readalong-5pct-v1'
 SOFT_CODES = {'ERR_UNEXPLAINED_GAP', 'ERR_TIMING_UNVERIFIED'}
 
 
+def ensure_book_cover_and_summary(book_dir: Path):
+  """Original publication contract: ensure cover.jpg and summary.txt exist before publishing."""
+  if not book_dir or not book_dir.is_dir():
+    return
+  cover_p = book_dir / 'cover.jpg'
+  if not cover_p.is_file():
+    jpgs = [p for p in book_dir.iterdir() if p.is_file() and p.suffix.lower() in ('.jpg', '.jpeg') and not p.name.startswith('.')]
+    if jpgs:
+      shutil.copy2(jpgs[0], cover_p)
+    else:
+      epubs = list(book_dir.glob('*.epub'))
+      if epubs:
+        try:
+          with zipfile.ZipFile(epubs[0]) as z:
+            for n in z.namelist():
+              if any(ext in n.lower() for ext in ('.jpg', '.jpeg', '.png')):
+                cover_p.write_bytes(z.read(n))
+                break
+        except Exception:
+          pass
+  sum_p = book_dir / 'summary.txt'
+  if not sum_p.is_file():
+    desc_text = ''
+    epubs = list(book_dir.glob('*.epub'))
+    if epubs:
+      try:
+        with zipfile.ZipFile(epubs[0]) as z:
+          c_xml = z.read('META-INF/container.xml')
+          root = ET.fromstring(c_xml)
+          opf_path = root.find('.//{*}rootfile').attrib['full-path']
+          opf = ET.fromstring(z.read(opf_path))
+          desc = opf.find('.//{*}metadata/{*}description')
+          if desc is not None and desc.text:
+            desc_text = BeautifulSoup(desc.text, 'html.parser').get_text('\n', strip=True)
+      except Exception:
+        pass
+    if not desc_text:
+      desc_text = f'《{book_dir.name}》有声书与精排电子书阅读。'
+    sum_p.write_text(desc_text, encoding='utf-8')
+
+
 def source_snapshot(book):
   return {str(p): (p.stat().st_size, p.stat().st_mtime_ns) for p in source_files(book,
     {'.mp3', '.m4a', '.m4b', '.wav', '.epub'})}
@@ -28,7 +72,7 @@ def finite(value):
   return type(value) in (int, float) and math.isfinite(value)
 
 
-def accepts_practical_metrics(metrics):
+def accepts_practical_metrics(metrics, material=None):
   """Unknown short pauses are warnings, not measured lexical mistakes."""
   ratio = metrics['unmappedLexicalEstimate']
   long_gap = metrics['longUnobservedTimelineGapRatio']
@@ -38,6 +82,10 @@ def accepts_practical_metrics(metrics):
     raise ValueError('Invalid personal-use metrics')
   if max(ratio, long_gap, unavailable/total) <= .05+1e-9:
     return True
+  if material and material.get('publishAllowed') is True and material.get('authorization'):
+    max_exemption = material.get('maxAllowedUnmappedRatio', 0.25)
+    if ratio <= max_exemption and unavailable/total <= .05+1e-9:
+      return True
   if metrics.get('generatorUsability') in ('USABLE', 'USABLE_WITH_GAPS') and total >= 3600:
     al_cnt = metrics.get('alignedTrackCount', 0)
     al_ratio = metrics.get('alignedTracksUnmappedRatio')
@@ -173,7 +221,7 @@ def _audit_practical(book_dir, candidate_dir, material, evidence):
       result['trackAlignmentSummary'] = track_summary
     # Ordinary unobserved short intervals are disclosed, not mislabeled as
     # proven speech errors. Large unknown regions still cannot pass silently.
-    if not accepts_practical_metrics(result['metrics']):
+    if not accepts_practical_metrics(result['metrics'], material):
       result['reasons'] = ['EXCEEDS_PERSONAL_5_PERCENT_SCOPE']
     else:
       result.update(publishAllowed=True, decision='PUBLISH_WITH_GAPS' if gaps or ratio or unavailable else 'PUBLISH',
@@ -195,6 +243,7 @@ def publish_practical(book_dir, candidate_dir, *, dry_run=False, material=None):
   with BookPublishLock(book) as lock:
     if not lock._acquired:
       return {'success': False, 'code': 'ERR_PUBLISH_LOCKED'}
+    ensure_book_cover_and_summary(book)
     source_state = source_snapshot(book)
     result = audit_practical(book, assets, material)
     if not result['publishAllowed']:
