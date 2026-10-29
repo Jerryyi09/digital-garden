@@ -391,6 +391,38 @@ button:active { opacity: 0.7; }
   margin-bottom: 16px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
+.book-banner-card.has-guide {
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.book-banner-card.has-guide:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border-color: rgba(66, 133, 244, 0.4);
+}
+.banner-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.badge-guide {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: rgba(184, 115, 51, 0.12);
+  color: #b87333;
+  border: 1px solid rgba(184, 115, 51, 0.28);
+  letter-spacing: 0.3px;
+  transition: background 0.15s ease;
+}
+.book-banner-card.has-guide:hover .badge-guide {
+  background: rgba(184, 115, 51, 0.22);
+}
 .banner-cover-wrap {
   width: 76px;
   height: 104px;
@@ -983,6 +1015,29 @@ button:active { opacity: 0.7; }
   padding: 6px 14px;
   border-radius: 16px;
 }
+#btn-speed, .timer-pill-btn {
+  min-width: 52px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.timer-pill-btn {
+  padding: 0;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+.timer-pill-icon {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+.timer-pill-btn.active {
+  background: var(--brand-blue);
+  color: #ffffff;
+}
 .circle-btn {
   width: 48px;
   height: 48px;
@@ -993,6 +1048,24 @@ button:active { opacity: 0.7; }
   width: 30px;
   height: 30px;
   fill: currentColor;
+}
+#rewind svg, #forward svg {
+  fill: none !important;
+}
+#rewind svg path, #forward svg path,
+#rewind svg polyline, #forward svg polyline {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#rewind svg text, #forward svg text {
+  fill: currentColor !important;
+  stroke: none !important;
+  font-size: 6.8px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
 }
 .primary-play-btn {
   width: 68px;
@@ -1009,23 +1082,25 @@ button:active { opacity: 0.7; }
 }
 
 /* Reliable Play/Pause Icon Toggle via CSS */
-#mini-play-icon, #play-svg, #rf-play-svg, #pf-play-svg {
+#mini-play-icon, #play-svg, #rf-play-svg, #pf-play-svg, #gf-play-svg {
   display: block;
 }
-#mini-pause-icon, #pause-svg, #rf-pause-svg, #pf-pause-svg {
+#mini-pause-icon, #pause-svg, #rf-pause-svg, #pf-pause-svg, #gf-pause-svg {
   display: none;
 }
 
 .is-playing #mini-play-icon,
 .is-playing #play-svg,
 .is-playing #rf-play-svg,
-.is-playing #pf-play-svg {
+.is-playing #pf-play-svg,
+.is-playing #gf-play-svg {
   display: none !important;
 }
 .is-playing #mini-pause-icon,
 .is-playing #pause-svg,
 .is-playing #rf-pause-svg,
-.is-playing #pf-pause-svg {
+.is-playing #pf-pause-svg,
+.is-playing #gf-pause-svg {
   display: block !important;
 }
 
@@ -1043,6 +1118,14 @@ button:active { opacity: 0.7; }
   align-items: center;
   gap: 4px;
   color: var(--text-sub);
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.dock-btn.disabled,
+.dock-btn:disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  filter: grayscale(1);
 }
 .dock-icon {
   width: 22px;
@@ -1161,13 +1244,14 @@ button:active { opacity: 0.7; }
   font-weight: 500;
   flex-shrink: 0;
 }
-#readalong-chapter-title, #pdf-title {
+#readalong-chapter-title, #pdf-title, #guide-title {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-main);
 }
 .readalong-top-actions {
   display: flex;

@@ -45,6 +45,10 @@ let readalongAssetBase = ""
 let currentPdfPath = ""
 let currentPdfName = ""
 let pdfViewerActive = false
+let currentGuidePath = ""
+let currentGuideTitle = ""
+let guideViewerActive = false
+let currentFolderGuidePath = ""
 
 // Sleep Timer State
 let sleepTimerId = null
@@ -365,6 +369,7 @@ async function list(path) {
   let pdfInFolder = null
   let epubInFolder = null
   let imageInFolder = null
+  let guideInFolder = null
   for (let page = 1; ; page++) {
     const data = await api("fs/list", {
       path,
@@ -385,6 +390,10 @@ async function list(path) {
     if (epubItem && !epubInFolder) {
       epubInFolder = epubItem.name
     }
+    const guideItem = batch.find((item) => !item.is_dir && /^guide\.html$/i.test(item.name))
+    if (guideItem && !guideInFolder) {
+      guideInFolder = guideItem.name
+    }
     const imgItem = batch.find((item) => !item.is_dir && IMG.test(item.name) && !item.name.startsWith("._"))
     if (imgItem && !imageInFolder) {
       imageInFolder = imgItem.name
@@ -401,6 +410,7 @@ async function list(path) {
     "runtime-snapshot",
     "__pycache__",
   ])
+  currentFolderGuidePath = guideInFolder ? `${path}/${guideInFolder}` : ""
   return content
     .filter((item) => {
       if (ignoredNames.has(item.name)) return false
@@ -794,6 +804,15 @@ function render() {
       const fullCoverPath = coverFile ? `${folder}/${coverFile}` : ""
       bannerCoverWrap.append(createBookCoverElement(currentDirName, "size-banner", fullCoverPath))
     }
+    if (currentFolderGuidePath) {
+      $("folder-summary").classList.add("has-guide")
+      const guideBadge = $("banner-guide-badge")
+      if (guideBadge) guideBadge.hidden = false
+    } else {
+      $("folder-summary").classList.remove("has-guide")
+      const guideBadge = $("banner-guide-badge")
+      if (guideBadge) guideBadge.hidden = true
+    }
     $("folder-summary").hidden = false
   } else {
     $("folder-summary").hidden = true
@@ -952,7 +971,7 @@ async function stream(track) {
 
 async function prepareNext(request) {
   preparedNext = null
-  $("btn-next").disabled = true
+  if ($("btn-next")) $("btn-next").disabled = true
   try {
     const parent = current.path.slice(0, current.path.lastIndexOf("/"))
     const tracks = (parent === folder ? entries : await list(parent))
@@ -964,7 +983,7 @@ async function prepareNext(request) {
     const url = await stream(next)
     if (request === playRequest) {
       preparedNext = { track: next, url, preparedAt: Date.now() }
-      $("btn-next").disabled = false
+      if ($("btn-next")) $("btn-next").disabled = false
     }
   } catch {
     /* Next chapter discovery failure shouldn't stop playback */
@@ -982,7 +1001,7 @@ async function loadTrack(track, preparedUrl) {
   pendingPosition = null
   current = null
   preparedNext = null
-  $("btn-next").disabled = true
+  if ($("btn-next")) $("btn-next").disabled = true
 
   // Immediately clear old timeline & document to avoid scanning wrong chapters
   readalongTimeline = []
@@ -990,6 +1009,14 @@ async function loadTrack(track, preparedUrl) {
   currentDocPath = ""
   $("dock-readalong").hidden = true
   $("dock-pdf").hidden = true
+  currentGuidePath = ""
+  currentGuideTitle = ""
+  const dockGuide = $("dock-guide")
+  if (dockGuide) {
+    dockGuide.disabled = true
+    dockGuide.classList.add("disabled")
+    dockGuide.title = "暂无深度导读"
+  }
 
   // Set titles and artwork in Mini and Full Player
   const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
@@ -1009,6 +1036,7 @@ async function loadTrack(track, preparedUrl) {
   const vinylCenter = $("vinyl-cover-art")
   const rfCenter = document.querySelector("#readalong-floating-disc .floating-center")
   const pfCenter = document.querySelector("#pdf-floating-disc .floating-center")
+  const gfCenter = document.querySelector("#guide-floating-disc .floating-center")
 
   // Fallback defaults: Elegant Ivory Vinyl Record Label (never pitch black!)
   const shortTitle = bookName.slice(0, 4)
@@ -1028,6 +1056,11 @@ async function loadTrack(track, preparedUrl) {
     pfCenter.style.color = "#18191b"
     pfCenter.textContent = "📄"
   }
+  if (gfCenter) {
+    gfCenter.style.background = "#fbf9f4"
+    gfCenter.style.color = "#18191b"
+    gfCenter.textContent = "🧭"
+  }
 
   // Load signed cover if exists
   if (fullCoverPath) {
@@ -1038,6 +1071,7 @@ async function loadTrack(track, preparedUrl) {
         if (vinylCenter) { vinylCenter.style.background = bgCss; vinylCenter.textContent = "" }
         if (rfCenter) { rfCenter.style.background = bgCss; rfCenter.textContent = "" }
         if (pfCenter) { pfCenter.style.background = bgCss; pfCenter.textContent = "" }
+        if (gfCenter) { gfCenter.style.background = bgCss; gfCenter.textContent = "" }
       }
     }).catch(() => {})
   }
@@ -1060,6 +1094,7 @@ async function loadTrack(track, preparedUrl) {
   prepareNext(request)
   setupReadalong(track, request)
   setupPdf(track, request)
+  setupGuide(track, request)
   renderDrawerTrackList()
 }
 
@@ -1133,12 +1168,14 @@ function updatePlayButtonUI(playing) {
   const miniPlayBtn = $("mini-play-btn")
   const rfBtn = $("readalong-floating-play-btn")
   const pfBtn = $("pdf-floating-play-btn")
+  const gfBtn = $("guide-floating-play-btn")
 
   // Class-based CSS toggle ensures 100% reliable SVG icon switching
   if (playBtn) playBtn.classList.toggle("is-playing", playing)
   if (miniPlayBtn) miniPlayBtn.classList.toggle("is-playing", playing)
   if (rfBtn) rfBtn.classList.toggle("is-playing", playing)
   if (pfBtn) pfBtn.classList.toggle("is-playing", playing)
+  if (gfBtn) gfBtn.classList.toggle("is-playing", playing)
 
   // Direct SVG hidden attributes fallback
   $("mini-play-icon").hidden = playing
@@ -1158,19 +1195,28 @@ function updatePlayButtonUI(playing) {
     pfPlay.hidden = playing
     pfPause.hidden = !playing
   }
+  const gfPlay = $("gf-play-svg")
+  const gfPause = $("gf-pause-svg")
+  if (gfPlay && gfPause) {
+    gfPlay.hidden = playing
+    gfPause.hidden = !playing
+  }
 
   const rfDisc = $("readalong-floating-disc")
   const pfDisc = $("pdf-floating-disc")
+  const gfDisc = $("guide-floating-disc")
   if (playing) {
     $("mini-cover-thumb").classList.add("spinning")
     $("vinyl-disc").classList.add("spinning")
     if (rfDisc) rfDisc.classList.add("spinning")
     if (pfDisc) pfDisc.classList.add("spinning")
+    if (gfDisc) gfDisc.classList.add("spinning")
   } else {
     $("mini-cover-thumb").classList.remove("spinning")
     $("vinyl-disc").classList.remove("spinning")
     if (rfDisc) rfDisc.classList.remove("spinning")
     if (pfDisc) pfDisc.classList.remove("spinning")
+    if (gfDisc) gfDisc.classList.remove("spinning")
   }
 }
 
@@ -1322,7 +1368,8 @@ function setSleepTimer(minutes) {
   clearSleepTimer()
   if (minutes === "track") {
     sleepTimerMode = "track"
-    $("timer-label").textContent = "播完关"
+    const timerLabel = $("timer-label")
+    if (timerLabel) timerLabel.textContent = "播完关"
     notice("已设置：当前章节播放完毕后停止")
   } else {
     const mins = Number(minutes)
@@ -1335,10 +1382,13 @@ function setSleepTimer(minutes) {
         clearSleepTimer()
         notice("定时关闭：时间到，已暂停播放")
       }, mins * 60 * 1000)
-      $("timer-label").textContent = `${mins}分关`
+      const timerLabel = $("timer-label")
+      if (timerLabel) timerLabel.textContent = `${mins}分关`
       notice(`已开启定时关闭：${mins} 分钟后停止播放`)
     }
   }
+  const timerBtn = $("btn-timer")
+  if (timerBtn) timerBtn.classList.toggle("active", sleepTimerMode !== "none")
   document.querySelectorAll(".timer-opt").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.minutes === String(minutes))
   })
@@ -1349,7 +1399,10 @@ function clearSleepTimer() {
   sleepTimerId = null
   sleepTimerMode = "none"
   sleepTimerMinutes = 0
-  $("timer-label").textContent = "定时"
+  const timerLabel = $("timer-label")
+  if (timerLabel) timerLabel.textContent = "定时"
+  const timerBtn = $("btn-timer")
+  if (timerBtn) timerBtn.classList.remove("active")
 }
 
 // Drawers (BottomSheet) Management
@@ -1635,6 +1688,94 @@ function closePdfViewer() {
   $("pdf-frame").removeAttribute("src")
 }
 
+async function setupGuide(track, request) {
+  currentGuidePath = ""
+  currentGuideTitle = ""
+  const dockGuide = $("dock-guide")
+  if (dockGuide) {
+    dockGuide.disabled = true
+    dockGuide.classList.add("disabled")
+    dockGuide.title = "暂无深度导读"
+  }
+
+  try {
+    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
+    const candidates = [parent]
+    const grandParent = parent.slice(0, parent.lastIndexOf("/"))
+    if (grandParent && isWithinRoot(grandParent)) {
+      candidates.push(grandParent)
+    }
+
+    let guideItem = null
+    let validParent = ""
+
+    for (const p of candidates) {
+      const data = await api("fs/list", {
+        path: p,
+        password: directoryPassword,
+        page: 1,
+        per_page: 50,
+        refresh: false,
+      }).catch(() => null)
+      if (data?.content) {
+        guideItem = data.content.find((item) => !item.is_dir && /^guide\.html$/i.test(item.name))
+        if (guideItem) {
+          validParent = p
+          break
+        }
+      }
+    }
+
+    if (!guideItem || request !== playRequest) return
+    currentGuidePath = `${validParent}/${guideItem.name}`
+    currentGuideTitle = validParent.slice(validParent.lastIndexOf("/") + 1) || "深度导读"
+    if (dockGuide) {
+      dockGuide.disabled = false
+      dockGuide.classList.remove("disabled")
+      dockGuide.title = "书籍深度导读"
+    }
+  } catch {
+    if (dockGuide) {
+      dockGuide.disabled = true
+      dockGuide.classList.add("disabled")
+      dockGuide.title = "暂无深度导读"
+    }
+  }
+}
+
+async function openGuideViewer(explicitPath, explicitTitle) {
+  const targetPath = explicitPath || currentGuidePath
+  if (!targetPath) return
+  guideViewerActive = true
+  $("guide-viewer").hidden = false
+  const titleText = explicitTitle || currentGuideTitle || $("banner-title")?.textContent || "书籍"
+  $("guide-title").textContent = `${titleText} · 深度导读`
+  $("guide-loading").hidden = false
+  updatePlayButtonUI(!audio.paused)
+
+  try {
+    const info = await api("fs/get", { path: targetPath, password: directoryPassword })
+    const guideUrl = mediaUrl(endpoint, { path: targetPath }, info.sign)
+    $("guide-external").href = guideUrl
+    const res = await fetch(guideUrl)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const htmlText = await res.text()
+    if (!htmlText.trim()) throw new Error("导读内容为空")
+    $("guide-frame").srcdoc = htmlText
+  } catch (err) {
+    notice(`加载导读失败: ${err.message}`)
+    closeGuideViewer()
+  } finally {
+    $("guide-loading").hidden = true
+  }
+}
+
+function closeGuideViewer() {
+  guideViewerActive = false
+  $("guide-viewer").hidden = true
+  $("guide-frame").removeAttribute("srcdoc")
+}
+
 function openReadalong() {
   if (!readalongManifest) return
   readalongActive = true
@@ -1651,17 +1792,9 @@ function openReadalong() {
   }
   if (!targetDoc) targetDoc = currentDocPath || readalongManifest.alignedDocument || ""
 
-  const badge = document.querySelector(".readalong-capsule-badge")
-  const followBtn = $("readalong-follow")
   const locateBtn = $("readalong-locate")
-
-  if (readalongTimeline.length) {
-    if (badge) badge.textContent = "跟读参考 · 精度未在本机核验"
-    if (followBtn) followBtn.hidden = false
-  } else {
-    if (badge) badge.textContent = "阅读模式"
-    if (followBtn) followBtn.hidden = true
-    if (locateBtn) locateBtn.hidden = true
+  if (locateBtn && !readalongTimeline.length) {
+    locateBtn.hidden = true
   }
 
   if (targetDoc && currentDocPath !== targetDoc) {
@@ -1755,8 +1888,10 @@ function attachReadalongFrameHandlers(frame) {
   const onUserScroll = () => {
     if (!readalongFollowing) return
     readalongFollowing = false
-    $("readalong-follow").textContent = "跟随：暂停"
-    $("readalong-locate").hidden = false
+    const followBtn = $("readalong-follow")
+    if (followBtn) followBtn.textContent = "跟随：暂停"
+    const locateBtn = $("readalong-locate")
+    if (locateBtn) locateBtn.hidden = false
   }
 
   frame.contentWindow?.addEventListener("wheel", onUserScroll, { passive: true })
@@ -1769,8 +1904,10 @@ function attachReadalongFrameHandlers(frame) {
     if (seg) {
       seek(seg.start)
       readalongFollowing = true
-      $("readalong-follow").textContent = "跟随：开"
-      $("readalong-locate").hidden = true
+      const followBtn = $("readalong-follow")
+      if (followBtn) followBtn.textContent = "跟随：开"
+      const locateBtn = $("readalong-locate")
+      if (locateBtn) locateBtn.hidden = true
       syncReadalong(true)
     }
   })
@@ -1954,25 +2091,43 @@ const toggleFloatingPlay = (e) => {
 }
 
 const openFullPlayerFromReader = () => {
+  closeReadalong()
+  closePdfViewer()
+  closeGuideViewer()
   $("full-player").hidden = false
 }
 
 on("readalong-floating-player", "click", toggleFloatingPlay)
 on("readalong-floating-play-btn", "click", toggleFloatingPlay)
 on("readalong-title-btn", "click", openFullPlayerFromReader)
-on("readalong-open-player-btn", "click", openFullPlayerFromReader)
 
 on("pdf-floating-player", "click", toggleFloatingPlay)
 on("pdf-floating-play-btn", "click", toggleFloatingPlay)
 on("pdf-title-btn", "click", openFullPlayerFromReader)
-on("pdf-open-player-btn", "click", openFullPlayerFromReader)
+
+on("guide-floating-player", "click", toggleFloatingPlay)
+on("guide-floating-play-btn", "click", toggleFloatingPlay)
+on("guide-title-btn", "click", openFullPlayerFromReader)
+on("guide-close", "click", closeGuideViewer)
 
 // Dock buttons in Full Player
 on("dock-chapters", "click", () => openDrawer("chapter-drawer"))
-on("dock-timer", "click", () => openDrawer("timer-drawer"))
+on("dock-guide", "click", () => {
+  if (currentGuidePath) {
+    openGuideViewer(currentGuidePath, currentGuideTitle)
+  }
+})
 on("dock-readalong", "click", openReadalong)
 on("dock-pdf", "click", openPdfViewer)
 on("btn-speed", "click", () => openDrawer("speed-drawer"))
+on("btn-timer", "click", () => openDrawer("timer-drawer"))
+
+// Banner header click in Book Folder: open guide.html if available
+on("folder-summary", "click", () => {
+  if (currentFolderGuidePath) {
+    openGuideViewer(currentFolderGuidePath, $("banner-title")?.textContent)
+  }
+})
 
 // Drawer Closers
 on("drawer-mask", "click", closeAllDrawers)
@@ -1999,17 +2154,10 @@ document.querySelectorAll(".timer-opt").forEach((btn) => {
 // Readalong Top Bar
 on("readalong-close", "click", closeReadalong)
 on("pdf-close", "click", closePdfViewer)
-on("readalong-follow", "click", () => {
-  readalongFollowing = !readalongFollowing
-  $("readalong-follow").textContent = `跟随：${readalongFollowing ? "开" : "暂停"}`
-  if (readalongFollowing) {
-    $("readalong-locate").hidden = true
-    syncReadalong(true)
-  }
-})
 on("readalong-locate", "click", () => {
   readalongFollowing = true
-  $("readalong-follow").textContent = "跟随：开"
+  const followBtn = $("readalong-follow")
+  if (followBtn) followBtn.textContent = "跟随：开"
   $("readalong-locate").hidden = true
   syncReadalong(true)
 })
@@ -2053,28 +2201,24 @@ function openSettingsModal() {
   const dlg = $("settings")
   if (!dlg) return
   const userInp = $("username")
-  if (userInp && prefs.username) userInp.value = prefs.username
-  const netSel = $("network")
-  if (netSel && prefs.mode) netSel.value = prefs.mode
-  $("login-status").textContent = ""
-  try {
-    $("endpoint-note").textContent = resolveEndpoint($("network")?.value || "auto")
-  } catch {
-    /* fallback */
+  const pwdInp = $("password")
+  if (userInp && prefs.username && !userInp.value) {
+    userInp.value = prefs.username
   }
+  $("login-status").textContent = ""
   dlg.showModal()
+  requestAnimationFrame(() => {
+    if (userInp && !userInp.value) {
+      userInp.focus()
+    } else if (pwdInp) {
+      pwdInp.focus()
+    }
+  })
 }
 
 on("settings-open", "click", openSettingsModal)
 on("open-conn-btn", "click", openSettingsModal)
 on("settings-close", "click", () => $("settings")?.close())
-on("network", "change", () => {
-  try {
-    $("endpoint-note").textContent = resolveEndpoint($("network").value)
-  } catch (error) {
-    $("endpoint-note").textContent = error.message
-  }
-})
 
 on("connection-form", "submit", async (event) => {
   event.preventDefault()
@@ -2082,7 +2226,8 @@ on("connection-form", "submit", async (event) => {
   if (loginBtn) loginBtn.disabled = true
   $("login-status").textContent = "正在登录…"
   try {
-    const nextEndpoint = resolveEndpoint($("network").value)
+    const mode = $("network")?.value || "auto"
+    const nextEndpoint = resolveEndpoint(mode)
     saveProgress()
     audio.pause()
     ++playRequest
@@ -2104,7 +2249,7 @@ on("connection-form", "submit", async (event) => {
       )
       auth = { token: data.token, deviceKey: data.device_key, username, endpoint }
     }
-    prefs = { ...prefs, mode: $("network").value, username }
+    prefs = { ...prefs, mode, username }
     write(localStorage, PREF, prefs)
     remove(localStorage, AUTH)
     remove(sessionStorage, AUTH)
