@@ -45,6 +45,10 @@ let readalongAssetBase = ""
 let currentPdfPath = ""
 let currentPdfName = ""
 let pdfViewerActive = false
+let currentGuidePath = ""
+let currentGuideTitle = ""
+let guideViewerActive = false
+let currentFolderGuidePath = ""
 
 // Sleep Timer State
 let sleepTimerId = null
@@ -365,6 +369,7 @@ async function list(path) {
   let pdfInFolder = null
   let epubInFolder = null
   let imageInFolder = null
+  let guideInFolder = null
   for (let page = 1; ; page++) {
     const data = await api("fs/list", {
       path,
@@ -385,6 +390,10 @@ async function list(path) {
     if (epubItem && !epubInFolder) {
       epubInFolder = epubItem.name
     }
+    const guideItem = batch.find((item) => !item.is_dir && /^guide\.html$/i.test(item.name))
+    if (guideItem && !guideInFolder) {
+      guideInFolder = guideItem.name
+    }
     const imgItem = batch.find((item) => !item.is_dir && IMG.test(item.name) && !item.name.startsWith("._"))
     if (imgItem && !imageInFolder) {
       imageInFolder = imgItem.name
@@ -401,6 +410,7 @@ async function list(path) {
     "runtime-snapshot",
     "__pycache__",
   ])
+  currentFolderGuidePath = guideInFolder ? `${path}/${guideInFolder}` : ""
   return content
     .filter((item) => {
       if (ignoredNames.has(item.name)) return false
@@ -664,9 +674,9 @@ function renderHomeDashboard(categoryItems) {
   // 2. 若不足 3 本，从书库经典已上线图书中补齐满 3 本！
   if (recentCardsData.length < 3) {
     const fallbackFeatured = [
-      { bookName: "思考快与慢", cat: "心智成长", trackName: "01 Chapter 1.mp3", pos: 350, dur: 1200 },
-      { bookName: "1984 乔治 奥威尔", cat: "文学作品", trackName: "01 Part 1 Chapter 1.mp3", pos: 420, dur: 1500 },
-      { bookName: "Why Machines Learn", cat: "计算机与AI", trackName: "Why Machines Learn꞉ The Elegant Maths Behind Modern AI - 06 - Chapter 1꞉ Desperately Seeking Patterns.m4b", pos: 180, dur: 1800 },
+      { bookName: "思考快与慢", cat: "心智成长", trackName: "Thinking, Fast and Slow.mp3", pos: 350, dur: 1200 },
+      { bookName: "1984 乔治 奥威尔", cat: "文学作品", trackName: "00 序言 Prologue.mp3", pos: 420, dur: 1500 },
+      { bookName: "Why Machines Learn", cat: "计算机与AI", trackName: "Why Machines Learn꞉ The Elegant Maths Behind Modern AI - 01 - Opening Credits.m4b", pos: 180, dur: 1800 },
     ]
     for (const f of fallbackFeatured) {
       if (!seenBooks.has(f.bookName)) {
@@ -793,6 +803,15 @@ function render() {
       const coverFile = getBookCover(currentDirName) || entries.find((i) => i.coverFile)?.coverFile
       const fullCoverPath = coverFile ? `${folder}/${coverFile}` : ""
       bannerCoverWrap.append(createBookCoverElement(currentDirName, "size-banner", fullCoverPath))
+    }
+    if (currentFolderGuidePath) {
+      $("folder-summary").classList.add("has-guide")
+      const guideBadge = $("banner-guide-badge")
+      if (guideBadge) guideBadge.hidden = false
+    } else {
+      $("folder-summary").classList.remove("has-guide")
+      const guideBadge = $("banner-guide-badge")
+      if (guideBadge) guideBadge.hidden = true
     }
     $("folder-summary").hidden = false
   } else {
@@ -946,13 +965,34 @@ function updateProfileStats() {
 }
 
 async function stream(track) {
-  const info = await api("fs/get", { path: track.path, password: directoryPassword })
-  return mediaUrl(endpoint, track, info.sign)
+  try {
+    const info = await api("fs/get", { path: track.path, password: directoryPassword })
+    return mediaUrl(endpoint, track, info.sign)
+  } catch (err) {
+    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
+    if (parent && isWithinRoot(parent)) {
+      try {
+        const items = await list(parent)
+        const audioTracks = items
+          .filter((item) => !item.is_dir && AUDIO.test(item.name))
+          .sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
+        if (audioTracks.length > 0 && audioTracks[0].path !== track.path) {
+          track.name = audioTracks[0].name
+          track.path = audioTracks[0].path
+          const info = await api("fs/get", { path: track.path, password: directoryPassword })
+          return mediaUrl(endpoint, track, info.sign)
+        }
+      } catch {
+        /* Fallback lookup failed, throw original error */
+      }
+    }
+    throw err
+  }
 }
 
 async function prepareNext(request) {
   preparedNext = null
-  $("btn-next").disabled = true
+  if ($("btn-next")) $("btn-next").disabled = true
   try {
     const parent = current.path.slice(0, current.path.lastIndexOf("/"))
     const tracks = (parent === folder ? entries : await list(parent))
@@ -964,7 +1004,7 @@ async function prepareNext(request) {
     const url = await stream(next)
     if (request === playRequest) {
       preparedNext = { track: next, url, preparedAt: Date.now() }
-      $("btn-next").disabled = false
+      if ($("btn-next")) $("btn-next").disabled = false
     }
   } catch {
     /* Next chapter discovery failure shouldn't stop playback */
@@ -982,7 +1022,7 @@ async function loadTrack(track, preparedUrl) {
   pendingPosition = null
   current = null
   preparedNext = null
-  $("btn-next").disabled = true
+  if ($("btn-next")) $("btn-next").disabled = true
 
   // Immediately clear old timeline & document to avoid scanning wrong chapters
   readalongTimeline = []
@@ -990,6 +1030,7 @@ async function loadTrack(track, preparedUrl) {
   currentDocPath = ""
   $("dock-readalong").hidden = true
   $("dock-pdf").hidden = true
+  $("dock-guide").hidden = true
 
   // Set titles and artwork in Mini and Full Player
   const parentDir = track.path.slice(0, track.path.lastIndexOf("/"))
@@ -1038,6 +1079,8 @@ async function loadTrack(track, preparedUrl) {
         if (vinylCenter) { vinylCenter.style.background = bgCss; vinylCenter.textContent = "" }
         if (rfCenter) { rfCenter.style.background = bgCss; rfCenter.textContent = "" }
         if (pfCenter) { pfCenter.style.background = bgCss; pfCenter.textContent = "" }
+        const gfCenter = document.querySelector("#guide-floating-disc .floating-center")
+        if (gfCenter) { gfCenter.style.background = bgCss; gfCenter.textContent = "" }
       }
     }).catch(() => {})
   }
@@ -1060,6 +1103,7 @@ async function loadTrack(track, preparedUrl) {
   prepareNext(request)
   setupReadalong(track, request)
   setupPdf(track, request)
+  setupGuide(track, request)
   renderDrawerTrackList()
 }
 
@@ -1265,7 +1309,7 @@ audio.addEventListener("timeupdate", () => {
 
 audio.addEventListener("playing", () => {
   updatePlayButtonUI(true)
-  $("player-track-desc").textContent = "正在播放 · 进度自动保存"
+  $("player-track-desc").textContent = ""
   if ("audioSession" in navigator) {
     try {
       navigator.audioSession.type = "playback"
@@ -1339,6 +1383,8 @@ function setSleepTimer(minutes) {
       notice(`已开启定时关闭：${mins} 分钟后停止播放`)
     }
   }
+  const timerBtn = $("btn-timer")
+  if (timerBtn) timerBtn.classList.toggle("active", sleepTimerMode !== "none")
   document.querySelectorAll(".timer-opt").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.minutes === String(minutes))
   })
@@ -1350,6 +1396,8 @@ function clearSleepTimer() {
   sleepTimerMode = "none"
   sleepTimerMinutes = 0
   $("timer-label").textContent = "定时"
+  const timerBtn = $("btn-timer")
+  if (timerBtn) timerBtn.classList.remove("active")
 }
 
 // Drawers (BottomSheet) Management
@@ -1498,10 +1546,9 @@ async function setupReadalong(track, request) {
       ? `${validParent}/.readalong_revisions/${manifest.assetRevision}`
       : `${validParent}/readalong`
     readalongManifest = manifest
-    if (releaseBadge && manifest.practicalRelease) {
-      const release = manifest.practicalRelease
-      releaseBadge.textContent = release.decision === "PUBLISH_WITH_GAPS" ? "跟读 · 有局部缺口" : "跟读 · 实用版"
-      releaseBadge.title = "段落级个人实用版本，非逐词声学认证；未映射处不高亮，下一可靠位置恢复。"
+    if (releaseBadge) {
+      releaseBadge.textContent = "跟读模式"
+      releaseBadge.title = ""
     }
     readalongParentPath = validParent
     readalongAssetBase = assetBase
@@ -1635,6 +1682,85 @@ function closePdfViewer() {
   $("pdf-frame").removeAttribute("src")
 }
 
+async function setupGuide(track, request) {
+  currentGuidePath = ""
+  currentGuideTitle = ""
+  $("dock-guide").hidden = true
+
+  try {
+    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
+    const candidates = [parent]
+    const grandParent = parent.slice(0, parent.lastIndexOf("/"))
+    if (grandParent && isWithinRoot(grandParent)) {
+      candidates.push(grandParent)
+    }
+
+    let guideItem = null
+    let validParent = ""
+
+    for (const p of candidates) {
+      const data = await api("fs/list", {
+        path: p,
+        password: directoryPassword,
+        page: 1,
+        per_page: 50,
+        refresh: false,
+      }).catch(() => null)
+      if (data?.content) {
+        guideItem = data.content.find((item) => !item.is_dir && /^guide\.html$/i.test(item.name))
+        if (guideItem) {
+          validParent = p
+          break
+        }
+      }
+    }
+
+    if (!guideItem || request !== playRequest) return
+    currentGuidePath = `${validParent}/${guideItem.name}`
+    currentGuideTitle = validParent.slice(validParent.lastIndexOf("/") + 1) || "深度导读"
+    $("dock-guide").hidden = false
+  } catch {
+    $("dock-guide").hidden = true
+  }
+}
+
+async function openGuideViewer(explicitPath, explicitTitle) {
+  const targetPath = explicitPath || currentGuidePath || (folder !== ROOT ? `${folder}/guide.html` : "")
+  if (!targetPath) {
+    notice("暂无导读页面 (guide.html)")
+    return
+  }
+  guideViewerActive = true
+  $("guide-viewer").hidden = false
+  const titleText = explicitTitle || currentGuideTitle || $("banner-title")?.textContent || "书籍"
+  $("guide-title").textContent = `${titleText} · 深度导读`
+  $("guide-loading").hidden = false
+  updatePlayButtonUI(!audio.paused)
+
+  try {
+    const info = await api("fs/get", { path: targetPath, password: directoryPassword })
+    const guideUrl = mediaUrl(endpoint, { path: targetPath }, info.sign)
+    $("guide-external").href = guideUrl
+    const res = await fetch(guideUrl)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const htmlText = await res.text()
+    if (!htmlText.trim()) throw new Error("导读内容为空")
+    $("guide-frame").srcdoc = htmlText
+  } catch (err) {
+    notice(`加载导读失败: ${err.message}`)
+    closeGuideViewer()
+  } finally {
+    $("guide-loading").hidden = true
+  }
+}
+
+function closeGuideViewer() {
+  guideViewerActive = false
+  $("guide-viewer").hidden = true
+  $("guide-frame").removeAttribute("src")
+  $("guide-frame").removeAttribute("srcdoc")
+}
+
 function openReadalong() {
   if (!readalongManifest) return
   readalongActive = true
@@ -1656,7 +1782,7 @@ function openReadalong() {
   const locateBtn = $("readalong-locate")
 
   if (readalongTimeline.length) {
-    if (badge) badge.textContent = "跟读参考 · 精度未在本机核验"
+    if (badge) badge.textContent = "跟读模式"
     if (followBtn) followBtn.hidden = false
   } else {
     if (badge) badge.textContent = "阅读模式"
@@ -1954,6 +2080,9 @@ const toggleFloatingPlay = (e) => {
 }
 
 const openFullPlayerFromReader = () => {
+  closeReadalong()
+  closePdfViewer()
+  closeGuideViewer()
   $("full-player").hidden = false
 }
 
@@ -1967,12 +2096,26 @@ on("pdf-floating-play-btn", "click", toggleFloatingPlay)
 on("pdf-title-btn", "click", openFullPlayerFromReader)
 on("pdf-open-player-btn", "click", openFullPlayerFromReader)
 
+on("guide-floating-player", "click", toggleFloatingPlay)
+on("guide-floating-play-btn", "click", toggleFloatingPlay)
+on("guide-title-btn", "click", openFullPlayerFromReader)
+on("guide-open-player-btn", "click", openFullPlayerFromReader)
+on("guide-close", "click", closeGuideViewer)
+
 // Dock buttons in Full Player
 on("dock-chapters", "click", () => openDrawer("chapter-drawer"))
-on("dock-timer", "click", () => openDrawer("timer-drawer"))
+on("dock-guide", "click", () => openGuideViewer(currentGuidePath, currentGuideTitle))
 on("dock-readalong", "click", openReadalong)
 on("dock-pdf", "click", openPdfViewer)
 on("btn-speed", "click", () => openDrawer("speed-drawer"))
+on("btn-timer", "click", () => openDrawer("timer-drawer"))
+
+// Banner header click in Book Folder: open guide.html
+on("folder-summary", "click", () => {
+  if (currentFolderGuidePath) {
+    openGuideViewer(currentFolderGuidePath, $("banner-title")?.textContent)
+  }
+})
 
 // Drawer Closers
 on("drawer-mask", "click", closeAllDrawers)

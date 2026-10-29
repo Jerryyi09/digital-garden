@@ -58,12 +58,15 @@
 
           <!-- Book Detail Header Card (Shown when inside a book folder) -->
           <div id="folder-summary" class="book-banner-card" hidden>
-            <div class="banner-cover-wrap">
+            <div class="banner-cover-wrap" title="点击阅读深度导读">
               <div class="book-spine-mock"></div>
               <div id="banner-cover" class="book-cover-art">📖</div>
             </div>
-            <div class="banner-info">
-              <h2 id="banner-title" class="banner-title">书籍名称</h2>
+            <div class="banner-info" title="点击阅读深度导读">
+              <div class="banner-title-row">
+                <h2 id="banner-title" class="banner-title">书籍名称</h2>
+                <span id="banner-guide-badge" class="badge-guide" hidden>📖 深度导读</span>
+              </div>
               <p id="folder-summary-text" class="banner-desc"></p>
             </div>
           </div>
@@ -246,9 +249,9 @@
             </button>
             <button id="rewind" class="circle-btn" aria-label="后退15秒" title="后退 15 秒">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 4a8 8 0 1 0 7.8 6.2" stroke-width="1.8"/>
-                <polyline points="12 1 12 5 8 5" stroke-width="1.8" fill="currentColor"/>
-                <text x="11.5" y="15" font-size="7.5" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none" font-family="-apple-system, sans-serif">15</text>
+                <path d="M12 4.5A7.5 7.5 0 1 0 19.5 12" stroke-width="1.8"/>
+                <polyline points="12 1.5 12 4.5 15 4.5" stroke-width="1.8" fill="currentColor"/>
+                <text x="12" y="12" font-size="6.8" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="none" font-family="system-ui, -apple-system, sans-serif">15</text>
               </svg>
             </button>
             <button id="play" class="primary-play-btn" aria-label="播放/暂停">
@@ -257,21 +260,22 @@
             </button>
             <button id="forward" class="circle-btn" aria-label="前进30秒" title="前进 30 秒">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 4a8 8 0 1 1-7.8 6.2" stroke-width="1.8"/>
-                <polyline points="12 1 12 5 16 5" stroke-width="1.8" fill="currentColor"/>
-                <text x="12.5" y="15" font-size="7.5" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none" font-family="-apple-system, sans-serif">30</text>
+                <path d="M12 4.5A7.5 7.5 0 1 1 4.5 12" stroke-width="1.8"/>
+                <polyline points="12 1.5 12 4.5 9 4.5" stroke-width="1.8" fill="currentColor"/>
+                <text x="12" y="12" font-size="6.8" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="currentColor" stroke="none" font-family="system-ui, -apple-system, sans-serif">30</text>
               </svg>
             </button>
-            <button id="btn-next" class="circle-btn" aria-label="下一节" title="下一节">
-              <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            <button id="btn-timer" class="pill-btn timer-pill-btn" aria-label="定时关闭" title="定时关闭">
+              <svg viewBox="0 0 24 24" class="timer-pill-icon"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              <span id="timer-label">定时</span>
             </button>
           </div>
 
           <!-- Bottom Utility Dock (微信读书特色功能底栏) -->
           <div class="utility-dock">
-            <button id="dock-timer" class="dock-btn" title="定时关闭">
-              <svg viewBox="0 0 24 24" class="dock-icon"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-              <span id="timer-label">定时</span>
+            <button id="dock-guide" class="dock-btn" hidden title="书籍深度导读">
+              <svg viewBox="0 0 24 24" class="dock-icon"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+              <span>导读</span>
             </button>
             <button id="dock-readalong" class="dock-btn" hidden title="EPUB 音文跟读">
               <svg viewBox="0 0 24 24" class="dock-icon"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
@@ -401,6 +405,40 @@
             <div id="pdf-floating-play-btn" class="floating-play-trigger" aria-hidden="true">
               <svg id="pf-play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               <svg id="pf-pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Guide Fullscreen Viewer Panel (深度导读阅读面板) -->
+      <section id="guide-viewer" class="wx-readalong-page" hidden>
+        <div class="readalong-top-bar">
+          <button id="guide-close" class="nav-back-btn" title="返回">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <div class="readalong-top-center" id="guide-title-btn" title="点击打开播放器">
+            <span class="readalong-capsule-badge guide-badge">深度导读</span>
+            <h3 id="guide-title">书籍导读</h3>
+          </div>
+          <div class="readalong-top-actions">
+            <button id="guide-open-player-btn" class="pill-btn player-expand-pill" title="打开完整播放器">🎧 播放器</button>
+            <a id="guide-external" class="pill-btn" target="_blank" rel="noopener noreferrer">↗ 全屏</a>
+          </div>
+        </div>
+        <div class="readalong-viewport">
+          <iframe id="guide-frame" title="书籍导读预览" allow="fullscreen"></iframe>
+          <div id="guide-loading" class="readalong-loading" hidden>正在载入深度导读…</div>
+        </div>
+        <!-- 悬浮黑胶唱片挂件（点击切换播放/暂停） -->
+        <div id="guide-floating-player" class="readalong-floating-player" title="点击播放 / 暂停" role="button" aria-label="控制播放与暂停">
+          <div class="floating-vinyl-wrap">
+            <div id="guide-floating-disc" class="floating-disc">
+              <div class="floating-grooves"></div>
+              <div class="floating-center">📖</div>
+            </div>
+            <div id="guide-floating-play-btn" class="floating-play-trigger" aria-hidden="true">
+              <svg id="gf-play-svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="gf-pause-svg" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             </div>
           </div>
         </div>
