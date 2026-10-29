@@ -11,7 +11,7 @@ cssclasses:
     <h1>Rosemary Garden</h1>
     <p class="garden-subtitle">A Personal Portal for Growing, Making, Learning, and Wondering</p>
     <nav class="garden-nav" aria-label="Garden sections">
-  <a href="/">Home</a>
+  <a href="https://gsw.melyi.uk/" data-router-ignore>谈诗说文</a>
   <a href="/library/">Library</a>
   <a href="/gallery/">Gallery</a>
   <a href="/studio/">Studio</a>
