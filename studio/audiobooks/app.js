@@ -674,9 +674,9 @@ function renderHomeDashboard(categoryItems) {
   // 2. 若不足 3 本，从书库经典已上线图书中补齐满 3 本！
   if (recentCardsData.length < 3) {
     const fallbackFeatured = [
-      { bookName: "思考快与慢", cat: "心智成长", trackName: "Thinking, Fast and Slow.mp3", pos: 350, dur: 1200 },
-      { bookName: "1984 乔治 奥威尔", cat: "文学作品", trackName: "00 序言 Prologue.mp3", pos: 420, dur: 1500 },
-      { bookName: "Why Machines Learn", cat: "计算机与AI", trackName: "Why Machines Learn꞉ The Elegant Maths Behind Modern AI - 01 - Opening Credits.m4b", pos: 180, dur: 1800 },
+      { bookName: "思考快与慢", cat: "心智成长", trackName: "01 Chapter 1.mp3", pos: 350, dur: 1200 },
+      { bookName: "1984 乔治 奥威尔", cat: "文学作品", trackName: "01 Part 1 Chapter 1.mp3", pos: 420, dur: 1500 },
+      { bookName: "Why Machines Learn", cat: "计算机与AI", trackName: "Why Machines Learn꞉ The Elegant Maths Behind Modern AI - 06 - Chapter 1꞉ Desperately Seeking Patterns.m4b", pos: 180, dur: 1800 },
     ]
     for (const f of fallbackFeatured) {
       if (!seenBooks.has(f.bookName)) {
@@ -965,29 +965,8 @@ function updateProfileStats() {
 }
 
 async function stream(track) {
-  try {
-    const info = await api("fs/get", { path: track.path, password: directoryPassword })
-    return mediaUrl(endpoint, track, info.sign)
-  } catch (err) {
-    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
-    if (parent && isWithinRoot(parent)) {
-      try {
-        const items = await list(parent)
-        const audioTracks = items
-          .filter((item) => !item.is_dir && AUDIO.test(item.name))
-          .sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
-        if (audioTracks.length > 0 && audioTracks[0].path !== track.path) {
-          track.name = audioTracks[0].name
-          track.path = audioTracks[0].path
-          const info = await api("fs/get", { path: track.path, password: directoryPassword })
-          return mediaUrl(endpoint, track, info.sign)
-        }
-      } catch {
-        /* Fallback lookup failed, throw original error */
-      }
-    }
-    throw err
-  }
+  const info = await api("fs/get", { path: track.path, password: directoryPassword })
+  return mediaUrl(endpoint, track, info.sign)
 }
 
 async function prepareNext(request) {
@@ -1309,7 +1288,7 @@ audio.addEventListener("timeupdate", () => {
 
 audio.addEventListener("playing", () => {
   updatePlayButtonUI(true)
-  $("player-track-desc").textContent = ""
+  $("player-track-desc").textContent = "正在播放 · 进度自动保存"
   if ("audioSession" in navigator) {
     try {
       navigator.audioSession.type = "playback"
@@ -1546,9 +1525,10 @@ async function setupReadalong(track, request) {
       ? `${validParent}/.readalong_revisions/${manifest.assetRevision}`
       : `${validParent}/readalong`
     readalongManifest = manifest
-    if (releaseBadge) {
-      releaseBadge.textContent = "跟读模式"
-      releaseBadge.title = ""
+    if (releaseBadge && manifest.practicalRelease) {
+      const release = manifest.practicalRelease
+      releaseBadge.textContent = release.decision === "PUBLISH_WITH_GAPS" ? "跟读 · 有局部缺口" : "跟读 · 实用版"
+      releaseBadge.title = "段落级个人实用版本，非逐词声学认证；未映射处不高亮，下一可靠位置恢复。"
     }
     readalongParentPath = validParent
     readalongAssetBase = assetBase
@@ -1782,7 +1762,7 @@ function openReadalong() {
   const locateBtn = $("readalong-locate")
 
   if (readalongTimeline.length) {
-    if (badge) badge.textContent = "跟读模式"
+    if (badge) badge.textContent = "跟读参考 · 精度未在本机核验"
     if (followBtn) followBtn.hidden = false
   } else {
     if (badge) badge.textContent = "阅读模式"
