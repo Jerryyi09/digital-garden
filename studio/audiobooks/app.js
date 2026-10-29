@@ -806,12 +806,8 @@ function render() {
     }
     if (currentFolderGuidePath) {
       $("folder-summary").classList.add("has-guide")
-      const guideBadge = $("banner-guide-badge")
-      if (guideBadge) guideBadge.hidden = false
     } else {
       $("folder-summary").classList.remove("has-guide")
-      const guideBadge = $("banner-guide-badge")
-      if (guideBadge) guideBadge.hidden = true
     }
     $("folder-summary").hidden = false
   } else {
@@ -1027,7 +1023,8 @@ async function loadTrack(track, preparedUrl) {
   $("mini-subtitle").textContent = bookName
   $("player-book-title").textContent = bookName
   $("player-track-title").textContent = trackName
-  $("player-track-desc").textContent = "正在加载音频..."
+  const trackDesc = $("player-track-desc")
+  if (trackDesc) trackDesc.textContent = "正在加载音频..."
 
   // Update Disc Center Artwork with Book Cover
   const fullCoverPath = resolveBookCoverPath(parentDir, bookName)
@@ -1141,7 +1138,8 @@ function restorePosition() {
     audio.currentTime = target
     pendingPosition = null
     ready = true
-    $("player-track-desc").textContent = target > 0 ? `已续播至 ${durationText(target)} (回退3秒)` : "已准备就绪"
+    const resumeDesc = $("player-track-desc")
+    if (resumeDesc) resumeDesc.textContent = target > 0 ? `已续播至 ${durationText(target)} (回退3秒)` : "已准备就绪"
   } catch {
     /* Stream seekable */
   }
@@ -1311,7 +1309,8 @@ audio.addEventListener("timeupdate", () => {
 
 audio.addEventListener("playing", () => {
   updatePlayButtonUI(true)
-  $("player-track-desc").textContent = "正在播放 · 进度自动保存"
+  const playingDesc = $("player-track-desc")
+  if (playingDesc) playingDesc.textContent = "正在播放 · 进度自动保存"
   if ("audioSession" in navigator) {
     try {
       navigator.audioSession.type = "playback"
@@ -1338,7 +1337,8 @@ audio.addEventListener("ended", () => {
   }
   if (preparedNext) nextTrack()
   else {
-    $("player-track-desc").textContent = "全书已播完"
+    const endDesc = $("player-track-desc")
+    if (endDesc) endDesc.textContent = "全书已播完"
     render()
   }
 })
@@ -2219,6 +2219,9 @@ function openSettingsModal() {
 on("settings-open", "click", openSettingsModal)
 on("open-conn-btn", "click", openSettingsModal)
 on("settings-close", "click", () => $("settings")?.close())
+$("settings")?.addEventListener("click", (e) => {
+  if (e.target === $("settings")) $("settings").close()
+})
 
 on("connection-form", "submit", async (event) => {
   event.preventDefault()

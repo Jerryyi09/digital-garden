@@ -63,10 +63,7 @@
               <div id="banner-cover" class="book-cover-art">📖</div>
             </div>
             <div class="banner-info">
-              <div class="banner-title-row">
-                <h2 id="banner-title" class="banner-title">书籍名称</h2>
-                <span id="banner-guide-badge" class="badge-guide" hidden>🧭 深度导读</span>
-              </div>
+              <h2 id="banner-title" class="banner-title">书籍名称</h2>
               <p id="folder-summary-text" class="banner-desc"></p>
             </div>
           </div>
@@ -227,7 +224,6 @@
           </div>
           <div class="track-details">
             <h2 id="player-track-title" class="track-title">章节名称</h2>
-            <p id="player-track-desc" class="track-desc"></p>
           </div>
         </div>
 
@@ -450,10 +446,6 @@
       <!-- AList Connect Dialog -->
       <dialog id="settings" class="wx-dialog">
         <form id="connection-form" autocomplete="on">
-          <div class="dialog-head">
-            <h3>连接家庭书库</h3>
-            <button type="button" id="settings-close" class="sheet-close-btn" aria-label="关闭">✕</button>
-          </div>
           <input type="hidden" id="network" value="auto">
           <p id="endpoint-note" class="hint-text" hidden></p>
           <label class="input-row">
@@ -469,9 +461,15 @@
             <span>记住此设备（安全保存访问令牌）</span>
           </label>
           <p id="login-status" class="login-status-text" role="status"></p>
-          <div class="dialog-btn-group">
-            <button type="submit" class="wx-btn wx-btn-primary" id="login">登录书库</button>
-            <button type="button" class="wx-btn wx-btn-subtle" id="logout">退出当前登录</button>
+          <div class="dialog-actions-row">
+            <button type="submit" class="wx-btn wx-btn-primary dialog-login-btn" id="login">登录书库</button>
+            <button type="button" class="dialog-logout-icon-btn" id="logout" title="退出当前登录" aria-label="退出当前登录">
+              <svg viewBox="0 0 24 24" class="dialog-logout-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
           </div>
         </form>
       </dialog>
