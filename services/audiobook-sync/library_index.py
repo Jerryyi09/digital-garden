@@ -90,6 +90,28 @@ def match_expression(query):
   return ' AND '.join(f'"{term}"*' for term in terms)
 
 
+def one_edit_or_less(left, right):
+  if left == right:
+    return True
+  if abs(len(left) - len(right)) > 1:
+    return False
+  if len(left) == len(right):
+    return sum(a != b for a, b in zip(left, right)) <= 1
+  if len(left) > len(right):
+    left, right = right, left
+  index_left = index_right = edits = 0
+  while index_left < len(left) and index_right < len(right):
+    if left[index_left] == right[index_right]:
+      index_left += 1
+      index_right += 1
+    elif edits:
+      return False
+    else:
+      edits += 1
+      index_right += 1
+  return True
+
+
 def search(db, query, limit=40):
   expression = match_expression(query)
   if not expression:
@@ -98,6 +120,19 @@ def search(db, query, limit=40):
     'SELECT path, kind, category, title, author, chapter, summary FROM library_fts WHERE library_fts MATCH ? ORDER BY bm25(library_fts), kind = \'book\' DESC LIMIT ?',
     (expression, limit),
   ).fetchall()
+  if not rows and query.isascii() and query.replace(' ', '').isalpha():
+    requested = [term.casefold() for term in query.split()]
+    authors = db.execute("SELECT DISTINCT author FROM library_fts WHERE kind='book' AND author <> ''").fetchall()
+    close_authors = [
+      author for (author,) in authors
+      if any(one_edit_or_less(term, candidate.casefold()) for term in requested for candidate in author.split())
+    ]
+    if close_authors:
+      placeholders = ','.join('?' for _ in close_authors)
+      rows = db.execute(
+        f"SELECT path, kind, category, title, author, chapter, summary FROM library_fts WHERE kind='book' AND author IN ({placeholders}) LIMIT ?",
+        (*close_authors, limit),
+      ).fetchall()
   return [dict(zip(('path', 'kind', 'category', 'title', 'author', 'chapter', 'summary'), row)) for row in rows]
 
 

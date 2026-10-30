@@ -26,6 +26,17 @@ class LibraryIndexTests(unittest.TestCase):
       self.assertEqual(by_author[0]['title'], '远方的书')
       self.assertTrue(any(row['kind'] == 'chapter' for row in by_chapter))
 
+  def test_search_tolerates_one_character_author_typo(self):
+    with tempfile.TemporaryDirectory() as temp:
+      db_path = Path(temp) / 'sync.sqlite3'
+      with sqlite3.connect(db_path) as db:
+        from library_index import ensure_schema
+        ensure_schema(db)
+        db.execute('INSERT INTO library_fts VALUES (?, ?, ?, ?, ?, ?, ?)', ('/book', 'book', '文学', '1984', 'George Orwel', '', ''))
+        db.execute('INSERT INTO library_fts VALUES (?, ?, ?, ?, ?, ?, ?)', ('/other', 'book', '电影', '电影叙事', 'David Bordwell', '', ''))
+        matches = search(db, 'Orwell')
+        self.assertEqual([row['title'] for row in matches], ['1984'])
+
 
 if __name__ == '__main__':
   unittest.main()
