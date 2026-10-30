@@ -4,6 +4,7 @@ import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config
 import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
 import { timelinePathForSource } from "./timeline-loader.js"
+import { canSearch, normalizedSearchQuery, searchUrl } from "./search-client.js"
 
 const manifestMemoryCache = new Map()
 const timelineMemoryCache = new Map()
@@ -37,6 +38,10 @@ let syncStore = null
 let userSync = null
 let syncAccount = ""
 let syncTimer = null
+let searchTimer = null
+let searchRequest = 0
+let searchAbort = null
+let globalSearchState = { query: "", results: [], loading: false, error: "" }
 
 // Readalong & PDF State
 let readalongManifest = null
@@ -109,6 +114,44 @@ function notice(message = "", duration = 4000) {
 
 function fail(error) {
   notice(error.message || "连接失败，请检查网络或登录状态。")
+}
+
+async function fetchGlobalSearch(query) {
+  if (!auth?.token || !canSearch(query)) return
+  const request = ++searchRequest
+  searchAbort?.abort()
+  searchAbort = new AbortController()
+  globalSearchState = { query, results: [], loading: true, error: "" }
+  render()
+  try {
+    const response = await fetch(searchUrl(query), {
+      headers: { Authorization: auth.token, "Client-Id": stableDevice, ...(auth.deviceKey ? { "Device-Key": auth.deviceKey } : {}) },
+      cache: "no-store", credentials: "omit", signal: searchAbort.signal,
+    })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.error === "invalid_query" ? "请输入 1 至 100 个字符。" : "全库搜索暂不可用")
+    if (request !== searchRequest) return
+    globalSearchState = { query, results: data.results || [], loading: false, error: "" }
+  } catch (error) {
+    if (error.name === "AbortError" || request !== searchRequest) return
+    globalSearchState = { query, results: [], loading: false, error: error.message || "全库搜索暂不可用" }
+  }
+  render()
+}
+
+function scheduleGlobalSearch(value) {
+  clearTimeout(searchTimer)
+  const query = normalizedSearchQuery(value)
+  ++searchRequest
+  searchAbort?.abort()
+  if (!canSearch(query)) {
+    globalSearchState = { query: "", results: [], loading: false, error: "" }
+    render()
+    return
+  }
+  globalSearchState = { query, results: [], loading: true, error: "" }
+  render()
+  searchTimer = setTimeout(() => fetchGlobalSearch(query), 250)
 }
 function attempt(fn) {
   return (...args) =>
@@ -907,6 +950,64 @@ function renderHomeDashboard(categoryItems) {
   container.append(dashboard)
 }
 
+function renderGlobalSearch(query) {
+  $("folder-summary").hidden = true
+  $("breadcrumbs").parentElement.hidden = false
+  $("list-status").parentElement.hidden = false
+  $("breadcrumbs").replaceChildren()
+  const crumb = document.createElement("span")
+  crumb.textContent = "全库搜索"
+  $("breadcrumbs").append(crumb)
+  $("items").replaceChildren()
+  const { results, loading, error } = globalSearchState
+  $("list-status").textContent = loading ? `正在搜索“${query}”...` : `“${query}” · ${results.length} 条全库结果`
+  if (error) {
+    const message = document.createElement("div")
+    message.className = "shelf-empty-state"
+    message.textContent = error
+    $("items").append(message)
+    return
+  }
+  for (const result of results) {
+    const row = document.createElement("div")
+    row.className = "item-row global-search-row"
+    row.setAttribute("role", "listitem")
+    const card = document.createElement("div")
+    card.className = "item-card"
+    const icon = document.createElement("div")
+    icon.className = result.kind === "book" ? "search-book-icon" : "track-disc-icon"
+    icon.textContent = result.kind === "book" ? "📖" : "♫"
+    const info = document.createElement("div")
+    info.className = "item-main-info"
+    const title = document.createElement("h3")
+    title.className = "item-name"
+    title.textContent = result.kind === "book" ? result.title : result.chapter
+    const meta = document.createElement("p")
+    meta.className = "item-meta-text search-result-meta"
+    meta.textContent = [result.title, result.author, result.category].filter(Boolean).join(" · ")
+    info.append(title, meta)
+    if (result.summary) {
+      const summary = document.createElement("p")
+      summary.className = "item-desc-text"
+      summary.textContent = result.summary
+      info.append(summary)
+    }
+    const action = document.createElement("div")
+    action.className = "item-action-icon"
+    action.textContent = result.kind === "book" ? "›" : "▶"
+    card.append(icon, info, action)
+    card.onclick = attempt(() => result.kind === "book" ? browse(result.path) : loadTrack({ path: result.path, name: result.chapter, is_dir: false }))
+    row.append(card)
+    $("items").append(row)
+  }
+  if (!loading && !results.length) {
+    const empty = document.createElement("div")
+    empty.className = "shelf-empty-state"
+    empty.textContent = "没有找到书名、作者或章节。"
+    $("items").append(empty)
+  }
+}
+
 function render() {
   breadcrumbs()
 
@@ -944,10 +1045,11 @@ function render() {
   }
 
   const query = $("search").value.trim().toLocaleLowerCase()
-  let items = [...entries]
   if (query) {
-    items = items.filter((item) => item.name.toLocaleLowerCase().includes(query))
+    renderGlobalSearch(normalizedSearchQuery(query))
+    return
   }
+  let items = [...entries]
 
   items.sort(
     (a, b) =>
@@ -2312,12 +2414,12 @@ on("nav-back-btn", "click", navigateUp)
 on("search", "input", (e) => {
   const clr = $("search-clear")
   if (clr) clr.hidden = !e.target.value
-  render()
+  scheduleGlobalSearch(e.target.value)
 })
 on("search-clear", "click", () => {
   $("search").value = ""
   $("search-clear").hidden = true
-  render()
+  scheduleGlobalSearch("")
 })
 on("sort", "change", render)
 
@@ -2434,6 +2536,9 @@ function logout() {
   auth = null
   directoryPassword = ""
   entries = []
+  clearTimeout(searchTimer)
+  searchAbort?.abort()
+  globalSearchState = { query: "", results: [], loading: false, error: "" }
   prefs.username = ""
   write(localStorage, PREF, prefs)
   remove(localStorage, AUTH)
@@ -2584,7 +2689,7 @@ async function init() {
 
   // Register Service Worker with cache busting & auto-reload on update
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js?v=31").then((reg) => {
+    navigator.serviceWorker.register("./sw.js?v=32").then((reg) => {
       reg.update().catch(() => {})
     }).catch(() => {})
     let refreshing = false

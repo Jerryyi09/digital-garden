@@ -37,8 +37,8 @@ class SyncTests(unittest.TestCase):
     self.auth.stop()
     self.temp.cleanup()
 
-  def request(self, token, body=None):
-    req = urllib.request.Request(self.base, data=json.dumps(body).encode() if body is not None else None, headers={'Authorization': token, 'Content-Type': 'application/json'})
+  def request(self, token, body=None, url=None):
+    req = urllib.request.Request(url or self.base, data=json.dumps(body).encode() if body is not None else None, headers={'Authorization': token, 'Content-Type': 'application/json'})
     try:
       with urllib.request.urlopen(req) as response:
         return response.status, json.load(response)
@@ -107,6 +107,17 @@ class SyncTests(unittest.TestCase):
     result = self.request('one')[1]['items']
     self.assertEqual(result[0]['revision'], 1)
     self.assertEqual(result[0]['value']['position'], 31)
+
+  def test_search_is_authenticated_and_returns_catalog_results(self):
+    with server.connect() as db:
+      db.execute('INSERT INTO library_fts VALUES (?, ?, ?, ?, ?, ?, ?)', ('/多媒体/750HD/有声书/文学作品/1984', 'book', '文学作品', '1984', 'George Orwell', '', '反乌托邦小说'))
+      db.execute('INSERT INTO library_fts VALUES (?, ?, ?, ?, ?, ?, ?)', ('/多媒体/750HD/有声书/文学作品/1984/01.mp3', 'chapter', '文学作品', '1984', 'George Orwell', 'Chapter 1', '反乌托邦小说'))
+    url = self.base.replace('/items', '/search?q=Orwell')
+    status, data = self.request('one', url=url)
+    self.assertEqual(status, 200)
+    self.assertEqual(data['results'][0]['title'], '1984')
+    self.assertEqual(self.request('invalid', url=url)[0], 401)
+    self.assertEqual(self.request('one', url=self.base.replace('/items', '/search?q='))[0], 400)
 
 
 class AuthenticationTests(unittest.TestCase):

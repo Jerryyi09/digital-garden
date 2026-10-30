@@ -6,13 +6,18 @@ import sqlite3
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import parse_qs, urlparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+from library_index import ensure_schema, search
 
 DB_PATH = os.environ.get('GARDEN_SYNC_DB', 'garden-sync.sqlite3')
 ALIST_ME = os.environ.get('GARDEN_ALIST_ME', 'http://127.0.0.1:5244/alist/api/me')
 ALLOWED_ORIGINS = {'https://notes.melyi.uk', 'https://melyi.uk:8089'}
 MAX_BODY = 131072
+MAX_SEARCH_QUERY = 100
+MAX_SEARCH_RESULTS = 40
 
 
 @contextlib.contextmanager
@@ -31,6 +36,7 @@ def initialize_database():
   with connect() as db:
     db.execute('PRAGMA journal_mode=WAL')
     db.execute('CREATE TABLE IF NOT EXISTS items (user_id INTEGER NOT NULL, kind TEXT NOT NULL, item_id TEXT NOT NULL, revision INTEGER NOT NULL, payload TEXT NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY(user_id, kind, item_id))')
+    ensure_schema(db)
 
 
 def authenticate(token, client_id='', device_key=''):
@@ -90,11 +96,19 @@ class Handler(BaseHTTPRequestHandler):
     return user_id
 
   def do_GET(self):
-    if self.path != '/sync/v1/items':
+    parsed = urlparse(self.path)
+    if parsed.path not in ('/sync/v1/items', '/sync/v1/search'):
       return self.send_json(404, {'error': 'not_found'})
     user_id = self.user()
     if user_id is None:
       return
+    if parsed.path == '/sync/v1/search':
+      query = parse_qs(parsed.query).get('q', [''])[0].strip()
+      if not 1 <= len(query) <= MAX_SEARCH_QUERY:
+        return self.send_json(400, {'error': 'invalid_query'})
+      with connect() as db:
+        results = search(db, query, MAX_SEARCH_RESULTS)
+      return self.send_json(200, {'results': results})
     with connect() as db:
       rows = db.execute('SELECT kind, item_id, revision, payload, updated_at FROM items WHERE user_id=?', (user_id,)).fetchall()
     self.send_json(200, {'items': [{'kind': k, 'id': i, 'revision': r, 'value': json.loads(p), 'updatedAt': t} for k, i, r, p, t in rows]})
