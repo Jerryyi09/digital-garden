@@ -29,12 +29,12 @@ cssclasses:
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
   <summary><span>语文 · 初二课文</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》深度赏析与读写结合导读手札 · 吴均" data-search="《与朱元思书》深度赏析与读写结合导读手札 · 吴均 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793339957000" data-router-ignore>
-  <span class="g-row-text"><strong>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</strong><small>10月30日</small></span>
+  <div class="g-list"><a class="g-row" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》赏析 · 吴均" data-search="《与朱元思书》赏析 · 吴均 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793350338093" data-router-ignore>
+  <span class="g-row-text"><strong>《与朱元思书》赏析 · 吴均</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/语文/初二课文/藤野先生.html" data-garden-item data-title="《藤野先生》深度赏析与读写结合导读手札 · 鲁迅" data-search="《藤野先生》深度赏析与读写结合导读手札 · 鲁迅 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793339957000" data-router-ignore>
-  <span class="g-row-text"><strong>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</strong><small>10月30日</small></span>
+<a class="g-row" href="/html/语文/初二课文/藤野先生.html" data-garden-item data-title="《藤野先生》赏析 · 鲁迅" data-search="《藤野先生》赏析 · 鲁迅 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793350338093" data-router-ignore>
+  <span class="g-row-text"><strong>《藤野先生》赏析 · 鲁迅</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>

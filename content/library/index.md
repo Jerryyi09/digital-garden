@@ -28,6 +28,17 @@ cssclasses:
 
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
+  <summary><span>语文 · 初二课文</span><em>2</em></summary>
+  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/三篇山水小品文" data-garden-item data-title="三篇山水小品文" data-search="三篇山水小品文 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793350338093">
+  <span class="g-row-text"><strong>三篇山水小品文</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/《三峡》" data-garden-item data-title="《三峡》" data-search="《三峡》 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793339957000">
+  <span class="g-row-text"><strong>《三峡》</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
+<details class="g-folder" data-folder open>
   <summary><span>语文 · 初一课文</span><em>11</em></summary>
   <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《阿长与〈山海经〉》" data-garden-item data-title="《阿长与〈山海经〉》" data-search="《阿长与〈山海经〉》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1793342497000">
   <span class="g-row-text"><strong>《阿长与〈山海经〉》</strong><small>10月30日</small></span>
@@ -71,17 +82,6 @@ cssclasses:
 </a>
 <a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/钢铁是怎样炼成的？" data-garden-item data-title="钢铁是怎样炼成的？" data-search="钢铁是怎样炼成的？ 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
   <span class="g-row-text"><strong>钢铁是怎样炼成的？</strong><small>6月11日</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a></div>
-</details>
-<details class="g-folder" data-folder open>
-  <summary><span>语文 · 初二课文</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/《三峡》" data-garden-item data-title="《三峡》" data-search="《三峡》 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793339957000">
-  <span class="g-row-text"><strong>《三峡》</strong><small>10月30日</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/《答谢中书书》《记承天寺夜游》《与朱元思书》" data-garden-item data-title="《答谢中书书》《记承天寺夜游》《与朱元思书》" data-search="《答谢中书书》《记承天寺夜游》《与朱元思书》 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793339957000">
-  <span class="g-row-text"><strong>《答谢中书书》《记承天寺夜游》《与朱元思书》</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
