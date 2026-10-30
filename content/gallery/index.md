@@ -1,80 +1,53 @@
 ---
 title: Gallery
+description: 互动网页与创作作品。
 cssclasses:
   - garden-page
   - garden-gallery
 ---
 
-<section class="garden-listing-hero">
-  <p class="garden-eyebrow">Works / Pages / Visuals</p>
-  <h1>Gallery</h1>
-  <nav class="garden-nav" aria-label="Garden sections">
-  <a href="/">Home</a>
-  <a href="/library/">Library</a>
-  <a href="/gallery/">Gallery</a>
-  <a href="/studio/">Studio</a>
+<nav class="g-tabbar" aria-label="花园导航">
+  <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg><span>首页</span></a>
+  <a href="/library/"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/></svg><span>Library</span></a>
+  <a href="/gallery/" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="m4 16 4.5-4.5 4 4 2.5-2.5L20 18"/><circle cx="15.5" cy="9.5" r="1.5"/></svg><span>Gallery</span></a>
+  <a href="/studio/"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Studio</span></a>
 </nav>
-</section>
 
-<section class="garden-section">
-  <div class="garden-tools">
-    <label class="garden-search"><span>搜索</span><input type="search" data-garden-search placeholder="搜索标题或目录" /></label>
-    <label class="garden-sort"><span>排序</span><select data-garden-sort><option value="updated">最近更新</option><option value="title">标题 A–Z</option></select></label>
-    <span class="garden-count" data-garden-count>4 项</span>
+<header class="g-page-head">
+  <h1>Gallery</h1>
+  <span class="g-count" data-garden-count>4 项</span>
+</header>
+
+<div class="g-tools">
+  <label class="g-search"><span class="g-visually-hidden">搜索</span><input type="search" data-garden-search placeholder="搜索标题或目录" enterkeyhint="search" autocomplete="off" /></label>
+  <div class="g-segment" role="radiogroup" aria-label="排序">
+    <button type="button" role="radio" aria-checked="true" data-sort="updated">最近</button>
+    <button type="button" role="radio" aria-checked="false" data-sort="title">标题</button>
   </div>
-  <div class="garden-directory" data-garden-directory><section class="garden-folder" data-folder="语文/初二课文"><h2>语文/初二课文</h2><div class="garden-list"><a class="garden-card" href="/html/语文/初二课文/藤野先生.html" data-garden-item data-title="《藤野先生》深度赏析与读写结合导读手札 · 鲁迅" data-category="语文/初二课文" data-updated="1793336984990.8645">
-  <strong>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</strong>
+</div>
+
+<div class="g-directory" data-garden-directory>
+<details class="g-folder" data-folder open>
+  <summary><span>语文 · 初二课文</span><em>2</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》深度赏析与读写结合导读手札 · 吴均" data-search="《与朱元思书》深度赏析与读写结合导读手札 · 吴均 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793339957000" data-router-ignore>
+  <span class="g-row-text"><strong>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="garden-card" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》深度赏析与读写结合导读手札 · 吴均" data-category="语文/初二课文" data-updated="1793336811930.5356">
-  <strong>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</strong>
-</a></div></section>
-<section class="garden-folder" data-folder="math_to_movie"><h2>math_to_movie</h2><div class="garden-list"><a class="garden-card" href="/html/math_to_movie/" data-garden-item data-title="数学解题 = 拍电影 · 五层同构模型" data-category="math_to_movie" data-updated="1780367651467.491">
-  <strong>数学解题 = 拍电影 · 五层同构模型</strong>
-</a></div></section>
-<section class="garden-folder" data-folder="未选择的路"><h2>未选择的路</h2><div class="garden-list"><a class="garden-card" href="/html/未选择的路/" data-garden-item data-title="《未选择的路》· 罗伯特·弗罗斯特诗歌解读" data-category="未选择的路" data-updated="1779620575475.4922">
-  <strong>《未选择的路》· 罗伯特·弗罗斯特诗歌解读</strong>
-</a></div></section></div>
-</section>
-<script>
-(() => {
-  const key = "rosemary-garden-recent-v1";
-  const read = () => { try { return JSON.parse(localStorage.getItem(key) || "[]") } catch { return [] } };
-  document.addEventListener("click", (event) => {
-    const link = event.target.closest("a[data-garden-item]");
-    if (!link || !link.dataset.title || link.href.startsWith("javascript:")) return;
-    const items = read().filter((item) => item.url !== link.href);
-    items.unshift({ title: link.dataset.title, url: link.href, category: link.dataset.category, updated: Number(link.dataset.updated) || 0 });
-    localStorage.setItem(key, JSON.stringify(items.slice(0, 24)));
-  });
-  const recent = document.querySelector("[data-recent-list]");
-  if (recent) {
-    const fallback = JSON.parse(recent.dataset.fallback || "[]");
-    const items = read();
-    const source = items.length ? items : fallback;
-    recent.replaceChildren();
-    for (const item of source.slice(0, 6)) {
-      const link = document.createElement("a"); link.className = "garden-row"; link.href = item.url;
-      const title = document.createElement("strong"); title.textContent = item.title;
-      link.append(title); recent.append(link);
-    }
-  }
-  const search = document.querySelector("[data-garden-search]");
-  const sort = document.querySelector("[data-garden-sort]");
-  if (!search || !sort) return;
-  const rows = [...document.querySelectorAll("[data-garden-item]")];
-  const count = document.querySelector("[data-garden-count]");
-  const update = () => {
-    const query = search.value.trim().toLocaleLowerCase();
-    let visible = 0;
-    for (const folder of document.querySelectorAll("[data-folder]")) {
-      const list = folder.querySelector(".garden-list");
-      const folderRows = [...list.querySelectorAll("[data-garden-item]")];
-      folderRows.sort((a, b) => sort.value === "title" ? a.dataset.title.localeCompare(b.dataset.title, "zh-CN") : Number(b.dataset.updated) - Number(a.dataset.updated));
-      for (const row of folderRows) { list.append(row); const text = (row.dataset.title + " " + folder.dataset.folder).toLocaleLowerCase(); row.hidden = !text.includes(query); if (!row.hidden) visible++; }
-      folder.hidden = !folderRows.some((row) => !row.hidden);
-    }
-    count.textContent = visible + " 项";
-  };
-  search.addEventListener("input", update); sort.addEventListener("change", update); update();
-})();
-</script>
+<a class="g-row" href="/html/语文/初二课文/藤野先生.html" data-garden-item data-title="《藤野先生》深度赏析与读写结合导读手札 · 鲁迅" data-search="《藤野先生》深度赏析与读写结合导读手札 · 鲁迅 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793339957000" data-router-ignore>
+  <span class="g-row-text"><strong>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
+<details class="g-folder" data-folder open>
+  <summary><span>作品</span><em>2</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/math_to_movie/" data-garden-item data-title="数学解题 = 拍电影 · 五层同构模型" data-search="数学解题 = 拍电影 · 五层同构模型  作品" data-room="Gallery" data-updated="1781073979000" data-router-ignore>
+  <span class="g-row-text"><strong>数学解题 = 拍电影 · 五层同构模型</strong><small>6月10日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/未选择的路/" data-garden-item data-title="《未选择的路》· 罗伯特·弗罗斯特诗歌解读" data-search="《未选择的路》· 罗伯特·弗罗斯特诗歌解读  作品" data-room="Gallery" data-updated="1781071524000" data-router-ignore>
+  <span class="g-row-text"><strong>《未选择的路》· 罗伯特·弗罗斯特诗歌解读</strong><small>6月10日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
+</div>
+<p class="g-empty" data-garden-empty hidden>没有找到匹配的内容</p>

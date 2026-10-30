@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process"
 import fs from "node:fs/promises"
 import path from "node:path"
 
@@ -12,6 +13,26 @@ const generatedPages = new Set([
   path.join("gallery", "index.md"),
   path.join("studio", "index.md"),
 ])
+
+const rooms = [
+  { key: "home", label: "首页", url: "/", icon: "home" },
+  { key: "library", label: "Library", url: "/library/", icon: "book" },
+  { key: "gallery", label: "Gallery", url: "/gallery/", icon: "frame" },
+  { key: "studio", label: "Studio", url: "/studio/", icon: "tools" },
+]
+
+const icons = {
+  home: '<path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/>',
+  book: '<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/>',
+  frame:
+    '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="m4 16 4.5-4.5 4 4 2.5-2.5L20 18"/><circle cx="15.5" cy="9.5" r="1.5"/>',
+  tools:
+    '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+}
+
+function icon(name) {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`
+}
 
 async function pathExists(filePath) {
   try {
@@ -51,10 +72,6 @@ function escapeHtml(value = "") {
     .replaceAll('"', "&quot;")
 }
 
-function stripFrontmatter(markdown) {
-  return markdown.replace(/^---\n[\s\S]*?\n---\n?/, "")
-}
-
 function parseFrontmatter(markdown) {
   const match = markdown.match(/^---\n([\s\S]*?)\n---/)
   const data = {}
@@ -67,26 +84,6 @@ function parseFrontmatter(markdown) {
   }
 
   return data
-}
-
-function firstHeading(markdown) {
-  return stripFrontmatter(markdown).match(/^#\s+(.+)$/m)?.[1]?.trim()
-}
-
-function firstParagraph(markdown) {
-  const body = stripFrontmatter(markdown)
-  const paragraph = body
-    .split(/\n{2,}/)
-    .map((block) =>
-      block
-        .replace(/^#+\s+.*$/gm, "")
-        .replace(/^---+$/gm, "")
-        .replace(/^>\s?/gm, "")
-        .trim(),
-    )
-    .find((block) => block && !block.startsWith("![["))
-
-  return paragraph?.replace(/\s+/g, " ").slice(0, 170)
 }
 
 function titleFromHtml(html, filePath) {
@@ -109,6 +106,69 @@ function publicHtmlUrl(relativePath) {
   return `/html/${normalized}`
 }
 
+// Last-change time per file. A fresh clone (Cloudflare build) gives every file the
+// same mtime, so committed files use their last commit time; files with local,
+// uncommitted changes use their mtime.
+function gitTimes() {
+  const times = new Map()
+  const dirty = new Set()
+  const git = (args) =>
+    execFileSync("git", ["-c", "core.quotePath=false", ...args], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+
+  try {
+    let current = 0
+    for (const line of git(["log", "--format=@@%ct", "--name-only", "--", "content", "html"]).split(
+      "\n",
+    )) {
+      if (line.startsWith("@@")) current = Number(line.slice(2)) * 1000
+      else if (line && !times.has(line)) times.set(line, current)
+    }
+    for (const line of git([
+      "status",
+      "--porcelain",
+      "--untracked-files=all",
+      "--",
+      "content",
+      "html",
+    ]).split("\n")) {
+      const file = line.slice(3).replace(/^"|"$/g, "")
+      if (file) dirty.add(file.split(" -> ").pop())
+    }
+  } catch {
+    // Not a git checkout: fall back to filesystem times.
+  }
+
+  return { times, dirty }
+}
+
+const history = gitTimes()
+
+async function updatedTime(file, frontmatter = {}) {
+  const declared = Date.parse(frontmatter.updated || frontmatter.modified || "")
+  if (!Number.isNaN(declared)) return declared
+
+  const relative = path.relative(projectRoot, file).split(path.sep).join("/")
+  if (!history.dirty.has(relative) && history.times.has(relative))
+    return history.times.get(relative)
+
+  return (await fs.stat(file)).mtimeMs
+}
+
+// "学习笔记/01 Areas/语文/初二课文" -> "语文 · 初二课文"
+function shortFolder(folder) {
+  if (!folder || folder === ".") return "未分类"
+  const parts = folder
+    .split(/[\\/]/)
+    .filter((part) => part && !/^\d+\s*(areas?|projects?|resources?|archives?)$/i.test(part))
+  if (parts.length > 1 && parts[0] === "学习笔记") parts.shift()
+  return parts.slice(-2).join(" · ") || folder
+}
+
 async function getNotes() {
   const files = (await walk(contentDir)).filter((file) => file.endsWith(".md"))
   const notes = []
@@ -120,15 +180,15 @@ async function getNotes() {
     const markdown = await fs.readFile(file, "utf8")
     const frontmatter = parseFrontmatter(markdown)
     const slug = relativePath.replace(/\.md$/, "").split(path.sep).join("/")
+    const folder = path.dirname(relativePath)
 
     notes.push({
       title: frontmatter.title || path.basename(file, ".md"),
-      summary: frontmatter.description || firstParagraph(markdown) || "A note from Rosemary Garden.",
       url: `/${slug}`,
-      type: "Note",
       room: "Library",
-      category: path.dirname(relativePath) === "." ? "未分类" : path.dirname(relativePath),
-      updated: (await fs.stat(file)).mtimeMs,
+      folder: folder === "." ? "" : folder.split(path.sep).join("/"),
+      category: shortFolder(folder),
+      updated: await updatedTime(file, frontmatter),
     })
   }
 
@@ -142,15 +202,18 @@ async function getHtmlPages() {
   for (const file of files) {
     const html = await fs.readFile(file, "utf8")
     const relativePath = path.relative(htmlDir, file)
+    let folder = path.dirname(relativePath)
+    // html/<name>/index.html is one work, not a folder of works.
+    if (path.basename(relativePath) === "index.html") folder = path.dirname(folder)
 
     pages.push({
       title: titleFromHtml(html, file),
-      summary: "An interactive page or visual work from the gallery.",
       url: publicHtmlUrl(relativePath),
-      type: "Gallery",
       room: "Gallery",
-      category: path.dirname(relativePath) === "." ? "未分类" : path.dirname(relativePath),
-      updated: (await fs.stat(file)).mtimeMs,
+      folder: folder === "." ? "" : folder.split(path.sep).join("/"),
+      category: folder === "." ? "作品" : shortFolder(folder),
+      updated: await updatedTime(file),
+      standalone: true,
     })
   }
 
@@ -159,11 +222,11 @@ async function getHtmlPages() {
 
 async function getStudioItems() {
   const alist = {
-    title: "Alist Resource Library",
-    type: "Resource Hub",
-    summary: "Browse extended files, media, and long-term resources.",
+    title: "Alist 资源库",
+    kind: "文件与媒体",
     url: "https://melyi.uk/alist/",
     room: "Studio",
+    category: "资源",
   }
 
   if (!(await pathExists(studioIndexPath))) return [alist]
@@ -174,27 +237,64 @@ async function getStudioItems() {
   return [
     ...items.map((item) => ({
       title: item.title,
-      type: item.type || "Download",
-      summary: item.description || "A downloadable resource from the studio.",
+      kind: item.type || "Download",
       url: item.url,
       room: "Studio",
+      category: "工具",
       standalone: item.standalone === true,
     })),
     alist,
   ]
 }
 
-function card(item) {
-  const routerIgnore = item.standalone || /^https?:\/\//i.test(item.url) ? " data-router-ignore" : ""
+function formatDate(ms) {
+  if (!ms) return ""
+  const date = new Date(ms)
+  const now = new Date()
+  const parts = new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(date)
+  const get = (type) => parts.find((part) => part.type === type)?.value
+  const sameYear = get("year") === String(now.getFullYear())
+  return `${sameYear ? "" : `${get("year")}年`}${get("month")}月${get("day")}日`
+}
 
-  return `<a class="garden-card" href="${escapeHtml(item.url)}" data-garden-item data-title="${escapeHtml(item.title)}" data-category="${escapeHtml(item.category || item.room)}" data-updated="${Number(item.updated) || 0}"${routerIgnore}>
-  <strong>${escapeHtml(item.title)}</strong>
+function isExternal(url) {
+  return /^https?:\/\//i.test(url)
+}
+
+function row(item, { showRoom = false } = {}) {
+  const external = isExternal(item.url)
+  // Standalone pages are not Quartz pages: let the browser load them normally.
+  const attrs = item.standalone || external ? " data-router-ignore" : ""
+  const target = external ? ' target="_blank" rel="noopener"' : ""
+  const meta =
+    item.kind || (showRoom ? `${item.room} · ${item.category}` : formatDate(item.updated))
+
+  return `<a class="g-row" href="${escapeHtml(item.url)}" data-garden-item data-title="${escapeHtml(item.title)}" data-search="${escapeHtml(`${item.title} ${item.folder || ""} ${item.category || ""}`)}" data-room="${escapeHtml(item.room)}" data-updated="${Number(item.updated) || 0}"${attrs}${target}>
+  <span class="g-row-text"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(meta)}</small></span>
+  <span class="g-row-go" aria-hidden="true">${external ? "↗" : "›"}</span>
 </a>`
 }
 
-function pageFrame({ title, subtitle, cssClass, body }) {
+function tabbar(active) {
+  return `<nav class="g-tabbar" aria-label="花园导航">
+  ${rooms
+    .map(
+      (room) =>
+        `<a href="${room.url}"${room.key === active ? ' aria-current="page"' : ""}>${icon(room.icon)}<span>${room.label}</span></a>`,
+    )
+    .join("\n  ")}
+</nav>`
+}
+
+function pageFrame({ title, description, cssClass, body }) {
   return `---
 title: ${title}
+description: ${description}
 cssclasses:
   - garden-page
   - ${cssClass}
@@ -204,143 +304,82 @@ ${body}
 `
 }
 
-function nav({ isHome = false } = {}) {
-  return `<nav class="garden-nav" aria-label="Garden sections">
-  ${isHome ? '<a href="https://gsw.melyi.uk/" data-router-ignore>谈诗说文</a>' : '<a href="/">Home</a>'}
-  <a href="/library/">Library</a>
-  <a href="/gallery/">Gallery</a>
-  <a href="/studio/">Studio</a>
-</nav>`
-}
-
-function homePage(notes, gallery, studio) {
-  const featured = [...gallery, ...notes, ...studio].slice(0, 4)
-  const recent = [...gallery, ...notes].slice(0, 6)
+function homePage(notes, gallery) {
+  const latest = [...notes, ...gallery].sort((a, b) => b.updated - a.updated).slice(0, 6)
 
   return pageFrame({
     title: "Rosemary Garden",
+    description: "Rosemary 的学习、阅读与创作花园。",
     cssClass: "garden-home",
-    body: `<section class="garden-hero">
-  <div class="garden-hero-copy">
-    <p class="garden-eyebrow">学习 · 阅读 · 创作</p>
-    <h1>Rosemary Garden</h1>
-    ${nav({ isHome: true })}
-  </div>
-  <figure class="garden-hero-art">
-    <picture>
-      <img src="/static/garden/cockatiel-hero.png" alt="A dreamy editorial illustration of a cockatiel in Rosemary Garden" loading="eager" decoding="async" onerror="this.onerror=null;this.src='/static/garden/cockatiel-hero.png'" />
-    </picture>
-  </figure>
+    body: `${tabbar("home")}
+
+<header class="g-home-head">
+  <h1>Rosemary Garden</h1>
+  <a class="g-chip" href="https://gsw.melyi.uk/" data-router-ignore target="_blank" rel="noopener">谈诗说文<span aria-hidden="true">↗</span></a>
+</header>
+
+<figure class="g-hero">
+  <img src="/static/garden/cockatiel-hero.png" alt="Rosemary Garden 插画：树枝上的玄凤鹦鹉与一本书" loading="eager" decoding="async" />
+</figure>
+
+<section class="g-section" data-recent-section hidden>
+  <h2>继续阅读</h2>
+  <div class="g-list" data-recent-list></div>
 </section>
 
-<section class="garden-section">
-  <div class="garden-section-head">
-    <p class="garden-eyebrow">探索花园</p>
-    <h2>今天想从哪里开始？</h2>
-  </div>
-  <div class="garden-room-grid">
-    ${roomCard("Library", "课程笔记与阅读发现", "/library/")}
-    ${roomCard("Gallery", "作品、网页与创意实验", "/gallery/")}
-    ${roomCard("Studio", "工具、资源与听书", "/studio/")}
-  </div>
-</section>
-
-<section class="garden-section">
-  <div class="garden-section-head">
-    <p class="garden-eyebrow">最近更新</p>
-    <h2>新鲜上架</h2>
-  </div>
-  <div class="garden-card-grid">${featured.map(card).join("\n")}</div>
-</section>
-
-<section class="garden-section">
-  <div class="garden-section-head">
-    <p class="garden-eyebrow">接着逛</p>
-    <h2>最近浏览</h2>
-  </div>
-  <div class="garden-list" data-recent-list data-fallback="${escapeHtml(JSON.stringify(recent))}">${recent.map(card).join("\n")}</div>
-</section>
-${recentBrowserScript()}`,
+<section class="g-section">
+  <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
+  <div class="g-list">${latest.map((item) => row(item, { showRoom: true })).join("\n")}</div>
+</section>`,
   })
 }
 
-function roomCard(title, summary, url) {
-  return `<a class="garden-room" href="${url}">
-  <span>${title}</span>
-</a>`
-}
+function listingPage({ title, description, cssClass, active, items, searchable = true }) {
+  const groups = new Map()
+  for (const item of items) {
+    const key = item.category || item.room
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key).push(item)
+  }
 
-function listingPage({ title, eyebrow, intro, cssClass, items }) {
-  const categories = [...new Set(items.map((item) => item.category || item.room))]
+  // Folder headings only help when a folder groups several items.
+  const flat = groups.size < 2 || [...groups.values()].every((group) => group.length < 2)
+
+  const tools = searchable
+    ? `<div class="g-tools">
+  <label class="g-search"><span class="g-visually-hidden">搜索</span><input type="search" data-garden-search placeholder="搜索标题或目录" enterkeyhint="search" autocomplete="off" /></label>
+  <div class="g-segment" role="radiogroup" aria-label="排序">
+    <button type="button" role="radio" aria-checked="true" data-sort="updated">最近</button>
+    <button type="button" role="radio" aria-checked="false" data-sort="title">标题</button>
+  </div>
+</div>`
+    : ""
+
   return pageFrame({
     title,
+    description,
     cssClass,
-    body: `<section class="garden-listing-hero">
-  <p class="garden-eyebrow">${escapeHtml(eyebrow)}</p>
+    body: `${tabbar(active)}
+
+<header class="g-page-head">
   <h1>${escapeHtml(title)}</h1>
-  ${nav()}
-</section>
+  <span class="g-count" data-garden-count>${items.length} 项</span>
+</header>
 
-<section class="garden-section">
-  <div class="garden-tools">
-    <label class="garden-search"><span>搜索</span><input type="search" data-garden-search placeholder="搜索标题或目录" /></label>
-    <label class="garden-sort"><span>排序</span><select data-garden-sort><option value="updated">最近更新</option><option value="title">标题 A–Z</option></select></label>
-    <span class="garden-count" data-garden-count>${items.length} 项</span>
-  </div>
-  <div class="garden-directory" data-garden-directory>${categories.map((category) => `<section class="garden-folder" data-folder="${escapeHtml(category)}"><h2>${escapeHtml(category)}</h2><div class="garden-list">${items.filter((item) => (item.category || item.room) === category).map(card).join("\n")}</div></section>`).join("\n")}</div>
-</section>
-${recentBrowserScript()}`,
+${tools}
+
+<div class="g-directory" data-garden-directory>
+${(flat ? [["", items]] : [...groups])
+  .map(
+    ([group, groupItems]) => `<details class="g-folder${flat ? " is-flat" : ""}" data-folder open>
+  ${flat ? "" : `<summary><span>${escapeHtml(group)}</span><em>${groupItems.length}</em></summary>`}
+  <div class="g-list">${groupItems.map((item) => row(item)).join("\n")}</div>
+</details>`,
+  )
+  .join("\n")}
+</div>
+<p class="g-empty" data-garden-empty hidden>没有找到匹配的内容</p>`,
   })
-}
-
-function recentBrowserScript() {
-  return `<script>
-(() => {
-  const key = "rosemary-garden-recent-v1";
-  const read = () => { try { return JSON.parse(localStorage.getItem(key) || "[]") } catch { return [] } };
-  document.addEventListener("click", (event) => {
-    const link = event.target.closest("a[data-garden-item]");
-    if (!link || !link.dataset.title || link.href.startsWith("javascript:")) return;
-    const items = read().filter((item) => item.url !== link.href);
-    items.unshift({ title: link.dataset.title, url: link.href, category: link.dataset.category, updated: Number(link.dataset.updated) || 0 });
-    localStorage.setItem(key, JSON.stringify(items.slice(0, 24)));
-  });
-  const recent = document.querySelector("[data-recent-list]");
-  if (recent) {
-    const fallback = JSON.parse(recent.dataset.fallback || "[]");
-    const items = read();
-    const source = items.length ? items : fallback;
-    recent.replaceChildren();
-    for (const item of source.slice(0, 6)) {
-      const link = document.createElement("a"); link.className = "garden-row"; link.href = item.url;
-      const title = document.createElement("strong"); title.textContent = item.title;
-      link.append(title); recent.append(link);
-    }
-  }
-  const search = document.querySelector("[data-garden-search]");
-  const sort = document.querySelector("[data-garden-sort]");
-  if (!search || !sort) return;
-  const rows = [...document.querySelectorAll("[data-garden-item]")];
-  const count = document.querySelector("[data-garden-count]");
-  const update = () => {
-    const query = search.value.trim().toLocaleLowerCase();
-    let visible = 0;
-    for (const folder of document.querySelectorAll("[data-folder]")) {
-      const list = folder.querySelector(".garden-list");
-      const folderRows = [...list.querySelectorAll("[data-garden-item]")];
-      folderRows.sort((a, b) => sort.value === "title" ? a.dataset.title.localeCompare(b.dataset.title, "zh-CN") : Number(b.dataset.updated) - Number(a.dataset.updated));
-      for (const row of folderRows) { list.append(row); const text = (row.dataset.title + " " + folder.dataset.folder).toLocaleLowerCase(); row.hidden = !text.includes(query); if (!row.hidden) visible++; }
-      folder.hidden = !folderRows.some((row) => !row.hidden);
-    }
-    count.textContent = visible + " 项";
-  };
-  search.addEventListener("input", update); sort.addEventListener("change", update); update();
-})();
-</script>`
-}
-
-function emptyState() {
-  return `<div class="garden-empty">This room is waiting for its first bloom.</div>`
 }
 
 async function writePage(name, content) {
@@ -354,14 +393,14 @@ async function main() {
   const gallery = await getHtmlPages()
   const studio = await getStudioItems()
 
-  await writePage("index.md", homePage(notes, gallery, studio))
+  await writePage("index.md", homePage(notes, gallery))
   await writePage(
     path.join("library", "index.md"),
     listingPage({
       title: "Library",
-      eyebrow: "Notes / Reading / Thinking",
-      intro: "A quiet room for notes, reading trails, and gathered ideas from Obsidian.",
+      description: "课程笔记与阅读导读。",
       cssClass: "garden-library",
+      active: "library",
       items: notes,
     }),
   )
@@ -369,9 +408,9 @@ async function main() {
     path.join("gallery", "index.md"),
     listingPage({
       title: "Gallery",
-      eyebrow: "Works / Pages / Visuals",
-      intro: "A bright exhibition room for interactive pages, slides, images, and project pieces.",
+      description: "互动网页与创作作品。",
       cssClass: "garden-gallery",
+      active: "gallery",
       items: gallery,
     }),
   )
@@ -379,14 +418,17 @@ async function main() {
     path.join("studio", "index.md"),
     listingPage({
       title: "Studio",
-      eyebrow: "Resources / Tools / Downloads",
-      intro: "A working room for resource links, downloadable materials, and future creative tools.",
+      description: "工具、资源与有声书。",
       cssClass: "garden-studio",
+      active: "studio",
       items: studio,
+      searchable: false,
     }),
   )
 
-  console.log(`Garden pages: ${notes.length} notes, ${gallery.length} gallery items, ${studio.length} studio items`)
+  console.log(
+    `Garden pages: ${notes.length} notes, ${gallery.length} gallery items, ${studio.length} studio items`,
+  )
 }
 
 main().catch((error) => {
