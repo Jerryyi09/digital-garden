@@ -1,3 +1,5 @@
+import { UserSync } from "./user-sync.js"
+import { openSyncStore } from "./sync-store.js"
 import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
 import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
@@ -31,6 +33,10 @@ let browseRequest = 0
 let preparedNext = null
 let db = null
 let directoryPassword = ""
+let syncStore = null
+let userSync = null
+let syncAccount = ""
+let syncTimer = null
 
 // Readalong & PDF State
 let readalongManifest = null
@@ -291,6 +297,120 @@ function persist(record) {
   }
 }
 
+async function startUserSync() {
+  if (!auth?.token || !syncStore) return
+  const owner = account()
+  syncAccount = owner
+  const client = new UserSync({
+    lockName: `garden-user-sync:${owner}`,
+    list: () => syncStore.list(owner),
+    put: row => syncStore.put(owner, row),
+    request: async (method, body) => {
+      if (syncAccount !== owner || !auth?.token) throw new Error("账号已切换")
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 12000)
+      try {
+        const response = await fetch("https://melyi.uk:8089/sync/v1/items", {
+          method, headers: { Authorization: auth.token, "Client-Id": stableDevice, ...(auth.deviceKey ? { "Device-Key": auth.deviceKey } : {}), ...(body ? { "Content-Type": "application/json" } : {}) },
+          body: body ? JSON.stringify(body) : undefined, cache: "no-store", credentials: "omit", signal: controller.signal,
+        })
+        const data = await response.json()
+        if (!response.ok) throw Object.assign(new Error("同步服务暂不可用"), { status: response.status, current: data.current })
+        return data
+      } finally {
+        clearTimeout(timer)
+      }
+    },
+    onChange: row => {
+      if (syncAccount !== owner) return
+      if (row.kind === "progress" && !row.dirty && row.value?.track && isWithinRoot(row.value.track.path)) {
+        const record = { ...row.value, account: owner, id: trackId(row.value.track), key: JSON.stringify([owner, trackId(row.value.track)]) }
+        persist(record)
+        const journal = read(localStorage, JOURNAL, null)
+        if (!journal || journal.account !== owner || record.updatedAt > journal.updatedAt) write(localStorage, JOURNAL, record)
+      }
+    },
+  })
+  userSync = client
+  try {
+    for (const record of records.filter(row => row.account === owner && row.track && isWithinRoot(row.track.path)).sort((a, b) => b.updatedAt - a.updatedAt)) {
+      await client.seed("progress", record.track.path, record)
+    }
+    await client.sync()
+    if (userSync === client) { render(); await renderSyncItems() }
+  } catch (error) {
+    if (userSync === client) {
+      await renderSyncItems()
+      $("sync-status").textContent = "同步未连接，记录保存在本机"
+    }
+  }
+}
+
+function scheduleUserSync() {
+  clearTimeout(syncTimer)
+  syncTimer = setTimeout(() => {
+    if (!userSync) return
+    userSync.sync().then(() => { render(); return renderSyncItems() }).catch(() => {
+      $("sync-status").textContent = "同步未连接，记录保存在本机"
+    })
+  }, 1500)
+}
+
+async function renderSyncItems() {
+  if (!syncStore || !userSync || !syncAccount) return
+  const owner = syncAccount
+  const rows = await syncStore.list(owner)
+  if (syncAccount !== owner) return
+  const conflicts = rows.filter(row => row.conflict)
+  const dirty = rows.filter(row => row.dirty)
+  $("sync-status").textContent = conflicts.length ? `有 ${conflicts.length} 条记录需要选择` : dirty.length ? `等待同步 ${dirty.length} 条` : "已同步"
+  const container = $("sync-items")
+  container.replaceChildren()
+  for (const row of conflicts) {
+    const group = document.createElement("div")
+    const label = document.createElement("p")
+    label.textContent = `同步冲突：${row.value?.track?.name || row.id}（本机 ${durationText(row.value?.position)} / 其他设备 ${durationText(row.conflict.value?.position)}）`
+    group.append(label)
+    const choices = row.conflict.missing ? [["local", "恢复本机"]] : [["local", "保留本机"], ["remote", "使用其他设备"]]
+    for (const [choice, title] of choices) {
+      const button = document.createElement("button")
+      button.textContent = title
+      button.addEventListener("click", attempt(async () => {
+        await userSync.resolve(row.kind, row.id, choice)
+        await userSync.sync()
+        render()
+        await renderSyncItems()
+      }))
+      group.append(button)
+    }
+    container.append(group)
+  }
+  const bookmarks = rows.filter(row => row.kind === "bookmark" && !row.value?.deleted)
+  const heading = document.createElement("p")
+  heading.textContent = `书签（${bookmarks.length}）`
+  container.append(heading)
+  for (const row of bookmarks) {
+    if (!row.value?.track || !isWithinRoot(row.value.track.path)) continue
+    const group = document.createElement("div")
+    const open = document.createElement("button")
+    open.textContent = `${row.value.track.name} · ${durationText(row.value.position)}`
+    open.addEventListener("click", attempt(async () => {
+      await loadTrack(row.value.track)
+      pendingPosition = Math.max(0, row.value.position)
+      restorePosition()
+    }))
+    const removeBookmark = document.createElement("button")
+    removeBookmark.textContent = "删除"
+    removeBookmark.addEventListener("click", attempt(async () => {
+      await userSync.save("bookmark", row.id, { ...row.value, deleted: true })
+      await renderSyncItems()
+      scheduleUserSync()
+    }))
+    group.append(open, removeBookmark)
+    container.append(group)
+  }
+}
+
 function saveProgress(completed = audio.ended) {
   if (
     !current ||
@@ -312,6 +432,9 @@ function saveProgress(completed = audio.ended) {
     speed: audio.playbackRate,
   }
   persist(record)
+  if (userSync && syncAccount === account()) {
+    userSync.save("progress", record.track.path, record).then(scheduleUserSync).catch(() => {})
+  }
   write(localStorage, JOURNAL, record)
   lastSave = Date.now()
 }
@@ -1101,7 +1224,7 @@ async function ensureCurrentLoaded(autoPlay = true) {
     return
   }
   const journal = read(localStorage, JOURNAL, null)
-  const candidateTrack = journal?.track || libraryRecords()[0]?.track
+  const candidateTrack = (journal?.account === account() ? journal.track : null) || libraryRecords()[0]?.track
   if (candidateTrack) {
     await loadTrack(candidateTrack)
     if (autoPlay) playAudio()
@@ -1349,8 +1472,11 @@ audio.addEventListener("error", () => {
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) saveProgress(audio.ended)
+  else if (userSync) scheduleUserSync()
 })
 window.addEventListener("pagehide", () => saveProgress(audio.ended))
+window.addEventListener("online", () => { if (userSync) scheduleUserSync() })
+setInterval(() => { if (userSync && !document.hidden) scheduleUserSync() }, 30000)
 
 // Speed Control
 function setSpeed(speedVal) {
@@ -2075,6 +2201,14 @@ on("mini-list-btn", "click", (e) => {
   e.stopPropagation()
   openDrawer("chapter-drawer")
 })
+on("player-share-btn", "click", attempt(async () => {
+  if (!current || !userSync) throw new Error("请先登录并选择音轨，再添加书签。")
+  const id = crypto.randomUUID()
+  await userSync.save("bookmark", id, { track: current, position: audio.currentTime, createdAt: Date.now(), deleted: false })
+  await renderSyncItems()
+  scheduleUserSync()
+  notice("已添加书签，可在“我的”中查看。")
+}))
 on("player-collapse-btn", "click", () => {
   $("full-player").hidden = true
 })
@@ -2259,6 +2393,7 @@ on("connection-form", "submit", async (event) => {
     write($("remember").checked ? localStorage : sessionStorage, AUTH, auth)
     $("password").value = ""
     $("settings")?.close()
+    startUserSync()
     notice("登录成功，正在同步书库...")
     await browse(ROOT)
   } catch (error) {
@@ -2276,6 +2411,11 @@ on("logout-btn", "click", logout)
 
 function logout() {
   saveProgress()
+  syncAccount = ""
+  userSync = null
+  clearTimeout(syncTimer)
+  $("sync-status").textContent = "未连接"
+  $("sync-items").replaceChildren()
   closeReadalong()
   closePdfViewer()
   audio.pause()
@@ -2360,8 +2500,12 @@ on("import", "change", attempt(async () => {
   })
   for (const record of candidates) {
     const existing = records.find((item) => item.key === record.key)
-    if (!existing || existing.updatedAt < record.updatedAt) persist(record)
+    if (!existing || existing.updatedAt < record.updatedAt) {
+      persist(record)
+      if (userSync && syncAccount === account()) await userSync.save("progress", record.track.path, record)
+    }
   }
+  if (userSync) scheduleUserSync()
   render()
   notice(`已成功合并 ${candidates.length} 条收听记录`)
   if (imp) imp.value = ""
@@ -2372,13 +2516,14 @@ async function init() {
   setSpeed(prefs.speed || 1)
   try {
     await openDatabase()
+    syncStore = await openSyncStore()
   } catch {
     notice("无法打开本地存储，收听记录可能无法持久保存。")
   }
 
   // Auto load recent playback from journal if present
   const journal = read(localStorage, JOURNAL, null)
-  if (journal && journal.track) {
+  if (journal && journal.account === account() && journal.track) {
     // Mini player placeholder
     $("mini-title").textContent = journal.track.name.replace(AUDIO, "")
     const parentDir = journal.track.path.slice(0, journal.track.path.lastIndexOf("/"))
@@ -2408,6 +2553,7 @@ async function init() {
   render()
 
   if (auth?.token) {
+    startUserSync()
     browse(ROOT).catch((err) => {
       console.warn("Initial browse failed:", err)
       $("list-status").textContent = "未连接书库，请点击右上角设置登录"

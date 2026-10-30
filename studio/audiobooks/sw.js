@@ -1,5 +1,5 @@
-const CACHE = "garden-audiobooks-v47-network-first"
-const SHELL = ["./", "./app.js", "./readalong-sync.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
+const CACHE = "garden-audiobooks-v48-network-first"
+const SHELL = ["./", "./app.js", "./user-sync.js", "./sync-store.js", "./readalong-sync.js", "./timeline-loader.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 
 // Precache bypasses the browser HTTP cache: app.js is served with max-age=14400, and a plain
 // cache.addAll() would store that stale copy under the new cache name, so a deploy only reached
