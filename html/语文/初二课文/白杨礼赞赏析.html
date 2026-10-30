@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>《白杨礼赞》深度赏析与读写结合导读 · 茅盾</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe4;
+      --border: rgba(30, 42, 50, 0.09);
+      --border-accent: rgba(23, 93, 126, 0.35);
+      --text-main: #1c2429;
+      --text-muted: #56646e;
+      --text-soft: #7f8e99;
+      --accent: #175d7e;
+      --accent-subtle: rgba(23, 93, 126, 0.08);
+      --accent-warm: #c05621;
+      --accent-warm-subtle: rgba(192, 86, 33, 0.09);
+      --success: #15803d;
+      --danger: #b91c1c;
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #242c34;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --accent: #38bdf8;
+        --accent-subtle: rgba(56, 189, 248, 0.14);
+        --accent-warm: #fb923c;
+        --accent-warm-subtle: rgba(251, 146, 60, 0.14);
+        --success: #4ade80;
+        --danger: #f87171;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; }
+
+    /* 顶部 Hero */
+    .hero {
+      text-align: center;
+      padding: 20px 14px 16px;
+      margin-bottom: 10px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge-wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .hero-badge-warm {
+      background: var(--accent-warm-subtle);
+      color: var(--accent-warm);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .hero-quote {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      padding: 9px 12px;
+      border-radius: 0 6px 6px 0;
+      display: inline-block;
+      width: 100%;
+      line-height: 1.68;
+      border-left: 3px solid var(--accent-warm);
+      text-align: justify;
+    }
+
+    /* 置顶工具栏 */
+    .toggle-toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-bottom: 12px;
+      padding: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .toggle-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .toggle-btn:hover { background: var(--bg-card); }
+    .toggle-btn.btn-read { color: var(--accent); background: var(--accent-subtle); }
+    .toggle-btn.btn-write { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* 手风琴栏目（唯一外层盒） */
+    .guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .section-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 12px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      list-style: none;
+      background: var(--bg-card);
+      gap: 8px;
+    }
+    .section-summary::-webkit-details-marker { display: none; }
+    .summary-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .section-idx {
+      font-family: var(--font-serif);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+    .section-idx-warm {
+      color: var(--accent-warm);
+      background: var(--accent-warm-subtle);
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+    .summary-toggle-icon {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-soft);
+      transition: transform 0.25s ease;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .guide-section[open] .summary-toggle-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.78;
+      color: var(--text-main);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; }
+    }
+
+    /* 内部小标题与扁平流式条目（杜绝框套框） */
+    .sub-heading {
+      font-family: var(--font-serif);
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--accent-warm); font-size: 12px; }
+
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* 紧凑双列元数据栅格 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+
+    /* 扁平纯色块（无四周边框，左侧3px竖线） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--accent-subtle); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--accent-warm-subtle); border-left: 3px solid var(--accent-warm); border-radius: 0 6px 6px 0; }
+    .tint-good { background: rgba(21, 128, 61, 0.07); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: rgba(185, 28, 28, 0.07); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 标签与公式 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--accent-subtle); color: var(--accent); }
+    .badge-context { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    .formula-tag {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--accent);
+    }
+    .formula-bar {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+
+    /* 表格自适应折行 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th { background: var(--bg-subtle); font-weight: 700; color: var(--accent); }
+
+    .svg-wrap {
+      width: 100%;
+      margin: 10px 0;
+      padding: 8px 4px;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+
+    ul.bullet-list, ol.num-list { padding-left: 17px; margin: 5px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14.5px; margin-bottom: 5px; line-height: 1.72; }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">现代文轨 · 05 现代写景状物与哲思散文</span>
+        <span class="hero-badge hero-badge-warm">统编初中语文八年级上册 · 第四单元</span>
+      </div>
+      <h1>《白杨礼赞》深度赏析与读写结合导读</h1>
+      <div class="hero-sub">茅盾（沈德鸿，1896—1981）· 现代文学巨匠 · 现实主义文学大师</div>
+      <div class="hero-quote">
+        <strong>一句话文眼</strong>：“白杨树实在是不平凡的，我赞美白杨树！”<br>
+        <strong>导读点睛</strong>：茅盾以西北高原极质朴之乔木为熔炉，将干、枝、叶、皮的笔挺昂扬与抗日军民的血性风骨熔铸为一，借六次回环赞叹与四重反问蓄势，在中国现代散文史上立起一座顶天立地的崇高丰碑。
+      </div>
+    </header>
+
+    <!-- 置顶控制工具栏 -->
+    <nav class="toggle-toolbar" aria-label="导读控制栏">
+      <button class="toggle-btn" onclick="toggleAllSections(true)">展开全部</button>
+      <button class="toggle-btn" onclick="toggleAllSections(false)">收起全部</button>
+      <button class="toggle-btn btn-read" onclick="focusTrack('read')">📖 读懂篇 (01-08)</button>
+      <button class="toggle-btn btn-write" onclick="focusTrack('write')">✍️ 读写转化 (09-13)</button>
+    </nav>
+
+    <div class="part-divider">上篇 · 文本深读、语言训诂与文学批评</div>
+
+    <!-- 栏目 01 · 课文坐标、单元定位与初读破冰 -->
+    <details class="guide-section" id="sec-01" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">01</span>
+          <h2 class="section-title">课文坐标、单元定位与初读破冰</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">篇目与作者</div>
+            <div class="spec-val">《白杨礼赞》· 茅盾</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">教材与单元</div>
+            <div class="spec-val">统编八年级上册 · 第四单元（散文天地）</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">体裁与表达</div>
+            <div class="spec-val">托物言志散文 · 象征抒情</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">单元任务群</div>
+            <div class="spec-val">品味散文的情趣与理趣 · 领悟物象寄托</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">核心理论镜头</div>
+            <div class="spec-val">崇高美学 · 欲扬先抑 · 四级象征跃迁</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">中考考查核心</div>
+            <div class="spec-val">六次“不平凡”线索 · 象征手法 · 白杨与楠木对比</div>
+          </div>
+        </div>
+
+        <div class="tint-accent">
+          <strong>学科坐标与防误读预警</strong><br>
+          <strong>学科坐标</strong>：中国现代革命托物言志散文的里程碑。茅盾以极具现代感的阳刚“崇高（Sublime）美学”，彻底颠覆了古典文人偏好弱柳婆娑、枯藤盘旋的阴柔趣味，将平凡树木升华为时代革命力量的庄严图腾。<br>
+          <strong>防误读警示</strong>：<span class="badge-evidence">【文本依据】</span> 切莫将本文读成干瘪空洞的“植物拟人赞美诗”或简单的“政治口号图解”！许多教辅直接将白杨树粗暴等同于“抗日军民”，却忽略了茅盾开篇不惜笔墨描摹黄土高原“雄壮—单调—惊醒”的欲扬先抑铺垫，也忽视了白杨树从“力争上游形态”到“好女子与伟丈夫对比”再到“四个反问句由树及人”的严密递进逻辑。没有高原苍茫的审美蓄能，后文由树及人的灵魂暴发就成了无源之水。
+        </div>
+
+        <div class="sub-heading">初读三问破冰卡（苏格拉底第一轮）</div>
+        <div class="item-block">
+          <ol class="num-list">
+            <li><strong>🔥 最打动人心的一处触动点</strong>：在无边无垠的黄土高原上，当视野被苍茫单调弄得“恹恹欲睡”时，“猛抬头”突然撞见傲然耸立的白杨树——那种在苍凉单调中拔地而起的顽强生机，给长途跋涉的旅人带来触电般的精神惊醒；以及第七段由浅入深的四个反问排比，句式层层叠浪，直击灵魂深处。</li>
+            <li><strong>❓ 最容易读滑过去的困惑/反常点</strong>：既然是要全力歌颂白杨树，茅盾为何不仅在开头花大篇幅描写高原让人困倦的“单调”，而且在第6段还直言它“算不得树中的好女子”？这种“抑”的手法究竟承载了怎样的审美意图与文化反思？</li>
+            <li><strong>✂️ 删改直觉实验</strong>：如果删去第7段那由“树”到“农民”、到“哨兵”、再到“精神意志”的四个反问排比句，文章将发生什么？全文将倒退为一篇普通的自然写景状物散文，托物言志的逻辑梯子被瞬间抽空，由物及人的精神升华彻底坍塌。</li>
+          </ol>
+        </div>
+
+        <div class="tint-warm">
+          <strong>本课“看世界的方法”初始猜想</strong>：从茅盾笔下学到——<strong>“在单调沉寂的地平线上捕捉拔地而起的骨气，把极普通的平凡物象透视成顶天立地的精神支柱”</strong>：拒绝以柔媚修剪生命，在粗粝苍茫的现实底色中，以专注挺拔对抗平庸虚无。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 02 · 核心词眼解码、标志句法与篇章拓扑 SVG -->
+    <details class="guide-section" id="sec-02" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">02</span>
+          <h2 class="section-title">核心词眼解码、标志句法与篇章拓扑 SVG</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">核心词眼与语义场辨析表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">核心词语</th>
+              <th style="width: 27%;">表层语境义 vs 潜台词</th>
+              <th style="width: 27%;">修辞机制（语言听诊器）</th>
+              <th style="width: 28%;">考点与人物/主题功能</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>坦荡如砥</strong> vs <strong>倔强挺立</strong></td>
+              <td>“平坦得像磨刀石”的大地，与垂直冲天的白杨形成强烈视觉冲突。</td>
+              <td><strong>空间张力修辞</strong>。绝对平展的二维地平线，反衬出三维垂直立柱拔地而起的惊人爆发力。</td>
+              <td>以高原的辽阔空旷为舞台，托出白杨树顶天立地的英雄气概。</td>
+            </tr>
+            <tr>
+              <td><strong>恹恹欲睡</strong> vs <strong>惊醒/惊叹</strong></td>
+              <td>由长久单调引起的精神疲钝，被眼前突现的绿色屏障瞬间劈开。</td>
+              <td><strong>心理节奏突转</strong>。“潜滋暗长”写心理疲倦之慢，“猛抬头”写视觉冲击之骤，形成心理势能的断裂反弹。</td>
+              <td>欲扬先抑的经典范式，白杨树的出现扮演了“解救审美窒息”的精神拯救者。</td>
+            </tr>
+            <tr>
+              <td><strong>旁逸斜出</strong> vs <strong>紧紧靠拢</strong></td>
+              <td>树枝绝不向旁斜伸，而是枝枝叶叶紧紧依傍主干向上。</td>
+              <td><strong>伦理象征隐喻</strong>。自然树枝的收束与向上，隐喻抗战军民铁一般的组织纪律性与团结意志。</td>
+              <td>严拒旁逸象征拒绝诱惑与涣散，紧紧靠拢象征全民族抵御外侮的精诚团结。</td>
+            </tr>
+            <tr>
+              <td><strong>婆娑/虬枝</strong> vs <strong>伟岸/力争上游</strong></td>
+              <td>婀娜舒展的姿态、屈曲盘旋的枝条；对比魁梧正直、向上奋进的气质。</td>
+              <td><strong>审美范式颠覆</strong>。否定封建士大夫病态的“好女子/盆景”趣味，树立无产阶级现代“伟丈夫”的阳刚崇高范式。</td>
+              <td>从传统阴柔审美向现代革命阳刚美学的决裂跃迁，赋予劳动人民崇高尊严。</td>
+            </tr>
+            <tr>
+              <td><strong>纵横决荡</strong> vs <strong>贵族化楠木</strong></td>
+              <td>在广阔平原驰骋冲杀、锐不可当；对比温室中娇贵自保、看不起民众的林木。</td>
+              <td><strong>阶级政治反讽</strong>。以敌后抗日军民的勇猛血性，对照国民党反动统治者与官僚文人的偏安萎靡。</td>
+              <td>全篇托物言志的政治落点，确立人民大众创造历史的主体地位。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">标志性句法剖析：四重反问的核裂变机制</div>
+        <div class="tint-box">
+          <strong>句式递进公式</strong>：<span class="formula-tag">第1问（破物象·11字） ➔ 第2问（拟农民·37字） ➔ 第3问（升哨兵·52字） ➔ 第4问（铸意志·73字）</span><br>
+          连用四个“难道……”，否定之否定构成雷霆万钧的雄辩气势。字数逐级扩充，视野由眼前树木扩展到北方农民、敌后哨兵、再到华北平原与民族未来历史。修辞节奏如海浪叠涌，一浪高过一浪，形成不可抗拒的思想向心力。
+        </div>
+
+        <div class="sub-heading">篇章结构罗盘与情感脉搏 SVG 矢量图</div>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 720 320" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#175d7e" stop-opacity="0.08"/>
+                <stop offset="100%" stop-color="#fbf9f4" stop-opacity="0.9"/>
+              </linearGradient>
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#175d7e"/>
+                <stop offset="35%" stop-color="#56646e"/>
+                <stop offset="55%" stop-color="#15803d"/>
+                <stop offset="80%" stop-color="#c05621"/>
+                <stop offset="100%" stop-color="#b91c1c"/>
+              </linearGradient>
+              <marker id="arrowHead" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#175d7e"/>
+              </marker>
+            </defs>
+
+            <!-- 整体外框背景 -->
+            <rect x="15" y="15" width="690" height="290" rx="10" fill="url(#skyGrad)" stroke="#175d7e" stroke-width="1.2" stroke-opacity="0.25"/>
+
+            <!-- 5个阶段背景列卡片 -->
+            <!-- 阶段 1 -->
+            <rect x="25" y="30" width="125" height="180" rx="6" fill="#ffffff" fill-opacity="0.85" stroke="#175d7e" stroke-width="1"/>
+            <text x="87" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#175d7e">一·开篇与高原</text>
+            <text x="87" y="68" text-anchor="middle" font-size="10" fill="#7f8e99">（第 1-3 段）</text>
+            <text x="87" y="94" text-anchor="middle" font-size="10" fill="#1c2429">直抒胸臆定调</text>
+            <text x="87" y="112" text-anchor="middle" font-size="9.5" fill="#56646e">黄绿错综大毡子</text>
+            <text x="87" y="130" text-anchor="middle" font-size="9.5" fill="#56646e">由雄壮滑落单调</text>
+            <rect x="35" y="145" width="105" height="24" rx="4" fill="#b91c1c" fill-opacity="0.1"/>
+            <text x="87" y="161" text-anchor="middle" font-size="10" font-weight="700" fill="#b91c1c">欲扬先抑：恹恹欲睡</text>
+
+            <!-- 阶段 2 -->
+            <rect x="160" y="30" width="125" height="180" rx="6" fill="#ffffff" fill-opacity="0.85" stroke="#15803d" stroke-width="1"/>
+            <text x="222" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">二·惊见与白描</text>
+            <text x="222" y="68" text-anchor="middle" font-size="10" fill="#7f8e99">（第 4-5 段）</text>
+            <text x="222" y="94" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">猛抬头·惊醒破局</text>
+            <text x="222" y="112" text-anchor="middle" font-size="9.5" fill="#56646e">直挺挺的绿屏障</text>
+            <text x="222" y="130" text-anchor="middle" font-size="9.5" fill="#1c2429">干/枝/叶/皮白描</text>
+            <rect x="170" y="145" width="105" height="24" rx="4" fill="#15803d" fill-opacity="0.12"/>
+            <text x="222" y="161" text-anchor="middle" font-size="10" font-weight="700" fill="#15803d">力争上游·倔强挺立</text>
+
+            <!-- 阶段 3 -->
+            <rect x="295" y="30" width="125" height="180" rx="6" fill="#ffffff" fill-opacity="0.85" stroke="#175d7e" stroke-width="1"/>
+            <text x="357" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#175d7e">三·审美定性</text>
+            <text x="357" y="68" text-anchor="middle" font-size="10" fill="#7f8e99">（第 6 段）</text>
+            <text x="357" y="94" text-anchor="middle" font-size="10" fill="#b91c1c">非“树中好女子”</text>
+            <text x="357" y="112" text-anchor="middle" font-size="9.5" fill="#56646e">无婆娑姿·无虬枝</text>
+            <text x="357" y="130" text-anchor="middle" font-size="9.5" fill="#175d7e">乃“树中伟丈夫”</text>
+            <rect x="305" y="145" width="105" height="24" rx="4" fill="#175d7e" fill-opacity="0.12"/>
+            <text x="357" y="161" text-anchor="middle" font-size="10" font-weight="700" fill="#175d7e">崇高美学·阳刚革命</text>
+
+            <!-- 阶段 4 -->
+            <rect x="430" y="30" width="140" height="180" rx="6" fill="#ffffff" fill-opacity="0.9" stroke="#c05621" stroke-width="1.3"/>
+            <text x="500" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#c05621">四·四级反问跃迁</text>
+            <text x="500" y="68" text-anchor="middle" font-size="10" fill="#7f8e99">（第 7 段 · 灵魂高潮）</text>
+            <text x="500" y="94" text-anchor="middle" font-size="9.5" fill="#1c2429">① 破除纯树象视角</text>
+            <text x="500" y="112" text-anchor="middle" font-size="9.5" fill="#1c2429">② 朴质严肃·北方农民</text>
+            <text x="500" y="130" text-anchor="middle" font-size="9.5" fill="#1c2429">③ 傲然挺立·敌后哨兵</text>
+            <rect x="440" y="145" width="120" height="24" rx="4" fill="#c05621" fill-opacity="0.15"/>
+            <text x="500" y="161" text-anchor="middle" font-size="10" font-weight="700" fill="#c05621">④ 纵横决荡·民族意志</text>
+
+            <!-- 阶段 5 -->
+            <rect x="580" y="30" width="115" height="180" rx="6" fill="#ffffff" fill-opacity="0.85" stroke="#b91c1c" stroke-width="1"/>
+            <text x="637" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">五·斥楠木高呼</text>
+            <text x="637" y="68" text-anchor="middle" font-size="10" fill="#7f8e99">（第 8-9 段）</text>
+            <text x="637" y="94" text-anchor="middle" font-size="10" fill="#56646e">贵族化楠木</text>
+            <text x="637" y="112" text-anchor="middle" font-size="9.5" fill="#b91c1c">反讽顽固倒退派</text>
+            <text x="637" y="130" text-anchor="middle" font-size="9.5" fill="#175d7e">对比白杨之质朴</text>
+            <rect x="588" y="145" width="100" height="24" rx="4" fill="#175d7e" fill-opacity="0.15"/>
+            <text x="637" y="161" text-anchor="middle" font-size="10" font-weight="700" fill="#175d7e">高声礼赞·首尾闭环</text>
+
+            <!-- 情感与思想脉搏曲线（波澜壮阔的动态贝塞尔曲线） -->
+            <path d="M 40 245 C 80 230, 95 285, 120 288 C 150 290, 180 220, 222 225 C 265 230, 310 220, 357 210 C 400 200, 440 255, 495 190 C 530 145, 560 175, 637 185" 
+                  fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- 关键节点圆圈与六次“不平凡”旋律标记 -->
+            <!-- 标记 1 -->
+            <circle cx="50" cy="242" r="4.5" fill="#175d7e" stroke="#fff" stroke-width="1.5"/>
+            <text x="50" y="230" text-anchor="middle" font-size="9" font-weight="700" fill="#175d7e">①不平凡(第1段)</text>
+
+            <!-- 低谷点 -->
+            <circle cx="120" cy="288" r="4" fill="#b91c1c" stroke="#fff" stroke-width="1.5"/>
+            <text x="120" y="304" text-anchor="middle" font-size="9" fill="#b91c1c">低谷·单调欲睡</text>
+
+            <!-- 标记 2 -->
+            <circle cx="222" cy="225" r="4.5" fill="#15803d" stroke="#fff" stroke-width="1.5"/>
+            <text x="222" y="243" text-anchor="middle" font-size="9" font-weight="700" fill="#15803d">②不平凡(第4段)</text>
+
+            <!-- 标记 3 -->
+            <circle cx="357" cy="210" r="4.5" fill="#175d7e" stroke="#fff" stroke-width="1.5"/>
+            <text x="357" y="198" text-anchor="middle" font-size="9" font-weight="700" fill="#175d7e">③决非平凡(第6段)</text>
+
+            <!-- 标记 4 巅峰 -->
+            <circle cx="495" cy="190" r="5" fill="#c05621" stroke="#fff" stroke-width="1.8"/>
+            <text x="495" y="178" text-anchor="middle" font-size="9" font-weight="800" fill="#c05621">④不平凡(第7段·峰值)</text>
+
+            <!-- 标记 5 -->
+            <circle cx="590" cy="180" r="4.5" fill="#b91c1c" stroke="#fff" stroke-width="1.5"/>
+            <text x="590" y="198" text-anchor="middle" font-size="9" font-weight="700" fill="#b91c1c">⑤不平凡(第8段)</text>
+
+            <!-- 标记 6 终点闭环 -->
+            <circle cx="650" cy="185" r="4.5" fill="#175d7e" stroke="#fff" stroke-width="1.5"/>
+            <text x="650" y="210" text-anchor="middle" font-size="9" font-weight="700" fill="#175d7e">⑥高声赞美(第9段)</text>
+          </svg>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 03 · 文本显微镜与语言听诊器 -->
+    <details class="guide-section" id="sec-03">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">03</span>
+          <h2 class="section-title">文本显微镜与语言听诊器：细读批注与正反改写</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <!-- 细读 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】细读 ① · 黄土高原大景与“单调—惊醒”的欲扬先抑</span><br>
+            “汽车在望不到边际的高原上奔驰，扑入你的视野的，是黄绿错综的一条大毡子……那是平坦，高原，辽阔，无边无垠……然而同时你的心里，却不由得潜滋暗长起一股‘单调’的感觉……直到猛抬头，一座直挺挺的绿屏障……”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：宏大空间与微观心理的温差对撞。起初，色彩是“黄绿错综”，质感是“大毡子”，给人以辽阔、坦荡与雄浑之感；但随着单调景致的延展，生理与心理的双重疲惫悄然滋生，读者随作者一同坠入“恹恹欲睡”的低谷。正在此时，“猛抬头”三个极具动作爆发力的字眼骤然杀入，紧接着是一座“直挺挺的绿屏障”以不可阻挡之势横空出世，撕裂苍茫，唤醒神志。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：“潜滋暗长”精微体察了倦怠感在无知无觉中的蔓延；而“猛抬头”由闭目或垂首到蓦然抬眼的动作，形成了强烈的感知顿挫。“直挺挺”是北方口语的化用，没有任何文人骚客的雕琢饰词，却以粗粝刚硬的骨相，与大地的“平坦如砥”构成九十度垂直交叉的视觉对抗。形式主义的“陌生化”震撼由此引爆。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写/教辅套话版</strong>：汽车在西北的大高原上行驶，窗外的风景虽然很雄伟，但看久了觉得很无聊。忽然，我看见远处路边有一排白杨树长得挺笔直，绿油油的，我一下子就清醒了。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：平庸改写只是平铺直叙地汇报了行程与心情，割裂了景物与人的心理交感。原文构建了**“审美蓄能池”**：先以辽阔的雄壮托举读者，再以漫长单调压低期待，使随后的白杨树不仅仅是一株植物，而是成为打破沉闷、救赎麻木的“崇高惊雷”，蓄势愈深，破局的审美撞击力愈强。
+          </div>
+        </div>
+
+        <!-- 细读 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】细读 ② · 白杨外形“干/枝/叶/皮”的四维几何极致白描</span><br>
+            “它的干通常是丈把高，像加过人工似的，一律向上，而且紧紧靠拢，也绝不旁逸斜出；它的宽大的叶子也是片片向上……它的皮光滑而有银色的晕圈，微微发暗……那是力争上游的一种树……”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：纯净而严密的立体几何雕塑。作者如同持刀的雕塑家，从主干、枝桠、树叶到树皮依次剥离审视。所有线条都指向同一个物理矢量——“垂直向上”。树干直，树枝靠，树叶仰，树皮净，没有任何横斜冗余的枝节，通体呈现出一种高度内敛、向天奋进的紧致张力。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：绝对化副词的链条轰炸。“一律向上”、“绝不旁逸斜出”、“片片向上”，作者以不容置疑的断言句式，赋予植物生物学特征以道德意志。“绝不旁逸斜出”原本是描写树木生长，却在汉语语境中自然荡开政治伦理回响——拒绝杂念、拒绝涣散、拒绝诱惑，只有精诚团结、力争上游。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写/教辅套话版</strong>：白杨树长得非常整齐美观。它的树干很高大，树枝密密麻麻地长在一起，树叶绿葱葱的很有生机，树皮也很光滑，整体给人一种积极向上、努力进取的感觉。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：平庸改写充斥着“美观、很有生机”等空泛形容词，线条是散乱软弱的。原文采用**“概念提炼+几何规整”**的冷峻白描，不仅写其形，更借“紧紧靠拢、绝不旁逸”为后文隐喻抗战军民的铁纪律、大团结埋下了不可动摇的物质对应物（Objective Correlative）。
+          </div>
+        </div>
+
+        <!-- 细读 3 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】细读 ③ · 第七段四个反问排比句的“四阶递进”修辞风暴</span><br>
+            “难道你就只觉得它只是树？难道你就不想到它的朴质，严肃，坚强，至少也象征了北方的农民？难道你竟一点也不联想到，在敌后的广大土地上，到处有坚强不屈，就像这白杨树一样傲然挺立的守卫他们家乡的哨兵？难道你又不更远一点想到，这样枝枝叶叶靠紧团结，力求上进的白杨树，宛然象征了今天在华北平原纵横决荡，用血写出新中国历史的那种精神和意志？”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：视野与意象的四级火箭式升空。第1层（11字）打破物象表层限制；第2层（37字）由物投射到北方农民的阶级品格；第3层（52字）由劳动者跃升为荷枪实弹的敌后抗日哨兵；第4层（73字）由具象人群升华为血写新中国历史的民族精神意志。空间从眼前树干延伸至千里敌后平原，时间从当下抗战贯通至新中国的未来黎明。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：否定之否定的排比设问风暴。作者不用平和的陈述句“它不仅是树，还象征了……”，而是连用四个“难道”逼近读者的胸膛。语气从试探性反诘（“难道你就只觉得……”），逐步强化为严峻逼问（“难道你竟一点也不……”），再拓展为高瞻远瞩的号召（“难道你又不更远一点想到……”），句式由短而长，行气如长江蓄洪开闸，不可阻挡。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写/教辅套话版</strong>：白杨树不仅是一种树，它象征了北方的农民，也象征了敌后的抗日哨兵，更象征了我们在华北平原浴血奋战的民族精神和坚强意志，值得我们所有人学习。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：陈述句是单向的“告知”，读者处于被动接收状态；原文的反诘排比是灵魂的**“审问与征召”**。通过四个步步紧逼的“难道”，作者逼迫每一个读者在战火纷飞的时代面前省察自己的良知，完成了从文学审美到政治动员的崇高飞跃。
+          </div>
+        </div>
+
+        <!-- 细读 4 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】细读 ④ · 从否定“好女子”到痛斥“贵族化楠木”的阳刚转舵</span><br>
+            “它没有婆娑的姿态，没有屈曲盘旋的虬枝……好女子……伟丈夫……让那些看不起民众、贱视民众、顽固的倒退的人们去赞美贵族化的楠木……我要高声赞美白杨树！”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：双重美学与阶级对立的白刃相见。前有白杨树与文人偏爱的“婆娑好女子”划清界限，后有白杨树与官僚特权象征的“贵族化楠木”正面交锋。“看不起民众、贱视民众、顽固的倒退”三个短语如同三发炮弹，直击国统区消极抗日、积极反共的反动阶层软肋。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：短促急切的三字格与四字格交错。“婆娑”、“虬枝”带有古典声律的软媚拖沓，而“伟丈夫”、“傲然挺立”则掷地有声。“让那些……去赞美……吧，我要……”构建了无可调和的阶级决裂句式，以公开的决裂宣誓，将赞美白杨树确立为一种决不妥协的政治立场。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写/教辅套话版</strong>：白杨树虽然没有某些名贵树木长得那么优美婀娜，但它有自己的雄伟阳刚之气。那些喜欢名贵楠木的人根本不懂白杨树的价值，我更喜欢普普通通的白杨树。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：平庸改写降格为个人的园艺审美偏好；原文借**“伟丈夫 vs 婆娑态”、“白杨 vs 楠木”**的剧烈交锋，撕开了1941年中国大地上最严酷的阶级对抗与路线冲突，使一篇散文具备了现代投枪与战旗的硬核力量。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 04 · 结构罗盘与叙事/章法机制 -->
+    <details class="guide-section" id="sec-04">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">04</span>
+          <h2 class="section-title">结构罗盘与叙事机制：关系、视角与人物处境</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">结构罗盘：六次“不平凡”回环呼应的音乐节律</div>
+        <div class="tint-box">
+          <p>全文以“不平凡”为抒情线索与核心文眼，六次出现绝非机械重复，而是按照<strong>“破题定调 ➔ 抑扬蓄势 ➔ 具象白描 ➔ 灵魂升华 ➔ 阶级对抗 ➔ 首尾闭环”</strong>的螺旋上升逻辑精密运转：</p>
+          <ol class="num-list">
+            <li><strong>第 1 次（第 1 段）· 开宗明义</strong>：“白杨树实在是不平凡的，我赞美白杨树！”——没有任何前奏，破空而来，确立全篇抒情总基调。</li>
+            <li><strong>第 2 次（第 4 段）· 冲破单调</strong>：“那就是白杨树，西北极普通的一种树，然而实在是不平凡的一种树！”——历经高原单调与恹恹欲睡后的顿悟惊呼，完成“欲扬先抑”的反弹。</li>
+            <li><strong>第 3 次（第 6 段）· 形神总结</strong>：“这就是白杨树，西北极普通的一种树，然而决不是平凡的树！”——在对干、枝、叶、皮进行精密的几何白描之后，由外形跃入内在品格，从“实在是不平凡”强化为斩钉截铁的“决不是平凡”。</li>
+            <li><strong>第 4 次（第 7 段末）· 象征飞跃</strong>：“我赞美白杨树，就因为……它实在是不平凡的一种树。”——经过四个排比反问句由树到农民、哨兵、民族精神的层层推进后，在此处落定，赋予“不平凡”深厚的时代政治与精神内涵。</li>
+            <li><strong>第 5 次（第 8 段末）· 对比反诘</strong>：“白杨树是不平凡的树，它在西北极普遍……我要高声赞美白杨树！”——在与国民党反动派钟爱的“贵族化楠木”正面交锋后，再次挺拔而起。</li>
+            <li><strong>第 6 次（第 9 段）· 尾声绝唱</strong>：“让楠木去吧，我要高声赞美白杨树！”——照应开头，完成了全篇在结构上的完美闭环与文气宣泄。</li>
+          </ol>
+        </div>
+
+        <div class="sub-heading">电影镜头式的宏微推拉与空间蒙太奇</div>
+        <p>作者在文中高超地调度了视觉观察镜头，构建起极富纵深感的审美空间：</p>
+        <ul class="bullet-list">
+          <li><strong>超大远景（Extreme Long Shot）</strong>：黄土高原无边无垠，黄绿错综的大毡子，坦荡如砥。地平线横向无限铺展，制造空旷沉郁的宇宙感。</li>
+          <li><strong>中景（Medium Shot）</strong>：飞驰的车窗外，“猛抬头”看见一排直挺挺的绿色屏障，白杨树在地平线上赫然挺立，撕裂单一色调。</li>
+          <li><strong>特写与微距（Close-up & Macro）</strong>：丈把高的树干、向上靠拢的枝条、微发青色的光滑树皮、银白色的光晕圈，工笔勾勒，毫发毕现。</li>
+          <li><strong>全景意识投影（Mental Panoramic Projection）</strong>：第七段镜头瞬间拉开，投向敌后广大的黄土地，投向抗日哨兵，投向华北平原的铁血烽火与新中国历史的破晓。</li>
+        </ul>
+
+        <div class="sub-heading">核心二元对立网络与张力图谱</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">美学/社会维度</th>
+              <th style="width: 37%;">正向极点（白杨树维度）</th>
+              <th style="width: 38%;">负向极点（对照物维度）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>存在状态</strong></td>
+              <td><strong>极普通</strong>（极普遍、常见、生长在荒凉贫瘠之地）</td>
+              <td><strong>极不凡</strong>（力争上游、倔强挺立、傲然耸立）</td>
+            </tr>
+            <tr>
+              <td><strong>空间体验</strong></td>
+              <td><strong>雄壮伟大</strong>（高原坦荡、无边无垠的大地）</td>
+              <td><strong>单调厌倦</strong>（潜滋暗长的困顿、恹恹欲睡）</td>
+            </tr>
+            <tr>
+              <td><strong>审美范式</strong></td>
+              <td><strong>伟丈夫</strong>（伟岸、质朴、严肃、坚强、刚健）</td>
+              <td><strong>好女子</strong>（婆娑、屈曲盘旋、婀娜柔靡的旧趣味）</td>
+            </tr>
+            <tr>
+              <td><strong>阶级政治</strong></td>
+              <td><strong>人民大众</strong>（北方农民、抗日哨兵、纵横决荡之力量）</td>
+              <td><strong>贵族特权</strong>（贵族化楠木、看不起民众、顽固倒退派）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">抒情主体的精神图谱演进</div>
+        <div class="tint-accent">
+          茅盾在文中的抒情主体形象经历了一场深刻的精神蜕变：<br>
+          <span class="formula-tag">旅途倦怠的行者 ➔ 审美电击的觉醒者 ➔ 细致入微的审视者 ➔ 时代雷霆的动员号手</span><br>
+          他不是高高在上的说教者，而是与读者并肩坐在同一辆颠簸的汽车里。正是因为他真实地体验了高原的单调与倦怠，当他被白杨树唤醒时，那种生命力的喷薄才具有无比真实的说服力；最终痛斥楠木、赞美白杨，则是作家将个人审美同仇敌忾地融入全民族抗战烈火中的庄严宣誓。
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 05 · 意象网络、主题三层与文学微评论 -->
+    <details class="guide-section" id="sec-05">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">05</span>
+          <h2 class="section-title">意象网络、主题三层与文学微评论</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">意象网络：立体交织的象征矩阵</div>
+        <div class="tint-box">
+          <ul class="bullet-list">
+            <li><strong>基底意象 · 黄土高原</strong>：苍茫、雄浑、平坦却潜藏闭塞与单调，它不仅是西北的自然地理风貌，更是中华民族数千年农耕文明的历史积淀与抗战军民赖以依托的生存母体。</li>
+            <li><strong>核心意象 · 白杨树</strong>：笔挺如剑、力争上游、紧紧靠拢、不折不挠。它是从粗粝母体中拔节而出的脊梁，是平凡躯壳中蕴藏的崇高伟力。</li>
+            <li><strong>伴生意象 · 麦浪与大毡子</strong>：黄绿错综的色彩，象征着北方土地上蓬勃的农业生产与普通百姓繁衍不息的生机。</li>
+            <li><strong>对立意象 · 贵族化楠木</strong>：生长于南方温润之所、质地名贵的楠木，在文中被剥离了自然属性，成为居高临下、自命不凡、贪图安逸、脱离群众的官僚反动特权阶层的象征符号。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">主题三层掘进模型：告别教辅扁平标签</div>
+        <div class="tint-box">
+          <ol class="num-list">
+            <li><strong>第一层 · 表层处境（自然风物）</strong>：在广袤贫瘠的大西北黄土高原上，极普通、随处可见的白杨树以其挺拔向上的外形，打破了天地的空旷单调，展现出顽强的生物生命力。</li>
+            <li><strong>第二层 · 深层困境（时代抗战）</strong>：1941年抗日战争相持阶段，大片国土沦陷，国统区政治空气反动压抑、投降妥协暗流涌动。但在中国共产党领导下的敌后广阔战场上，千万平凡的北方农民与前线战士在艰苦卓绝的严酷环境中，凭借质朴坚强的信念挺立抗战。</li>
+            <li><strong>第三层 · 根本追问（民族文明之魂）</strong>：当一个古老文明面临生死存亡的至暗时刻，究竟靠什么战胜残酷环境、浴火重生？茅盾通过白杨树宣告：靠的绝不是躲在后方自命高贵的特权精英，而是最深扎泥土、最团结协作、最具有“纵横决荡”血性的人民大众！</li>
+          </ol>
+          <div class="formula-bar">
+            核心价值张力公式：【平民大众的质朴坚挺与抗击意志】 ⚡ 【贵族特权的虚妄修饰与偏安苟且】
+          </div>
+        </div>
+
+        <div class="sub-heading">大学中文系级“文学微评论”示范（310字）</div>
+        <div class="tint-accent">
+          <strong>《论〈白杨礼赞〉中“伟丈夫”修辞对中国传统审美范式的现代颠覆》</strong><br>
+          茅盾在《白杨礼赞》中对白杨树的定性，标志着中国现代抒情散文审美范式的一次深刻革命。传统文人托物言志，往往偏好柳丝之婆娑、梅花之孤清或盆景的“曲折盘旋”，本质上是将自然物象纳入士大夫阶层赏玩怡情、独善其身的阴柔审美系统。茅盾却决绝地宣告白杨树“算不得树中的好女子”，以“伟丈夫”这一极具现代阳刚崇高感的无产阶级主体命名之。<br>
+          通过干、枝、叶、皮“一律向上、绝不旁逸斜出”的几何硬线条，茅盾把审美目光从“文人士大夫的私密雅趣”彻底扭转为“平民力量的崇高显影”。白杨树不仅是西北风物，更是动员民族救亡的现代精神图腾——它无情撕裂了旧时代的软弱病态，在抗战烽火中立起了中国人民顶天立地的血肉风骨与刚健国格。
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 06 · 阐释边界与不确定性判断尺 -->
+    <details class="guide-section" id="sec-06">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">06</span>
+          <h2 class="section-title">阐释边界与不确定性判断尺：确定、推测与合理异读</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">诠释学循环与不确定性判断尺</div>
+        <div class="item-block">
+          <p><strong>🟢 可以确定（铁证如山 · 有原文直接证据支撑）</strong>：</p>
+          <ul class="bullet-list">
+            <li>象征手法是贯穿全文的灵魂钥匙，白杨树直接象征北方农民、敌后抗日哨兵以及华北平原用血写出新中国历史的精神意志（见课文第7段原文明确反问）。</li>
+            <li>“欲扬先抑”是行文的枢纽章法，描写高原“单调”与“恹恹欲睡”是为白杨树的拔地而起蓄积强烈的审美破局动能。</li>
+            <li>文末的“楠木”绝非单纯的树木品种比较，而是极具阶级政治针砭意味的讽刺符号，代表着鄙弃劳苦大众、妥协倒退的国民党顽固派（见课文第8段明确斥责）。</li>
+          </ul>
+        </div>
+
+        <div class="item-block">
+          <p><strong>🟡 可以推测（合理延伸 · 结合时代与心理背景的合理推导）</strong>：</p>
+          <ul class="bullet-list">
+            <li>茅盾在写高原“单调”时的窒息感，潜意识中投射了他在国统区感受到的政治白色恐怖；而白杨树傲然挺立的蓬勃生机，正是延安五个月见闻带给他的精神救赎与洗礼。</li>
+            <li>否定“好女子”的婆娑柔靡，暗含了茅盾作为“五四”文学元老，对当时文坛部分文人沉湎于感伤罗曼蒂克、脱离抗战大潮的软媚文风的深刻清算。</li>
+          </ul>
+        </div>
+
+        <div class="item-block">
+          <p><strong>🔴 警惕过度阐释（过度穿凿 · 缺乏证据的硬套）</strong>：</p>
+          <ul class="bullet-list">
+            <li>把白杨树的微观物理结构（如“丈把高”、“枝枝叶叶靠紧”）死搬硬套地索隐为某种具体的八路军正规编制或政治会议决议，严重破坏了文学象征的含蓄与自足性。</li>
+            <li>将作者对“贵族化楠木”的批判无限泛化为对所有南方植物或中国古代古典温婉美学的全盘抹杀，脱离了特定历史时期抗战救亡的战时修辞语境。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">接受视野窗：多元异读交锋</div>
+        <div class="tint-box">
+          <p><strong>异读 A · 革命现实主义政治寓言视角</strong>：</p>
+          <p>持此观点的批评家认为，《白杨礼赞》是一篇纯粹的“战时政治檄文”。每一个细节都有着严格的阶级指向：黄土高原是根据地，白杨树是工农武装，楠木是重庆官僚买办集团。散文的美学价值完全服务于政治动员与抗日反顽的斗争需要。</p>
+          <p><strong>异读 B · 生态美学与生命崇高论视角</strong>：</p>
+          <p>现代生态文艺批评学者指出，即使剥离1941年的具体政治战局，《白杨礼赞》依然具有震撼人心的普世魅力。它展现了植物在严酷荒漠环境中对抗风沙、力求向上的生命尊严，是人类在面对荒芜宇宙与命运重压时“挺立向上”的存在主义宣言。</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 07 · 知人论世、文体源流与文明思想坐标 -->
+    <details class="guide-section" id="sec-07">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">07</span>
+          <h2 class="section-title">知人论世、文体源流与文明思想坐标</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">【文学背景】知人论世：延安的阳光与重庆的阴霾</div>
+        <div class="tint-box">
+          <p><span class="badge-context">【文学背景】</span> 1940年5月，著名作家茅盾受朱德总司令诚挚邀请，从新疆经西安抵达延安。在延安的5个月时间里，他在鲁迅艺术学院讲学，亲身感受到了陕甘宁边区军民在极端匮乏的物质条件下，展现出空前纯洁的民主、平等、团结与昂扬的生命活力，这给长期生活在国统区的茅盾带来了极大的精神震撼与心灵涤荡。</p>
+          <p>同年10月，茅盾随周恩来同志转赴国民党战时陪都重庆。1941年1月，国民党顽固派制造了骇人听闻的“皖南事变”，掀起反共高潮，重庆政治气氛如严冬封冻，进步文化界遭到白色恐怖的残酷监控与威胁。在逼仄险恶的环境中，茅盾常常回想起延安军民的勃勃生机与大西北荒原上迎风挺拔的白杨树，激情难遏，于1941年3月隐忍挥毫，写下了这篇以托物言志破局的经典名篇。</p>
+        </div>
+
+        <div class="sub-heading">文章学与文体源流演进：从君子自适到人民史诗</div>
+        <p>中国散文有着悠久而深厚的“托物言志”传统，但茅盾的《白杨礼赞》完成了这一文体在20世纪的惊人跃迁：</p>
+        <ul class="bullet-list">
+          <li><strong>先秦屈原《橘颂》</strong>：“受命不迁，生南国兮。深固难徙，更壹志兮。”——托南方之橘，抒发楚国士大夫坚守本土、忠贞不二的独立人格。</li>
+          <li><strong>北宋周敦颐《爱莲说》</strong>：“出淤泥而不染，濯清涟而不妖。”——借莲之清逸，标榜理学文人洁身自好、远离名利的君子风骨。</li>
+          <li><strong>现代茅盾《白杨礼赞》的破体创新</strong>：彻底打碎了古典文人将物象作为“个人私德隐逸与自怜工具”的藩篱，首次将托物言志的对象转向最粗粝的西北普通乔木，寄托的主体跃迁为<strong>“人民群众的集体历史实践”</strong>。物象不再是书斋的清玩，而是战火纷飞中华夏儿女顶天立地的革命丰碑。</li>
+        </ul>
+
+        <div class="sub-heading">思想史与文艺哲学坐标</div>
+        <div class="tint-accent">
+          《白杨礼赞》是中国现代文学中<strong>“崇高（Sublime）美学”</strong>与<strong>儒家“刚健自强”传统</strong>（《易经》“天行健，君子以自强不息”）在20世纪民族救亡战火中的伟大交响。它超越了五四新文学初期感伤自怜的弱势姿态，以黄钟大吕般的语言气象，宣告了中国平民阶级作为历史主人翁登临现代历史舞台的无畏豪迈。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 08 · 比较阅读桥 -->
+    <details class="guide-section" id="sec-08">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">08</span>
+          <h2 class="section-title">比较阅读桥：同题异构与群文联读矩阵</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">经典托物言志名篇深度比读矩阵</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">篇目 / 作者</th>
+              <th style="width: 20%;">核心物象与环境</th>
+              <th style="width: 22%;">象征所指 / 主题内核</th>
+              <th style="width: 20%;">美学范式与修辞</th>
+              <th style="width: 20%;">读写转换启示</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>《白杨礼赞》</strong><br>茅盾（现代）</td>
+              <td>西北荒原白杨树<br>（黄绿错综、贫瘠单调）</td>
+              <td>北方抗日军民、质朴坚强的民族精神与新中国意志。</td>
+              <td><strong>崇高阳刚</strong><br>欲扬先抑、四重反问叠浪、白杨与楠木对立。</td>
+              <td>从物象几何线条提炼伦理品格，由物及人进行四级阶梯跃迁。</td>
+            </tr>
+            <tr>
+              <td><strong>《爱莲说》</strong><br>周敦颐（北宋）</td>
+              <td>池塘水生之莲花<br>（淤泥与清涟之间）</td>
+              <td>士大夫洁身自好、独善其身、中通外直的君子美德。</td>
+              <td><strong>清幽高洁</strong><br>菊/牡丹/莲三者映衬、正衬与反衬结合。</td>
+              <td>构建“群物对立网”，用不同物象的选择标定不同的人格价值追求。</td>
+            </tr>
+            <tr>
+              <td><strong>《紫藤萝瀑布》</strong><br>宗璞（当代）</td>
+              <td>庭院重开之紫藤花<br>（从稀落零乱到繁密辉煌）</td>
+              <td>生命的长河无止境，个体历经浩劫创伤后的治愈与新生。</td>
+              <td><strong>温婉深沉</strong><br>通感比喻、时空倒叙、花运与国运的隐秘交感。</td>
+              <td>写花开花落的微小盛衰，映射宏大历史年代的复苏与精神破茧。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">比读认知刷新：物本无言，关键在生命痛感与精神寄托</div>
+        <div class="tint-warm">
+          <p><strong>认知升级</strong>：通过比较可见，自然界的一木一花本身并无先天的善恶与思想，是作者所处的<strong>时代风云与生命痛感</strong>为物象注入了灵魂。</p>
+          <ul class="bullet-list">
+            <li>周敦颐身处北宋争名逐利的官场，故借出尘之莲守护心灵净土；</li>
+            <li>宗璞身处文革创伤初愈、弟病垂危的初春，故借瀑布般的花穗感悟生命的长河不竭；</li>
+            <li>茅盾身处民族存亡绝续、国共相持激战的烽火岁月，故借挺直向上的白杨吹响全民族抵御外侮的铁血号角！</li>
+          </ul>
+          <p><strong>写作启示</strong>：中学生进行托物言志写作时，切忌硬贴“坚强、奉献”等空洞标签，必须将物象的形态特质深深扎根于自己的真实生活困境中，才能写出真正有骨力、有温度的文字。</p>
+        </div>
+      </div>
+    </details>
+
+    <div class="part-divider">下篇 · 读写结合、素材炼金与创造行动</div>
+
+    <!-- 栏目 09 · 五维金句解码与情境化阶梯仿写支架 -->
+    <details class="guide-section" id="sec-09" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">09</span>
+          <h2 class="section-title">五维金句解码与情境化阶梯仿写支架</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <!-- 金句 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】金句 ① · 🌿 景造氛围（苍茫空间与极简色彩）</span><br>
+            “汽车在望不到边际的高原上奔驰，扑入你的视野的，是黄绿错综的一条大毡子……那是平坦，高原，辽阔，无边无垠……”
+          </div>
+          <p><strong>📐 技法与句法骨架解剖</strong>：<span class="formula-tag">[移动载具A] 在 [广袤空间容器B] 疾驰，扑入视野的，是 [双色质感复合的名词性物象C]……那是 [单音节/双音节极简概念词层叠推进D]</span>。用长句制造流动视线，紧接一连串无连词的短语点刹，营造雄浑壮阔的苍茫底色。</p>
+          <div class="tint-box">
+            <strong>🎯 情境化阶梯仿写任务</strong>：<br>
+            <strong>🏠 迁移生活情境</strong>：冬日清晨搭乘城际列车穿行北方原野，或晚自习后站在天台俯瞰车流交织的工业城区。<br>
+            <strong>🧩 可替换填空支架</strong>：列车在__________的长夜里疾驰，扑入眼帘的，是__________的一袭__________；那是__________，__________，__________，__________。<br>
+            <strong>⚠️ 避坑指南</strong>：切忌使用滥俗华丽词藻（如“美丽如画”、“绚丽多彩”）；后面的极简词必须从具象物理感受逐步上升为心理概念，不可同义词死循环。<br>
+            <strong>✨ 高分仿写示范（导师下水文）</strong>：列车在望不到尽头的北方原野上疾驰，扑入车窗的，是铁灰与枯草暗黄交织的一袭粗布；那是空旷，严寒，沉寂，无边无际。（点评：以“铁灰与枯黄粗布”定调北方冬日的大地肌理，冷硬而厚重）。
+          </div>
+        </div>
+
+        <!-- 金句 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】金句 ② · 👤 人立形象（几何线条与精神内敛）</span><br>
+            “它的干通常是丈把高，像加过人工似的，一律向上，而且紧紧靠拢，也绝不旁逸斜出；它的宽大的叶子也是片片向上……”
+          </div>
+          <p><strong>📐 技法与句法骨架解剖</strong>：<span class="formula-tag">[观察核心部位A] 是 [客观物理规格B]，[限定副词C] 一律 [方向动词D]，而且 [紧密程度描写E]，绝不 [偏离核心航向的行为F]</span>。以冷峻的几何向量剥离杂质，将外在生物学特征纯化为具有极高辨识度的精神意志。</p>
+          <div class="tint-box">
+            <strong>🎯 情境化阶梯仿写任务</strong>：<br>
+            <strong>🏠 迁移生活情境</strong>：中考/高考备考教室内埋头刷题的学子群像，或工厂老钳工手持锉刀时的专注姿态。<br>
+            <strong>🧩 可替换填空支架</strong>：他们的__________通常是__________，像__________似的，一律__________，而且__________，也绝不__________；他们手中的__________也是__________……<br>
+            <strong>⚠️ 避坑指南</strong>：不要写散架！必须牢牢锁定一个核心动作方向，副词“一律”、“绝不”必须呼应，形成铁纪律般的视觉压迫感。<br>
+            <strong>✨ 高分仿写示范（导师下水文）</strong>：他们的脊背通常是微躬的，像被岁月反复锻打的青铜立桩，一律向前倾注，而且纹丝不动，绝不东张西望；他们手中的钢笔也是分秒不歇，在粗糙的草稿纸上咬出沙沙的急雨。（点评：以“微躬脊背”与“绝不东张西望”写出集体备考时高度内聚的执着力量）。
+          </div>
+        </div>
+
+        <!-- 金句 3 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】金句 ③ · ⚡ 事推情节/理推逻辑（突转破局与审美唤醒）</span><br>
+            “然而刹那间，要是你猛抬头，一座直挺挺的绿屏障，——那是白杨树，西北极普通的一种树，然而实在是不平凡的一种树！”
+          </div>
+          <p><strong>📐 技法与句法骨架解剖</strong>：<span class="formula-tag">然而刹那间，要是你 [突发性动作A]，[打破平庸画面的强势意象B]，——那是 [寻常甚至卑微之物C]，然而实在是不平凡的 [庄严审美定性D]！</span>。用假设条件句制造迟滞，破折号引出平实真相，转折词“然而”完成两次升华。</p>
+          <div class="tint-box">
+            <strong>🎯 情境化阶梯仿写任务</strong>：<br>
+            <strong>🏠 迁移生活情境</strong>：在漫长迷茫的失败阴影中，突然看到街头残疾艺人沉醉拉琴的场景；或暴雨倾盆的夜里看见交警在路口指挥。<br>
+            <strong>🧩 可替换填空支架</strong>：然而刹那间，要是你__________，__________，——那是__________，__________，然而实在是不平凡的__________！<br>
+            <strong>⚠️ 避坑指南</strong>：在“然而刹那间”之前必须在文中做好漫长的沉闷或绝望铺垫，否则突转就会显得无病呻吟、缺乏重量。<br>
+            <strong>✨ 高分仿写示范（导师下水文）</strong>：然而刹那间，要是你推开那扇落满灰尘的天台铁门，一抹迎着暴烈北风猎猎翻飞的橘红，——那是高空作业的电力检修工，这城市中最平凡的一个背影，然而实在是一道令人肃然起敬的生命界碑！（点评：天台推门的动作瞬间撞开闭塞，橘红背影与界碑定性一气呵成）。
+          </div>
+        </div>
+
+        <!-- 金句 4 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】金句 ④ · 💫 情传心声（四重反问叠浪与灵魂质询）</span><br>
+            “难道你就只觉得它只是树？难道你就不想到它的朴质，严肃，坚强，至少也象征了北方的农民？难道你竟一点也不联想到……哨兵？难道你又不更远一点想到……纵横决荡……那种精神和意志？”
+          </div>
+          <p><strong>📐 技法与句法骨架解剖</strong>：<span class="formula-tag">难道你就只觉得它只是 [物理表面A]？难道你就不想到它的 [品质排比B]，至少也象征了 [基层平凡群体C]？难道你竟一点也不联想到…… [英勇坚守者群像D]？难道你又不更远一点想到…… [时代/历史大局精神E]？</span>。环环相扣，反诘递进，由浅入深，形成无可辩驳的真理向心力。</p>
+          <div class="tint-box">
+            <strong>🎯 情境化阶梯仿写任务</strong>：<br>
+            <strong>🏠 迁移生活情境</strong>：赞美父辈粗糙布满伤痕的双手，或赞美老城墙脚下被岁月磨平的青石板。<br>
+            <strong>🧩 可替换填空支架</strong>：难道你就只觉得它只是__________？难道你就不想到它的__________，至少也象征了__________？难道你竟一点也不联想到__________？难道你又不更远一点想到__________？<br>
+            <strong>⚠️ 避坑指南</strong>：四个层次必须严密递进，绝对不可平级打转，必须遵循“破物象 ➔ 拟基层 ➔ 提英模 ➔ 升精神”的逻辑阶梯。<br>
+            <strong>✨ 高分仿写示范（导师下水文）</strong>：难道你就只觉得这双手只是生满厚茧的皮肉？难道你就不想到它的粗粝、沉稳与执拗，至少也象征了田垄间年年弓背耕耘的父辈？难道你竟一点也不联想到，在大国重器的精密机床前，有千千万万双这样长年被油污浸透、在微米之间校准中国脊梁的当代工匠？难道你又不更远一点想到，这样一代代接力打磨、力透纸背的双手，宛然象征了中华民族在逆境中默默筑起历史的那种沉默巨浪？（点评：严格复刻由皮肉到父辈、工匠、再到民族巨浪的四级跃迁，气势磅礴）。
+          </div>
+        </div>
+
+        <!-- 金句 5 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】金句 ⑤ · 🔺 意升主题（两极对抗与决裂宣誓）</span><br>
+            “让那些看不起民众、贱视民众、顽固的倒退的人们去赞美贵族化的楠木……我要高声赞美白杨树！”
+          </div>
+          <p><strong>📐 技法与句法骨架解剖</strong>：<span class="formula-tag">让那些 [三个排比偏正短语指斥其非A] 的人们去 [追捧虚妄腐朽物象B] 吧……我要 [坚定意志动作C] 赞美 [质朴顽强的新生力量D]！</span>。通过鲜明的阵营划分与断然决裂，将文章主题推向无可撼动的道德与时代制高点。</p>
+          <div class="tint-box">
+            <strong>🎯 情境化阶梯仿写任务</strong>：<br>
+            <strong>🏠 迁移生活情境</strong>：考场思辨议论文收尾，批判浮躁享乐、功利钻营，歌颂脚踏实地的实干精神。<br>
+            <strong>🧩 可替换填空支架</strong>：让那些__________、__________、__________的人们去追捧__________吧……我要__________赞美__________！<br>
+            <strong>⚠️ 避坑指南</strong>：前句指斥必须痛快利落，不可拖泥带水；后句自我宣告必须如刀劈斧削，充满坚定的道德勇气。<br>
+            <strong>✨ 高分仿写示范（导师下水文）</strong>：让那些追逐虚名、逢迎流量、在温室里精巧弄姿的人们去赞美镀金的塑料花吧，鄙视它的空虚与娇贵；我要敞开胸膛，高声赞美那些在泥沼里赤足跋涉、以粗粝肉身丈量大地的开荒者！（点评：以“镀金塑料花”反衬“赤足开荒者”，两军对垒，掷地有声）。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 10 · 作文素材炼金炉与高阶立意库 -->
+    <details class="guide-section" id="sec-10" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">10</span>
+          <h2 class="section-title">作文素材炼金炉与高阶立意库</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">三大高阶思想立意提炼术（告别陈词滥调）</div>
+        <div class="tint-box">
+          <ul class="bullet-list">
+            <li><strong>立意 ① · 粗粝底色上的立定向上（平凡中的崇高）</strong>：<br>
+            公式：`贫瘠单调的高原环境 + 绝不旁逸的垂直拔节 = 逆境中人的神圣尊严`。<br>
+            现实落点：批判把“优渥环境”当作成功前提的娇气，赞美普通人在简陋匮乏的现实中自我扎根、向上挺立的野性生机。（适配考场母题：#平凡与崇高 #逆境突围 #生长的姿态）</li>
+            <li><strong>立意 ② · 严拒旁逸的精诚纯粹（专注自律对抗虚浮）</strong>：<br>
+            公式：`没有婆娑虬枝的诱惑 + 枝枝叶叶紧紧靠拢 = 纯粹专注的人生定力`。<br>
+            现实落点：在当下充满算法诱惑、浮华短视频与焦虑内卷的时代，学习白杨树砍掉冗余枝蔓，以“绝不旁逸斜出”的专注力，向着人生的主要方向坚韧生长。（适配考场母题：#专注与定力 #做减法的人生 #扣好第一粒扣子）</li>
+            <li><strong>立意 ③ · 冲破楠木神话的平民脊梁（打破精致利己）</strong>：<br>
+            公式：`贵族楠木的偏安虚弱 vs 白杨军民的纵横决荡 = 劳动大众是历史的真正创造者`。<br>
+            现实落点：反思社会中崇尚“高贵特权、精致利己、远离泥土”的庸俗价值观，重新确立对扎根一线、默默奉献的普通劳动者的崇高敬意。（适配考场母题：#家国情怀 #平民英雄 #脚踏实地）</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">标准化考场作文素材卡（即背即用）</div>
+
+        <!-- 素材卡 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #01 ｜【西北风雪中的倔强挺立者】</strong><br>
+            <strong>标签</strong>：<span class="formula-tag">#逆境坚守</span> <span class="formula-tag">#平凡的骨气</span> <span class="formula-tag">#向上生长</span><br>
+            <strong>100 字核能叙事精述</strong>：<br>
+            茅盾穿行苍茫单调的黄土高原，在漫无边际的萧索中偶遇直挺挺耸立的白杨树。它在风雪严寒中不折不挠，干笔直、枝靠拢、叶仰天、皮光洁，以极普通的躯壳撑起大地的雄浑。白杨不仅是一株风物乔木，更是无数扎根泥土、浴血抗争的平民英雄的化身。<br>
+            <strong>名句化用公式</strong>：化用“绝不旁逸斜出”的自律与“力争上游”的锐气。
+          </div>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入标杆示范段</strong>：<br>
+            真正的崇高往往不着华衮，它往往诞生于最粗粝的生存底色之中。正如茅盾在西北荒原上遇见的白杨树，没有婆娑之姿，没有曲折虬枝，却以“绝不旁逸斜出”的笔挺，在贫瘠的风雪中撑起一片天地。现实中那些扎根乡村的教师、守卫边防的战士，何尝不是人间的白杨？他们朴质、严肃、坚强，在无人注视的旷野里紧紧靠拢，用沉默的脊梁把平凡的日子撑成了历史的丰碑。
+          </div>
+        </div>
+
+        <!-- 素材卡 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #02 ｜【打破楠木神话的平民脊梁】</strong><br>
+            <strong>标签</strong>：<span class="formula-tag">#批判虚伪特权</span> <span class="formula-tag">#实干兴邦</span> <span class="formula-tag">#平民力量</span><br>
+            <strong>100 字核能叙事精述</strong>：<br>
+            面对国民党反动势力的妥协倒退与国统区贵族文人的虚饰偏安，茅盾以白杨树与楠木展开鲜明对决。楠木居高临下、自命名贵，却脱离民众、软弱萎靡；白杨树扎根风雪、质朴无华，却纵横决荡。作者借高声礼赞白杨，打破了上层精英的神话，宣告唯有泥土中的实干者才是历史的真正开拓者。<br>
+            <strong>名句化用公式</strong>：弃绝“贵族化的楠木”，礼赞“纵横决荡的骨血”。
+          </div>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入标杆示范段</strong>：<br>
+            历史的风云激荡总会剥落那些浮华的油彩。那些如同“贵族化楠木”般自矜身价、偏安自保的看客，终将在时代的巨浪中被抛弃；唯有像白杨树一样植根大地、在风雪中力争上游的实干者，才能铸就真正的民族骨血。当一个时代的青年不再艳羡温室中雕琢的盆景，而是选择扎根现实泥土、向阳而生，那些看似微小的平民微光，终将汇聚成重塑未来的磅礴伟力。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 11 · 万能写作模型与读写映射总纲 -->
+    <details class="guide-section" id="sec-11">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">11</span>
+          <h2 class="section-title">万能写作模型与读写映射总纲</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">模型 ① · 托物言志四级跃迁模型</div>
+        <div class="tint-box">
+          <p><strong>1. 结构公式</strong>：<br>
+          <span class="formula-tag">【物象外形特写】（干枝叶皮几何特征 · 占20%） ➔ 【品质拟人提纯】（剥离植物性命名品德 · 占20%） ➔ 【基层群像映射】（投射到特定劳动者与奋斗者 · 占30%） ➔ 【时代精神升华】（提升为全民族文明图腾 · 占30%）</span></p>
+          <p><strong>2. 课文原型精准对应</strong>：<br>
+          第5段白描干/枝/叶/皮向上 ➔ 第6段提炼“伟丈夫”与倔强挺立 ➔ 第7段前两问投射北方农民与敌后哨兵 ➔ 第7段后两问升华到华北平原纵横决荡的新中国意志。</p>
+          <p><strong>3. 适用考场题型</strong>：散文、托物言志记叙文（如《那一株草》《路口的指路石》《老街的长条凳》）。</p>
+          <p><strong>4. 全新作文题移植大纲示范（题目：《一盏旧马灯》）</strong>：<br>
+          - 环节 A：特写老马灯生锈斑驳的铁皮罩、微黄聚拢的棉线灯芯与抗风结构；<br>
+          - 环节 B：提炼其“耐受严寒、不避风雨、聚拢光明”的质朴与笃定品格；<br>
+          - 环节 C：由灯投射到几十年来扎根深山老林、手持马灯夜探地质矿脉的父辈地质队员；<br>
+          - 环节 D：升华为新中国工业从一穷二白中破茧腾飞、默默照亮复兴之路的代际担当。</p>
+          <p><strong>5. 避坑清单</strong>：切忌四级之间生硬“跳级”，物理属性必须与人格隐喻严密同构（如铁皮耐寒对应意志坚强，灯芯聚拢对应精诚专注）。</p>
+        </div>
+
+        <div class="sub-heading">模型 ② · 欲扬先抑破局反弹模型</div>
+        <div class="tint-box">
+          <p><strong>1. 结构公式</strong>：<br>
+          <span class="formula-tag">【平淡漫长铺展】（制造审美疲劳与心理低谷 · 占30%） ➔ 【强力焦点破局】（骤然动作撕裂沉闷 · 占15%） ➔ 【形神深度赋能】（精描细刻充沛生命力 · 占30%） ➔ 【排比反诘定音】（情感冲顶拔高立意 · 占25%）</span></p>
+          <p><strong>2. 课文原型精准对应</strong>：<br>
+          第2-3段黄土高原车行的“单调”与“恹恹欲睡” ➔ 第4段“刹那间猛抬头”的绿屏障破局 ➔ 第5段干枝叶皮力争上游的白描 ➔ 第7段四个反问句的情感喷薄。</p>
+          <p><strong>3. 适用考场题型</strong>：记叙文成长突转、写人散文（如《走过那段迷茫》《拐弯处的微光》《那一刻，我被震醒了》）。</p>
+        </div>
+
+        <div class="sub-heading">本课「读什么特征 ➔ 写什么技巧 ➔ 达成什么核心素养」映射总表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;">维度</th>
+              <th style="width: 28%;">文本阅读所见之“读”</th>
+              <th style="width: 29%;">考场写作迁移之“写”</th>
+              <th style="width: 28%;">达成的核心语文素养</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>立意</strong></td>
+              <td>从极普通物象中透视时代与民族的崇高意志。</td>
+              <td>拒绝平庸煽情，学会“以微显巨、以凡显圣”的思想穿透。</td>
+              <td><strong>审美鉴赏与创造</strong><br>发现平凡中的崇高</td>
+            </tr>
+            <tr>
+              <td><strong>结构</strong></td>
+              <td>欲扬先抑蓄积势能，六次“不平凡”回环呼应。</td>
+              <td>掌握抑扬反弹法与文眼回旋镖结构，文章张弛有度。</td>
+              <td><strong>思维发展与提升</strong><br>把握波澜曲折的行文构架</td>
+            </tr>
+            <tr>
+              <td><strong>细节</strong></td>
+              <td>聚焦干、枝、叶、皮的垂直向度极简白描。</td>
+              <td>学会“特征聚焦法”，用几何线条刻画对象，拒绝无用废话。</td>
+              <td><strong>语言建构与运用</strong><br>精准具象的白描锤炼</td>
+            </tr>
+            <tr>
+              <td><strong>语言</strong></td>
+              <td>四个反问排比句由短及长、句式叠浪排山倒海。</td>
+              <td>掌握“反诘排比核裂变”句式，增强议论与抒情的大气磅礴。</td>
+              <td><strong>语言建构与运用</strong><br>修辞语势的爆发力控制</td>
+            </tr>
+            <tr>
+              <td><strong>升华</strong></td>
+              <td>白杨与楠木二元对立，鄙弃特权贵族，赞颂劳动大众。</td>
+              <td>在文章末尾引入反向参照物，形成强烈对比，拔高价值站位。</td>
+              <td><strong>文化传承与理解</strong><br>树立刚健质朴的平民价值观</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 12 · 五个苏格拉底深想问题与多场景表达协作 -->
+    <details class="guide-section" id="sec-12">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">12</span>
+          <h2 class="section-title">五个苏格拉底深想问题与多场景表达协作</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">五个直击深水区的苏格拉底追问（绝无标准答案）</div>
+        <div class="tint-box">
+          <ol class="num-list">
+            <li><strong>形式张力问 · 抑的代价有多大？</strong>：<br>
+            茅盾既然要全力礼赞白杨树，为何开篇耗费近三分之一篇幅描写黄土高原的“单调”？在注意力碎片化的今天，如果一篇考场作文也花这么大比例写“枯燥无聊”，阅卷老师是否可能直接判为跑题？“欲扬先抑”的铺垫长度与情绪烈度，其安全边界究竟在哪里？<br>
+            <span class="badge-comment">【思考支架】</span>：注意茅盾写单调并不是真的“无话可说”，而是用“雄壮、伟大”先托高，再以“潜滋暗长”精细解剖心理反应，每一步都在为随后的破局蓄积势能。</li>
+
+            <li><strong>处境两难问 · “绝无旁枝”的单一性与个体发展</strong>：<br>
+            白杨树“一律向上，紧紧靠拢，绝不旁逸斜出”，在1941年全民族救亡图存的战时语境下，是精诚团结与钢铁纪律的至高崇高象征；但在和平年代与现代多元社会中，我们常常鼓励“个性发展”、“斜杠青年”与“生物多样性”。那么，我们今天该如何辩证看待“绝不旁逸”与“自由探索”之间的价值张力？<br>
+            <span class="badge-comment">【思考支架】</span>：区分“核心立场的坚定纯粹”（不被歪风邪气带偏）与“个性探索的宽广胸怀”，白杨树的启示更多在于精神底色的笃定，而非剥夺多元探索。</li>
+
+            <li><strong>核心假设挑战问 · 把植物道德化与政治化的解释限度</strong>：<br>
+            茅盾在文末将“楠木”作为批判国民党反动派、自矜高贵的讽刺靶子。但从自然植物学角度看，楠木本身木质优良、幽香沉静，亦是自然界的宝贵生灵。将一种自然物强行绑定阶级特权并予以鄙弃，这种文学修辞策略在带来强烈战斗性的同时，是否也存在将自然审美扁平化、二元对立化的内在局限？<br>
+            <span class="badge-comment">【思考支架】</span>：理解战争相持阶段特定历史语境下的“战时隐喻修辞”，文学在特定时代充当政治反抗投枪的必要性，与和平年代生态审美的适度区分。</li>
+
+            <li><strong>当代社会与 AI 时代共振问 · 在算法温室里，我们还需要白杨骨气吗？</strong>：<br>
+            当今算法时代，各种迎合人性惰性的“即时满足”、“精致利己”和“温室保护”无处不在，像白杨树那样朴质、严肃、在风霜雨雪中硬抗向上的品质，是否正被一些人视为“太累、太傻、过时”？面对充满不确定性的未来世界，算法能为我们提供答案，但能为我们提供在贫瘠现实中“纵横决荡”的血性骨气吗？<br>
+            <span class="badge-comment">【思考支架】</span>：工具越发达，人类对自身生命韧性与崇高尊严的需求反而越迫切；算法可以计算最优解，但唯有白杨般的意志才能支撑人类穿越至暗时刻。</li>
+
+            <li><strong>个体成长自省问 · 怎样度过生命中的“平原单调期”？</strong>：<br>
+            在初三或高三漫长枯燥的复习备考中，在那些日复一日、看似毫无波澜的试卷与日常里，你的生活是否也像是一片“坦荡如砥却又让人恹恹欲睡的黄土高原”？在这样的平淡甚至窒息中，你是选择随波逐流地睡去，还是能在心里为自己栽下一排笔挺向天的白杨树？<br>
+            <span class="badge-comment">【思考支架】</span>：将外部环境的单调转化为向内扎根的定力，在无人喝彩的漫长沉寂里完成力量的垂直积蓄。</li>
+          </ol>
+        </div>
+
+        <div class="sub-heading">多场景表达协作示范（同一核心证据链的三级缩放）</div>
+
+        <div class="item-block">
+          <p><strong>🎙️ 场景 ① · 30 秒课间快嘴提炼版（电梯演讲）</strong>：<br>
+          “别再把《白杨礼赞》当成老套的植物赞美诗了！茅盾最绝的是欲扬先抑的心理过山车：先用西北黄土高原无边无际的单调把你按进‘恹恹欲睡’的绝望里，紧接着用‘猛抬头’三个字像一记耳光把你扇醒——地平线上赫然挺立着一排绝无旁枝、傲然向天的白杨！四个排比反问层层轰炸，把树硬生生炼成了北方的农民、敌后的哨兵和抗战的新中国脊梁。读懂了它，你就懂了什么叫在粗粝绝境里挺起傲骨！”</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>🎙️ 场景 ② · 3 分钟课堂演讲与微课文案版</strong>：<br>
+          “各位老师、同学，大家好！如果让你选择，你想做一株温室里身价千金的楠木，还是西北荒原上一棵普通得不能再普通的白杨？<br>
+          八十多年前，身处国统区政治严寒中的茅盾先生给出了他的抉择。在《白杨礼赞》里，他没有避讳黄土高原的贫瘠与单调，甚至坦白自己看得‘恹恹欲睡’。但他真正要告诉我们的，正是崇高往往诞生于最粗粝的泥土。当他‘猛抬头’看见那直挺挺的绿屏障时，他看到了一种极致的几何美感：树干丈把高、一律向上、绝不旁逸斜出。没有婆娑柔靡的姿态，却有‘力争上游’的刚健。<br>
+          在第七段，茅盾连用四个反问句，将这株树推向了灵魂高潮：它象征了北方的农民，象征了敌后坚守的哨兵，更象征了在华北平原用血写出新中国历史的民族意志！今天我们面对繁重的学业、面对人生的迷茫，或许也会陷入‘单调与疲惫’。但请记住那株白杨——在平坦的大地上，只要你拒绝旁逸斜出的虚浮，只要你咬紧牙关向上挺立，平凡的你我，就是这个时代不可动摇的脊梁！”</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>🎙️ 场景 ③ · 深度学术研讨课/读书会开场白</strong>：<br>
+          “各位同仁，欢迎来到《白杨礼赞》深度研讨。今天我们重读这篇初二经典，需要摘掉两个刻板滤镜：第一是‘纯自然写景’的浅表审美，第二是‘政治口号贴标签’的庸俗社会学解读。请大家注意文本写作的时间锚点——1941年3月，皖南事变爆发两个月后，身在陪都重庆特务密布之下的茅盾先生。当全篇以六次回环的‘不平凡’构建起音乐般的交响，当作者用‘伟丈夫’断然否定‘好女子’的传统审美，茅盾实际上是在借西北边区蓬勃质朴的白杨树，向当时弥漫在国统区的靡靡之音与妥协投降思潮发起了一场决绝的文学宣战。我们今天的核心议题，就是拆解这种形式如何催生政治动员力量，以及在今天，我们如何将这种崇高美学转化为中学生抵抗平庸写作的利刃。”</p>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 13 · 综合创作实战、世界方法与元认知说明书 -->
+    <details class="guide-section" id="sec-13">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">13</span>
+          <h2 class="section-title">综合创作实战、世界方法与元认知说明书</h2>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">双轨实战习作命题（带脚手架与评分量规）</div>
+
+        <div class="item-block">
+          <p><strong>✍️ 任务 ① · 考场级综合大作文（600~800 字）</strong>：<br>
+          <strong>题目</strong>：《在平凡的地平线上挺立》<br>
+          <strong>写作提示与要求</strong>：<br>
+          1. 必须调用本课习得的<strong>“托物言志四级跃迁模型”</strong>或<strong>“欲扬先抑破局模型”</strong>；<br>
+          2. 文章中必须包含至少 <strong>1 处聚焦核心物象的几何白描</strong>（如干枝叶皮般的线条提炼）与 <strong>1 组排比反问递进句群</strong>；<br>
+          3. 拒绝泛泛空谈，立意须扎根于现实生活中的某个具体平凡物象或普通人群，体现由凡入圣的崇高感。<br>
+          <strong>三步构思支架</strong>：<br>
+          - 起笔：描摹一个常人觉得乏味单调的环境（如清晨寒风中灰暗的车站、深夜昏暗的自习室、老旧工厂的流水线）；<br>
+          - 发展：镜头突然聚焦于某一个被忽略的物象或身影（如生锈的铁轨、磨光的黑板擦、环卫工直挺的扫帚），运用几何白描刻画其“紧凑挺立”；<br>
+          - 升华：连用排比反问，将该物象升华为默默支撑家庭、社会运转的奉献精神，以昂扬赞美收束。</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>✍️ 任务 ② · 文学微评论写作题（300 字）</strong>：<br>
+          <strong>题目</strong>：《从“单调”到“惊醒”：论〈白杨礼赞〉中“欲扬先抑”的审美张力》<br>
+          <strong>写作结构范式</strong>：<br>
+          - 论点（40字）：开门见山指出黄土高原的单调描写是白杨树崇高美的必要审美蓄能池；<br>
+          - 证据与机制（180字）：引用“恹恹欲睡”与“猛抬头”的原文，拆解心理期待与突发视觉冲击的温差对比；<br>
+          - 边界与总结（80字）：说明若无前段单调的沉闷铺垫，白杨树的出现将沦为普通风景，失去精神惊醒的震撼力。</p>
+        </div>
+
+        <div class="sub-heading">一周现实观察微行动卡</div>
+        <div class="tint-box">
+          <strong>🔭 行动名称</strong>：街角平凡物象的“精神显影”实测<br>
+          <strong>行动任务</strong>：在上下学路上或居住社区内，寻找一个每天路过却从无人多看一眼的极平凡物体（如：小区门口生锈的减速带、路灯下的旧配电箱、修鞋匠磨得发亮的马扎凳）。<br>
+          <strong>记录清单</strong>：<br>
+          1. <strong>记录 3 个冷硬客观的物理细节</strong>（颜色、磨损痕迹、形态线条，拒绝使用主观形容词）；<br>
+          2. <strong>提炼出 1 个非比寻常的几何姿态</strong>（它是如何抗拒外界风雨重压的？）；<br>
+          3. <strong>写下一段 50 字的哲学猜想</strong>：如果这个物体有意志，它是在为谁坚守？它和生活在这个城市中的哪一类人有着同构的灵魂？
+        </div>
+
+        <div class="sub-heading">🌍 《从〈白杨礼赞〉学到的一种看世界的方法》结业说明书</div>
+        <div class="tint-accent">
+          <strong>方法名称</strong>：<strong>透视平凡物象的生命骨相法</strong><br>
+          <strong>课文原型</strong>：茅盾在西北荒原单调地平线上，穿透白杨树极普通的生物学躯壳，捕捉其“一律向上、紧紧靠拢”的刚健骨相，将其显影为抗日军民顶天立地的精神脊梁。<br>
+          <strong>核心观察动作</strong>：<br>
+          1. <strong>剥离浮华表象</strong>：拒绝被“婆娑、妖娆、高贵”等消费主义审美绑架，主动凝视那些生活在恶劣艰苦环境中的质朴事物；<br>
+          2. <strong>锁定生长矢量</strong>：在杂乱无章的世界中寻找“向上拔节”的执着线条（干、枝、叶的收束聚拢）；<br>
+          3. <strong>建立伦理同构</strong>：将物理世界的硬线条，与人类社会中默默奉献、精诚团结的平民脊梁相连接。<br>
+          <strong>适用场景与失效边界</strong>：<br>
+          - 适用：面对困境、平淡期或需要激发集体斗志与崇高信仰的时刻；<br>
+          - 失效边界：不可用于需要细腻私人情感抚慰、享受生命悠闲松弛或欣赏柔和温婉之美的生活间歇，避免陷入全盘泛政治化或道德紧绷。
+        </div>
+
+        <div class="sub-heading">🛡️ 读写元认知自我标注说明书模板（结业档案卡）</div>
+        <div class="tint-box">
+          <p><strong>学生在完成本课写作后，请复制并填写以下元认知标注表：</strong></p>
+          <ul class="bullet-list">
+            <li><strong>本次调用的分析/写作工具</strong>：<span class="formula-tag">[例：文本显微镜 / 托物言志四级跃迁模型]</span></li>
+            <li><strong>核心理论视角</strong>：<span class="formula-tag">[例：新批评张力 / 欲扬先抑修辞学]</span></li>
+            <li><strong>【文本依据】推导链</strong>：我注意到了原文的 __________ 细节，因此在写作中设计了 __________ 的转折。</li>
+            <li><strong>模型映射段落</strong>：我的习作第 ____ 段对应模型的“外形特写”，第 ____ 段对应“精神升华”。</li>
+            <li><strong>能力阶梯自评（L1~L4）</strong>：<br>
+              - L1（复述期）：只能简单机械地把物象比作某个人；<br>
+              - L2（形神期）：能写清物象的物理细节并赋予初步品格；<br>
+              - L3（递进期）：熟练运用排比反问与四级跃迁，由物及人再升华至精神；<br>
+              - L4（创造期）：能自如运用欲扬先抑与两极对比，在粗粝现实中开掘出震撼人心的崇高感，形成个人独特的精神文风。
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </details>
+
+    <footer>
+      《白杨礼赞》深度赏析与读写结合导读 · 初二上学期第四单元 · 自包含沉浸式手机阅读版<br>
+      融贯中文系学术深度与中考读写实战 · 赋能语文核心素养
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+    function focusTrack(track) {
+      document.querySelectorAll('.guide-section').forEach((d, idx) => {
+        const num = idx + 1;
+        d.open = (track === 'read') ? (num <= 8) : (num >= 9);
+      });
+      const target = document.getElementById(track === 'read' ? 'sec-01' : 'sec-09');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
+</body>
+</html>

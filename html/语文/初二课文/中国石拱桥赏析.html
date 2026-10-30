@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>《中国石拱桥》深度赏析与读写结合导读 · 茅以升</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe4;
+      --border: rgba(30, 42, 50, 0.09);
+      --border-accent: rgba(23, 93, 126, 0.35);
+      --text-main: #1c2429;
+      --text-muted: #56646e;
+      --text-soft: #7f8e99;
+      --accent: #175d7e;
+      --accent-subtle: rgba(23, 93, 126, 0.08);
+      --accent-warm: #c05621;
+      --accent-warm-subtle: rgba(192, 86, 33, 0.09);
+      --success: #15803d;
+      --danger: #b91c1c;
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #242c34;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --accent: #38bdf8;
+        --accent-subtle: rgba(56, 189, 248, 0.14);
+        --accent-warm: #fb923c;
+        --accent-warm-subtle: rgba(251, 146, 60, 0.14);
+        --success: #4ade80;
+        --danger: #f87171;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; word-break: break-word; overflow-wrap: anywhere; }
+    
+    /* 顶部 Hero */
+    .hero {
+      text-align: center;
+      padding: 20px 14px 16px;
+      margin-bottom: 10px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge-wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .hero-badge-warm {
+      background: var(--accent-warm-subtle);
+      color: var(--accent-warm);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .hero-quote {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      padding: 9px 12px;
+      border-radius: 0 6px 6px 0;
+      display: inline-block;
+      width: 100%;
+      line-height: 1.68;
+      border-left: 3px solid var(--accent-warm);
+      text-align: justify;
+    }
+    
+    /* 置顶控制工具栏 */
+    .toggle-toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-bottom: 12px;
+      padding: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .toggle-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .toggle-btn:hover { background: var(--bg-card); color: var(--text-main); }
+    .toggle-btn.btn-read { color: var(--accent); background: var(--accent-subtle); }
+    .toggle-btn.btn-write { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+
+    /* 分轨小标题 */
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* 手风琴栏目（唯一外框，内部严禁套大边框盒） */
+    .guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .section-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 12px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      list-style: none;
+      background: var(--bg-card);
+      gap: 8px;
+    }
+    .section-summary::-webkit-details-marker { display: none; }
+    .summary-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .section-idx {
+      font-family: var(--font-serif);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+    .section-idx-warm {
+      color: var(--accent-warm);
+      background: var(--accent-warm-subtle);
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+    .summary-arrow {
+      font-size: 16px;
+      color: var(--text-soft);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    details[open] > .section-summary .summary-arrow {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    details[open] > .section-summary .section-idx-warm ~ .summary-arrow,
+    details[open] > .section-summary:has(.section-idx-warm) .summary-arrow {
+      color: var(--accent-warm);
+    }
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; }
+    }
+
+    /* 内部小标题与流式块（替代嵌套边框） */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--accent-warm); font-size: 12px; }
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* 元信息紧凑网格（仅限短标签） */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+
+    /* 纯色块（无上下右边框，仅左侧3px竖线） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+      text-align: justify;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--accent-subtle); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--accent-warm-subtle); border-left: 3px solid var(--accent-warm); border-radius: 0 6px 6px 0; }
+    .tint-good { background: rgba(21, 128, 61, 0.08); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: rgba(185, 28, 28, 0.08); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 三类信息标注标签 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-right: 4px;
+      vertical-align: 1px;
+    }
+    .badge-evidence { background: var(--accent-subtle); color: var(--accent); }
+    .badge-context { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 单行公式条与等宽标签 */
+    .formula-bar {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-family: var(--font-mono);
+      overflow-x: auto;
+    }
+    .formula-tag {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--accent);
+    }
+
+    /* 满宽自适应表格 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* 内联 SVG 容器 */
+    .svg-wrap {
+      width: 100%;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 8px 4px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+
+    ul.bullet-list, ol.num-list { padding-left: 17px; margin: 6px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14.5px; margin-bottom: 5px; line-height: 1.72; }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">现代文轨 · 10 建筑科技说明文</span>
+        <span class="hero-badge hero-badge-warm">统编八年级上册 · 第五单元</span>
+        <span class="hero-badge">茅以升（1896—1989）</span>
+      </div>
+      <h1>中国石拱桥赏析</h1>
+      <p class="hero-sub">桥梁泰斗的科学诗学 · 形式优美 · 结构坚固 · 历史悠久</p>
+      <div class="hero-quote">
+        “初月出云，长虹饮涧——建筑不仅是石头与受力的物理堆叠，更是古今匠人以毫厘求真的分寸感，在江河之上筑起的文明长虹。”
+      </div>
+      <div style="margin-top: 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+        <span class="formula-tag">🔍 语言听诊器</span>
+        <span class="formula-tag">📐 说明机制罗盘</span>
+        <span class="formula-tag">⚗️ 素材炼金炉</span>
+      </div>
+    </header>
+
+    <!-- 置顶控制工具栏 -->
+    <nav class="toggle-toolbar" aria-label="导读控制栏">
+      <button class="toggle-btn" onclick="toggleAllSections(true)">展开全部</button>
+      <button class="toggle-btn" onclick="toggleAllSections(false)">收起全部</button>
+      <button class="toggle-btn btn-read" onclick="focusTrack('read')">📖 读懂篇 (01-08)</button>
+      <button class="toggle-btn btn-write" onclick="focusTrack('write')">✍️ 读写转化 (09-13)</button>
+    </nav>
+
+    <!-- 上篇：文本深读、语言听诊与说明机制 -->
+    <div class="part-divider">上篇 · 文本深读与科学批评（栏目 01-08）</div>
+
+    <!-- 栏目 01 -->
+    <details class="guide-section" id="sec-01" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">01</span>
+          <span class="section-title">课文坐标、单元定位与初读破冰</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">篇目作者</div>
+            <div class="spec-val">《中国石拱桥》茅以升</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">教材单元</div>
+            <div class="spec-val">八上第五单元（说明文）</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">细分类目</div>
+            <div class="spec-val">现代文 · 科技事物说明文</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">核心任务</div>
+            <div class="spec-val">把握对象特征与逻辑顺序</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">理论镜头</div>
+            <div class="spec-val">科学修辞学 + 结构拓扑</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">考查高频点</div>
+            <div class="spec-val">说明方法/语言准确分寸</div>
+          </div>
+        </div>
+
+        <div class="tint-bad">
+          <strong>⚠️ 审美防误读预警</strong>：切忌将本课降格为干瘪背诵“下定义、列数字、打比方”三种说明方法标签！科技说明文的最高境界不是名词术语的拼贴，而是<strong>“以科学家的求真分寸驯服语言的夸饰，以工科理性的受力骨架支撑历史的自豪”</strong>。若读不出“大约/可能/几乎/当时”副词背后的史实敬畏，读不出敞肩拱排洪减重的力学机理，就等于买椟还珠。
+        </div>
+
+        <div class="sub-heading">初读三问破冰卡（苏格拉底追问）</div>
+        <div class="tint-accent">
+          <strong>🔥 触动点：</strong>为什么全篇最生动传神的一笔，既不是宏大的数据堆砌，也不是赵州桥的神仙传说，而是卢沟桥柱头上“有的母子相抱，有的交头接耳，有的像倾听水声”的石狮子群像？——冷硬的石块在此与鲜活的人间烟火、工匠的童趣生命合体。
+        </div>
+        <div class="tint-warm">
+          <strong>❓ 反常点：</strong>既然是介绍“中国石拱桥”，作者为何不在全中国上万座古桥中泛泛列举，而偏偏只浓墨重彩剖析赵州桥与卢沟桥？两座桥在功能与结构上构成了怎样的精妙互补？
+        </div>
+        <div class="tint-box">
+          <strong>✂️ 删改直觉实验：</strong>试将“《水经注》里提到的‘旅人桥’，大约建成于公元282年，可能是有记载的最早的石拱桥了”删去“大约”与“可能”。直觉上句子更斩截有力了，但科学界碑却轰然崩塌——把未确证的文献记载当成了不容置辩的绝对真理。
+        </div>
+
+        <div class="formula-bar">
+          🌍 本课“看世界的方法”猜想：透过万物表象的奇观，穿透其内在受力与解题的系统结构；以最严谨克制的修饰语，捍卫对未知事实的敬畏。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 02 -->
+    <details class="guide-section" id="sec-02" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">02</span>
+          <span class="section-title">字词句解码、语用分寸与篇章拓扑 SVG</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">核心词眼与语用分寸解码（重点词汇与副词限定）</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 24%;">核心词句</th>
+              <th style="width: 38%;">语境深意与修辞色彩</th>
+              <th style="width: 38%;">不可替代性与科学分寸</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>雄跨</strong><br><span style="font-size:11px;color:var(--text-soft);">（动词）</span></td>
+              <td>“雄跨在洨河上”。不仅写跨度之大（37.4米），更赋予石桥顶天立地、气吞山河的拟人体态。</td>
+              <td>比“横跨”多了雄健刚劲的力量感，体现单拱无墩直跨两岸的工程魄力。</td>
+            </tr>
+            <tr>
+              <td><strong>巧妙绝伦</strong><br><span style="font-size:11px;color:var(--text-soft);">（成语）</span></td>
+              <td>“绝伦”意为独一无二、无可比拟。定性赵州桥敞肩拱与28道并列拱圈的构造智慧。</td>
+              <td>不是主观滥美，而是对隋代工匠突破世界桥梁极限构想的客观公论。</td>
+            </tr>
+            <tr>
+              <td><strong>长虹卧波</strong><br><span style="font-size:11px;color:var(--text-soft);">（成语化用）</span></td>
+              <td>化用杜牧《阿房宫赋》“长桥卧波，未云何龙”。描摹拱桥静止在水面上倒映成圆的美感。</td>
+              <td>将古典诗歌中的灵动神采转化为建筑形态美，实现文学与工程的共鸣。</td>
+            </tr>
+            <tr>
+              <td><strong>推崇</strong><br><span style="font-size:11px;color:var(--text-soft);">（动词）</span></td>
+              <td>“宋代朱熹等著名学者极为推崇它”。指给予极高的评价和尊重。</td>
+              <td>引述历代大家对古桥的评价，从文化史角度印证中国石拱桥在士人心中的精神地位。</td>
+            </tr>
+            <tr>
+              <td><strong>残损</strong><br><span style="font-size:11px;color:var(--text-soft);">（形容词/动词）</span></td>
+              <td>“桥上的石栏石柱会因风吹雨淋而残损”。指残缺、破损。</td>
+              <td>客观记录岁月痕迹，反衬出石拱桥“虽局部残损而主拱结构千年不坍”的惊人力学韧性。</td>
+            </tr>
+            <tr>
+              <td><strong>大约 / 可能</strong><br><span style="font-size:11px;color:var(--text-soft);">（副词限制）</span></td>
+              <td>修饰“旅人桥”建成年份与历史地位，保留考古与文献留白的真实状态。</td>
+              <td>严防将孤证当定论，体现科技说明文“知之为知之”的学术人格基石。</td>
+            </tr>
+            <tr>
+              <td><strong>几乎到处都有</strong><br><span style="font-size:11px;color:var(--text-soft);">（程度副词）</span></td>
+              <td>修饰石拱桥在中国的地域分布。“几乎”表绝大部分，而非绝对毫无例外。</td>
+              <td>排除大西北戈壁荒漠无水系区域，用分寸感保证了事实真确性。</td>
+            </tr>
+            <tr>
+              <td><strong>在当时可算</strong><br><span style="font-size:11px;color:var(--text-soft);">（时态修饰）</span></td>
+              <td>“在当时可算是世界上最长的石拱”。加上时间坐标与审慎推断。</td>
+              <td>防止现代读者误认为至今仍是世界最长，精准恪守历史时空坐标。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">篇章逻辑演进与双璧拓扑 SVG 矢量图</div>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="background:transparent; font-family:-apple-system,BlinkMacSystemFont,PingFang SC,sans-serif;">
+            <!-- 背景网格修饰 -->
+            <rect x="10" y="10" width="700" height="300" rx="12" fill="none" stroke="rgba(23,93,126,0.12)" stroke-width="1.5" stroke-dasharray="4 4" />
+            
+            <!-- 阶段 1：总说石拱桥普遍特征 -->
+            <g transform="translate(30, 26)">
+              <rect x="0" y="0" width="190" height="74" rx="8" fill="rgba(23,93,126,0.08)" stroke="#175d7e" stroke-width="1.5"/>
+              <text x="95" y="24" text-anchor="middle" font-size="13" font-weight="bold" fill="#175d7e">【总论】石拱桥普遍特征</text>
+              <text x="95" y="44" text-anchor="middle" font-size="11" fill="var(--text-main)">桥洞成弧形，形如卧虹</text>
+              <text x="95" y="62" text-anchor="middle" font-size="11" font-weight="bold" fill="#c05621">形式优美 · 结构坚固 · 历史悠久</text>
+            </g>
+
+            <!-- 阶段 2：过渡至中国石拱桥 -->
+            <g transform="translate(265, 26)">
+              <rect x="0" y="0" width="190" height="74" rx="8" fill="rgba(192,86,33,0.08)" stroke="#c05621" stroke-width="1.5"/>
+              <text x="95" y="24" text-anchor="middle" font-size="13" font-weight="bold" fill="#c05621">【过渡】中国石拱桥总貌</text>
+              <text x="95" y="44" text-anchor="middle" font-size="11" fill="var(--text-main)">几乎到处都有 · 历史悠久</text>
+              <text x="95" y="62" text-anchor="middle" font-size="11" fill="var(--text-muted)">《水经注》旅人桥（大约/可能）</text>
+            </g>
+
+            <!-- 箭头：总论 -> 过渡 -->
+            <path d="M 220 63 L 260 63" fill="none" stroke="#175d7e" stroke-width="2" marker-end="url(#arrow)" />
+
+            <!-- 阶段 3：分述双璧（单拱 vs 联拱） -->
+            <!-- 赵州桥 -->
+            <g transform="translate(30, 130)">
+              <rect x="0" y="0" width="315" height="102" rx="8" fill="var(--bg-card)" stroke="#175d7e" stroke-width="1.5"/>
+              <text x="16" y="24" font-size="13" font-weight="bold" fill="#175d7e">📌 典型代表①：赵州桥（单孔敞肩石拱首创）</text>
+              <text x="16" y="45" font-size="11.5" fill="var(--text-main)">• 李春设计 · 隋唐世界敞肩拱先驱（跨度37.4米）</text>
+              <text x="16" y="66" font-size="11.5" fill="#15803d">▶ 敞肩拱：大拱两肩各设两小拱（减重·排洪·节料）</text>
+              <text x="16" y="87" font-size="11.5" fill="var(--text-muted)">▶ 28道并列拱圈独立承重 + 平拱缓坡车马畅通</text>
+            </g>
+
+            <!-- 卢沟桥 -->
+            <g transform="translate(375, 130)">
+              <rect x="0" y="0" width="315" height="102" rx="8" fill="var(--bg-card)" stroke="#c05621" stroke-width="1.5"/>
+              <text x="16" y="24" font-size="13" font-weight="bold" fill="#c05621">📌 典型代表②：卢沟桥（联拱抗洪杰作）</text>
+              <text x="16" y="45" font-size="11.5" fill="var(--text-main)">• 金代修建 · 11孔联拱（长265m）· 惊涛狂澜不倒</text>
+              <text x="16" y="66" font-size="11.5" fill="#15803d">▶ 艺术审美：马可·波罗赞独一无二 · 石狮千态万状</text>
+              <text x="16" y="87" font-size="11.5" fill="var(--text-muted)">▶ 历史丰碑：七七事变全面抗战策源地（红色记忆）</text>
+            </g>
+
+            <!-- 连接线从过渡连到双桥 -->
+            <path d="M 360 100 L 360 115 L 187 115 L 187 130" fill="none" stroke="#175d7e" stroke-width="1.5" />
+            <path d="M 360 100 L 360 115 L 532 115 L 532 130" fill="none" stroke="#c05621" stroke-width="1.5" />
+
+            <!-- 阶段 4：成因溯源与现代跃迁 -->
+            <g transform="translate(30, 250)">
+              <rect x="0" y="0" width="315" height="54" rx="6" fill="rgba(21,128,61,0.08)" stroke="#15803d" stroke-width="1.2"/>
+              <text x="157" y="22" text-anchor="middle" font-size="12" font-weight="bold" fill="#15803d">【成因深挖】为什么中国石拱桥如此卓越？</text>
+              <text x="157" y="41" text-anchor="middle" font-size="11" fill="var(--text-main)">①劳动人民智慧 ②集体组织传统 ③石料丰富因地制宜</text>
+            </g>
+
+            <g transform="translate(375, 250)">
+              <rect x="0" y="0" width="315" height="54" rx="6" fill="rgba(23,93,126,0.08)" stroke="#175d7e" stroke-width="1.2"/>
+              <text x="157" y="22" text-anchor="middle" font-size="12" font-weight="bold" fill="#175d7e">【现代跃迁】社会主义建设新发展</text>
+              <text x="157" y="41" text-anchor="middle" font-size="11" fill="var(--text-main)">长虹大桥（净跨112.5m）· 双曲拱桥 · 社会主义制度优越性</text>
+            </g>
+
+            <!-- 连接下层箭头 -->
+            <path d="M 187 232 L 187 250" fill="none" stroke="#15803d" stroke-width="1.5" />
+            <path d="M 532 232 L 532 250" fill="none" stroke="#175d7e" stroke-width="1.5" />
+
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#175d7e" />
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:4px;">全篇篇章结构罗盘：由一般到个别，由古代到现代，双桥互补，因果相生。</p>
+      </div>
+    </details>
+
+    <!-- 栏目 03 -->
+    <details class="guide-section" id="sec-03">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">03</span>
+          <span class="section-title">文本显微镜与语言听诊器：细读批注与正反改写实验</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <!-- 细读 1 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点① · 科技史料引证的审慎分寸</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“《水经注》里提到的‘旅人桥’，<strong>大约</strong>建成于公元282年，<strong>可能</strong>是有记载的最早的石拱桥了。”
+          </div>
+          <p><span class="formula-tag">🔍 文本显微镜</span>：一句话连用“大约”与“可能”两个限制性副词。“大约”修饰年代，表明公元282年并非出土碑刻等一清二楚的精确断代，而是史书推算；“可能”修饰“最早”，表明历史长河中或有更早的石拱桥湮灭无闻，或有尚未发掘的古桥，只敢称“有记载的最早”。</p>
+          <p><span class="formula-tag">🩺 语言听诊器</span>：茅以升是工程科学家，他深知科学不等于拍胸脯。说明文的权威性，恰恰建立在对证据限度的敬畏之上。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“《水经注》里提到的‘旅人桥’，建成于公元282年，是有记载的最早的石拱桥。”
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>去掉了“大约”和“可能”，句子看似斩钉截铁，实则犯了学术硬伤，将推测当铁证。原文胜在以微言大义捍卫了<strong>求真品格</strong>，经得起几百年后的考古检验。
+          </div>
+        </div>
+
+        <!-- 细读 2 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点② · 敞肩拱力学与功能的合一之美</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“大拱的两肩上，各有两个小拱。这个创造性的设计，<strong>不但</strong>节约了石料，减轻了桥身的重量，<strong>而且</strong>在河水暴涨的时候，还可以增加桥洞的过水量，减轻洪水对桥身的冲击。”
+          </div>
+          <p><span class="formula-tag">🔍 文本显微镜</span>：“两肩”取自人体解剖学隐喻，将冰冷桥台人格化。“不但……而且……”递进复句精准剖析了敞肩拱的物理功能：前一层是<strong>桥身重力自身的内在化解</strong>（节省石料、减少下沉载荷），后一层是<strong>对抗外部极端水力灾害的韧性设计</strong>（排洪孔分流）。</p>
+          <p><span class="formula-tag">🩺 语言听诊器</span>：逻辑层层递进，由静载受力到动载抗洪，将千年前李春的工程构想翻译为清晰的物理力学方程式。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“大拱两边有四个小孔，这不仅好看，而且让水能流过去，桥也不会塌。”
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>平庸版用主观模糊的“好看”、“不会塌”带过；原文使用工程专业语言（“节约石料”、“减轻重量”、“增加过水量”、“减轻冲击”），因果清晰、动静结合，将科技说明文的逻辑说服力推向极致。
+          </div>
+        </div>
+
+        <!-- 细读 3 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点③ · 28道独立并列拱圈的容错韧性</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“大拱由28道拱圈拼成，就像这么多同样形状的弓合拢在一起，做成一个弧形的桥洞。<strong>每道拱圈都能独立支撑上面的重量，一道坏了，其他各道不致受到影响。</strong>”
+          </div>
+          <p><span class="formula-tag">🔍 文本显微镜</span>：“像……弓合拢在一起”运用打比方，将复杂的并联拱圈解构为中学生熟悉的弓形；而紧接着揭示出该设计最硬核的系统思想——<strong>“模块化容错机制”</strong>。局部受损不引发系统性溃散，这是千年前古人的高容错设计。</p>
+          <p><span class="formula-tag">🩺 语言听诊器</span>：短句明快，主谓结构分明，“每道……一道……其他各道……”形成严密的互锁排比，工程原理跃然纸上。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“大拱由很多石圈并排拼在一起，非常结实耐用，历经上千年都没有塌掉。”
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>原文明确指出“28道”确数，并给出“独立支撑、单损无虞”的力学机理；平庸版只剩下苍白的赞美口号，丢失了技术细节与系统思想。
+          </div>
+        </div>
+
+        <!-- 细读 4 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点④ · 摹状貌排比中的生机与秩序</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“这些石刻狮子，<strong>有的</strong>母子相抱，<strong>有的</strong>交头接耳，<strong>有的</strong>像倾听水声，<strong>有的</strong>像注视行人，千态万状，惟妙惟肖。”
+          </div>
+          <p><span class="formula-tag">🔍 文本显微镜</span>：四个“有的”排比，构成了近景特写的蒙太奇镜头：由骨肉亲情（母子相抱）到同类密语（交头接耳），由低头听河（自然声场）到抬头观人（社会众生）。石狮子从死物被点染成了卢沟桥历史沧桑的活见证。</p>
+          <p><span class="formula-tag">🩺 语言听诊器</span>：说明文不仅有冰冷的数据（长265米、宽约9米、11个石拱），亦有温润的摹状貌。这一笔为坚固的石质防御建筑注入了民族审美的温度。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“柱头上的石刻狮子雕得特别好，姿态各种各样，看起来十分逼真好看。”
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>平庸改写只有结论没有证据；原文通过四个典型具象动作的摹拟，让“千态万状、惟妙惟肖”不证自明。
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 04 -->
+    <details class="guide-section" id="sec-04">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">04</span>
+          <span class="section-title">结构罗盘与说明机制：双璧互补与逻辑推演</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">全篇宏观说明顺序与递进法则</div>
+        <ul class="bullet-list">
+          <li><strong>由一般到特殊</strong>：第1-2段介绍世界石拱桥的普遍性特征（弧形如虹、悠久坚固） → 第3段聚焦中国石拱桥的独特历史与分布 → 第4-8段降落到赵州桥与卢沟桥两个具象坐标。</li>
+          <li><strong>由概括到具体</strong>：先总括中国石拱桥“不仅形式优美，而且结构坚固”，再通过双桥的具体跨度、小拱尺寸、受力机理加以充实佐证。</li>
+          <li><strong>由古及今的时间演进</strong>：赵州桥（隋代） → 卢沟桥（金代） → 解放后长虹大桥与双曲拱桥（现代），展现出中华民族工匠血脉的断续与重光。</li>
+          <li><strong>由表象到本质的因果探求</strong>：介绍完古今名桥后，第9段水到渠成深挖“为什么能取得如此辉煌成就”的三大原因（人民智慧 → 集体组织 → 丰富石料），完成了从工程现象到文明机理的跃迁。</li>
+        </ul>
+
+        <div class="sub-heading">双璧互补模型：为何选赵州桥与卢沟桥？</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">比较维度</th>
+              <th style="width: 40%;">赵州桥（安济桥）</th>
+              <th style="width: 40%;">卢沟桥</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>结构形制</strong></td>
+              <td><strong>独拱（单孔）石拱桥杰作</strong>：一孔雄跨，世界最早敞肩拱，平拱坡缓。</td>
+              <td><strong>联拱（多孔）石拱桥杰作</strong>：11个半圆拱相联，厚墩实砌，抗大河狂汛。</td>
+            </tr>
+            <tr>
+              <td><strong>地理与功能</strong></td>
+              <td>跨越洨河，两岸山地水流湍急，追求轻灵大跨、节省石料与极速排洪。</td>
+              <td>跨越永定河，平原阔水多泥沙与特大洪峰，追求联跨延展与极强耐冲性。</td>
+            </tr>
+            <tr>
+              <td><strong>说明侧重点</strong></td>
+              <td><strong>偏重工程科学机理</strong>：四个技术特征（敞肩拱、并列拱圈、车马畅通、和谐优美）。</td>
+              <td><strong>偏重艺术审美与历史纪念</strong>：石狮摹状貌、马可·波罗记载、“七七事变”抗战丰碑。</td>
+            </tr>
+            <tr>
+              <td><strong>互补价值</strong></td>
+              <td colspan="2">两座桥一单孔一联孔，一重科学独创一重人文历史，<strong>同题异构，互为表里</strong>，穷尽了中国传统石拱桥最高维度的技术与精神光谱！</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">赵州桥四个特征的行文逻辑（主次分明）</div>
+        <div class="tint-accent">
+          茅以升介绍赵州桥四个特点绝非随意罗列，而是遵循着极为严谨的<strong>工程主次逻辑</strong>：<br>
+          ① <strong>宏观全局（全桥一大拱）</strong>：首先解决跨度与受力基础；<br>
+          ② <strong>核心独创（大拱两肩各设两小拱）</strong>：敞肩拱力学减重与排洪发明；<br>
+          ③ <strong>微观结构（28道拱圈拼成）</strong>：施工工艺与局部容错；<br>
+          ④ <strong>外部造型与雕刻（结构匀称、古朴美观）</strong>：由力学本质延伸至外在审美。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 05 -->
+    <details class="guide-section" id="sec-05">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">05</span>
+          <span class="section-title">意象网络、主题三层与科学微评论</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🕸️ 核心意象网络：“虹”的工程具象化</div>
+        <div class="tint-box">
+          <p><strong>天之虹（神话浪漫） ➔ 石之虹（力学物化） ➔ 人之虹（精神贯通）</strong></p>
+          <ul class="bullet-list">
+            <li><strong>开篇起兴：</strong>“石拱桥的桥洞成弧形，就像虹。”借大自然最纯净优美的光学奇迹，为沉重冰冷的石料赋予轻盈飘逸的生命力。</li>
+            <li><strong>唐宋引证：</strong>张嘉贞称赵州桥“制造奇特，人不知其所以为”，张𬸦赞其“初月出云，长虹饮涧”，将古典山水诗情直接嫁接于工程拱圈。</li>
+            <li><strong>现代长虹：</strong>云南“长虹大桥”净跨112.5米，象征古代石拱桥的技术基因在现代国家工业建设中重新破土飞跃。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🎯 主题三层掘进模型</div>
+        <div class="item-block">
+          <p><strong>1. 表层处境：</strong>详述中国石拱桥悠久的历史、惊人的坚固度与绝妙的形式美，以赵州桥、卢沟桥为样本科普其构造智慧。</p>
+          <p><strong>2. 深层困境：</strong>在缺乏现代微积分、材料力学公式与重工业机械的古代农耕文明中，中国工匠如何在经验、直觉与有限就地石材中，解开千年重载与百年山洪的受力困局？</p>
+          <p><strong>3. 根本追问：</strong>何为真正的“大国工匠精神”？那不是封闭固步的盲目自大，而是李春打破传统的敞肩创新，是茅以升严谨克制的求真分寸，是文明在经历战争摧残后依然屹立不倒的坚韧脊梁。</p>
+          <div class="formula-bar">
+            核心价值张力：【工程理性与力学严谨】 ⚡ 【人文温度与历史记忆】
+          </div>
+        </div>
+
+        <div class="sub-heading">📝 大学中文系级“科学微评论”示范（320字）</div>
+        <div class="tint-accent">
+          <span class="badge-comment">【工科人文微评论】</span><strong>《分寸感中的科学理性与文人心魂》</strong><br>
+          茅以升的《中国石拱桥》之所以成为现代科普说明文的不朽范本，在于他用最克制的语言完成了一场盛大的科学筑桥。面对“旅人桥”，他连用“大约”与“可能”两个轻柔却千钧的副词，对尚存争议的文献保持理性敬畏；面对赵州桥，他摒弃了民间神仙点石成桥的鬼怪奇谭，直击“敞肩拱”减重排洪的力学真谛。这种严密的论述毫不枯燥，因为工科专家的受力解析始终浸润着中国知识分子的家国深情。从唐人“长虹饮涧”的诗性审美，到卢沟桥狮群千态万状的摹状貌，再到“七七事变”抗战烽火的冷峻点穴，文章以桥为媒，将冰冷的力学计算转化为了民族文明生生不息的活水长流。这是严密求真的科学精神，亦是挺立大地的民族精神。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 06 -->
+    <details class="guide-section" id="sec-06">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">06</span>
+          <span class="section-title">阐释边界与不确定性判断尺：确定、推测与过度阐释</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">📏 诠释学循环与不确定性判断尺</div>
+        <div class="tint-good">
+          <strong>🟢 可以确定（铁证如山 · 文本与物理事实闭环）：</strong>
+          <ul class="bullet-list">
+            <li>赵州桥是隋代著名工匠李春设计建造的，距今已有1400余年历史；其敞肩拱（在主拱两肩各挖两个小拱）确实具备减轻自重和增加洪水宣泄截面的力学效能。</li>
+            <li>卢沟桥在1937年7月7日是日本帝国主义发动全面侵华战争的地点，也是中国全民族抗战的起点，具有不可替代的历史政治符号价值。</li>
+          </ul>
+        </div>
+
+        <div class="tint-warm">
+          <strong>🟡 可以推测（合理延伸 · 文本留白与文化机理）：</strong>
+          <ul class="bullet-list">
+            <li>民间关于鲁班建赵州桥、张果老倒骑毛驴压出驴蹄印的传说，反映了普通民众对这一超越时代工程奇迹的惊叹与朴素崇拜，是一种通过神话化来补偿技术认知的集体无意识。</li>
+            <li>茅以升特意提及新中国成立后修建的“长虹大桥”与“双曲拱桥”，不仅是科技演进记录，更有回应1960年代初期国家克服经济困难、自力更生进行社会主义建设的时代精神暗示。</li>
+          </ul>
+        </div>
+
+        <div class="tint-bad">
+          <strong>🔴 警惕过度阐释（教辅套话与虚妄推演）：</strong>
+          <ul class="bullet-list">
+            <li><strong>过度现代化拔高：</strong>认为隋代李春在建桥时“已经完全掌握了现代微积分与高等结构力学理论”——这是无视历史科学发展阶梯的荒谬套用；古代工匠靠的是卓越的经验累积、几何直觉与代代试错传承，硬扣现代数学模型是对历史经验的不尊重。</li>
+            <li><strong>意识形态泛政治化：</strong>过度引申“28道拱圈象征全民族28个行业大团结”等教辅式牵强附会——文中清清楚楚交代28道拱圈是出于“独立支撑、局部受损不影响整体”的施工工艺与力学独立性，切不可滑入政治象征的庸俗泥潭。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🪟 接受视野窗：科技说明文中的“情”与“理”的边界</div>
+        <div class="tint-box">
+          <strong>争议点：说明文究竟应否保留文学性描写？</strong><br>
+          • <strong>极端技术主义观点：</strong>认为科技文章应当追求绝对的客观冷峻，卢沟桥的石狮子描写（有的母子相抱、有的交头接耳）与抗日历史叙述带有过多文学情感，属于不纯粹的杂质。<br>
+          • <strong>人文科技主义观点（茅以升之范式）：</strong>科普文章的对象是普通大众与青少年，冷冰冰的数据容易形成认知壁垒。用“长虹饮涧”唤醒文化认同，用石狮百态注入生命趣味，用抗战血泪赋予建筑精神血肉，恰恰是“文理交融”的典范，使科学普及拥有了恒久的人性温度。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 07 -->
+    <details class="guide-section" id="sec-07">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">07</span>
+          <span class="section-title">知人论世、文体源流与文明思想坐标</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">【文学背景】茅以升：造桥、炸桥与复桥的悲壮大勇</div>
+        <div class="tint-warm">
+          <p><span class="badge-context">【文学背景】</span>茅以升（1896—1989），中国近代桥梁工程奠基人。1937年9月，由他主持设计、攻克钱塘江流沙与汹涌潮水、中国人自行建造的第一座大型双层公铁两用钢桥——<strong>钱塘江大桥</strong>竣工通车。然而，仅仅通车89天后，因日军逼近杭州，为了阻断侵略军南下，茅以升含泪亲手点燃了预埋在大桥各桥墩里的炸药，炸毁了心血结晶。那天晚上，他在书桌前写下八个泣血大字：<strong>“抗战必胜，此桥必复！”</strong></p>
+          <p>1946年抗战胜利后，他受命重回钱塘江，带领团队在废墟中重新修复大桥。当茅以升在1962年写下这篇《中国石拱桥》时，这位历经战火、亲手建桥又亲手炸桥的老科学家，笔下流淌的每一块坚固基石，都浸透着<strong>“科学报国、守卫山河”</strong>的生命沉淀。这不是书斋里编造的修辞，而是一个战士对民族技术脊梁的深情致敬。</p>
+        </div>
+
+        <div class="sub-heading">📜 文体源流：从古代工程笔记到现代事物说明文</div>
+        <ul class="bullet-list">
+          <li><strong>古代工匠科技笔记脉络：</strong>从先秦《考工记》的“知者创物，巧者述之”，到郦道元《水经注》的地理考实，再到北宋沈括《梦溪笔谈》、明代宋应星《天工开物》，中国古代工程记录重经验、重实操、寓理于物。</li>
+          <li><strong>现代科学说明文的立范：</strong>茅以升的《中国石拱桥》完成了从中国传统“名物训诂记述”向现代“结构功能因果说明”的伟大转型。它既传承了汉语四字成语的音韵整饬，又引入了现代工程分类学、统计数据与受力机理解剖，成为现代中文科普写作的定海神针。</li>
+        </ul>
+
+        <div class="sub-heading">🧭 思想史坐标：农耕经验直觉与实证科学理性的和鸣</div>
+        <div class="tint-box">
+          中国石拱桥展现了中国传统思想中的<strong>“天人合一”与“物尽其材”</strong>：不与河水对抗，而是化解河水冲击（敞肩拱减重泄洪）；不追求几何绝对对称的傲慢，而在28道并列拱圈中蕴藏互不干涉、共御外侮的系统自洽。茅以升以现代科学家的眼光重新审视这一文明成果，实现了传统工匠智慧在现代实证语境下的光荣受洗。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 08 -->
+    <details class="guide-section" id="sec-08">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">08</span>
+          <span class="section-title">比较阅读桥：同题异构与群文联读矩阵</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">群文比读矩阵：说明文的两种美学向度</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">对比维度</th>
+              <th style="width: 37%;">茅以升《中国石拱桥》</th>
+              <th style="width: 38%;">叶圣陶《苏州园林》</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>说明对象与特质</strong></td>
+              <td><strong>桥梁建筑工程</strong>：力学稳定、过载抗洪、结构功能至上。</td>
+              <td><strong>文人造园艺术</strong>：移步换景、虽由人作宛自天开、美学至上。</td>
+            </tr>
+            <tr>
+              <td><strong>核心说明纲领</strong></td>
+              <td>形式优美、结构坚固、历史悠久（功能与力学基底）。</td>
+              <td>“务必使游览者无论站在哪个点上，眼前总是一幅完美的图画”（图画美基底）。</td>
+            </tr>
+            <tr>
+              <td><strong>逻辑与说明方法</strong></td>
+              <td><strong>由一般到个别</strong>，解剖典型个案（赵州桥、卢沟桥），重列数字、作比较、打比方。</td>
+              <td><strong>总分结构</strong>，由四大主项到细微末节展开，多作比较、摹状貌。</td>
+            </tr>
+            <tr>
+              <td><strong>语言与气质</strong></td>
+              <td><strong>科学家的大气与严密</strong>：求真分寸，副词谨严，充满工科厚重感。</td>
+              <td><strong>文学家的雅致与精细</strong>：句调从容，注重虚实明暗与山水画理。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">与古代科学经典比读：沈括《梦溪笔谈·喻皓木经》</div>
+        <div class="tint-accent">
+          <span class="badge-comment">【群文拓展】</span>沈括记录五代名匠喻皓建开宝寺塔，“塔身微倾西北，以防千年朔风吹正”。这与《中国石拱桥》中李春在赵州桥大拱两肩凿孔以防山洪的设计异曲同工！两篇文字相隔千年，却都在阐释同一个硬核哲学：<strong>真正的伟大工程，从不狂妄对抗大自然，而是预判自然的力量，在建筑的骨骼里预先留出宣泄与消解的通道。</strong>
+        </div>
+      </div>
+    </details>
+
+    <!-- 下篇：读写结合、素材炼金与创造行动 -->
+    <div class="part-divider">下篇 · 读写结合与创作实战（栏目 09-13）</div>
+
+    <!-- 栏目 09 -->
+    <details class="guide-section" id="sec-09" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">09</span>
+          <span class="section-title">五维金句解码与情境化阶梯仿写支架</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <!-- 金句 1 -->
+        <div class="item-block">
+          <div class="sub-heading">金句① · 🌿景/物造氛围（打比方与通感生动化）</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“石拱桥的桥洞成弧形，就像虹。古代神话里说，雨后彩虹是‘人间天上的桥’，通过彩虹可以上天。我国的诗人爱把拱桥比作虹，说拱桥是‘卧虹’‘飞虹’，把水上拱桥形容为‘长虹卧波’。”
+          </div>
+          <div class="formula-bar">
+            📐 句法骨架：[核心物理特征A] + [自然通感比喻B] + 引述 [文化神话/诗文意象群C] + 提炼为 [四字古典意境词D]
+          </div>
+          <p><strong>🏠 迁移情境：</strong>描写校园清晨的林荫道、老车站的钢铁雨棚或江南水乡的乌篷船。</p>
+          <p><strong>🧩 填空支架：</strong>老街尽头的古银杏树冠亭亭如盖，就像______。民间传说里常说，老树是‘______’；文人骚客总爱把它唤作‘______’，将金黄落叶漫天飘拂的刹那定格为‘______’。</p>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文：</strong>老车站斑驳的钢铁雨棚呈幽深的鱼骨状，就像巨鲸的苍白肋骨。北方民谣里唱，铁轨是“大地未愈合的琴弦”，旅人踏着琴弦远去他乡。摄影师总爱把这穹顶唤作“时间的筛子”，把穿透锈蚀缝隙的落日余晖形容为“落日熔金的叹息”。<br>
+            <em>（点评：借意象引申与文化诗语，瞬间将破旧的火车站提升为具象的历史剧场。）</em>
+          </div>
+        </div>
+
+        <!-- 金句 2 -->
+        <div class="item-block">
+          <div class="sub-heading">金句② · ⚡理推逻辑（递进复句解构双重功能）</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“这个创造性的设计，不但节约了石料，减轻了桥身的重量，而且在河水暴涨的时候，还可以增加桥洞的过水量，减轻洪水对桥身的冲击。”
+          </div>
+          <div class="formula-bar">
+            📐 句法骨架：这个创造性的设计，不但 [内向化解A：节约/减轻内部负担]，而且在 [外部极端条件B] 的时候，还可以 [反向扩容C]，[抵抗外部冲击D]。
+          </div>
+          <p><strong>🏠 迁移情境：</strong>考场议论文分析某种学习习惯、制度设计、社会机制或心理韧性调节。</p>
+          <p><strong>🧩 填空支架：</strong>这种在日常中______的自律机制，不但______，减轻了______，而且在______的时候，还可以______，减轻______。</p>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文：</strong>这种在每周复习中“主动留白与结构整理”的习惯，不但清空了大脑内存的繁杂碎片，减轻了临考前机械死记硬背的认知过载，而且在遇到冷门压轴题的危急关头，还可以提供从容回旋的思考余量，极大减轻焦虑恐慌情绪对心理防线的冲击。<br>
+            <em>（点评：将敞肩拱的“物理排洪受力”模型，完美迁移为中学生认知心理的防崩盘机制。）</em>
+          </div>
+        </div>
+
+        <!-- 金句 3 -->
+        <div class="item-block">
+          <div class="sub-heading">金句③ · ⚡理推逻辑（副词限定的严密求真分寸）</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“《水经注》里提到的‘旅人桥’，大约建成于公元282年，可能是有记载的最早的石拱桥了。”
+          </div>
+          <div class="formula-bar">
+            📐 句法骨架：[文献/观测源A] 里提及的 [研究对象B]，[推测副词：大约/据考] 产生于 [时空坐标C]，[审慎副词：可能/几乎] 是 [范围限制：有明确记录/目前已知] 的最 [特征定性D] 了。
+          </div>
+          <p><strong>🏠 迁移情境：</strong>在科技随笔、调查报告或议论文中论证某项传统技艺或前沿发现的发轫时间。</p>
+          <p><strong>🧩 填空支架：</strong>______里记载的______，大约______于______，可能是有实物出土的______了。</p>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文：</strong>族谱秘本与方志遗篇里记载的“竹丝扣瓷”绝活，大约发轫于同治年间的蜀道深山，可能是目前国内仅存的以纯手工无胎编织瓷器的非遗孤例了。<br>
+            <em>（点评：用“大约”与“可能”守住科学判断边界，文风沉稳持重，绝无大话欺人。）</em>
+          </div>
+        </div>
+
+        <!-- 金句 4 -->
+        <div class="item-block">
+          <div class="sub-heading">金句④ · 👤人/物立形象（排比摹状貌特写群像）</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“这些石刻狮子，有的母子相抱，有的交头接耳，有的像倾听水声，有的像注视行人，千态万状，惟妙惟肖。”
+          </div>
+          <div class="formula-bar">
+            📐 句法骨架：这些 [群体对象A]，有的 [内部亲情/互动态B]，有的 [窃窃私语动态C]，有的像 [倾听自然外界D]，有的像 [凝视社会人潮E]，[四字成语一]，[四字成语二]。
+          </div>
+          <p><strong>🏠 迁移情境：</strong>晚自习教室众生相、早高峰地铁站百态、菜市场手艺人剪影。</p>
+          <p><strong>🧩 填空支架：</strong>晚自习深处的同学们，有的______，有的______，有的像______，有的像______，______，______。</p>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文：</strong>台灯幽光下的这群高三少年，有的蹙眉奋笔疾书，有的托腮低声复诵，有的像在试卷留白处倾听命运齿轮的微弱咬合，有的像在透过夜窗凝视远方不眠的万家灯火，神情各异，寂静坚毅。<br>
+            <em>（点评：四个排比层层推向精神世界，从伏案小动作跃迁至家国梦想，气韵充沛。）</em>
+          </div>
+        </div>
+
+        <!-- 金句 5 -->
+        <div class="item-block">
+          <div class="sub-heading">金句⑤ · 🔺意升主题（由物入史的文明赞颂）</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“我国石拱桥的设计施工有优良传统，这充分表现了我国劳动人民的高度智慧和优秀创造才能。”
+          </div>
+          <div class="formula-bar">
+            📐 句法骨架：[特定物象/传统领域A] 的 [实践品格B]，不仅凝结着 [历史积淀C]，更向世界深刻印证了 [文化主体D] 在 [困厄挑战E] 面前所爆发出的 [核心精神价值F]。
+          </div>
+          <p><strong>🏠 迁移情境：</strong>中考作文总结中国传统工匠智慧、航天精神或当代基建力量。</p>
+          <p><strong>🧩 填空支架：</strong>中国古建与桥梁所贯穿的______传统，不仅凝结着______，更向世人深刻印证了______。</p>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文：</strong>中华民族在江河沧海之上筑桥开路的千年求索，不仅凝结着几百代无名泥瓦匠巧借自然、化险为夷的生存智慧，更向世界深刻印证了这片土地上的人民在滔天洪流与重峦叠嶂面前，永不屈服、逢山开路的刚健脊梁。<br>
+            <em>（点评：告别空洞大口号，以“逢山开路的刚健脊梁”实化主题，铿锵有力。）</em>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 10 -->
+    <details class="guide-section" id="sec-10" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">10</span>
+          <span class="section-title">作文素材炼金炉与高阶立意库</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🔥 三大高阶思想立意提取术</div>
+        <div class="tint-warm">
+          <strong>立意方向 01：在重负与险阻处“敞肩开窍”的解题智慧</strong><br>
+          • <em>内核提炼：</em>赵州桥面对巨拱重压与山洪冲击，没有盲目加固加厚，反而在拱肩凿开四个小孔——以“空虚”化解沉重，以“留白”消解暴烈。面对人生的重负与焦虑，真正的高手懂得做减法，在看似不可能处打破成规、巧妙分流。<br>
+          • <em>适用母题：</em>#面对逆境 #巧妙化解 #创新思维 #留白的智慧
+        </div>
+
+        <div class="tint-accent">
+          <strong>立意方向 02：28道拱圈的“模块独立与同心相依”</strong><br>
+          • <em>内核提炼：</em>赵州桥大拱由28道拱圈独立拼成，每道自立受力，一道受损不祸及整体。这是对现代社会系统韧性、团队协作与个人独立人格的绝佳隐喻：个体唯有具备独当一面的专业骨力，合在一起时才能筑成不可撼动的时代飞虹。<br>
+          • <em>适用母题：</em>#独立与合作 #系统韧性 #工匠责任 #底线思维
+        </div>
+
+        <div class="tint-box">
+          <strong>立意方向 03：桥梁与脊梁——知识分子的悲壮担当</strong><br>
+          • <em>内核提炼：</em>茅以升一生建桥无数，却在民族危亡时亲手炸断钱塘江大桥，战后又在废墟上复桥。他将科学救国的赤忱融入每一座钢桥与石桥，笔下写的是桥的坚固，立起的是民族不屈的脊梁。<br>
+          • <em>适用母题：</em>#家国情怀 #抉择与担当 #科学家精神 #民族脊梁
+        </div>
+
+        <div class="sub-heading">🗂️ 2 张标准化考场作文素材卡（背诵即用）</div>
+        
+        <!-- 素材卡 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #01 ｜ 茅以升：于江河之上立起不垮的民族脊梁</strong><br>
+            <span class="formula-tag">#家国抉择</span> <span class="formula-tag">#科学家精神</span> <span class="formula-tag">#坚守与担当</span>
+            <p style="margin-top:6px;"><span class="badge-evidence">【100字核能叙事】</span>1937年，茅以升历尽艰辛建成钱塘江大桥，打破外国垄断。然而仅仅89天后，面对日寇紧逼，他毅然下令点燃桥墩炸药，含泪写下“抗战必胜，此桥必复”。新中国成立后，他再赴荒江修桥，并写下《中国石拱桥》。他亲手建桥，亲手毁桥，又亲手复桥，以一生坚守化身为中华民族最坚韧的钢铁桥墩。</p>
+            <p><span class="badge-comment">【名句化用公式】</span>以“初月出云、长虹卧波”的诗意入笔，转入“点燃炸药、铁骨铮铮”的壮烈。</p>
+            <div class="tint-accent" style="margin-top:6px;">
+              <strong>💎 150字考场议论文嵌入示范段：</strong><br>
+              真正的科学家，不仅懂得计算钢筋石料的屈服强度，更懂得在时代风暴中校准人格的精神烈度。桥梁泰斗茅以升耗尽心血铸成钱塘江大桥，却在日寇压境的危急关头，为了阻敌南侵，毅然挥泪引爆炸药，留下“抗战必胜，此桥必复”的铮铮铁骨。他深知，世上最坚固的桥梁不在江面之上，而在人心深处。肉体与砖石虽可粉碎，但一个挺直脊梁、宁为玉碎的民族，终将在这片多难兴邦的大地上，再次跨越历史长河，架起重生的万里飞虹。
+            </div>
+          </div>
+        </div>
+
+        <!-- 素材卡 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #02 ｜ 李春与赵州桥：在重负两肩凿出通江达海的孔窍</strong><br>
+            <span class="formula-tag">#巧破困局</span> <span class="formula-tag">#解题智慧</span> <span class="formula-tag">#工匠精神</span>
+            <p style="margin-top:6px;"><span class="badge-evidence">【100字核能叙事】</span>隋代大匠李春在洨河之上营造赵州桥时，面对37米巨大石拱的沉重自重与山洪肆虐，摒弃盲目增厚桥墩的笨法，在主拱两肩凿开四个空灵的小拱。这一世界首创的“敞肩拱”，既省料减重，又在暴洪来临时宣泄巨澜，让一座石桥安然挺立1400余年。</p>
+            <p><span class="badge-comment">【名句化用公式】</span>将“敞肩减重排洪”转化为“面对沉重现实做减法、留通渠”的处世智慧。</p>
+            <div class="tint-accent" style="margin-top:6px;">
+              <strong>💎 150字考场议论文嵌入示范段：</strong><br>
+              平庸者面对沉重的压力往往只会盲目增添防线，智者却懂得在看似不可撼动的壁垒两端主动开辟疏通的孔窍。正如隋代工匠李春营造赵州桥，面对千钧石拱与汹涌山洪，他不曾加筑笨重桥墩，而是在大拱两肩凿出四个精巧的小拱——既卸下了桥身自身的沉重负荷，又在暴汛来临时为狂澜让出了生命信道。人生解题亦是如此，面对沉重的逆境与负荷，与其死守顽抗，不如学会在重压的两肩凿开思考与自省的敞肩，让肆虐的风浪化作穿隙而过的清风。
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 11 -->
+    <details class="guide-section" id="sec-11">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">11</span>
+          <span class="section-title">万能写作模型与读写映射总纲</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🏛️ 万能写作模型 01：“物性解剖·四阶跃迁模型”</div>
+        <div class="tint-accent">
+          <strong>适用文体：</strong>事物/事理说明文、科技类记叙散文、文化大散文、中考说明性作文。<br>
+          <strong>结构公式：</strong><br>
+          <span class="formula-tag">① 宏观定性（20%）</span>：以诗性打比方或历史源流起笔，提炼事物的三大核心特质（如：形式/结构/历史）；<br>
+          <span class="formula-tag">② 双璧剖解（40%）</span>：选取两个具有“极差对比”或“同题异构”的典型样本，抽丝剥茧拆解核心构造与机理；<br>
+          <span class="formula-tag">③ 根因溯源（20%）</span>：跳出器物本身，深入人、地理、体制、文化底层，追问“何以如此卓越”；<br>
+          <span class="formula-tag">④ 时代回声（20%）</span>：由历史遗存跨入当代现实，展现该技艺或精神在当下的飞跃与重生。
+        </div>
+        <p><strong>🎯 考场命题移植大纲（如作文题《古巷里的旧手艺》）：</strong><br>
+        1. <strong>引子：</strong>青石板深处的老篾匠铺，竹编兼具“轻盈柔韧、朴素耐用、代代传承”之特质；<br>
+        2. <strong>双璧解剖：</strong>详写一把竹摇椅的卯榫自锁结构（力学智慧）与一只竹提篮的经纬编织（美学雕琢）；<br>
+        3. <strong>深挖根因：</strong>分析手艺人顺应竹子天然纤维的谦逊哲学与就地取材的生存智慧；<br>
+        4. <strong>时代回声：</strong>联结当代非遗工坊用竹纤维造可降解航空餐盒，古老篾香化为绿色未来的飞虹。</p>
+
+        <div class="sub-heading">🏛️ 万能写作模型 02：“精确审慎·证据链分级说理模型”</div>
+        <div class="tint-warm">
+          <strong>适用文体：</strong>思辨性议论文、学术短评、辩驳文。<br>
+          <strong>结构公式：</strong><br>
+          <span class="formula-tag">① 现象归纳</span>：指出某种普遍存在的经验事实；<br>
+          <span class="formula-tag">② 证据分级（分寸限定）</span>：严格区分“确凿事实”与“推测可能”，连用审慎副词框定边界；<br>
+          <span class="formula-tag">③ 机理穿透</span>：剖析现象背后的物理/心理因果逻辑（不但……而且……）；<br>
+          <span class="formula-tag">④ 辩证留白</span>：指出当前认知的局限性，留出敬畏与探索空间。
+        </div>
+
+        <div class="sub-heading">📊 本课读写映射总表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">读课文维度</th>
+              <th style="width: 38%;">课文卓越机制</th>
+              <th style="width: 44%;">写作可迁移技巧</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>立意与高度</strong></td>
+              <td>将石桥从冰冷土木提升为民族意志与求真理性的化身。</td>
+              <td>写物切忌停留在物，必须寻找物与时代脊梁的同频共振点。</td>
+            </tr>
+            <tr>
+              <td><strong>结构与布局</strong></td>
+              <td>由一般到特殊，双璧单联互补，四步逻辑由主到次。</td>
+              <td>典型例证切忌单一重复，要选两极互补的样本穷尽论题空间。</td>
+            </tr>
+            <tr>
+              <td><strong>细节与逻辑</strong></td>
+              <td>敞肩拱受力减重与排洪因果复句，28道拱圈容错剖析。</td>
+              <td>论述科技或事理过程时，必须把“受力/传动/因果链条”交代透彻。</td>
+            </tr>
+            <tr>
+              <td><strong>语言与修辞</strong></td>
+              <td>“大约/可能/几乎/当时”副词分寸感；打比方与排比摹状貌。</td>
+              <td>写严谨文体多用限定词避免绝对化；写特写善用“有的……有的……”镜头组合。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 12 -->
+    <details class="guide-section" id="sec-12">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">12</span>
+          <span class="section-title">五个苏格拉底深想问题与多场景表达协作</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🧠 直击深水区的五个苏格拉底追问</div>
+        <div class="item-block">
+          <p><strong>1. 语言张力问：</strong>茅以升在介绍赵州桥时引用了唐代张嘉贞“制造奇特，人不知其所以为”与宋代张𬸦“初月出云，长虹饮涧”两处古代文献。作为现代科学家的茅以升，为什么要把古人带有些许神秘与抒情色彩的词句作为证据引入严密的说明文中？这是否会削弱科学的严谨性？</p>
+          <p><em>思考切入：</em>古籍评价不仅是修辞，更是技术历史档案；它证明了在缺乏公式的古代，人们通过文学感知记录下了当时最高工程的震撼体验，达成了科学与审美的共谋。</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>2. 历史伦理两难问：</strong>1937年茅以升亲手炸毁耗尽心血的钱塘江大桥，这种“亲手毁灭自己创造的至美之物”的心境，给工程师伦理带来了怎样的灵魂冲击？当工程技术的最高成就与保家卫国的残酷现实相冲突时，何者才是文明的终极依托？</p>
+          <p><em>思考切入：</em>建筑是肉体，人民与国家是灵魂。摧毁肉体以保全灵魂，正是中国知识分子由“匠人”跃升为“国士”的精神涅槃。</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>3. 现代工程反思问：</strong>当代中国桥梁工程（港珠澳大桥、北盘江大桥）早已登顶世界之巅，我们拥有了最强大的盾构机、特种钢材与超级算法。在今天，回望赵州桥这种依靠天然石料与无名工匠手工凿刻的石桥，我们究竟在回望什么？现代过度依赖超级算法的工程，是否失落了某种工匠与泥土对话的原生韧性？</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>4. AI与算法时代共振问：</strong>在ChatGPT与大模型轻易生成万字宏论的今天，“大约”、“可能”、“据文献考证”这些体现知识不确定性与敬畏心的副词，为什么变得空前稀缺且珍贵？AI生成的流利肯定句，是否正在悄悄剥夺人类保持怀疑与求真分寸的能力？</p>
+        </div>
+
+        <div class="item-block">
+          <p><strong>5. 个人生命自省问：</strong>你的个人生活与学习计划，是一座死板僵硬的“单薄平板桥”，还是一座拥有“敞肩拱”自我减重排洪、28道“并列拱圈”局部受损不致全盘瘫痪的韧性生命之桥？当焦虑的洪水暴涨时，你预留了几个可以宣泄洪峰的小拱？</p>
+        </div>
+
+        <div class="sub-heading">🎙️ 多场景表达协作示范（同一核心观点三级缩放）</div>
+        <div class="tint-accent">
+          <strong>⚡ 30秒快嘴版（课间/电梯对话）：</strong><br>
+          “别以为《中国石拱桥》只是一篇叫你背‘列数字、打比方’的死板课文！它最酷的地方是两点：第一，李春在赵州桥两肩凿了四个小洞，既给石桥减了重，又在大水来时让洪水穿过去，这是千年前的神级物理算法；第二，大桥梁家茅以升写古代古桥，老老实实用‘大约’‘可能’，绝不瞎吹牛。懂做减法，守住分寸，这才是真正的理工男浪漫！”
+        </div>
+
+        <div class="tint-warm">
+          <strong>🎤 3分钟课堂演讲版（晨读/课前分享）：</strong><br>
+          “老师、同学们，今天我想跟大家聊聊茅以升先生笔下的赵州桥。<br>
+          大家读到第四段，往往只会记住它‘长达37.4米’这些数字。但作为一名曾经亲手炸毁钱塘江大桥的桥梁大师，茅以升眼中最震撼的，是李春在大拱两肩各设两个小拱的设计。<br>
+          设身处地想一想，如果你是隋朝的石匠，面对汹涌的洨河和沉重的石材，本能往往是‘把桥墩砌得更厚、把石头填得更实’。可李春偏偏不。他勇敢地在大拱的肩膀上凿开了孔洞！这四个孔洞，不但节约了石料、减轻了自身重负，更在滔天山洪袭来时，让狂暴的江水有了穿流而过的通道。这就是中国古人的‘敞肩哲学’——真正的大力量，不是与江水死磕硬顶，而是在自身内部为危险让出通途。<br>
+          再看茅以升先生的语言，他说‘旅人桥大约建成于公元282年，可能是有记载的最早的石拱桥’。他用了‘大约’和‘可能’，克制而庄重。这篇课文教给我们的，不仅是桥梁知识，更是一种‘勇于给生命敞肩减重、永远对事实心存敬畏’的博大智慧。谢谢大家！”
+        </div>
+
+        <div class="tint-box">
+          <strong>📚 读书会/研讨课开场白（学术深度版）：</strong><br>
+          “各位师友：重读茅以升写于1962年的《中国石拱桥》，我们面对的不仅是一份国家级的优秀科普教材，更是二十世纪中国知识分子在现代性实证科学与传统民族美学之间完成的一次深刻调谐。全篇以‘优美、坚固、悠久’三元架构立意，又以赵州桥的‘单跨敞肩’与卢沟桥的‘多孔联拱’构建了完美的同题异构样本空间。茅以升以其罕见的工程师审慎，用‘大约’‘可能’等限定修辞，将科学语言从宣传口号式的浮夸中剥离出来，重塑了科技说明文的伦理基石。今天我们研讨这篇课文，核心命题正是：在算法与算力重构万物的当代，我们该如何重拾这种‘基于物理受力、恪守证据分寸、深植家国情怀’的科学文风？让我们进入文本细节。”
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 13 -->
+    <details class="guide-section" id="sec-13">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">13</span>
+          <span class="section-title">综合创作实战、世界方法与元认知说明书</span>
+        </div>
+        <span class="summary-arrow">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">✍️ 双轨实战习作命题（带脚手架与评分量规）</div>
+        <div class="tint-accent">
+          <strong>📝 任务一：考场大作文（600-800字说明性散文或哲理议论文）</strong><br>
+          <strong>题目：</strong>《给生活开一扇“敞肩小拱”》或《一座桥的自白》（任选一题）<br>
+          <strong>写作指令：</strong><br>
+          ① 必须调用本课习得的<strong>“物性解剖·四阶跃迁模型”</strong>或<strong>“敞肩减重排洪”核心隐喻</strong>；<br>
+          ② 必须在文中展现至少两处<strong>“审慎修饰语（大约/可能/几乎）”</strong>或一组<strong>“排比摹状貌特写”</strong>；<br>
+          ③ 告别空洞喊口号，必须写出具体的内在张力与解决机制。
+        </div>
+
+        <div class="tint-warm" style="margin-top:8px;">
+          <strong>📝 任务二：学术微评论（300字左右）</strong><br>
+          <strong>题目：</strong>评析《中国石拱桥》中副词运用的科学精神与审美分寸。<br>
+          <strong>评价量规（Rubric）：</strong><br>
+          • <strong>论点锋利（30%）：</strong>明确指出限制性副词对科学真实性的护航作用；<br>
+          • <strong>证据扎实（40%）：</strong>精准提取“大约/可能/几乎/当时”两处以上原文进行细读剖析；<br>
+          • <strong>理论与升华（30%）：</strong>升华至科技文体的人格伦理与现代启示。
+        </div>
+
+        <div class="sub-heading">🔭 一周现实观察微行动卡</div>
+        <div class="tint-box">
+          <strong>【行动代号：城市的受力骨架与分寸感打卡】</strong><br>
+          1. <strong>观察对象：</strong>本周末去观察你所居住城市的一座真实桥梁（立交桥、人行天桥、古石桥或地铁跨江高架）。<br>
+          2. <strong>记录三项硬核事实：</strong><br>
+             - 它的主要受力形式是什么？（悬索、斜拉、拱圈、连续刚构？记录其桥墩或缆索特征）；<br>
+             - 它采用了怎样的“排洪/减震/容错”设计？（如橡胶支座、伸缩缝、泄水管）；<br>
+             - 仔细记录一条关于这座桥的官方介绍标牌，挑出其中使用最严谨的2个副词或修饰语。<br>
+          3. <strong>反思暂缓结论：</strong>不要轻易下“这桥真漂亮”的武断评价，尝试先用200字纯客观说明语言描述其工程机理，再写其美感。
+        </div>
+
+        <div class="sub-heading">🌍 《从〈中国石拱桥〉学到的一种看世界的方法》</div>
+        <div class="tint-good">
+          <strong>【世界方法命名】：敞肩卸荷法与分寸求真尺（Open-Spandrel Method & Precision Scale）</strong><br>
+          <ul class="bullet-list">
+            <li><strong>课文原型：</strong>赵州桥大拱两肩的四孔开窍设计 + “旅人桥大约建成于282年可能最早”的谨严修辞。</li>
+            <li><strong>核心观察动作：</strong><br>
+              ① <strong>透视受力结构：</strong>在审视任何复杂系统（一个建筑、一个组织、一份学业计划）时，首先跳出外表光鲜，寻找承载重力的核心主拱；<br>
+              ② <strong>主动敞肩卸荷：</strong>在系统压力最大的薄弱处，不盲目死拼堆料，而是主动打通容错孔道，化解阻力并分流意外冲击；<br>
+              ③ <strong>克制语言断言：</strong>在面对未完全证实的信息时，强制使用“大约、可能、基于现有记录”给事实留出边界，对武断绝对保持警惕。</li>
+            <li><strong>适用场景：</strong>应对繁重学业焦虑、分析复杂社会新闻、撰写科学报告、制定团队抗风险方案。</li>
+            <li><strong>失效边界：</strong>在需要雷厉风行、即刻止血的紧急决断时刻，过度使用推测性副词会导致行动瘫痪；敞肩孔洞的大小必须经过严密力学验算，不可无限度挖空导致主拱失稳。</li>
+            <li><strong>人类独特性：</strong>AI可以秒速输出全部数据与说明模板，但唯有人类能够体会“把炸药埋进亲手设计的桥墩”时的国士之痛，唯有人类能够在面对古桥石狮时流下敬畏岁月与匠心的热泪。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🛡️ 读写元认知自我标注说明书（结业自评量表）</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">能力维度</th>
+              <th style="width: 25%;">L1 初窥门径</th>
+              <th style="width: 25%;">L2 融会贯通</th>
+              <th style="width: 30%;">L3 炉火纯青（卓越）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>说明语言听诊</strong></td>
+              <td>能机械背出“大约/可能”表示估计和推测。</td>
+              <td>能结合原文分析删去副词后导致的科学事实失准。</td>
+              <td>在自身写作中能自如运用限制性副词，形成克制严谨的个人文风。</td>
+            </tr>
+            <tr>
+              <td><strong>结构机制透视</strong></td>
+              <td>只知道文章写了赵州桥和卢沟桥。</td>
+              <td>能讲清两座桥在“单孔 vs 联孔”及功能上的互补设计。</td>
+              <td>能熟练迁移“物性解剖·四阶跃迁模型”搭建复杂新题写作框架。</td>
+            </tr>
+            <tr>
+              <td><strong>思想立意提炼</strong></td>
+              <td>只能背诵“赞美了劳动人民的智慧”。</td>
+              <td>能结合敞肩拱受力提出“做减法以御洪流”的思辨见解。</td>
+              <td>能结合茅以升炸桥生平，写出兼具科技理性与家国担当的考场高分段。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <footer>
+      《中国石拱桥》深度赏析与读写结合单文件电子导读 · 基于中学语文核心素养与大学学术批评双轨构建
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+    function focusTrack(track) {
+      document.querySelectorAll('.guide-section').forEach((d, idx) => {
+        const num = idx + 1;
+        d.open = (track === 'read') ? (num <= 8) : (num >= 9);
+      });
+      const target = document.getElementById(track === 'read' ? 'sec-01' : 'sec-09');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+</body>
+</html>

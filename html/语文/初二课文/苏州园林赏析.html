@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>《苏州园林》深度赏析与读写结合导读 · 叶圣陶</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --border: rgba(30, 42, 50, 0.09);
+      --border-accent: rgba(23, 93, 126, 0.35);
+      --text-main: #1c2429;
+      --text-muted: #56646e;
+      --text-soft: #7f8e99;
+      --accent: #175d7e;
+      --accent-subtle: rgba(23, 93, 126, 0.08);
+      --accent-warm: #c05621;
+      --accent-warm-subtle: rgba(192, 86, 33, 0.09);
+      --success: #15803d;
+      --danger: #b91c1c;
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #242c34;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --accent: #38bdf8;
+        --accent-subtle: rgba(56, 189, 248, 0.14);
+        --accent-warm: #fb923c;
+        --accent-warm-subtle: rgba(251, 146, 60, 0.14);
+        --success: #4ade80;
+        --danger: #f87171;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; }
+
+    /* 顶部 Hero */
+    .hero {
+      text-align: center;
+      padding: 20px 14px 16px;
+      margin-bottom: 10px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge-wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .hero-badge-warm {
+      background: var(--accent-warm-subtle);
+      color: var(--accent-warm);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .hero-quote {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      padding: 9px 12px;
+      border-radius: 0 6px 6px 0;
+      display: inline-block;
+      width: 100%;
+      line-height: 1.68;
+      border-left: 3px solid var(--accent-warm);
+      text-align: justify;
+    }
+
+    /* 置顶控制工具栏 */
+    .toggle-toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-bottom: 12px;
+      padding: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .toggle-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .toggle-btn.btn-read { color: var(--accent); background: var(--accent-subtle); }
+    .toggle-btn.btn-write { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* 手风琴栏目 */
+    .guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .section-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 12px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      list-style: none;
+      background: var(--bg-card);
+      gap: 8px;
+    }
+    .section-summary::-webkit-details-marker { display: none; }
+    .summary-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .section-idx {
+      font-family: var(--font-serif);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+    .section-idx-warm {
+      color: var(--accent-warm);
+      background: var(--accent-warm-subtle);
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+    .summary-toggle-icon {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-soft);
+      transition: transform 0.25s ease;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .guide-section[open] .summary-toggle-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.78;
+      color: var(--text-main);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; }
+    }
+
+    .sub-heading {
+      font-family: var(--font-serif);
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--accent-warm); font-size: 12px; }
+
+    /* 紧凑双列/三列元数据网格 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+
+    /* 流式块（无边框，内部禁止再套边框盒） */
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 14.5px;
+    }
+    .item-block:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    /* 纯色块区分（无四周边框，内部绝不套框） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--accent-subtle); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--accent-warm-subtle); border-left: 3px solid var(--accent-warm); border-radius: 0 6px 6px 0; }
+    .tint-good { background: rgba(21, 128, 61, 0.07); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: rgba(185, 28, 28, 0.07); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--accent-subtle); color: var(--accent); }
+    .badge-context { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    .formula-tag {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--accent);
+    }
+    .formula-bar {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      padding: 8px 5px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th { background: var(--bg-subtle); font-weight: 700; color: var(--accent); }
+
+    .svg-wrap {
+      width: 100%;
+      margin: 10px 0;
+      padding: 8px 4px;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+
+    ul.bullet-list, ol.num-list { padding-left: 17px; margin: 5px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14.5px; margin-bottom: 5px; line-height: 1.72; }
+    ul.bullet-list li strong, ol.num-list li strong { color: var(--text-main); }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 600px) { .compare-grid { grid-template-columns: 1fr 1fr; } }
+    .compare-bad {
+      background: rgba(185, 28, 28, 0.06);
+      border-left: 3px solid var(--danger);
+      padding: 8px 10px;
+      border-radius: 0 5px 5px 0;
+      font-size: 13.5px;
+      color: var(--text-main);
+    }
+    .compare-good {
+      background: rgba(21, 128, 61, 0.06);
+      border-left: 3px solid var(--success);
+      padding: 8px 10px;
+      border-radius: 0 5px 5px 0;
+      font-size: 13.5px;
+      color: var(--text-main);
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">统编八上 · 第五单元</span>
+        <span class="hero-badge">现代文轨 · 10 事理说明文与美学随笔</span>
+        <span class="hero-badge hero-badge-warm">核心素养：审美建构 × 空间逻辑</span>
+      </div>
+      <h1>《苏州园林》深度赏析与读写结合导读</h1>
+      <div class="hero-sub">叶圣陶（1894—1988）· 现代著名作家、教育家、出版家</div>
+      <div class="hero-quote">
+        “务必使游览者无论站在哪个点上，眼前总是一幅完美的图画。”——从空间造物到文人诗心，破译中国园林“虽由人作，宛自天开”的至高美学密码与说明文严谨逻辑章法。
+      </div>
+    </header>
+
+    <!-- 置顶控制工具栏 -->
+    <div class="toggle-toolbar">
+      <button class="toggle-btn" onclick="toggleAll(true)">全部展开</button>
+      <button class="toggle-btn" onclick="toggleAll(false)">全部收起</button>
+      <button class="toggle-btn btn-read" onclick="filterTrack('read')">📖 读懂篇 (01-08)</button>
+      <button class="toggle-btn btn-write" onclick="filterTrack('write')">✍️ 转化篇 (09-13)</button>
+    </div>
+
+    <!-- 上篇：文本深读、语言训诂与文学批评 -->
+    <div class="part-divider">上篇 · 文本深读 · 说明逻辑与审美批评 (01-08)</div>
+
+    <!-- 栏目 01 -->
+    <details class="guide-section" id="sec-01" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">01</span>
+          <span class="section-title">课文坐标、单元定位与初读破冰</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="specs-grid">
+          <div class="spec-item"><div class="spec-label">所属教材</div><div class="spec-val">统编八上第五单元</div></div>
+          <div class="spec-item"><div class="spec-label">核心文体</div><div class="spec-val">事理说明文 / 文艺随笔</div></div>
+          <div class="spec-item"><div class="spec-label">说明对象</div><div class="spec-val">苏州园林的共同审美特征</div></div>
+          <div class="spec-item"><div class="spec-label">理论透镜</div><div class="spec-val">空间美学 + 形式主义架构</div></div>
+          <div class="spec-item"><div class="spec-label">中考考查</div><div class="spec-val">说明顺序·说明方法·语言严密性</div></div>
+          <div class="spec-item"><div class="spec-label">核心文眼</div><div class="spec-val">务必使……总是一幅完美的图画</div></div>
+        </div>
+
+        <div class="tint-bad">
+          <strong>⚠️ 审美与阅读防误读预警：</strong><br />
+          切莫把本文当作浮光掠影的“旅游风景区导游词”或“游记散文”来读！导游词重在按游览路线“移步换景”介绍具体景观名称与历史典故；而叶圣陶写的是一篇<strong>高维度的“事理说明文”</strong>。他抛开了沧浪亭、拙政园、留园、狮子林等个别景致的细枝末节，而是站在中国传统美学与建筑哲学的总源头，提炼出所有苏州园林千变万化背后的<strong>“唯一共同美学纲领”</strong>。
+        </div>
+
+        <div class="sub-heading">初读三问破冰卡（苏格拉底思维探针）</div>
+        <div class="item-block">
+          <ul class="bullet-list">
+            <li>
+              <strong>🔥 最打动人心的一处触动点：</strong><br />
+              <span class="badge-evidence">【文本依据】</span>“墙壁上有镂空的花窗，廊子大多是两边无所依傍的，实际是隔而未隔，界而未界，同时景物却变了。”<br />
+              <strong>直觉体验：</strong>看似被一堵墙挡住了视线，透过去却又别有洞天；中国古人居然在巴掌大的私家庭院里，利用一堵花墙制造出“无限深邃”的精神天地，这种虚实相生的空间魔术令人震撼。
+            </li>
+            <li>
+              <strong>❓ 最容易读滑过去的一处反常点：</strong><br />
+              <span class="badge-evidence">【文本依据】</span>“苏州园林绝不讲究对称，东边有了一个亭子或者一道回廊，西边决不会来一个同样的亭子或者一道同样的回廊。”<br />
+              <strong>深度追问：</strong>故宫、天坛、民居四合院都是森严的中轴对称，为什么同为中国古代建筑巅峰的苏州园林却<strong>“绝不讲究对称”</strong>？
+            </li>
+            <li>
+              <strong>✂️ 删改直觉实验：</strong><br />
+              如果删去第5段中的“没有修剪得像宝塔那样的松柏，没有阅兵式似的道旁树”，全篇会瞬间丧失什么？<br />
+              <strong>机制洞察：</strong>删去后就只剩普通的正面描写，恰恰是这两个生动的反面否定句，不仅以幽默笔触刺破了机械呆板的几何修剪法，更如定海神针般树立起中国传统水墨画“崇尚自然生气、反对人为拘束”的灵魂尺度！
+            </li>
+          </ul>
+        </div>
+
+        <div class="tint-accent">
+          <strong>🔭 本课看世界的方法初始猜想：</strong><br />
+          学习叶圣陶如何透过大千世界纷繁芜杂的“个别表象”，精准萃取出一套贯穿宏观全局与微观肌理的<strong>“底层美学结构系统”</strong>。从此你看房间布置、摄影构图、穿搭审美甚至人生规划，都能调用“画意、因地制宜、层次与留白”的通透法门。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 02 -->
+    <details class="guide-section" id="sec-02" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">02</span>
+          <span class="section-title">字词句解码与篇章拓扑 SVG 演进图</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">现代文核心词眼与语义场精准解码</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 28%;">核心词眼</th>
+              <th style="width: 36%;">语境义与空间美学内涵</th>
+              <th style="width: 36%;">不可替代的语言功能</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>轩榭<br />(xuān xiè)</strong></td>
+              <td>“轩”指带有窗槛、高扬开敞的长廊或小屋；“榭”指建在高台或水面上的开敞式木构建筑。</td>
+              <td>不可笼统写成“房屋建筑”。两个字精准传达出江南水乡园林建筑临水依风、空灵轻巧的文人气质。</td>
+            </tr>
+            <tr>
+              <td><strong>因地制宜<br />自出心裁</strong></td>
+              <td>“因地制宜”指顺应地势水流自然条件；“自出心裁”指独创匠心，绝不盲目照搬现成图纸。</td>
+              <td>成对出现，界定了园林营造的最高辩证法：既有对大自然的敬畏顺从，又有造园家的主体审美独创。</td>
+            </tr>
+            <tr>
+              <td><strong>重峦叠嶂<br />嶙峋 (lín xún)</strong></td>
+              <td>叠嶂指重重险峻山峰；嶙峋本指山石突兀重叠，在文中形容假山奇石峰棱峭拔的苍古骨力。</td>
+              <td>将苏东坡“石文而丑，丑则奇”的水墨美学具象化，体现造园大师“生平多阅历，胸中有丘壑”的精神造诣。</td>
+            </tr>
+            <tr>
+              <td><strong>俯仰生姿<br />相间 (jiàn)</strong></td>
+              <td>高树如长辈俯身相顾，低树如后生仰面致敬；落叶常绿交替，四季花时交错。</td>
+              <td>赋予静止植物以动态的拟人化情态与四时轮转的生命呼吸感，彻底击碎单调僵化的植物种植方式。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">标志性句法：说明文的“科学分寸感”与修饰限定密码</div>
+        <div class="item-block">
+          <ul class="bullet-list">
+            <li>
+              <strong>极为果决的绝对否定副词（立规矩）：</strong><br />
+              <span class="badge-evidence">【文本依据】</span>“我国的建筑，从古代的宫殿到近代的一般住房，<strong>绝大部分</strong>是对称的……苏州园林可<strong>绝不</strong>讲究对称，东边有了一个亭子……西边<strong>决不会</strong>来一个同样的亭子……”<br />
+              <span class="badge-comment">【语言听诊】</span>在说明一般建筑规律时用“绝大部分”（留有例外，显科学严谨）；而在指出苏州园林美学特质时，接连使用“绝不”、“决不会”，斩钉截铁，显示出对文人造园精神毫不妥协的极致确信。
+            </li>
+            <li>
+              <strong>极其周密审慎的概括限定词（留分寸）：</strong><br />
+              <span class="badge-evidence">【文本依据】</span>“假山的堆叠，<strong>可以说</strong>是一项艺术而<strong>不仅是</strong>技术。”“水面<strong>假如</strong>成河道模样，<strong>往往</strong>安排桥梁。”“苏州园林与北京的园林不同，极少使用彩绘。梁和柱子<strong>大多</strong>涂上本色或者淡青色……”<br />
+              <span class="badge-comment">【语言听诊】</span>“可以说”、“不仅是”、“往往”、“大多”，这些词语绝非含糊不清，而是准确反映了客观现实中千百座园林的丰富差异，体现了叶圣陶作为一代语文巨匠对于语言分寸的千锤百炼。
+            </li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">原生内联矢量图：篇章拓扑与说明逻辑演进罗盘</div>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg">
+            <!-- 背景暗底 -->
+            <rect x="0" y="0" width="720" height="320" rx="8" fill="var(--bg-subtle)" />
+            
+            <!-- 顶部总纲节点 -->
+            <rect x="180" y="16" width="360" height="48" rx="8" fill="var(--accent-warm)" />
+            <text x="360" y="36" fill="#ffffff" font-size="13.5" font-weight="bold" text-anchor="middle" font-family="sans-serif">【核心总纲】无论站在哪个点上，眼前总是一幅完美的图画</text>
+            <text x="360" y="53" fill="rgba(255,255,255,0.85)" font-size="11" text-anchor="middle" font-family="sans-serif">四大讲究（宏观骨架）+ 三大注意（微观肌理）· 先主后次</text>
+
+            <!-- 主干连接线 -->
+            <path d="M 360 64 L 360 84" stroke="var(--accent)" stroke-width="2" fill="none" />
+            <path d="M 95 84 L 625 84" stroke="var(--accent)" stroke-width="2" fill="none" />
+            <path d="M 95 84 L 95 106" stroke="var(--accent)" stroke-width="2" fill="none" />
+            <path d="M 270 84 L 270 106" stroke="var(--accent)" stroke-width="2" fill="none" />
+            <path d="M 450 84 L 450 106" stroke="var(--accent)" stroke-width="2" fill="none" />
+            <path d="M 625 84 L 625 106" stroke="var(--accent)" stroke-width="2" fill="none" />
+
+            <!-- 四大讲究（宏观主支） -->
+            <!-- 支柱 1 -->
+            <rect x="20" y="106" width="150" height="76" rx="6" fill="var(--bg-card)" stroke="var(--accent)" stroke-width="1.5" />
+            <text x="95" y="126" fill="var(--accent)" font-size="12" font-weight="bold" text-anchor="middle">① 亭台轩榭的布局</text>
+            <text x="95" y="146" fill="var(--text-main)" font-size="11" text-anchor="middle">绝不讲究对称</text>
+            <text x="95" y="164" fill="var(--text-muted)" font-size="10" text-anchor="middle">自然之趣 vs 人为整齐</text>
+
+            <!-- 支柱 2 -->
+            <rect x="195" y="106" width="150" height="76" rx="6" fill="var(--bg-card)" stroke="var(--accent)" stroke-width="1.5" />
+            <text x="270" y="126" fill="var(--accent)" font-size="12" font-weight="bold" text-anchor="middle">② 假山池沼的配合</text>
+            <text x="270" y="146" fill="var(--text-main)" font-size="11" text-anchor="middle">艺术而非仅技术</text>
+            <text x="270" y="164" fill="var(--text-muted)" font-size="10" text-anchor="middle">胸中有丘壑 · 活水生机</text>
+
+            <!-- 支柱 3 -->
+            <rect x="375" y="106" width="150" height="76" rx="6" fill="var(--bg-card)" stroke="var(--accent)" stroke-width="1.5" />
+            <text x="450" y="126" fill="var(--accent)" font-size="12" font-weight="bold" text-anchor="middle">③ 花草树木的映衬</text>
+            <text x="450" y="146" fill="var(--text-main)" font-size="11" text-anchor="middle">着眼在画意</text>
+            <text x="450" y="164" fill="var(--text-muted)" font-size="10" text-anchor="middle">俯仰生姿 · 无阅兵道旁树</text>
+
+            <!-- 支柱 4 -->
+            <rect x="550" y="106" width="150" height="76" rx="6" fill="var(--bg-card)" stroke="var(--accent)" stroke-width="1.5" />
+            <text x="625" y="126" fill="var(--accent)" font-size="12" font-weight="bold" text-anchor="middle">④ 近景远景的层次</text>
+            <text x="625" y="146" fill="var(--text-main)" font-size="11" text-anchor="middle">隔而未隔，界而未界</text>
+            <text x="625" y="164" fill="var(--text-muted)" font-size="10" text-anchor="middle">花墙镂窗 · 景致深邃莫测</text>
+
+            <!-- 微观细部过渡线 -->
+            <path d="M 360 182 L 360 206" stroke="var(--accent-warm)" stroke-dasharray="3,3" stroke-width="1.5" fill="none" />
+            <path d="M 140 206 L 580 206" stroke="var(--accent-warm)" stroke-dasharray="3,3" stroke-width="1.5" fill="none" />
+            <path d="M 140 206 L 140 226" stroke="var(--accent-warm)" stroke-dasharray="3,3" stroke-width="1.5" fill="none" />
+            <path d="M 360 206 L 360 226" stroke="var(--accent-warm)" stroke-dasharray="3,3" stroke-width="1.5" fill="none" />
+            <path d="M 580 206 L 580 226" stroke="var(--accent-warm)" stroke-dasharray="3,3" stroke-width="1.5" fill="none" />
+
+            <!-- 三大细部注意（微观肌理） -->
+            <!-- 细部 1 -->
+            <rect x="40" y="226" width="200" height="68" rx="6" fill="var(--bg-card)" stroke="var(--accent-warm)" stroke-width="1.2" />
+            <text x="140" y="246" fill="var(--accent-warm)" font-size="11.5" font-weight="bold" text-anchor="middle">⑤ 角落修饰的图画美</text>
+            <text x="140" y="265" fill="var(--text-main)" font-size="10.5" text-anchor="middle">阶砌栽书带草 · 爬山虎蔷薇</text>
+            <text x="140" y="281" fill="var(--text-muted)" font-size="9.5" text-anchor="middle">补足死角，化死板为生机</text>
+
+            <!-- 细部 2 -->
+            <rect x="260" y="226" width="200" height="68" rx="6" fill="var(--bg-card)" stroke="var(--accent-warm)" stroke-width="1.2" />
+            <text x="360" y="246" fill="var(--accent-warm)" font-size="11.5" font-weight="bold" text-anchor="middle">⑥ 门窗雕镂与光线纳采</text>
+            <text x="360" y="265" fill="var(--text-main)" font-size="10.5" text-anchor="middle">极细碎雕琢 · 工细而简朴</text>
+            <text x="360" y="281" fill="var(--text-muted)" font-size="9.5" text-anchor="middle">镂空花窗，室外光影移入室</text>
+
+            <!-- 细部 3 -->
+            <rect x="480" y="226" width="200" height="68" rx="6" fill="var(--bg-card)" stroke="var(--accent-warm)" stroke-width="1.2" />
+            <text x="580" y="246" fill="var(--accent-warm)" font-size="11.5" font-weight="bold" text-anchor="middle">⑦ 屋瓦色彩的淡雅本色</text>
+            <text x="580" y="265" fill="var(--text-main)" font-size="10.5" text-anchor="middle">极少使用彩绘 · 梁柱涂本色</text>
+            <text x="580" y="281" fill="var(--text-muted)" font-size="9.5" text-anchor="middle">白墙灰瓦，映衬万紫千红</text>
+
+            <!-- 底部说明指示 -->
+            <text x="360" y="308" fill="var(--text-soft)" font-size="10" text-anchor="middle">【逻辑流向】：从宏观空间营建到微观细节浸润 · 从大处落笔到细部勾勒</text>
+          </svg>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 03 -->
+    <details class="guide-section" id="sec-03">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">03</span>
+          <span class="section-title">文本显微镜与语言听诊器：细读批注与正反改写</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <!-- 细读 1 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点一：亭台布局的“非对称性”与中国画画理的深层同构</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“我国的建筑，从古代的宫殿到近代的一般住房，绝大部分是对称的，左边怎么样，右边也怎么样。苏州园林可绝不讲究对称，东边有了一个亭子或者一道回廊，西边决不会来一个同样的亭子或者一道同样的回廊。这是为什么？我想，用图画来比方，对称的建筑是图案画，不是美术画，而园林是美术画，美术画要求自然之趣，是不讲究对称的。”
+          </div>
+          <p>
+            <strong>🔍 文本显微镜（看见了什么）：</strong><br />
+            作者先用两千多年中国传统建筑的绝对主流“宫殿与民居之对称”作为巨大底色反衬；接着用具体空间动作“东边有亭、西边决不来同样亭子”，将抽象的非对称化为眼前实景；最后借设问引出神级比喻——<strong>“图案画” vs “美术画”</strong>。
+          </p>
+          <p>
+            <strong>🩺 语言听诊器（形式如何生成意义）：</strong><br />
+            “图案画”指讲求几何规律、机械复制、秩序规整的实用美术；而“美术画”（即中国传统水墨山水画）讲求气韵生动、开合呼应、参差错落。叶圣陶不用枯燥的建筑学术语，而用人人皆能领会的绘画常识，瞬间点破了造园师的核心审美追求：<strong>以画入园，借物构境</strong>。
+          </p>
+          <div class="compare-grid">
+            <div class="compare-bad">
+              <strong>❌ 平庸改写版（教辅说明体）：</strong><br />
+              苏州园林里的建筑布置很随意，不讲究对称，东边和西边的建筑物造型各不相同，体现了不一样的特色风格。
+            </div>
+            <div class="compare-good">
+              <strong>✅ 原文胜出机制：</strong><br />
+              原文先设宏大参照系（古代宫殿），再以“绝不”、“决不会”强化其特立独行，最后升华为“图案画与美术画”的本质哲学之别，将空间营建升华为文明审美。
+            </div>
+          </div>
+        </div>
+
+        <!-- 细读 2 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点二：假山池沼的“艺术性”与生命丘壑的灵魂投射</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“假山的堆叠，可以说是一项艺术而不仅是技术。或者是重峦叠嶂，或者是几座小山配合着竹子花木，全在乎设计者和匠师们生平多阅历，胸中有丘壑，才能使游览者攀登的时候忘却苏州城市，只觉得身在山间。”
+          </div>
+          <p>
+            <strong>🔍 文本显微镜（看见了什么）：</strong><br />
+            “艺术”与“技术”一字之差，境界云泥。技术只需掌握泥水石料的物理堆砌；而艺术则要求将万里山河的奇峰怪石、天地造化的险峻雄奇，经由造园家“生平阅历”的熔铸，凝缩进一庭之内。
+          </p>
+          <p>
+            <strong>🩺 语言听诊器（形式如何生成意义）：</strong><br />
+            “胸中有丘壑”化用宋代画家郭熙《林泉高致》之画理。下半句“忘却苏州城市，只觉得身在山间”，精准揭示了心理学上的“审美移情”与“空间置换”。在寸土寸金的凡俗闹市中，凭空凿出一座让人精神出世的桃花源！
+          </p>
+          <div class="compare-grid">
+            <div class="compare-bad">
+              <strong>❌ 平庸改写版（直白夸赞体）：</strong><br />
+              工人们堆假山的技术非常高超，堆出很多像山一样的石头，游客爬上去都觉得很逼真，像真的一样。
+            </div>
+            <div class="compare-good">
+              <strong>✅ 原文胜出机制：</strong><br />
+              原文不用低俗的“逼真”，而用“生平多阅历，胸中有丘壑”，将匠人的劳作直接拔高到大文人、大艺术家的精神创造高度，彰显中国士人文化的精神寄托。
+            </div>
+          </div>
+        </div>
+
+        <!-- 细读 3 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点三：花草树木的“画意立体感”与反同质化审美宣示</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“高树与低树俯仰生姿。落叶树与常绿树相间，花时不同的多种花树相间。这就一年四季不感到寂寞。苏州园林栽种和修剪树木也着眼在画意。还在那儿攀附着，花开得也算多。可是没有修剪得像宝塔那样的松柏，没有阅兵式似的道旁树：因为依据中国画的审美观点看，这是不足取的。”
+          </div>
+          <p>
+            <strong>🔍 文本显微镜（看见了什么）：</strong><br />
+            “俯仰生姿”赋予树木立体的顾盼深情；“相间”两度重复，在时间维度上布局了春桃秋菊、夏荷冬梅的生生不息，破除“寂寞”；后文笔锋一转，连用两个“没有”，向西方修剪式几何园林与工业化齐步走审美悍然亮剑！
+          </p>
+          <p>
+            <strong>🩺 语言听诊器（形式如何生成意义）：</strong><br />
+            “修剪得像宝塔那样的松柏”暗示人工对植物天性的粗暴残害，“阅兵式似的道旁树”暗示整齐划一的机械规训。结尾轻描淡写的“这是不足取的”，带着典型的江南儒雅名士的温和与从容，语调越是克制，美学立场的判定就越发千钧有力！
+          </p>
+          <div class="compare-grid">
+            <div class="compare-bad">
+              <strong>❌ 平庸改写版（平铺直叙体）：</strong><br />
+              园林里的树种得很讲究，高树和矮树在一起很好看，树木一年四季都有绿色，而且从不修剪成整齐的形状。
+            </div>
+            <div class="compare-good">
+              <strong>✅ 原文胜出机制：</strong><br />
+              原文以“俯仰生姿”赋予生命动感，以“寂寞”写时间感知，以“宝塔”、“阅兵式”具象化讽刺呆板，完成了从“视觉描述”向“审美伦理”的惊艳跨越。
+            </div>
+          </div>
+        </div>
+
+        <!-- 细读 4 -->
+        <div class="item-block">
+          <div class="sub-heading">细读点四：花墙与廊子的“空间辩证法”——隔而未隔，界而未界</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span>“游览者必然也不会忽略另外一点，就是苏州园林在每一个角落都注意图画美。阶砌旁边栽几丛书带草。墙上蔓延着爬山虎或者蔷薇。这些安排绝不随便，……有墙壁隔着，有廊子界着，可是墙壁上有镂空的花窗，廊子大多是两边无所依傍的，实际是隔而未隔，界而未界，同时景物却变了。浏览者走到一个地方，就另有一番局势，觉得苏州园林大得很，深邃莫测，令人玩味不尽。”
+          </div>
+          <p>
+            <strong>🔍 文本显微镜（看见了什么）：</strong><br />
+            一堵白墙，如果封死，就是窒息的死胡同；但嵌上几扇如秋叶、如折扇、如海棠的镂空花窗，院外的芭蕉、修竹、微雨便借景入室。廊子两边透风，人在廊中走，步移景异。
+          </p>
+          <p>
+            <strong>🩺 语言听诊器（形式如何生成意义）：</strong><br />
+            “隔而未隔，界而未界”八个字是全篇最具哲理意味的文眼！两个否定词“未”在肯定词“隔”与“界”之间激荡出极高妙的辩证张力。它打破了物理空间的大小局限，用“障景”与“漏景”在咫尺之间创造出无垠的心灵瀚海。
+          </p>
+          <div class="compare-grid">
+            <div class="compare-bad">
+              <strong>❌ 平庸改写版（空洞概括体）：</strong><br />
+              苏州园林的花墙和走廊设计得很巧妙，虽然隔开了不同的院落，但是由于有窗户，所以感觉空间更大了。
+            </div>
+            <div class="compare-good">
+              <strong>✅ 原文胜出机制：</strong><br />
+              原文用“隔而未隔，界而未界”提炼出中国古典哲学虚实相生的精魂，进而推导出游览者“深邃莫测，令人玩味不尽”的沉浸式心理体验。
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 04 -->
+    <details class="guide-section" id="sec-04">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">04</span>
+          <span class="section-title">结构罗盘与说明机制：逻辑章法与视角交织</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">逻辑罗盘：总分严密的“剥笋式”事理说明顺序</div>
+        <div class="item-block">
+          <p>
+            叶圣陶先生作为一代语文宗师，其文章章法结构堪称“说明文写作的绝对典范”。全文严格遵循<strong>“总—分—总”</strong>的逻辑顺序展开：
+          </p>
+          <ul class="bullet-list">
+            <li><strong>第一层：开宗明义，标本定性（第1段）</strong>——开篇第一句便指出“苏州园林是我国各地园林的标本”，确立其在全国园林建筑史上的崇高地位。</li>
+            <li><strong>第二层：高瞻远瞩，提出总纲（第2段）</strong>——从“务必使游览者无论站在哪个点上，眼前总是一幅完美的图画”出发，紧扣这一审美理想，立下“四大讲究”（布局、配合、映衬、层次）与“三大注意”（角落、门窗、色彩）的宏大提纲。</li>
+            <li><strong>第三层：先主后次，大处落墨（第3—6段）</strong>——依次深入阐释“四大讲究”。这四项是园林构筑的骨干与基石，决定了园林的宏观空间格局，属于核心主干说明。</li>
+            <li><strong>第四层：由大到小，细部勾勒（第7—9段）</strong>——转向“三大注意”。从角落的点缀、门窗的雕镂到色彩的涂抹，由建筑空间走向微观装饰，使全篇结构如同画卷般由远山大川渐次推入工笔细描。</li>
+            <li><strong>第五层：留有余地，言简意丰（第10段）</strong>——“可以说的当然不止这些……”不作拖泥带水的机械重复，戛然而止，既照应开头，又留给读者无限联想空间。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">叙事/观察镜头：空间体验者与美学批评者的双重聚焦</div>
+        <div class="tint-accent">
+          <strong>双影视角交响：</strong><br />
+          文中的叙述视角绝非单一枯燥的解说员，而是精妙地交织着两种身份：<br />
+          1. <strong>“游览者”的具身体验视角</strong>：站在某个点上、攀登假山、游于池沼之畔、步履穿行于回廊与花墙之间，带来身临其境的视听动感；<br />
+          2. <strong>“鉴赏家/画家”的形上审视视角</strong>：时刻用中国水墨画的画理、虚实、开合、气韵来衡量一草一木一石的布局。双重视角的无缝切换，使得事理阐述既有感性的温度，又有哲思的高度。
+        </div>
+
+        <div class="sub-heading">特级说明方法剖分图谱</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">说明方法</th>
+              <th style="width: 45%;">课文典型例句</th>
+              <th style="width: 35%;">修辞与认知赋能</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>作比较</strong></td>
+              <td>“对称的建筑是图案画，不是美术画，而园林是美术画……”“我国的建筑……绝大部分是对称的，苏州园林可绝不讲究对称……”</td>
+              <td>在鲜明的对照中凸显苏州园林反常态、求自然的独特艺术生命力。</td>
+            </tr>
+            <tr>
+              <td><strong>打比方</strong></td>
+              <td>“我想，用图画来比方，对称的建筑是图案画……”“没有修剪得像宝塔那样的松柏，没有阅兵式似的道旁树……”</td>
+              <td>化抽象的空间美学原理为具象的生活画面，风趣幽默，极具说服力。</td>
+            </tr>
+            <tr>
+              <td><strong>举例子</strong></td>
+              <td>“阶砌旁边栽几丛书带草。墙上蔓延着爬山虎或者蔷薇……”“有的宅第池沼往往引用活水……”</td>
+              <td>以具体的植物与水系安排为证，坐实“绝不随便”、“处处入画”的论断。</td>
+            </tr>
+            <tr>
+              <td><strong>分类别</strong></td>
+              <td>将园林之美清晰划分为四个宏观核心（布局、配合、映衬、层次）与三个微观细部。</td>
+              <td>条分缕析，使庞大复杂的园林艺术体系变得纲举目张、井然有序。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 05 -->
+    <details class="guide-section" id="sec-05">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">05</span>
+          <span class="section-title">美学网络、主题三层与园林美学微评论</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🕸️ 意象与造物网络：园林作为“生命有机体”</div>
+        <div class="item-block">
+          <p>在叶圣陶笔下，苏州园林不是钢筋水泥的死物，而是一个呼吸律动的生命场：</p>
+          <ul class="bullet-list">
+            <li><strong>石为骨骼</strong>：假山堆叠不是乱石堆聚，而是将万水千山的风骨熔铸为胸中丘壑，挺立起园林的风骨与峥嵘；</li>
+            <li><strong>水为血脉</strong>：池沼借由活水相通，桥梁随流屈曲，如天地之血脉周流不息，涵养游鱼睡莲的自在生机；</li>
+            <li><strong>木为毛发情态</strong>：古藤屈曲如蟠龙，高树俯首若慈长，低树仰面如稚童，四季花开不绝，赋予园林以岁时情绪；</li>
+            <li><strong>墙为留白呼吸</strong>：粉墙为纸，竹影作墨，漏窗通透光影，在有限界域内安顿空灵与玄远；</li>
+            <li><strong>色为心性品格</strong>：摒弃金碧辉煌的宫廷彩绘，独守粉墙黛瓦与梁柱本色，沉淀出文人甘于淡泊、退守素朴的心灵净土。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🎯 主题三层掘进模型</div>
+        <div class="tint-box">
+          <ol class="num-list">
+            <li><strong>表层处境：</strong>系统说明苏州园林在空间布局、山水营造、植物配置与建筑细部上力求“处处入画”的建筑技巧与实景风貌。</li>
+            <li><strong>深层困境：</strong>中国文人在封建皇权官场的束缚与市井喧嚣的逼仄中，如何安顿内心对大自然的永恒渴求？——“不出城郭而获山林之怡，身居闹市而有泉石之乐”。</li>
+            <li><strong>根本追问：</strong>人何以诗意地栖居？苏州园林用一砖一石一草一木给出了东方回答：拒绝人为对自然的暴力征服与机械规训，在人与天地万物的温情对话中重构生命的自由与和谐。</li>
+          </ol>
+          <div class="formula-bar">
+            核心价值张力公式：【人造匠心之巧 ⚡ 宛自天成之拙】（虽由人作，宛自天开）
+          </div>
+        </div>
+
+        <div class="sub-heading">📝 大学中文系级“文学微评论”示范（320字）</div>
+        <div class="tint-accent">
+          <strong>《咫尺乾坤：论苏州园林空间的“留白与破界”》</strong><br />
+          叶圣陶先生笔下的苏州园林，本质上是一场中国文人以空间为画布的心灵突围。面对城市私家庭院的尺度局限，造园大师既不妥协于逼仄，亦不屈从于宫廷式的对称规训，而是将水墨画的“虚实相生”化为建筑实体。文中“隔而未隔，界而未界”八字，精准揭示了东方的空间辩证法：墙体筑起物理边界，镂空花窗与两边无依的游廊却瞬间撕裂了封闭性，使视线得以在重重景深中延展。此处之“隔”，隔断的是市井尘俗的喧嚣；此处之“通”，打通的是心灵与天地大美的交融。园林虽小，却因留白而气象万千，因破界而吞吐乾坤。这不仅是一项造园艺术，更是中国士人在逼仄现实中构筑精神桃花源的至高生存智慧。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 06 -->
+    <details class="guide-section" id="sec-06">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">06</span>
+          <span class="section-title">阐释边界与不确定性判断尺：逻辑与审美平衡</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">📏 诠释学循环与事实判断分级</div>
+        <div class="item-block">
+          <ul class="bullet-list">
+            <li>
+              <strong>🟢 可以确定（铁证如山）：</strong><br />
+              1. 本文并非介绍具体某一园（如拙政园、留园），而是论述所有苏州园林的“共有美学法则”；<br />
+              2. 作者明确将中国水墨画的审美标准作为衡量园林艺术高下的唯一核心尺度；<br />
+              3. 文章结构严格遵循先总后分、先宏观主干后微观局部的说明逻辑，无任何杂乱游离。
+            </li>
+            <li>
+              <strong>🟡 可以推测（合理延伸）：</strong><br />
+              文中对“宝塔式松柏”与“阅兵式道旁树”的幽默排斥，隐隐呼应了叶圣陶自“五四”新文化运动以来所秉持的现代人文主义——反对封建礼教对人性的机械压抑与规训，崇尚生命的个性舒展与自然率真。
+            </li>
+            <li>
+              <strong>🔴 暂不判断 / 警惕过度阐释：</strong><br />
+              不可脱离说明文文体，将文中的“避世园林”过度政治化，将其强行定性为“封建士大夫消极逃避阶级斗争的落后产物”，亦不可附会西方后现代建筑解构主义理论。必须回扣叶圣陶写作为摄影集作序的普及性与审美关照的真实初衷。
+            </li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🪟 接受视野窗：多元异读交锋</div>
+        <div class="tint-warm">
+          <strong>争议点：苏州园林究竟是“封闭自足的避世牢笼”，还是“精神超越的诗意绿洲”？</strong><br />
+          <strong>视角 A（社会历史批评）：</strong>认为私家园林是封建官僚退隐后用高墙深院将自己与民间疾苦隔绝的产物，其“忘却苏州城市”带有一种特权阶层的自我麻醉色彩。<br />
+          <strong>视角 B（文化诗学与存在主义批评）：</strong>认为园林是中国文人在异化官场与残酷政治博弈中保护独立人格的文化堡垒。他们借假山水池重返天地怀抱，是古代知识分子在精神上对抗皇权规训的最优雅抵抗。叶老之文显然更偏向后者对文化原真性的深情护持。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 07 -->
+    <details class="guide-section" id="sec-07">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">07</span>
+          <span class="section-title">知人论世、文体源流与文明思想坐标</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">【文学背景】八十五岁老人的故土深眷与序言文体</div>
+        <div class="item-block">
+          <p>
+            <span class="badge-context">【知人论世】</span>1979年初，香港一家出版社计划出版大型画册《苏州园林》，特邀85岁高龄的叶圣陶先生作序。叶老生于苏州、长于苏州，少年时期常常流连于拙政园、狮子林、怡园的曲径回廊之间，苏州园林早已化入其血肉生命。<br />
+            彼时中国刚刚经历特殊年代的动荡，迎来了改革开放的文化复苏。面对故乡那些经历风雨依然宛然在目的园林瑰宝，叶老怀着深沉的文化眷恋，一气呵成写就《拙政诸园寄深眷——谈苏州园林》。入选统编教材时，编者删节了前言后记的客套应酬，保留了核心的事理说明与美学阐发部分，定名为《苏州园林》。
+          </p>
+        </div>
+
+        <div class="sub-heading">📜 文体流变：从古代《园冶》到现代科学事理说明文</div>
+        <div class="tint-box">
+          中国园林理论自古有之，明代计成著《园冶》、文震亨著《长物志》、清代李渔著《闲情偶寄》，多为骈散相间的造园技艺与闲情雅趣记述。而叶圣陶的《苏州园林》在文体上完成了惊艳的<strong>“现代科学转化”</strong>：<br />
+          他用现代逻辑学、分类学与系统论的方法，将感性的文人美学拆解为纲目清晰、条理分明的事理链条；同时又保留了传统中国文人的雅致辞章。既有科学家的严密求实，又有文学家的流光溢彩，开创了现代“文艺性事理说明文”的高峰。
+        </div>
+
+        <div class="sub-heading">🧭 文明坐标：天人合一与儒道互补的心灵庇护所</div>
+        <div class="item-block">
+          <p>
+            中国传统知识分子的一生始终在儒与道之间寻求平衡：<strong>“达则兼济天下（入世建功），穷则独善其身（归隐山林）”</strong>。然而现实中并非人人都能退隐终南山或归耕田园，于是苏州园林应运而生。它以“天人合一”为宇宙观，把大自然的万千丘壑搬入深宅大院，构成了中国士大夫心灵深处进退自如的缓冲带与精神锚地。
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 08 -->
+    <details class="guide-section" id="sec-08">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx">08</span>
+          <span class="section-title">比较阅读桥：同题异构与美学经典矩阵</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">三部中国建筑与空间美学名篇联读矩阵</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">篇目与作者</th>
+              <th style="width: 35%;">核心文本与美学机制</th>
+              <th style="width: 40%;">认知刷新与比读启示</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>《苏州园林》<br />叶圣陶</strong></td>
+              <td>“实际是隔而未隔，界而未界，同时景物却变了。”<br /><strong>机制：</strong>以事理说明文的逻辑性统摄整体园林画意。</td>
+              <td>重在<strong>系统建模</strong>：从宏观到微观，提炼出一套可复现、可阐释的江南园林普遍性美学秩序。</td>
+            </tr>
+            <tr>
+              <td><strong>《说“屏”》<br />陈从周</strong></td>
+              <td>“屏者，障也，可以缓冲视线……‘似隔非隔，在有景无景之间’。”<br /><strong>机制：</strong>聚焦单一室内构件，兼具学者考据与散文情致。</td>
+              <td>与叶文的“隔而未隔”异曲同工，证明了“障与漏”是中国传统空间艺术从宏观建筑到微观家具的一贯灵魂。</td>
+            </tr>
+            <tr>
+              <td><strong>《美学散步》<br />宗白华</strong></td>
+              <td>“以微尘见大千，以尺幅纳万里……中国园林是‘游’的艺术，在运动中体现宇宙律动。”<br /><strong>机制：</strong>哲学家的高维思辨，打通水墨、书法与园林。</td>
+              <td>为叶圣陶的“游览者无论站在哪个点上总是一幅图画”提供了最高哲学注脚：园林是一座凝固的哲学诗篇。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="tint-accent">
+          <strong>💡 比读核心启发：</strong><br />
+          陈从周见“情味与考据”，宗白华见“宇宙与哲理”，而叶圣陶最伟大之处在于<strong>“见规律与文眼”</strong>。他用最平实纯正的现代汉语，架起了一座连接普通读者与高深东方建筑美学的彩虹之桥。
+        </div>
+      </div>
+    </details>
+
+    <!-- 下篇：读写结合、素材炼金与创造行动 -->
+    <div class="part-divider">下篇 · 读写结合 · 素材炼金与万能模型 (09-13)</div>
+
+    <!-- 栏目 09 -->
+    <details class="guide-section" id="sec-09" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">09</span>
+          <span class="section-title">五维金句解码与情境化阶梯仿写支架</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <!-- 金句 1 -->
+        <div class="item-block">
+          <div class="sub-heading">金句 01【🌿 景造氛围 · 空间立体与光阴交错】</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【原句】</span>“高树与低树俯仰生姿。落叶树与常绿树相间，花时不同的多种花树相间。这就一年四季不感到寂寞。”
+          </div>
+          <p>
+            <strong>📐 技法与句法骨架解剖：</strong><br />
+            <span class="formula-tag">[对立状态A] 与 [对立状态B] + 拟人化动感C + [物象D与物象E相间] + 破除某种心理负面感受F</span><br />
+            先构造高低错落的立体视觉，再通过双重“相间”引入时间的绵延流动，最终落在富有温情的情感词（“不感到寂寞”）上。
+          </p>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境：</strong>深夜自习室或城市老街转角的温情角落。<br />
+            <strong>🧩 可替换填空支架：</strong>[高处的____]与[低矮的____]______。______与______相间，______与______相间。这就让[整个逼仄空间/漫长岁月]不感到[冷清/枯燥/寂寞]。<br />
+            <strong>⚠️ 避坑指南：</strong>切忌机械罗列景物名称而没有赋予动词生姿（如只写“树很多”）；结尾必须收束于某种心理体验。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong><br />
+            老书房里，高耸的书架与斑驳的矮几相映成趣。厚重的大部头典籍与轻巧的线装旧诗相间，泛黄的书页与翠绿的铜钱草相间。这就让堆满故纸堆的方寸斗室，在一整年萧瑟的寒暑里都不曾感到寂寞。（点评：将树木移植为书房器物，俯仰生姿化为古今相映，意蕴极为雅致）。
+          </div>
+        </div>
+
+        <!-- 金句 2 -->
+        <div class="item-block">
+          <div class="sub-heading">金句 02【👤 人立形象 · 匠心造极与精神气度】</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【原句】</span>“假山的堆叠，可以说是一项艺术而不仅是技术。……全在乎设计者和匠师们生平多阅历，胸中有丘壑……”
+          </div>
+          <p>
+            <strong>📐 技法与句法骨架解剖：</strong><br />
+            <span class="formula-tag">[某项日常劳动/技能A]，可以说是一项 [精神/艺术界定B] 而不仅是 [物理/技术层面C]。全在乎 [主体D] [深层积累E]，[内化格局F]……</span>
+          </p>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境：</strong>老厨师颠勺、手艺人制陶、老教师批阅作文或父亲修理老钟表。<br />
+            <strong>🧩 可替换填空支架：</strong>[这门行当/操作A]，可以说是一项______而不仅是______。全在乎______生平______，胸中______，才能使[受众/后来者]……<br />
+            <strong>⚠️ 避坑指南：</strong>“艺术”与“技术”的对比不可颠倒；后半句的四字成语要精准刻画出人物深沉的历史积淀与胸怀。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong><br />
+            祖父修补那些残破的老旧时钟，可以说是一场与光阴的深情对弈而不仅是机械零件的拼凑。或者是校准齿轮游丝，或者是打磨褪色发条，全在乎老人一生看尽人间悲欢、心底自有沉着定力，才能让凝固的滴答声重新在风雨深夜里安详敲响。（点评：将匠人技艺升华至生命与时间对话的高度，精准扣题）。
+          </div>
+        </div>
+
+        <!-- 金句 3 -->
+        <div class="item-block">
+          <div class="sub-heading">金句 03【⚡ 理推逻辑 · 虚实破界与空间辩证】</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【原句】</span>“有墙壁隔着，有廊子界着，可是墙壁上有镂空的花窗，廊子大多是两边无所依傍的，实际是隔而未隔，界而未界，同时景物却变了。”
+          </div>
+          <p>
+            <strong>📐 技法与句法骨架解剖：</strong><br />
+            <span class="formula-tag">有 [显性屏障A] 阻滞着，有 [现实界限B] 约束着，可是 [破局转机C]，实际是 [概念A] 而未 [A]，[概念B] 而未 [B]，同时 [内在格局/心境] 却变了。</span>
+          </p>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境：</strong>人与人之间的交往分寸、成长过程中的挫折边界、网络时代的社交距离。<br />
+            <strong>🧩 可替换填空支架：</strong>有______阻隔着，有______界定着，可是______，实际是______而未______，______而未______，同时______却变了。<br />
+            <strong>⚠️ 避坑指南：</strong>“隔而未隔”的矛盾修辞必须有具象物或转折条件支撑，不能凭空说胡话。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong><br />
+            两代人之间有沉默的代沟横亘着，有紧闭的房门阻隔着，可是门缝下悄然递进的热牛奶、书桌旁默默换好的护眼灯泡，实际是隔而未隔，界而未界，同时那份无声的关切早已温润了整座深夜的寒舍。（点评：将物理花窗巧妙置换为母爱的隐蔽细节，虚实相生，感人至深）。
+          </div>
+        </div>
+
+        <!-- 金句 4 -->
+        <div class="item-block">
+          <div class="sub-heading">金句 04【💫 情传心声 · 拒绝规训与从容风骨】</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【原句】</span>“可是没有修剪得像宝塔那样的松柏，没有阅兵式似的道旁树：因为依据中国画的审美观点看，这是不足取的。”
+          </div>
+          <p>
+            <strong>📐 技法与句法骨架解剖：</strong><br />
+            <span class="formula-tag">可是没有 [机械同质化形式A]，没有 [被规训的刻板状态B]：因为依据 [更高精神信条/文化根基C] 看，这是不足取的。</span>
+          </p>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境：</strong>青春的个性成长、拒绝盲目内卷、捍卫真实独特的创作风骨。<br />
+            <strong>🧩 可替换填空支架：</strong>可是没有修剪得像______那样的______，没有______似的______：因为依据______看，这是不足取的。<br />
+            <strong>⚠️ 避坑指南：</strong>反面比喻要形象犀利，最后的判定语要克制内敛，体现君子温润有力的批判尺度。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong><br />
+            真正的青春考场，没有修剪得如同流水线模具般千篇一律的标配答卷，没有如同木偶般循规蹈矩的僵硬身姿：因为依据生命本真舒展的法则看，抹杀个性独创的平庸，是断然不足取的。（点评：抨击千人一面的应试心态，立意高远，笔锋锐利）。
+          </div>
+        </div>
+
+        <!-- 金句 5 -->
+        <div class="item-block">
+          <div class="sub-heading">金句 05【🔺 意升主题 · 万流归宗与终极图景】</div>
+          <div class="tint-box">
+            <span class="badge-evidence">【原句】</span>“务必使游览者无论站在哪个点上，眼前总是一幅完美的图画。”
+          </div>
+          <p>
+            <strong>📐 技法与句法骨架解剖：</strong><br />
+            <span class="formula-tag">务必使 [体验主体A] 无论 [身处何种极端/微小处境B]，[感官/心灵C] 总能 [收获某种至高完整的圆满体验D]。</span>
+          </p>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境：</strong>追求极致的工匠精神、文学创作的无死角沉浸感、理想班级/家庭氛围构筑。<br />
+            <strong>🧩 可替换填空支架：</strong>务必使______无论处在哪个______，心中总是一______。<br />
+            <strong>⚠️ 避坑指南：</strong>“无论……总……”构成绝对无条件的充分必要条件，不可写得软弱无力。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong><br />
+            一位真正卓越的作家构筑其精神长篇时，务必使读者无论翻开哪一页、停留在哪一个看似闲笔的细小章节上，心底总能激荡起浩瀚磅礴的历史回声。（点评：将造园总纲完美迁移到文学创作巨匠的格局追求上，气势磅礴）。
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 10 -->
+    <details class="guide-section" id="sec-10" open>
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">10</span>
+          <span class="section-title">作文素材炼金炉与高阶立意库</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🔥 三大高阶思想立意提取术（告别平庸套话）</div>
+        <div class="item-block">
+          <ul class="bullet-list">
+            <li>
+              <strong>高阶立意 1：【隔而未隔的留白智慧：在紧绷日常中构筑人生的“深邃莫测”】</strong><br />
+              <strong>哲学抽象：</strong>空间因为一堵实墙而终结，却因一扇漏窗而通向无极。生活如果排满日程便会窒息，唯有保留适当的边界与诗意留白，生命才有玩味不尽的深邃。<br />
+              <strong>适配中高考母题：</strong>《生活的留白》、《分寸感》、《方寸之间》、《留一扇窗给风景》。
+            </li>
+            <li>
+              <strong>高阶立意 2：【因地制宜的原生秩序：顺应生命肌理，拒绝整齐划一的“阅兵式”】</strong><br />
+              <strong>哲学抽象：</strong>真正的美从不建立在对万物的机械修剪与强行扭曲之上。尊重每一座假山的奇险嶙峋，尊重每一棵树的俯仰天性，才是大自然的至高秩序与现代人个性的守护神。<br />
+              <strong>适配中高考母题：</strong>《独特的姿态》、《不合群的风景》、《标准答案之外》、《做一棵野蛮生长的树》。
+            </li>
+            <li>
+              <strong>高阶立意 3：【市井深处的山水精神：在局促现实中安顿不妥协的诗性灵魂】</strong><br />
+              <strong>哲学抽象：</strong>即使困居于喧嚣闹市的一隅，心怀丘壑的造园师依然能引一勺清泉见江湖，堆数拳怪石见峰峦。人生的格局不在于舞台的大小，而在于能否在逼仄中构筑起浩荡的精神宇宙。<br />
+              <strong>适配中高考母题：</strong>《心中的桃花源》、《把日子过成一幅画》、《平凡中的诗意》、《精神的高度》。
+            </li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🗂️ 2 张中考/高考标准考场作文素材卡</div>
+        <!-- 素材卡 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #01 ｜ 【隔而未隔的人生留白】</strong><br />
+            <span class="badge-evidence">#空间美学</span> <span class="badge-evidence">#心灵留白</span> <span class="badge-evidence">#边界与交融</span>
+          </div>
+          <p>
+            <strong>⚡ 100 字核能叙事精述：</strong><br />
+            苏州园林在逼仄庭院中创造无限景深的秘诀，在于花墙与回廊那“隔而未隔，界而未界”的奇绝巧思。一堵白墙若完全封死则视野逼仄；嵌上镂空花窗，墙外的松竹与流云便借景入室。看似被界定，天地却因此深邃莫测，余味无穷。
+          </p>
+          <p>
+            <strong>🔗 名句化用公式：</strong><br />
+            正如叶圣陶笔下那“隔而未隔，界而未界”的园林花窗，真正高级的人生与交往，从来不在于……而在于……
+          </p>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入示范段：</strong><br />
+            步入叶圣陶笔下的苏州园林，最震撼人心的莫过于花墙前“隔而未隔，界而未界”的深邃境界。物理的高墙并未将天地封死，几扇镂空花窗，便将墙外的翠竹流云温润借入室内，化逼仄为瀚海。处世之道何尝不是如此？人与人之间若毫无界限，必然导致倾轧与窒息；若高筑壁垒，又将沦为孤岛。唯有如园林之巧匠，守住各自尊严的边界，又留出彼此张望与共鸣的留白，生活才能在方寸之间显出玩味不尽的从容与深远。
+          </div>
+        </div>
+
+        <!-- 素材卡 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #02 ｜ 【因地制宜的天然风骨】</strong><br />
+            <span class="badge-evidence">#自然之趣</span> <span class="badge-evidence">#拒绝同质化</span> <span class="badge-evidence">#个性舒展</span>
+          </div>
+          <p>
+            <strong>⚡ 100 字核能叙事精述：</strong><br />
+            苏州园林的匠师们从不追求刻板的对称，更不屑于将松柏修剪成死板的宝塔，或者排成“阅兵式似”的道旁树。他们因地制宜，任高树与低树俯仰生姿，落叶与常绿相间。尊重万物的天然肌理与参差个性，最终筑就了步步入画的人间奇迹。
+          </p>
+          <p>
+            <strong>🔗 名句化用公式：</strong><br />
+            拒绝那些如“阅兵式似的道旁树”般的模具化规训，我们才能在时代的水墨画卷里，舒展出属于自己……
+          </p>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入示范段：</strong><br />
+            在工业文明崇尚标准化与流水线的今天，苏州园林的美学警钟格外清脆。叶圣陶先生赞叹那里的草木“着眼在画意”，绝不修剪成几何宝塔，绝不排成阅兵式般的道旁树，而是任由落叶与常绿相间、高树与低树俯仰生姿。这种因地制宜的智慧，何尝不是对当代青年精神成长的最高启示？我们何必在单一评价标准的模具里削足适履？拒绝千人一面的机械整齐，捍卫自身独特的生机与棱角，你我才能在这辽阔天地间，长成一帧无可替代的完美图画。
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 11 -->
+    <details class="guide-section" id="sec-11">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">11</span>
+          <span class="section-title">万能写作模型与读写映射总纲</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🏛️ 提炼可复用的两大品牌化写作模型</div>
+
+        <div class="item-block">
+          <strong>模型一：【总纲纲领—四维主干—细部点睛】多维空间美学说明模型</strong><br />
+          <div class="formula-bar">
+            结构公式：标本定性（提出崇高地位） → 审美总纲（一句统摄万象） → 四维宏观布局（分类逐层推演） → 三维微观细部（工笔点缀生机） → 留白收束（言有尽而意无穷）
+          </div>
+          <p>
+            <strong>课文原型对应：</strong>第1段总定“标本” → 第2段“总是一幅图画” → 第3-6段亭台/假山/花木/景深 → 第7-9段角落/门窗/色彩 → 第10段余韵。<br />
+            <strong>适用题型：</strong>说明文写作、写景状物散文、城市/校园文化解说词、大型设计作品陈述方案。
+          </p>
+          <div class="tint-accent">
+            <strong>新作文题移植示范（作文题：《我们这所老校园的“自出心裁”》）：</strong><br />
+            1. <strong>总起：</strong>倘若要我说说母校的特质，它是百年老城教育的一部活化石；<br />
+            2. <strong>总纲：</strong>设计者与历代师生所共同缔造的，是让身处其中的每一个人，无论站在哪处角落，都能浸润在一种“博雅从容”的书卷气里；<br />
+            3. <strong>宏观主干：</strong>从老红楼与新实验楼的不讲求刻板对齐（岁月沉淀与现代前沿的互望），写到参天银杏与匍匐草坪的俯仰相间，再写到林荫小道在喧嚣市声中的曲径通幽；<br />
+            4. <strong>微观细部：</strong>教室窗台上一盆不起眼的绿萝、老墙砖缝隙里滋生的苔藓、木楼梯转角处学生随手粘贴的书画笺；<br />
+            5. <strong>收束：</strong>母校的美当然不止这些，但这四景三态，已足以说明它如何悄然塑造了一代学子的精神脊梁。
+          </div>
+        </div>
+
+        <div class="item-block">
+          <strong>模型二：【隔与通·虚与实】思辨张力写作模型</strong><br />
+          <div class="formula-bar">
+            结构公式：提出困境（物理/生活边界之逼仄） → 借物生智（发现某种巧思与媒介） → 辩证突破（隔而未隔、界而未界的升华） → 精神安顿（在有限中收获无限从容）
+          </div>
+          <p>
+            <strong>适用题型：</strong>中高考中高分哲思散文、议论性散文、考场思辨微作文。
+          </p>
+        </div>
+
+        <div class="sub-heading">📊 读写转化映射总表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">文本维度</th>
+              <th style="width: 35%;">课文经典特征</th>
+              <th style="width: 45%;">考场写作迁移抓手</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>立意提炼</strong></td>
+              <td>将具体的造园技术提炼为“虽由人作，宛自天开”的生命哲思。</td>
+              <td>写任何具体器物/劳动，严禁停留于“勤劳、熟练”，必须挖掘其背后的美学追求与精神信仰。</td>
+            </tr>
+            <tr>
+              <td><strong>结构布局</strong></td>
+              <td>总分严谨，从宏观骨干（四大讲究）到微观毛发（三大细部）。</td>
+              <td>写多对象作文坚决拒绝“流水账”，先用一句话提炼统摄全篇的“文眼”，再分枝散叶。</td>
+            </tr>
+            <tr>
+              <td><strong>细节描摹</strong></td>
+              <td>“阶砌栽书带草，墙蔓延爬山虎”，补足一切死角。</td>
+              <td>善于在文章的转折处或场景的边缘安排富有生机的细微物象，制造“处处有灵气”的饱满感。</td>
+            </tr>
+            <tr>
+              <td><strong>语言修饰</strong></td>
+              <td>“大多”、“往往”、“决不”等副词体现的精细分寸感。</td>
+              <td>在考场议论文论述中，熟练运用限定修饰语，使论证逻辑滴水不漏，杜绝以偏概全的空洞口号。</td>
+            </tr>
+            <tr>
+              <td><strong>主题升华</strong></td>
+              <td>在逼仄闹市中构建让人“忘却城市”的山水桃源。</td>
+              <td>将日常生活中的平凡事物，上升到对抗精神平庸、安顿个体诗意栖居的永恒母题。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 12 -->
+    <details class="guide-section" id="sec-12">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">12</span>
+          <span class="section-title">五个苏格拉底深想问题与多场景表达</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">🧠 直击深水区的五个苏格拉底深想追问</div>
+        <div class="item-block">
+          <ol class="num-list">
+            <li>
+              <strong>文本形式/逻辑张力问：</strong>为什么叶圣陶将“亭台轩榭不讲究对称”排在四大讲究的第一位，而不是将最具江南风情的“池沼游鱼”排在第一位？<br />
+              <span class="badge-comment">【思考支架】</span>建筑布局是整个园林的“骨架”，决定了人行走的动线与空间的大势；水石植物皆依附建筑而生。从骨骼到血肉，彰显了逻辑学上“由骨至肉”的不可逆顺序。
+            </li>
+            <li>
+              <strong>作者审美偏好两难问：</strong>文中对“修剪得像宝塔那样的松柏”判以“不足取”，难道西方几何对称园林（如凡尔赛宫）就不是人类文明的至高杰作吗？叶圣陶是在搞文化偏见吗？<br />
+              <span class="badge-comment">【思考支架】</span>绝非文化偏见，而是明确了“语境与坐标”。西方古典园林彰显的是启蒙时代人类理性征服自然、重构几何秩序的力量；而苏州园林代表的是东方哲学对天道造化的谦卑顺应与天人合一。不同的哲学基石孕育了完全不同的审美体系。
+            </li>
+            <li>
+              <strong>核心假设挑战问：</strong>假如真的如叶老所言“无论站在哪个点上，眼前总是一幅完美的图画”，那游览者会不会产生审美疲劳？这种处处设计的“刻意自然”，是否本身就是一种终极的人工束缚？<br />
+              <span class="badge-comment">【思考支架】</span>极佳的批判性视角！庄子讲“大巧若拙”，最顶级的匠心恰恰是在耗尽心机之后，让游人感受不到丝毫“匠气”，只觉得一切原本就该如此。
+            </li>
+            <li>
+              <strong>当代科技与 AI 时代共振问：</strong>在今天 AI 能够瞬间生成百万张“完美园林渲染图”、虚拟现实可以构建无边无际数字空间的时代，我们为什么还要亲自去苏州园林抚摸斑驳的花窗与青苔？<br />
+              <span class="badge-comment">【思考支架】</span>数字图画没有真实的晨昏风雨、草木冷暖与青石板的潮湿气味。苏州园林不仅是一幅视网膜上的图画，更是一座需要五感全开的“生命体验场”。
+            </li>
+            <li>
+              <strong>个体生命成长自省问：</strong>我们每个人的日常生活与内心空间，是早已被外界的考卷和规矩修剪成了“阅兵式似的道旁树”，还是依然保留着几分“俯仰生姿”的自然野趣？
+            </li>
+          </ol>
+        </div>
+
+        <div class="sub-heading">🎙️ 多场景表达协作示范（同一证据链的三级缩放）</div>
+        <div class="tint-box">
+          <strong>① 30秒快嘴课间版：</strong><br />
+          “你以为苏州园林只是古代有钱人的大别墅？大错特错！叶圣陶先生用一句话戳穿了它最牛的秘密：‘务必使游览者无论站在哪个点上，眼前总是一幅完美的图画’！甚至为了打破方寸小院的死板，他们故意在白墙上凿出镂空花窗，‘隔而未隔，界而未界’，把巴掌大的地方硬生生做成了无限深邃的宇宙！这就是真正的东方空间魔法！”
+        </div>
+        <div class="tint-warm">
+          <strong>② 3分钟课堂演讲/短视频文案版：</strong><br />
+          大家好！今天我想带大家重新认识初二课本里的《苏州园林》。很多人以为叶圣陶先生写的是一篇普通的风景解说，但只要你细读，就会发现这是一篇刀锋般锐利的东方美学宣言。<br />
+          在开篇确立了‘处处入画’的总纲之后，叶老写了一句极具风骨的话：‘没有修剪得像宝塔那样的松柏，没有阅兵式似的道旁树’。为什么？因为真正的自然美，绝不是把万物塞进冷酷划一的模具里。从假山的‘胸中有丘壑’，到花树的‘俯仰生姿’，再到花墙廊子的‘隔而未隔，界而未界’，造园大师告诉我们：美，产生于对天性的尊重与对边界的超越。无论时代如何内卷焦虑，愿我们每个人心中，都能修葺出一座拒绝整齐划一、独具画意的精神园林！
+        </div>
+        <div class="tint-accent">
+          <strong>③ 读书研讨会学术开场白：</strong><br />
+          “各位师友：重读叶圣陶先生的《苏州园林》，我们实际上是在叩问一个古老而崭新的哲学命题——人当如何在方寸囚笼中安顿辽阔诗心？叶老跳出了名胜古迹的琐碎考据，用‘事理说明’这柄解剖刀，精准剥离出江南造园的深层密码。从‘非对称’对抗机械理性，到‘漏窗障景’重构空间景深，苏州园林不仅是石木构件的物理营建，更是中国文人面对逼仄现实时所发起的一场优雅的心灵自救。今天，就让我们跟随叶老的文字听诊器，走进这场关于秩序、留白与诗性栖居的跨时空对话……”
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 13 -->
+    <details class="guide-section" id="sec-13">
+      <summary class="section-summary">
+        <div class="summary-left">
+          <span class="section-idx section-idx-warm">13</span>
+          <span class="section-title">综合实战习作、世界方法与元认知说明书</span>
+        </div>
+        <span class="summary-toggle-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">✍️ 双轨实战写作题（带评分量规）</div>
+        <div class="item-block">
+          <strong>【任务 A · 考场级综合大作文（600~800字）】</strong><br />
+          <strong>题目：</strong>《我身边的“画意”》或《方寸之间别有乾坤》<br />
+          <strong>写作支架：</strong><br />
+          1. <strong>选材定位：</strong>选择你熟悉的一处日常生活空间（如自家的阳台、书桌一角、校园林荫路或老旧居民区的小巷）；<br />
+          2. <strong>模型调用：</strong>必须调用本课提炼的【多维空间美学说明模型】或【隔与通思辨模型】；<br />
+          3. <strong>语言与细节：</strong>全文至少包含一处“俯仰生姿”式的立体动感描写、一处反同质化对比（如“没有……没有……”句式），并在文末由景物上升到个体的精神自处。
+        </div>
+
+        <div class="item-block">
+          <strong>【任务 B · 考场学术级文学微评论（250~350字）】</strong><br />
+          <strong>论题：</strong>就《苏州园林》中“隔而未隔，界而未界”的空间美学手法，写一段逻辑严密的文学短评。<br />
+          <strong>结构要求：</strong>论点明确 → 结合文中花墙镂窗证据 → 分析形式如何引发深邃心理感受 → 指出这一手法的哲学意蕴。
+        </div>
+
+        <div class="sub-heading">🔭 一周现实观察微行动卡</div>
+        <div class="tint-box">
+          <strong>行动名称：</strong>【发现身边的“画意断点”与“生机修补”】<br />
+          <strong>观察任务：</strong>连续三天，寻找校园或家里一个平时最杂乱或被遗忘的“死角”（如落满灰尘的走廊角落、堆积杂物的玄关）。<br />
+          <strong>操作动作：</strong><br />
+          1. 像叶圣陶审视角落栽书带草一样，尝试放置一盆绿植、贴一幅明信片或调整一盏台灯的角度；<br />
+          2. 记录前后光线、阴影与空间纵深感的变化；<br />
+          3. 用一段100字的小札，写出为何这一点微小的变动打破了原有的呆滞死气。
+        </div>
+
+        <div class="sub-heading">🌍 《从〈苏州园林〉学到的一种看世界的方法》：【图画系统解构法】</div>
+        <div class="tint-accent">
+          <strong>方法命名：</strong>【图画系统解构法】<br />
+          <strong>方法原型：</strong>叶圣陶面对上百座形貌各异的苏州园林，不迷失于纷繁个案，而是提炼出“一幅完美的图画”这一底层母系统，并下辖“四宏观+三微观”的分析框架。<br />
+          <strong>核心动作：</strong><br />
+          1. <strong>抓母题：</strong>面对复杂系统，先追问其终极追求（它是为了解决什么根本体验？）；<br />
+          2. <strong>理主干：</strong>拆解支撑该体验的3~4个决定性宏观维度，分清主次先后；<br />
+          3. <strong>抠细部：</strong>寻找哪怕最边缘的角落，检视其是否依然贯彻了母题的审美逻辑；<br />
+          4. <strong>辩虚实：</strong>观察系统内是否存在“阻隔与连通”的巧妙缓冲，拒绝一览无余的粗暴设计。<br />
+          <strong>适用边界：</strong>适用于建筑审视、文章谋篇、PPT版面排版、产品UI交互设计以及个人居所整理；当用于纯粹追求效率与标准化的工业流水线设计时，本方法需让位于实用功能逻辑。
+        </div>
+
+        <div class="sub-heading">🛡️ 读写元认知自我标注说明书（结业自评量表）</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">能力维度</th>
+              <th style="width: 40%;">L1~L2 基础水准（需提升）</th>
+              <th style="width: 40%;">L3~L4 卓越水准（本课达成）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>文本解读</strong></td>
+              <td>当成普通游记，摘抄景物好词好句，概括为“赞美了园林高超技艺”。</td>
+              <td>精准识别事理说明文特征，清晰梳理“总—分—总”与先主后次的逻辑链，洞察中国传统水墨画意与空间哲学的互证。</td>
+            </tr>
+            <tr>
+              <td><strong>语言剖析</strong></td>
+              <td>只会指出“用了打比方、作比较修辞，写得生动形象”。</td>
+              <td>精准听诊“绝不”、“大多”、“往往”背后的科学审慎分寸，透析“隔而未隔”的辩证修辞张力。</td>
+            </tr>
+            <tr>
+              <td><strong>写作迁移</strong></td>
+              <td>写写景作文依然是一步一步报流水账，景物杂乱无中心。</td>
+              <td>熟练调用“总纲—主干—细部”模型，在有限篇幅内制造空间层次与时间相间，并能提炼深刻的人生留白立意。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <footer>
+      统编版初中语文深度赏析与读写结合电子书 · 学习笔记专属排版 · 2026
+    </footer>
+  </div>
+
+  <script>
+    function toggleAll(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+    function filterTrack(track) {
+      document.querySelectorAll('.guide-section').forEach((d, idx) => {
+        const num = idx + 1;
+        if (track === 'read') {
+          d.open = (num <= 8);
+        } else if (track === 'write') {
+          d.open = (num >= 9);
+        }
+      });
+      const targetId = (track === 'read') ? 'sec-01' : 'sec-09';
+      const targetElem = document.getElementById(targetId);
+      if (targetElem) {
+        targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
+</body>
+</html>

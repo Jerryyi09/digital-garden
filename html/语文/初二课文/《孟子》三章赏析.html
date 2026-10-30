@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>《孟子》三章深度赏析与读写结合导读</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.07);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.11);
+        --bg-warm: rgba(251, 146, 60, 0.11);
+        --bg-danger: rgba(248, 113, 113, 0.11);
+        --bg-success: rgba(74, 222, 128, 0.11);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; }
+
+    /* 顶部 Hero */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 { font-size: 22px; font-weight: 800; line-height: 1.35; margin-bottom: 4px; }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+    }
+    .hero-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tool-tag {
+      font-size: 11.5px;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .t-btn.read { background: var(--bg-accent); color: var(--primary); }
+    .t-btn.write { background: var(--bg-warm); color: var(--secondary); }
+
+    .part-divider {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目（唯一外框） */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--bg-accent);
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .sec-num.warm { background: var(--bg-warm); color: var(--secondary); }
+    .sec-title { font-size: 15px; font-weight: 700; line-height: 1.35; }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; }
+    }
+
+    /* 标题与流式分隔（无嵌套框） */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* 紧凑双列/三列规格网格 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+
+    /* 纯色块区分（左侧3px竖线，内部绝无嵌套边框） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      border-radius: 0 6px 6px 0;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); border-radius: 6px; }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); }
+
+    /* 短公式条与代码行内标签 */
+    .formula-bar {
+      background: var(--bg-accent);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .formula-tag {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--primary);
+      display: inline-block;
+    }
+
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+      vertical-align: middle;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 满宽表格自适应 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* 内联 SVG 容器 */
+    .svg-wrap {
+      width: 100%;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 8px 4px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+
+    ul.bullet-list, ol.num-list { padding-left: 18px; margin: 5px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14px; margin-bottom: 5px; line-height: 1.72; }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      <div class="hero-badges">
+        <span class="badge">古诗文轨 · 03 先秦诸子与论说辞赋</span>
+        <span class="badge badge-warm">统编初中语文八年级上册 · 第六单元</span>
+      </div>
+      <h1>《孟子》三章 深度赏析与读写结合</h1>
+      <p class="hero-sub">孟子（约前372—前289，名轲，战国邹人，“亚圣”，儒家思孟学派宗师）</p>
+      <div class="hero-quote">
+        <strong>一句话文眼：</strong>“富贵不能淫，贫贱不能移，威武不能屈，此之谓大丈夫。”<br>
+        <span style="font-size: 13px; color: var(--text-muted);">治国之本在“人和民心”，立身之基在“道义风骨”，成才之道在“逆境淬炼”——孟子以浩然之气构建的中国精神定海神针。</span>
+      </div>
+      <div class="hero-tools">
+        <span class="tool-tag">🔍 训诂字源刀</span>
+        <span class="tool-tag">📐 诸子论辩层进仪</span>
+        <span class="tool-tag">⚖️ 大丈夫人格标尺</span>
+        <span class="tool-tag">⚗️ 考场立意炼金炉</span>
+      </div>
+    </header>
+
+    <!-- 置顶控制工具栏 -->
+    <nav class="toolbar" aria-label="导读导航控制">
+      <button class="t-btn" onclick="toggleAllSections(true)">展开全部</button>
+      <button class="t-btn" onclick="toggleAllSections(false)">收起全部</button>
+      <button class="t-btn read" onclick="focusTrack('read')">📖 读懂篇 (01-08)</button>
+      <button class="t-btn write" onclick="focusTrack('write')">✍️ 读写转化 (09-13)</button>
+    </nav>
+
+    <!-- 分割标记 -->
+    <div class="part-divider">上篇 · 文本深读、训诂对译与思想批评</div>
+
+    <!-- ==========================================
+         栏目 01 · 课文坐标、单元定位与初读破冰
+         ========================================== -->
+    <details class="guide-section" id="sec-01" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">01</span>
+          <h2 class="sec-title">课文坐标、单元定位与初读破冰</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">篇目与作者</div>
+            <div class="spec-val">《孟子》三章 / 孟子及门人</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">教材单元定位</div>
+            <div class="spec-val">八年级上册第六单元 · 诸子散文</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">细分类目定位</div>
+            <div class="spec-val">先秦诸子论说文（主）/ 论辩史料（次）</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">核心文体机制</div>
+            <div class="spec-val">层层递进立论 + 破立结合驳论 + 归纳演译</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">核心理论镜头</div>
+            <div class="spec-val">六书训诂学 + 儒家主体性伦理学 + 雄辩修辞学</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">中考考查核心</div>
+            <div class="spec-val">使动与通假 / 排比论证气势 / 大丈夫风骨现代阐释</div>
+          </div>
+        </div>
+
+        <div class="tint-bad">
+          <strong>⚠️ 审美与防误读预警：</strong>
+          切忌将“大丈夫”矮化为“掌握绝对暴力与权势的霸道强人”，更切忌将“生于忧患”鸡汤化为“只要受苦就必然成才”。孟子的大丈夫核心在“道义自主”，而非“权谋成败”；苦难成才的关键在于“动心忍性”的自觉反思，而非苦难本身。
+        </div>
+
+        <div class="sub-heading">初读三问破冰卡（苏格拉底深层触动）</div>
+        <div class="item-block">
+          <p><strong>🔥 最打动人心的触动点：</strong><span class="badge-evidence">【文本依据】</span>“富贵不能淫，贫贱不能移，威武不能屈”。在战国策士唯利是图、朝秦暮楚的浊浪中，孟子立下的不仅是一套道德准则，更是中国知识分子抵御权势侵蚀、保持灵魂站立的傲岸铁骨。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>❓ 最容易读滑过去的困惑/反常点：</strong><span class="badge-evidence">【文本依据】</span>景春称赞公孙衍、张仪“一怒而诸侯惧，安居而天下息”，在世俗眼光中这堪称顶峰权势与英雄，为何孟子一上来就严厉斥责其为“妾妇之道”？孟子用“出嫁从夫、顺从夫子”的侍奉逻辑，精准刺破了纵横家“看似玩弄诸侯、实则彻底依附君王意志”的奴才底色。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>✂️ 删改直觉实验：</strong>如果把《生于忧患，死于安乐》开头并列的舜、傅说、胶鬲、管夷吾、孙叔敖、百里奚六位先贤名号全部删去，直接开门见山写“天将降大任于人也，必先磨砺其身心”，文章会发生什么塌陷？——论证瞬间失去先秦上古历史与集体记忆的千钧实证分量，从“无可辩驳的史实归纳”退化为空洞干瘪的说教。</p>
+        </div>
+
+        <div class="tint-accent">
+          <strong>🌍 本课“看世界的方法”初始猜想：</strong>
+          【精神主体立基法】——在外部世界以胜负、财富、暴力论英雄时，学会用“仁义正道”作为终极审判标尺，建立不受外界权势诱惑与逼迫的自我主权。
+        </div>
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 02 · 字词句精粹、训诂对译与篇章拓扑 SVG
+         ========================================== -->
+    <details class="guide-section" id="sec-02" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">02</span>
+          <h2 class="sec-title">字词句精粹、训诂对译与篇章拓扑 SVG</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <div class="sub-heading">文明关键字与六书字源训诂</div>
+        <div class="item-block">
+          <p><strong>1. 「道」字（象形兼会意 · 辵部）</strong>：<span class="badge-evidence">【文本依据】</span>“得道者多助，失道者寡助”；“行天下之大道”。金文由“行”（十字路口）与“首”（头颅、眼睛注视）组成，原指人目光引领所踏出的大路。在孟子笔下，“道”完成了从具体通路向政治哲学最高维度的升华，特指合乎天理人性的<strong>“王道仁政”</strong>与<strong>“道德本心”</strong>，反之“霸道暴政”即为失道。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>2. 「淫」字（形声 · 水部）</strong>：<span class="badge-evidence">【文本依据】</span>“富贵不能淫”。《说文》：“淫，私逸也，从水侚声。一曰浸淫随理也。”本义为雨水过多漫溢成灾。引申为过度、放纵、惑乱心志。此处为<strong>使动用法</strong>：“使……迷惑放纵”，指显赫的财富地位不能使自己的本心漫溢迷失。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>3. 「移」字（形声 · 禾部）</strong>：<span class="badge-evidence">【文本依据】</span>“贫贱不能移”。金文从禾多声，本指禾苗随风倾斜、移植变动。引申为改变方向、动摇志节。此处为<strong>使动用法</strong>：“使……改变”，指物质生活的困厄匮乏不能使内在的气节信仰随风倾倒。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>4. 「屈」字（会意 · 尾部）</strong>：<span class="badge-evidence">【文本依据】</span>“威武不能屈”。从尾出声，像动物尾巴受压折弯之形，本义为弯曲。引申为屈服、折节。此处为<strong>使动用法</strong>：“使……屈服”，指强权暴力的威吓无法迫使崇高的人格脊梁下跪。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>5. 使动与通假词群训诂：</strong>
+            <br>• <strong>苦、劳、饿、空乏</strong>：均为形容词/动词的使动用法，即“使……受痛苦”、“使……经受劳累”、“使……经受饥饿”、“使……资财缺乏”。
+            <br>• <strong>动、忍</strong>：使动用法，“使他的心惊动警觉”、“使他的性格坚韧克制”。
+            <br>• <strong>曾</strong>：通“增”，增加；“曾益其所不能”即增加他所不具备的才能。
+            <br>• <strong>衡</strong>：通“横”，梗塞、不顺畅；“困于心，衡于虑”指内心受困、思虑堵塞。
+            <br>• <strong>拂</strong>：两处异义：①“行拂乱其所为”中为动词，阻挠、颠倒；②“入则无法家拂士”中“拂”通“弼”，辅佐之意。</p>
+        </div>
+
+        <div class="sub-heading">重点句式剖分与括号层次对译表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 32%;">文言原句与特殊句式</th>
+              <th style="width: 44%;">括号补省精准直译</th>
+              <th style="width: 24%;">文气与机制点评</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>城非不高也，池非不深也，兵革非不坚利也，米粟非不多也……</strong><br><span class="formula-tag">双重否定四重排比</span></td>
+              <td>城墙不是不高（防守设施不可谓不险），护城河不是不深，武器盔甲不是不坚硬锋利，粮食储备不是不充足（然而守城者依然）弃城而逃……</td>
+              <td>以四重否定句式层层推高物力防守的极限，随即以“委而去之”剧烈反跌，坐实“人和”压倒“地利”。</td>
+            </tr>
+            <tr>
+              <td><strong>以顺为正者，妾妇之道也。</strong><br><span class="formula-tag">判断句 · 喻证驳论</span></td>
+              <td>把（对君主权贵盲目地）顺从当作正理规矩的，（不过是像宫妾妇人侍奉丈夫一样的）奴才之道罢了。</td>
+              <td>用一记辛辣断喝，撕开策士呼风唤雨的威风假象，剥离其谄媚奴役的依附本质。</td>
+            </tr>
+            <tr>
+              <td><strong>困于心，衡于虑，而后作；征于色，发于声，而后喻。</strong><br><span class="formula-tag">对仗复句 · 心理实证</span></td>
+              <td>（人的思想）在内心经历困顿，思虑受到阻塞，然后才能奋起有所作为；（忧患情态）显露在脸色上，流露在声音中，然后才能被人所理解领会。</td>
+              <td>精准剖析心智突破的心理临界点——从内在的压抑激荡，走向外在的行动顿悟。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">篇章结构拓扑与先秦诸子论辩演进网（原生矢量 SVG）</div>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#175d7e" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#c05621" stop-opacity="0.05" />
+              </linearGradient>
+              <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#175d7e" />
+              </marker>
+              <marker id="arrowWarm" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#c05621" />
+              </marker>
+            </defs>
+
+            <!-- 外框底色 -->
+            <rect x="8" y="8" width="704" height="304" rx="10" fill="url(#bgGrad)" stroke="#175d7e" stroke-width="1" stroke-opacity="0.2"/>
+
+            <!-- 顶部总标题 -->
+            <text x="360" y="32" font-size="14" font-weight="bold" fill="#175d7e" text-anchor="middle" letter-spacing="1">《孟子》三章论辩拓扑：政治秩序 · 独立人格 · 生命磨砺之三重建构</text>
+
+            <!-- 篇章 1：《得道多助》政治论辩 -->
+            <g transform="translate(24, 52)">
+              <rect x="0" y="0" width="210" height="200" rx="8" fill="#ffffff" stroke="#175d7e" stroke-width="1.2" />
+              <rect x="0" y="0" width="210" height="28" rx="8" fill="#175d7e" fill-opacity="0.12" />
+              <text x="105" y="19" font-size="12" font-weight="bold" fill="#175d7e" text-anchor="middle">① 政治维 · 《得道多助》</text>
+
+              <rect x="15" y="40" width="180" height="24" rx="4" fill="#f4efe6" />
+              <text x="105" y="56" font-size="11" fill="#1c2429" text-anchor="middle">天时不如地利，地利不如人和</text>
+
+              <path d="M 105 64 L 105 78" stroke="#175d7e" stroke-width="1.2" marker-end="url(#arrow)" />
+
+              <rect x="15" y="80" width="180" height="34" rx="4" fill="#f4efe6" />
+              <text x="105" y="94" font-size="10.5" fill="#52606d" text-anchor="middle">攻城不拔（验天时）</text>
+              <text x="105" y="108" font-size="10.5" fill="#52606d" text-anchor="middle">弃城而逃（验地利虚妄）</text>
+
+              <path d="M 105 114 L 105 128" stroke="#175d7e" stroke-width="1.2" marker-end="url(#arrow)" />
+
+              <rect x="15" y="130" width="180" height="24" rx="4" fill="#f4efe6" />
+              <text x="105" y="146" font-size="10.5" fill="#1c2429" text-anchor="middle">域民/固国/威天下“三不以”</text>
+
+              <path d="M 105 154 L 105 168" stroke="#175d7e" stroke-width="1.2" marker-end="url(#arrow)" />
+
+              <rect x="15" y="170" width="180" height="22" rx="4" fill="#175d7e" fill-opacity="0.15" />
+              <text x="105" y="185" font-size="11" font-weight="bold" fill="#175d7e" text-anchor="middle">得道多助 ➔ 天下顺之</text>
+            </g>
+
+            <!-- 篇章 2：《富贵不能淫》人格确立 -->
+            <g transform="translate(255, 52)">
+              <rect x="0" y="0" width="210" height="200" rx="8" fill="#ffffff" stroke="#c05621" stroke-width="1.2" />
+              <rect x="0" y="0" width="210" height="28" rx="8" fill="#c05621" fill-opacity="0.12" />
+              <text x="105" y="19" font-size="12" font-weight="bold" fill="#c05621" text-anchor="middle">② 人格维 · 《富贵不能淫》</text>
+
+              <rect x="15" y="40" width="180" height="24" rx="4" fill="#f4efe6" />
+              <text x="105" y="56" font-size="10.5" fill="#b91c1c" text-anchor="middle">树靶：景春颂纵横“一怒诸侯惧”</text>
+
+              <path d="M 105 64 L 105 78" stroke="#c05621" stroke-width="1.2" marker-end="url(#arrowWarm)" />
+
+              <rect x="15" y="80" width="180" height="34" rx="4" fill="#f4efe6" />
+              <text x="105" y="94" font-size="10.5" fill="#b91c1c" text-anchor="middle">破论：以顺为正者，妾妇之道</text>
+              <text x="105" y="108" font-size="10" fill="#52606d" text-anchor="middle">剥离纵横策士依附奴性</text>
+
+              <path d="M 105 114 L 105 128" stroke="#c05621" stroke-width="1.2" marker-end="url(#arrowWarm)" />
+
+              <rect x="15" y="130" width="180" height="24" rx="4" fill="#f4efe6" />
+              <text x="105" y="146" font-size="10.5" fill="#1c2429" text-anchor="middle">立道：居广居·立正位·行大道</text>
+
+              <path d="M 105 154 L 105 168" stroke="#c05621" stroke-width="1.2" marker-end="url(#arrowWarm)" />
+
+              <rect x="15" y="170" width="180" height="22" rx="4" fill="#c05621" fill-opacity="0.15" />
+              <text x="105" y="185" font-size="11" font-weight="bold" fill="#c05621" text-anchor="middle">富贵不淫·贫贱不移·威武不屈</text>
+            </g>
+
+            <!-- 篇章 3：《生于忧患》生命磨砺 -->
+            <g transform="translate(486, 52)">
+              <rect x="0" y="0" width="210" height="200" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="1.2" />
+              <rect x="0" y="0" width="210" height="28" rx="8" fill="#15803d" fill-opacity="0.12" />
+              <text x="105" y="19" font-size="12" font-weight="bold" fill="#15803d" text-anchor="middle">③ 成才维 · 《生于忧患》</text>
+
+              <rect x="15" y="40" width="180" height="24" rx="4" fill="#f4efe6" />
+              <text x="105" y="56" font-size="10.5" fill="#1c2429" text-anchor="middle">舜/傅说/胶鬲等六圣贤出身微贱</text>
+
+              <path d="M 105 64 L 105 78" stroke="#15803d" stroke-width="1.2" marker-end="url(#arrow)" />
+
+              <rect x="15" y="80" width="180" height="34" rx="4" fill="#f4efe6" />
+              <text x="105" y="94" font-size="10.5" fill="#52606d" text-anchor="middle">苦心志·劳筋骨·饿体肤·乱所为</text>
+              <text x="105" y="108" font-size="10" fill="#15803d" text-anchor="middle">动心忍性 ➔ 曾益其所不能</text>
+
+              <path d="M 105 114 L 105 128" stroke="#15803d" stroke-width="1.2" marker-end="url(#arrow)" />
+
+              <rect x="15" y="130" width="180" height="24" rx="4" fill="#f4efe6" />
+              <text x="105" y="146" font-size="10.5" fill="#1c2429" text-anchor="middle">个人困心衡虑 ➔ 国家无外患亡</text>
+
+              <path d="M 105 154 L 105 168" stroke="#15803d" stroke-width="1.2" marker-end="url(#arrow)" />
+
+              <rect x="15" y="170" width="180" height="22" rx="4" fill="#15803d" fill-opacity="0.15" />
+              <text x="105" y="185" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">生于忧患 · 死于安乐</text>
+            </g>
+
+            <!-- 底部交汇枢纽 -->
+            <rect x="140" y="265" width="440" height="34" rx="6" fill="#175d7e" fill-opacity="0.08" stroke="#175d7e" stroke-dasharray="4,3" />
+            <text x="360" y="287" font-size="12" font-weight="bold" fill="#175d7e" text-anchor="middle">底层思想归旨：养吾浩然之气 · 仁义礼智根植自心 · 抗衡战国霸道攻伐</text>
+
+            <path d="M 129 252 L 200 265" stroke="#175d7e" stroke-width="1" stroke-dasharray="2,2" />
+            <path d="M 360 252 L 360 265" stroke="#c05621" stroke-width="1" stroke-dasharray="2,2" />
+            <path d="M 591 252 L 520 265" stroke="#15803d" stroke-width="1" stroke-dasharray="2,2" />
+          </svg>
+        </div>
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 03 · 文本显微镜与语言听诊器
+         ========================================== -->
+    <details class="guide-section" id="sec-03">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">03</span>
+          <h2 class="sec-title">文本显微镜与语言听诊器：细读批注与正反改写实验</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <!-- 细读 1 -->
+        <div class="item-block">
+          <div class="formula-bar">细读 01 ｜ 四重双重否定排比的千钧文气（《得道多助》）</div>
+          <p><span class="badge-evidence">【文本依据】</span>“城非不高也，池非不深也，兵革非不坚利也，米粟非不多也，委而去之，是地利不如人和也。”</p>
+          <div class="tint-box">
+            <strong>🔍 文本显微镜：</strong>连续调动防御建筑（城、池）与战争消耗物资（兵革、米粟）四项客观物理硬件指标，全部置于“非不……也”的双重否定模版中，声调促迫，如战鼓咚咚擂起；然而，在所有硬件条件臻于极致的瞬间，孟子笔锋凌空一折，吐出冷峻的四个字——“委而去之”（守军弃城溃逃）。
+          </div>
+          <div class="tint-box">
+            <strong>🩺 语言听诊器：</strong>形式即内容。双重否定赋予了语言绝对的不容置疑感；四音节的重叠推进（城非不高也／池非不深也……）形成了如同滚石下山般的<strong>声律回环势能</strong>。这种“极力铺垫硬件完美 ➔ 刹那间全盘瓦解”的反差，用无可辩驳的事实撕碎了统治者对物理防御设施的迷信。
+          </div>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“城墙很高，护城河很深，兵器很锋利，粮食也很多，但大家还是逃跑了，所以人和最重要。”<br>
+            <em>病灶：陈述平铺直叙，毫无层层蓄势后轰然坍塌的心理冲击力，论证力度彻底疲软。</em>
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>原文借助双重否定排比制造了极高的大气压强，在峰顶骤然斩断，以剧烈的<strong>落差反讽</strong>直击论题灵魂——没有民心，铜墙铁壁不过是风中流沙。
+          </div>
+        </div>
+
+        <!-- 细读 2 -->
+        <div class="item-block">
+          <div class="formula-bar">细读 02 ｜ 儒家道德空间隐喻的三位一体（《富贵不能淫》）</div>
+          <p><span class="badge-evidence">【文本依据】</span>“居天下之广居，立天下之正位，行天下之大道。得志，与民由之；不得志，独行其道。”</p>
+          <div class="tint-box">
+            <strong>🔍 文本显微镜：</strong>孟子在此创造了一组雄浑的空间隐喻：“广居”（宽广的住宅）、“正位”（端正的站位）、“大道”（宽阔坦途）。在先秦文献中，这绝非指物理建筑，朱熹《四书章句集注》明确解构：“广居，仁也；正位，礼也；大道，义也。”
+          </div>
+          <div class="tint-box">
+            <strong>🩺 语言听诊器：</strong>动词“居、立、行”构成了一个人安身立命的完整动作链：<strong>居</strong>是内在的情感安顿（仁者爱人，心安即广居）；<strong>立</strong>是外在的仪轨立足（礼节规矩，不偏不倚）；<strong>行</strong>是具体的社会实践（行义于世，无愧天地）。排比鼎足而立，音韵铿锵；随后“得志/不得志”的转折对仗，展示了士人超越顺逆境遇的恒定气象。
+          </div>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“我们要遵守仁义礼智，顺境时带领百姓好好干，逆境时自己一个人坚持原则。”<br>
+            <em>病灶：将充盈着天地空间感的伟大隐喻降维为抽象枯燥的道德说教，失去了宇宙苍茫间巍峨立人的神圣感。</em>
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>孟子以“天地的尺度”丈量“个体的脊梁”，让儒家道德化作可感、可栖居、可行走的广袤宇宙，赋予人格尊严以万钧重量。
+          </div>
+        </div>
+
+        <!-- 细读 3 -->
+        <div class="item-block">
+          <div class="formula-bar">细读 03 ｜ 历史归纳法与使动动词的高压熔炉（《生于忧患》）</div>
+          <p><span class="badge-evidence">【文本依据】</span>“舜发于畎亩之中，傅说举于版筑之间……故天将降大任于是人也，必先苦其心志，劳其筋骨，饿其体肤，空乏其身，行拂乱其所为，所以动心忍性，曾益其所不能。”</p>
+          <div class="tint-box">
+            <strong>🔍 文本显微镜：</strong>开篇六个“于”字被动句式列阵（畎亩、版筑、鱼盐、士、海、市），涵盖农夫、泥瓦工、小贩、囚犯、隐士、奴隶，全方位呈现社会底层边缘人。接着以一组密集连贯的使动动词——“苦、劳、饿、空乏、拂、乱”，对主人公进行肉体、生计、意志与处境的立体轰炸。
+          </div>
+          <div class="tint-box">
+            <strong>🩺 语言听诊器：</strong>六位先贤并举是<strong>先秦诸子归纳论辩法</strong>的典范。随后的使动动词排比句节奏急促短悍，如同铁锤连续重击砧板上的毛铁，声韵如裂帛；最后以“动心忍性，曾益其所不能”平缓降调收束，揭示出这一连串非人折磨的终极目的——精神主体的脱胎换骨。
+          </div>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版：</strong>“历史上很多大人物小时候都很穷很苦。所以老天要重用一个人，一定要让他吃很多苦，这样他才能学到新本领。”<br>
+            <em>病灶：丧失了上古史诗人物列阵的庄严感，抹平了使动词铸造的肉身淬炼痛感与精神升华的张力。</em>
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制：</strong>以无可辩驳的史实作为底座，通过“受难—淬炼—升华”的音律律动，构建起古典文明史上最为震撼的心智演进模型。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 04 · 结构罗盘与论辩机制
+         ========================================== -->
+    <details class="guide-section" id="sec-04">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">04</span>
+          <h2 class="sec-title">结构罗盘与论辩机制：先秦诸子的论辩利刃</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">三篇章论辩结构剖析</div>
+        <div class="item-block">
+          <p><strong>1. 《得道多助，失道寡助》：层层剥笋的演绎递推链</strong>
+            <br>• <strong>起（立论）</strong>：开篇斩钉截铁提出总论点“天时不如地利，地利不如人和”，统领全篇；
+            <br>• <strong>承（验战）</strong>：从军事攻防两端设验：先以攻城“环而攻之而不胜”验“天时不如地利”；再以守城“城高池深兵利粟多而委而去之”验“地利不如人和”；
+            <br>• <strong>转（推治）</strong>：由局部战事推演至国家治理顶层设计，提出“域民/固国/威天下”的三个反向假设（不以封疆、不以山溪、不以兵革）；
+            <br>• <strong>合（结穴）</strong>：由治国推演出政治总规律——“得道多助，失道寡助”，最终以“亲戚畔之”对比“天下顺之”，得出“战必胜矣”的必然结论。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>2. 《富贵不能淫》：先破后立的驳论解构法</strong>
+            <br>• <strong>树靶</strong>：引述景春之言，指出世俗对权谋策士“一怒诸侯惧，安居天下息”的盲目崇拜；
+            <br>• <strong>破论（归谬）</strong>：用士人之礼反诘，以女子出嫁“以顺为正”为譬喻，一针见血判定纵横策士表面威风、实为毫无独立人格的“妾妇”；
+            <br>• <strong>立论（树碑）</strong>：重新确立儒家男儿的行动大宪章：居广居（仁）、立正位（礼）、行大道（义）；进则“与民由之”，退则“独行其道”；
+            <br>• <strong>升华</strong>：掷地有声定义“富贵不淫、贫贱不移、威武不屈”的大丈夫终极人格标尺。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>3. 《生于忧患，死于安乐》：由点及面、由人及国的归纳飞跃</strong>
+            <br>• <strong>事实归纳</strong>：六位上古名贤从底层泥淖崛起的排比案例；
+            <br>• <strong>内在机理</strong>：阐释“天降大任”的生理心理熔炉法则（动心忍性，曾益其所不能）；
+            <br>• <strong>心智跃迁</strong>：微观聚焦个体犯错、受困、顿悟的成长闭环（困于心，衡于虑，而后作）；
+            <br>• <strong>宏观升华</strong>：由“个人修身成才”跃升至“国家存亡之道”（无法家拂士、无敌国外患者恒亡），结穴于“生于忧患而死于安乐”的千古通则。</p>
+        </div>
+
+        <div class="tint-warm">
+          <strong>📐 孟子论辩美学核心：“气盛言宜”</strong>
+          <br><span class="badge-context">【文学背景】</span>韩愈在《清河房公字序》中赞誉：“孟子之文章，说理不仅透彻，尤在其浩然充沛之气，气盛则言之短长与声之高下皆宜。”孟子的论辩从不抠字眼玩弄诡辩，而是以宏阔的胸襟、磅礴的排偶、剧烈的转折对照，展现出真理在胸的浩然正气。
+        </div>
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 05 · 意象网络、主题三层与儒家哲学微评论
+         ========================================== -->
+    <details class="guide-section" id="sec-05">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">05</span>
+          <h2 class="sec-title">意象网络、主题三层与儒家哲学微评论</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">儒家核心概念拓扑网络</div>
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">政治理想</div>
+            <div class="spec-val">【得道与人和】</div>
+            <div class="spec-label" style="margin-top:4px;">民心为天，反对纯军事硬件与疆界威权迷信</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">人格主体</div>
+            <div class="spec-val">【大丈夫风骨】</div>
+            <div class="spec-label" style="margin-top:4px;">内植仁礼义，拒绝沦为强权与利益的妾妇附庸</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">生命锤炼</div>
+            <div class="spec-val">【忧患与反躬】</div>
+            <div class="spec-label" style="margin-top:4px;">困心衡虑，化苦难为曾益其所不能的认知资产</div>
+          </div>
+        </div>
+
+        <div class="sub-heading">主题三层掘进模型</div>
+        <div class="item-block">
+          <p><strong>1. 表层处境：</strong>战国兼并战争惨烈残酷，列国君王穷兵黩武，游说策士朝秦暮楚，士人平民陷于战火与贫困的深渊。</p>
+          <p><strong>2. 深层困境：</strong>世俗彻底陷入“唯功利成败论英雄”与“唯暴力威权为真理”的精神异化；知识分子沦为权势的附庸与玩偶，国家因沉溺武力和享乐而走向瓦解。</p>
+          <p><strong>3. 根本追问：</strong>在强权碾压一切的大争之世，人何以确立不可剥夺的尊严？治国的终极基石究竟是外在的暴力还是内在的道义？</p>
+          <div class="formula-bar">
+            核心价值张力公式：【内在主体性之仁义担当与人格操守】 ⚡ 【外在现实之霸道强权、名利诱惑与生存重压】
+          </div>
+        </div>
+
+        <div class="sub-heading">大学中文系级哲学微评论示范（约 300 字）</div>
+        <div class="tint-accent">
+          <p><span class="badge-comment">【延伸评论】</span><strong>评孟子“大丈夫”伦理对先秦依附性权谋的解构</strong></p>
+          <p style="text-indent: 2em; margin-top: 4px;">
+            在战国大变局中，公孙衍、张仪所代表的纵横策士，凭借三寸不烂之舌操弄诸侯，“一怒诸侯惧”，看似登上了权势巅峰，但孟子以洞穿历史的冷峻目光揭露其本质：他们的一切威风，均建立在对君主欲望的奴颜婢膝与绝对顺从之上。这种“以顺为正”的行径，剥夺了个体精神的内在自足，本质上与侍奉主人的“妾妇”无异。孟子所挺立的“大丈夫”，不是占有暴力的超人，而是以“仁、礼、义”重构宇宙空间的伦理主体。当个体将根系扎入“广居、正位、大道”，世俗意义上的“富贵、贫贱、威武”便全部失去了贬损或抬高人格的能力。孟子的这一宣告，在两千年前宣告了中国知识分子精神自主权的诞生，确立了道义高于权势的永恒法则。
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 06 · 阐释边界与不确定性判断尺
+         ========================================== -->
+    <details class="guide-section" id="sec-06">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">06</span>
+          <h2 class="sec-title">阐释边界与不确定性判断尺：确定、推测与合理异读</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">诠释学循环与事实判断尺</div>
+
+        <div class="tint-good">
+          <strong>🟢 可以确定（铁证如山，有原文结构支撑）：</strong>
+          <br>1. 孟子主张战争与政治胜负的决定因素是“人心向背（人和）”，而非纯粹武器装备、城池险阻（“天时不如地利，地利不如人和”）；
+          <br>2. 孟子坚决否定纵横家的人格独立性，将其行为机制界定为“妾妇依附之道”；
+          <br>3. 孟子认为逆境与挫折具有迫使主体反思内省、进而激发潜在抗逆力的心理机制（“动心忍性，曾益其所不能”）。
+        </div>
+
+        <div class="tint-accent">
+          <strong>🟡 可以推测（合理延伸，结合文明语境推导）：</strong>
+          <br>1. “天将降大任于是人也”中的“天”，并非人格化的造物神，而是儒家哲学中蕴含道德秩序与历史使命感的“天命”隐喻；
+          <br>2. 孟子对“无法家拂士、无敌国外患，国恒亡”的警示，实际上触及了现代组织行为学中的“系统内卷与外部压力倒逼激活”机制。
+        </div>
+
+        <div class="tint-bad">
+          <strong>🔴 暂不判断 / 警惕过度阐释（教辅与现代泛化误区）：</strong>
+          <br>1. <strong>误把“民本”等同于现代“民主自由”</strong>：孟子的“得道多助”与“民贵君轻”，本质上仍是圣王明君代民做主的仁慈治理哲学，绝非现代公民平权选举的代议制度；
+          <br>2. <strong>把“生于忧患”曲解为“苦难崇拜”</strong>：苦难本身绝不等于财富或才能；无数人在赤贫与战乱中被摧毁毁灭。唯有在苦难中完成“困心衡虑”的认知重构，苦难才具备正向价值。
+        </div>
+
+        <div class="sub-heading">🪟 接受视野窗：多元异读交锋</div>
+        <div class="item-block">
+          <p><strong>辩题：在战国现实历史语境下，张仪与孟子谁更具历史推进力？</strong>
+            <br>• <strong>异读视角 A（实用主义与历史实效）：</strong>从短期政治效果而言，张仪连横破楚破齐，为秦国兼并六国、终结战国五百年乱世立下不世之功；而孟子奔走梁齐，屡遭诸侯冷落，其学说被讥为“迂远而阔于事情”。
+            <br>• <strong>异读视角 B（文化道统与长时段精神）：</strong>秦王朝凭借纵横法家二世而亡，而孟子所确立的“大丈夫”气节与仁政民本思想，成为中华民族百折不挠的伦理支柱与文明密码。正如清代学者焦循所言：“张仪之功在一时，孟子之道在万世。”</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 07 · 知人论世、文体源流与文明思想坐标
+         ========================================== -->
+    <details class="guide-section" id="sec-07">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">07</span>
+          <h2 class="sec-title">知人论世、文体源流与文明思想坐标</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">【文学背景】战国大变局与孟子的孤愤道统</div>
+        <div class="item-block">
+          <p><span class="badge-context">【文学背景】</span><strong>大争之世的儒家突围：</strong>
+          战国中期，封建宗法制彻底瓦解，七雄逐鹿，兼并战争规模动辄伏尸百万。诸侯君主急功近利，重用商鞅之刻薄刑名、孙膑庞涓之兵法诡道、苏秦张仪之朝秦暮楚。孟子继承孔子学说，游说齐宣王、梁惠王等当世雄主，倡导“仁政”、“制民之产”、“与民同乐”，却因不合诸侯“富国强兵”之急欲而“道既通，不用”。晚年孟子退而讲学，与万章等弟子著书立说，他的文字中充溢着一种“虽千万人吾往矣”的悲壮与傲骨。</p>
+        </div>
+
+        <div class="sub-heading">文体源流：先秦散文从“微言大义”到“浩然长辩”</div>
+        <div class="item-block">
+          <p>从《论语》的<strong>简短语录体</strong>（雍容和雅、多言行记录），发展到《孟子》，诸子散文完成了一次文体质的飞跃：
+            <br>① <strong>对话篇幅大幅拉长</strong>：形成了围绕一个命题展开层层辩难的论辩散文；
+            <br>② <strong>设喻与归谬的成熟运用</strong>：以日常生动经验作譬，诱敌深入，继而凌空一击；
+            <br>③ <strong>辞气激越，排偶连环</strong>：大量使用整齐的对仗句与排比句，形成了先秦散文中独步天下的“磅礴文气”。</p>
+        </div>
+
+        <div class="sub-heading">诸子争鸣思想坐标定位</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">学派代表</th>
+              <th style="width: 40%;">面对乱世的核心主张</th>
+              <th style="width: 35%;">对“个体人格”的定义</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>儒家 · 孟子</strong></td>
+              <td>尊王道、行仁政、保民而王</td>
+              <td><strong>大丈夫</strong>：仁礼义立身，穷则独善其身，达则兼济天下</td>
+            </tr>
+            <tr>
+              <td><strong>纵横家 · 张仪</strong></td>
+              <td>连横合纵、远交近攻、因势利导</td>
+              <td><strong>权术策士</strong>：以顺为正，依附君威，谋求一时之名位功利</td>
+            </tr>
+            <tr>
+              <td><strong>法家 · 韩非</strong></td>
+              <td>法术势并用、严刑峻法、耕战强国</td>
+              <td><strong>臣民工具</strong>：彻底服从君主与国家机器意志，无个体独立性</td>
+            </tr>
+            <tr>
+              <td><strong>道家 · 庄子</strong></td>
+              <td>齐物我、绝圣弃智、顺应自然</td>
+              <td><strong>真人至人</strong>：逍遥物外，不汲汲于名利，与天地精神往来</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 08 · 比较阅读桥：同题异构与群文联读矩阵
+         ========================================== -->
+    <details class="guide-section" id="sec-08">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">08</span>
+          <h2 class="sec-title">比较阅读桥：同题异构与群文联读矩阵</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">先秦与汉代经典跨文本矩阵对比</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 28%;">对比文本</th>
+              <th style="width: 38%;">共同追问的核心母题</th>
+              <th style="width: 34%;">论证机制与思维反差</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>孟子《富贵不能淫》<br>vs<br>庄子《逍遥游》</strong></td>
+              <td>个体如何在逼仄凶险的社会中保全独立尊严？</td>
+              <td><strong>孟子：入世道义担当</strong>，以仁礼义筑牢广居正位；<br><strong>庄子：出世超越解脱</strong>，借大鹏与藐姑射神人瓦解功名羁绊。</td>
+            </tr>
+            <tr>
+              <td><strong>孟子《生于忧患》<br>vs<br>司马迁《报任安书》</strong></td>
+              <td>惨烈苦难与人生逆境如何转化为创造性力量？</td>
+              <td><strong>孟子：天命淬炼论</strong>，从形而上层面论述困境是增益才能的磨刀石；<br><strong>司马迁：发愤著书说</strong>，从士人受辱幽愤处血泪呼号（西伯演周易、屈原赋离骚）。</td>
+            </tr>
+            <tr>
+              <td><strong>孟子《得道多助》<br>vs<br>贾谊《过秦论》</strong></td>
+              <td>国家政权安危取决于物理险阻还是政治德行？</td>
+              <td><strong>孟子：正反论断</strong>，以“天时不如地利，地利不如人和”直指民心向背；<br><strong>贾谊：史实宏叙</strong>，以秦始皇“关中之固”覆灭论证“仁义不施而攻守之势异也”。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="tint-accent">
+          <strong>💡 比读认知刷新：</strong>通过与庄子、司马迁、贾谊的比读，我们看清了孟子的独特精神坐标——他既不同于庄子的抽身世外，也不同于司马迁受难后的悲愤宣泄；孟子始终以一种<strong>顶天立地的道德阳刚之气</strong>，向全人类宣告：苦难不是压垮人性的深渊，而是伟大灵魂破茧成蝶的熔炉。
+        </div>
+      </div>
+    </details>
+
+    <!-- 分割标记 -->
+    <div class="part-divider">下篇 · 读写结合、素材炼金与创造行动</div>
+
+    <!-- ==========================================
+         栏目 09 · 五维金句解码与情境化阶梯仿写支架
+         ========================================== -->
+    <details class="guide-section" id="sec-09" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">09</span>
+          <h2 class="sec-title">五维金句解码与情境化阶梯仿写支架</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <!-- 金句 1 -->
+        <div class="item-block">
+          <div class="formula-bar">金句 01【🌿 境造氛围 / 破除硬件幻象】</div>
+          <p><span class="badge-evidence">【文本依据】</span>“城非不高也，池非不深也，兵革非不坚利也，米粟非不多也，委而去之，是地利不如人和也。”</p>
+          <p><strong>📐 技法骨架解剖：</strong><span class="formula-tag">[表层硬件A] 非不 [优越] 也，[硬件B] 非不 [完备] 也，[骤然转折动作C]，是 [外部依赖] 不如 [内在精神核心] 也。</span></p>
+          <div class="tint-box">
+            <strong>🏠 迁移生活情境：</strong>考试失利反思、现代数字化硬件泛滥却丧失专注力、班集体建设只重口号不重凝聚力。
+            <br><strong>🧩 可替换填空支架：</strong>笔墨非不______也，桌椅非不______也，辅导材料非不______也，______而去之，是外部条件不如______也。
+            <br><strong>⚠️ 避坑指南：</strong>前四项排比必须是并列的客观条件，切忌感情用事；转折动作必须极度简练冷酷，形成落差。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong>
+            书桌非不宽大考究也，台灯非不明亮柔和也，辅导真题非不汗牛充栋也，数码平板非不高精尖端也，颓然而睡之，是物质装备之繁盛，终究敌不过内心专注与自律之匮缺也。（点评：四重双重否定层叠，将现代中学生对学习工具的迷信击得粉碎，发人深省。）
+          </div>
+        </div>
+
+        <!-- 金句 2 -->
+        <div class="item-block">
+          <div class="formula-bar">金句 02【👤 人立形象 / 主体人格宪章】</div>
+          <p><span class="badge-evidence">【文本依据】</span>“居天下之广居，立天下之正位，行天下之大道。得志，与民由之；不得志，独行其道。”</p>
+          <p><strong>📐 技法骨架解剖：</strong><span class="formula-tag">居 [最高精神境界A]，立 [最端正准则B]，行 [最宽广实践C]。顺境时 [兼济群体]，逆境时 [笃守孤光]。</span></p>
+          <div class="tint-box">
+            <strong>🏠 迁移生活情境：</strong>青年志愿者的服务精神、中学生面对名次诱惑坚守诚信底线、面对潮流盲从而选择自立。
+            <br><strong>🧩 可替换填空支架：</strong>胸怀天下之______，恪守为人处世之______，践行少年担当之______。被理解时，______；遭遇误解时，______。
+            <br><strong>⚠️ 避坑指南：</strong>切忌把“得志”与“不得志”写成个人名利发财与倒霉，必须扣紧理想的推行与坚守。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong>
+            胸藏求索之广厦，立身诚信之基石，躬行笃学之坦途。逢春风得意、掌声雷动之期，与同窗共襄精进之美；遇山重水复、孤立无援之境，亦独守案头那一盏青灯不移其志。（点评：工整对偶，气势充盈，完美将孟子的人格进退智慧平移至青少年日常苦读生活。）
+          </div>
+        </div>
+
+        <!-- 金句 3 -->
+        <div class="item-block">
+          <div class="formula-bar">金句 03【⚡ 理推逻辑 / 逆境赋能使动链】</div>
+          <p><span class="badge-evidence">【文本依据】</span>“必先苦其心志，劳其筋骨，饿其体肤，空乏其身，行拂乱其所为，所以动心忍性，曾益其所不能。”</p>
+          <p><strong>📐 技法骨架解剖：</strong><span class="formula-tag">必先 [使动动词群A：心志/体魄/境遇的全面施压]，所以 [心理重构动作B]，[能力跨越终局C]。</span></p>
+          <div class="tint-box">
+            <strong>🏠 迁移生活情境：</strong>体育中考长跑训练、攻克数学压轴题的煎熬蜕变、艺术集训期间的枯燥磨砺。
+            <br><strong>🧩 可替换填空支架：</strong>必先______其思绪，______其指节，______其精力，打破其旧有认知，所以______，______其未经锤炼之本领。
+            <br><strong>⚠️ 避坑指南：</strong>使动动词必须有层次性（从精神到肉体再到处境），最后的“动心忍性”必须是认知质变。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong>
+            命运若要磨砺一个探索者的筋骨，必先枯竭其眼前的现成捷径，撕裂其盲目的安逸舒适，逼仄其前进的容错空间，使其四顾茫然，正是要以此激荡其沉睡的韧劲，熔铸其坚不可摧的认知定力。（点评：使动排比铺叙紧密，生动诠释了“逆境作为成长催化剂”的心理机制。）
+          </div>
+        </div>
+
+        <!-- 金句 4 -->
+        <div class="item-block">
+          <div class="formula-bar">金句 04【💫 情传心声 / 气节戒尺立界】</div>
+          <p><span class="badge-evidence">【文本依据】</span>“富贵不能淫，贫贱不能移，威武不能屈，此之谓大丈夫。”</p>
+          <p><strong>📐 技法骨架解剖：</strong><span class="formula-tag">[诱惑A] 不能 [惑乱动词]，[苦难B] 不能 [动摇动词]，[暴力/压力C] 不能 [折弯动词]，此之谓 [崇高品格]。</span></p>
+          <div class="tint-box">
+            <strong>🏠 迁移生活情境：</strong>拒绝电子网络娱乐成瘾的诱惑、面对家庭清贫依然昂首自信、面对同伴欺凌坚决不低头。
+            <br><strong>🧩 可替换填空支架：</strong>______不能惑其初心，______不能折其锐气，______不能弯其脊梁，此之谓中国青年的______。
+            <br><strong>⚠️ 避坑指南：</strong>三项必须由轻到重、由软诱惑到硬胁迫递进，不可顺序颠倒。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong>
+            海量算法推送之浮华，不能迷乱其探求真理的双眼；一时考试分数之起落，不能阻遏其向下扎根的深潜；世俗平庸标签之规训，不能压弯其特立独行的脊梁——此之谓当代奔涌后浪之真正自尊。（点评：融入“算法、唯分数论、世俗标签”等现代切口，旧瓶装新酒，极具考场辨识度。）
+          </div>
+        </div>
+
+        <!-- 金句 5 -->
+        <div class="item-block">
+          <div class="formula-bar">金句 05【🔺 意升主题 / 危机觉醒的宇宙法则】</div>
+          <p><span class="badge-evidence">【文本依据】</span>“人恒过，然后能改；困于心，衡于虑，而后作；征于色，发于声，而后喻。……然后知生于忧患而死于安乐也。”</p>
+          <p><strong>📐 技法骨架解剖：</strong><span class="formula-tag">人常 [受挫表现]，然后方能 [觉醒行动]；[微观个体心智机制]，[宏观群体生存律]；然后知 [永恒真理警策]。</span></p>
+          <div class="tint-box">
+            <strong>🏠 迁移生活情境：</strong>个人走出舒适区、科技公司拒绝技术停滞、文明发展中的危机倒逼机制。
+            <br><strong>🧩 可替换填空支架：</strong>思绪常历______，而后得通透；步履常涉______，而后知坦途。物种在安逸中______，在风暴中______；然后知______。
+            <br><strong>⚠️ 避坑指南：</strong>必须由微观的“思维困顿”自然跃迁至宏观的“生命安危”，避免两张皮脱节。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 高分仿写示范（特级教师下水文）：</strong>
+            心智往往在碰壁跌撞中方知边界，思绪唯有在极度阻塞与煎熬后方得澄明；一个生命在温软温室中终将萎靡，唯在朔风暴雨之洗礼下始铸刚魂。由是观之，沉溺安逸实乃生命枯竭之死局，勇泅忧患方为凤凰涅槃之坦途。（点评：从个人认知阻滞升华到生命存在法则，哲理深邃，文辞温润醇厚。）
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 10 · 作文素材炼金炉与高阶立意库
+         ========================================== -->
+    <details class="guide-section" id="sec-10" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">10</span>
+          <h2 class="sec-title">作文素材炼金炉与高阶立意库</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <div class="sub-heading">三大高阶思想立意库（跳出肤浅鸡汤套路）</div>
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">立意方向 01</div>
+            <div class="spec-val">【脱卸器物迷信，筑牢精神内核】</div>
+            <div class="spec-label" style="margin-top:4px;">适用母题：硬件与软件、真正的力量、凝聚力与虚妄设施</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">立意方向 02</div>
+            <div class="spec-val">【拒绝权势附庸，挺立独立人格】</div>
+            <div class="spec-label" style="margin-top:4px;">适用母题：风骨与尊严、拒绝盲从与攀附、做自己的主人</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">立意方向 03</div>
+            <div class="spec-val">【走出温室舒适，重估逆境赋能】</div>
+            <div class="spec-label" style="margin-top:4px;">适用母题：走出舒适区、危机与生机、困境中的认知觉醒</div>
+          </div>
+        </div>
+
+        <div class="sub-heading">考场核能素材卡（可直接背诵化用）</div>
+
+        <!-- 素材卡 01 -->
+        <div class="item-block">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:var(--primary);">素材卡 #01 ｜ 大丈夫脊梁：拒绝做时代的“妾妇”，挺立民族的精神铁骨</strong>
+            <span class="formula-tag">标签：风骨 · 尊严 · 拒绝攀附</span>
+          </div>
+          <p><strong>100 字核能叙事压缩：</strong>
+            战国浊浪排空，纵横策士张仪以“一怒诸侯惧”窃取权位，世人皆艳羡其威势。孟子却在滔天物欲与强权面前冷眼断喝：以顺为正者，妾妇之道也！他手握“仁礼义”三尺神尺，立下“富贵不淫、贫贱不移、威武不屈”的铁规，为华夏民族锻造了超越名利权势的独立人格风骨。
+          </p>
+          <div class="tint-accent" style="margin-top:6px;">
+            <strong>💎 考场议论文 150 字嵌入示范段：</strong><br>
+            真正的尊严，从不依附于权贵的施舍与流量的光环，而源于灵魂深处不可折弯的独立自主。正如孟子在两千年前对张仪之流的凌空怒斥——在世人皆对策士“一怒诸侯惧”顶礼膜拜时，唯有孟子一眼看穿其“以顺为正”的妾妇底色。他挥毫写就“富贵不能淫，贫贱不能移，威武不能屈”十二字浩然箴言，不仅宣告了士人精神主权的诞生，更为中华民族在风雨如晦的历史长夜中，筑起了一座绝不向强权下跪的精神丰碑。
+          </div>
+        </div>
+
+        <!-- 素材卡 02 -->
+        <div class="item-block">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:var(--secondary);">素材卡 #02 ｜ 忧患赋能：在逆境熔炉中淬炼“曾益其所不能”的生命抗逆力</strong>
+            <span class="formula-tag">标签：走出舒适区 · 挫折教育 · 认知蜕变</span>
+          </div>
+          <p><strong>100 字核能叙事压缩：</strong>
+            舜耕历山，傅说筑墙，百里奚身陷奴市。古之圣贤无不深陷泥淖深渊。孟子点破天机：“天将降大任，必先苦其心志”。苦难非天命诅咒，而是生命的极度打磨。唯有在“困于心、衡于虑”的极致窒息中，人才能震碎惯性思维的枷锁，在忧患的烈焰里淬炼出无坚不摧的卓越本领。
+          </p>
+          <div class="tint-warm" style="margin-top:6px;">
+            <strong>💎 考场议论文 150 字嵌入示范段：</strong><br>
+            身处物质丰裕的和平年代，我们极易沉溺于恒温箱般的舒适圈中，将偶尔的波折视作不可承受之重。然而，回顾先贤走过的泥泞，孟子早已以宏阔的历史视野昭示万代：舜发畎亩、傅说版筑，凡成大器者，必先历经“劳筋骨、饿体肤、行拂乱其所为”的连环轰炸。困境从来不是命运的绊脚石，而是逼迫灵魂向内深掘的试金石。唯有勇敢直面“困心衡虑”的煎熬时刻，主动走出安乐的泥潭，我们才能在时代风暴的淬炼中，真正“动心忍性”，完成生命抗逆力的终极升维。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 11 · 万能写作模型与读写映射总纲
+         ========================================== -->
+    <details class="guide-section" id="sec-11">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">11</span>
+          <h2 class="sec-title">万能写作模型与读写映射总纲</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <div class="sub-heading">模型 01：【破伪立真·四步诸子论辩驳论模型】</div>
+        <div class="item-block">
+          <p><strong>📐 结构公式：</strong><span class="formula-tag">树靶呈现伪共识（约15%） ➔ 譬喻归谬剥底色（约30%） ➔ 重构价值新坐标（约35%） ➔ 标尺警策定乾坤（约20%）</span></p>
+          <ul class="bullet-list">
+            <li><strong>环节 1 · 树靶（破的起点）</strong>：引述当下流行但本质浅薄的某种世俗观点或现象（对应《富贵》景春引张仪“岂不诚大丈夫”）；</li>
+            <li><strong>环节 2 · 譬喻归谬（锋芒破局）</strong>：引入一个精妙反差的喻体，撕下伪观点的光鲜假面，暴露其荒谬或依附性（对应孟子喻“妾妇之道”）；</li>
+            <li><strong>环节 3 · 价值重构（正面立言）</strong>：从天地大道、社会责任与主体人格角度，提出崇高的真正标准（对应“居广居、立正位、行大道”）；</li>
+            <li><strong>环节 4 · 警策收束（立碑铸魂）</strong>：用高度对仗凝练的排比句，给出不容撼动的定义性结论（对应“富贵不淫、贫贱不移、威武不屈”）。</li>
+          </ul>
+          <div class="tint-box">
+            <strong>🎯 新作文题移植大纲示范（考场作文题《什么是真正的“酷”》）：</strong>
+            <br>① <strong>树靶</strong>：有人以为在网络上炫耀名牌球鞋、出口伤人、标新立异就是当代少年的“酷”；
+            <br>② <strong>归谬</strong>：这种所谓的“酷”，不过是甘当消费主义提线木偶与算法流量奴隶的“当代妾妇”，看似叛逆，实则奴颜卑膝；
+            <br>③ <strong>重构</strong>：真正的“酷”，是在喧嚣洪流中守住清醒的大脑，在弱者蒙难时挺身而出的侠义，在知识旷野上耐得住十年板凳冷的孤勇；
+            <br>④ <strong>收束</strong>：诱惑在前不随波逐流，低谷之中不自我轻贱，权势逼人绝不弯折脊梁——此之谓吾辈青年之真正大“酷”！
+          </div>
+        </div>
+
+        <div class="sub-heading">模型 02：【由微至宏·逆境觉醒归纳跃迁模型】</div>
+        <div class="item-block">
+          <p><strong>📐 结构公式：</strong><span class="formula-tag">典型群像矩阵排比（20%） ➔ 心理承压与阻滞剖析（35%） ➔ 认知破局顿悟行动（25%） ➔ 群体/国家宏观警策（20%）</span></p>
+          <ul class="bullet-list">
+            <li><strong>环节 1</strong>：并列罗列 3-4 位在边缘泥泞中艰难崛起的个体或群像事实（对应舜、傅说等六人并举）；</li>
+            <li><strong>环节 2</strong>：深入微观肌理，剖析苦难对生理、意志、思绪的极致挤压与心理临界点（对应“苦劳饿空乏”与“困于心衡于虑”）；</li>
+            <li><strong>环节 3</strong>：展示个体如何化被动受难为主动反思，实现“动心忍性”的才能跃迁；</li>
+            <li><strong>环节 4</strong>：由个体成长升华至一个集体、民族、文明的生存法则（对应“生于忧患死于安乐”）。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">本课「读什么特征 ➔ 写什么技巧 ➔ 达成什么素养」映射总表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 28%;">读到的课文核心特征</th>
+              <th style="width: 40%;">转化的考场写作武器与技法</th>
+              <th style="width: 32%;">达成的核心语文素养</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>“城非不高也……”双重否定排比</strong></td>
+              <td><strong>极差反跌法</strong>：先极力铺垫硬件优渥，骤然折入瓦解，反衬精神决定性</td>
+              <td>思维发展 · 辩证批判思维</td>
+            </tr>
+            <tr>
+              <td><strong>“以顺为正者，妾妇之道”</strong></td>
+              <td><strong>剥茧破靶法</strong>：抓住对手核心逻辑链条，以诛心譬喻击碎假象</td>
+              <td>语言建构 · 锐利论辩表达力</td>
+            </tr>
+            <tr>
+              <td><strong>“居广居·立正位·行大道”</strong></td>
+              <td><strong>空间隐喻立人法</strong>：将抽象道德概念具象为宽阔的精神物理空间</td>
+              <td>审美鉴赏 · 崇高意境营构力</td>
+            </tr>
+            <tr>
+              <td><strong>六圣贤出身的排比列阵</strong></td>
+              <td><strong>典型群像归纳法</strong>：多维度历史先例密集并置，形成无懈可击的事实基座</td>
+              <td>文化传承 · 历史证据调用力</td>
+            </tr>
+            <tr>
+              <td><strong>“生于忧患，死于安乐”</strong></td>
+              <td><strong>二元对偶警策法</strong>：在文章结尾以极度工整的对举句式定谳终极哲理</td>
+              <td>语言建构 · 格言警句凝练力</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 12 · 五个苏格拉底深想问题与多场景表达
+         ========================================== -->
+    <details class="guide-section" id="sec-12">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">12</span>
+          <h2 class="sec-title">五个苏格拉底深想问题与多场景表达</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <div class="sub-heading">五个直击灵魂的苏格拉底式追问</div>
+        <ol class="num-list">
+          <li><strong>形式与修辞张力问：</strong>孟子痛斥张仪等纵横家“以顺为正”是“妾妇之道”，但他自己周游列国、向齐宣王梁惠王兜售“仁政”时，是否也需要千方百计逢迎君主的耳朵？孟子的“说服策略”与张仪的“谄媚顺从”，界限究竟画在何处？</li>
+          <li><strong>伦理两难与现实冲突问：</strong>如果一个恪守“贫贱不能移、威武不能屈”的大丈夫，导致其父母妻儿在战乱中活活饿死或惨遭杀戮，这种孤高的道德坚持是否具有某种隐蔽的残酷性与伦理道德自私？道义坚持与亲人庇护发生剧烈撕裂时，何去何从？</li>
+          <li><strong>现代逆境反常识反诘问：</strong>现代心理学表明，童年持续的赤贫、暴力与创伤极易造成永久性的心理缺陷甚至精神崩溃。孟子将苦难定义为“天降大任”、“曾益其所不能”，是否在无意中掩盖了苦难对普通人毁灭性的剥夺？苦难转化为智慧的前置条件到底是什么？</li>
+          <li><strong>AI与算法时代共振问：</strong>在今天大数据算法精准投喂、信息茧房密不透风的时代，算法日夜摸清并顺从我们的每一次点击偏好。如果把“以算法之顺为用户之正”代入思考，我们是否正在不知不觉中沦为被数字权柄豢养的“现代妾妇”？</li>
+          <li><strong>青少年日常生活自省问：</strong>在你的班级或朋友圈中，是否有过为了迎合某个“强势群体”或获得好感，而不敢表达异见、违心附和的“以顺为正”时刻？那一刻你内心的“大丈夫脊梁”是否悄悄弯折过？</li>
+        </ol>
+
+        <div class="sub-heading">多场景表达协作示范（同一核心洞见的弹性缩放）</div>
+
+        <div class="item-block">
+          <strong>⚡ 30 秒课间快嘴版：</strong>
+          <p style="margin-top:4px;">
+            “背《孟子》三章别光死记实词！孟子其实是战国第一猛男兼第一‘金句反黑达人’。世人都在羡慕张仪翻云覆雨、一发火诸侯就发抖，孟子直接怼过去：‘这算啥英雄？不过是伺候老公的妾妇罢了！’在孟子眼里，真正的猛人不是掌握生杀大权的暴君，而是手里没钱、没权、面对枪口，内心道义也绝不下跪的大丈夫。这才是中国骨气的祖师爷。”
+          </p>
+        </div>
+
+        <div class="item-block">
+          <strong>🎙️ 3 分钟晨读国旗下演讲/读书会发言版：</strong>
+          <p style="margin-top:4px;">
+            “老师们、同学们：两千多年前，战国策士张仪佩戴六国相印，叱咤风云，天下人以为这就是权力和成功的巅峰。然而，一位布衣长者孟子却以惊世骇俗的断喝刺破了这层虚荣：‘以顺为正者，妾妇之道也！’孟子提醒我们，一切靠丧失尊严、奴颜婢膝换来的所谓‘成功’，底色不过是依附权势的奴才。
+            <br>今天，我们生活在物质充裕但充满竞争焦虑的时代。有人把拥有一件名牌、获得某种特权、或者在考场上压倒对手当作成功的唯一标志。但孟子给出的‘大丈夫’标尺却截然相反——‘富贵不能淫，贫贱不能移，威武不能屈’。真正的精神高贵，不是你在顺境时能占有多少资源，而是在名利诱惑面前能否守住清澈底线，在跌入谷底‘困心衡虑’时能否把磨难当成淬炼内功的试金石。读《孟子》，不仅是学习文言句式，更是为我们每一个现代少年的胸膛，注入一口永不屈服的浩然正气！”
+          </p>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- ==========================================
+         栏目 13 · 综合创作实战、世界方法与元认知说明书
+         ========================================== -->
+    <details class="guide-section" id="sec-13">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">13</span>
+          <h2 class="sec-title">综合创作实战、世界方法与元认知说明书</h2>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <div class="sub-heading">考场实战写作命题（双轨演练）</div>
+        <div class="item-block">
+          <p><strong>✍️ 任务 A · 中考/高考考场大作文（600–800字议论文/记叙文）</strong></p>
+          <p><strong>题目</strong>：《走出温室之后》 或 《不跪的脊梁》<br>
+          <strong>构思硬性要求</strong>：
+          <br>1. 必须调用本课提炼的【破伪立真驳论模型】或【逆境觉醒归纳跃迁模型】；
+          <br>2. 必须化用本课至少 2 处经典名句（如“以顺为正”、“困心衡虑”、“曾益其所不能”）；
+          <br>3. 必须包含由“个人微观受挫体验”向“精神人格独立”的深化跃迁。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>✍️ 任务 B · 300 字文学微评论专项练笔</strong></p>
+          <p><strong>题目</strong>：评《孟子》三章中“使动动词与双重否定排比”对论辩气势的建构机制。<br>
+          <strong>框架支架</strong>：观点句 ➔ 原文语言证据（引用具体字词） ➔ 句法形式如何催生“气盛言宜” ➔ 解释限度与现代写作启示。</p>
+        </div>
+
+        <div class="sub-heading">🔭 一周现实观察微行动卡</div>
+        <div class="tint-box">
+          <strong>观察任务：</strong>在接下来的一周中，在校园或日常生活中捕捉一次“以顺为正”的盲从现场（例如某个群体起哄孤立某人、盲目追捧某种网红烂梗、或在权威面前放弃合理质疑）。记录下：
+          <br>① 盲从者当时的语言与身体姿态；
+          <br>② 现场制造的从众压力；
+          <br>③ 尝试用孟子“广居·正位·大道”的内省视角，写下如果是你，你会如何不失礼节又坚守底线地表达独立立场。
+        </div>
+
+        <div class="sub-heading">🌍 《从〈孟子〉学到的一种看世界的方法》结业档案</div>
+        <div class="tint-accent">
+          <strong>我的方法命名：</strong><strong>【精神主体立基法（The Inner Sovereignty Method）】</strong><br>
+          <strong>一、观察动作：</strong>当面对强势的环境、权威的威吓、潮流的裹挟或巨大的顺逆境诱惑时，强制按下暂停键；不以对方的“权势位阶与声量大小”为评估基准，而是启动内省雷达，以“道义/礼法/真理”作为唯一的标尺进行逆向核验。<br>
+          <strong>二、四步解码机制：</strong>
+          <ol class="num-list" style="margin-top:4px;">
+            <li><strong>第一步 · 剥离威权假象（去魅）</strong>：审视对方的威势背后，究竟是真理在握，还是仅仅“以顺为正”地把持了某种话语权；</li>
+            <li><strong>第二步 · 重回内心广厦（立心）</strong>：以仁爱、诚信与正道筑底，确立“哪怕孤身一人也要站立”的内在空间感；</li>
+            <li><strong>第三步 · 逆境赋能转化（淬火）</strong>：把当下的打压、冷遇与窒息感，视为“动心忍性”的必经训练营；</li>
+            <li><strong>第四步 · 进退从容自洽（定行）</strong>：得志时与同道共襄其盛，不得志时笃守独行其道，永远保持精神的主权完整。</li>
+          </ol>
+          <strong>三、适用场景：</strong>遭遇校园隐性霸凌时、面对升学考试重大挫折时、在群体压力下需要做出伦理抉择时。<br>
+          <strong>四、失效与避坑边界：</strong>此方法是帮人“守住道义底线”，绝不是教人“盲目偏执、狂妄自大、拒绝一切善意建议”。切忌把孟子的大丈夫风骨误用为拒绝沟通的自恋与顽固。
+        </div>
+
+        <div class="sub-heading">🛡️ 读写元认知自我标注说明书（学生实战模板）</div>
+        <div class="tint-box">
+          <p><em>（在完成本课写作或仿写后，附于文末的自我审视量规卡）</em></p>
+          <p>
+            1. <strong>【工具调用】</strong>：我在正文第 ___ 段调用了【训诂字源刀/双重否定排比】，重构了关于 ________________ 的深层句意；<br>
+            2. <strong>【理论镜头】</strong>：我在第 ___ 段实践了【主体人格立人隐喻】，打破了过去写大话套话的毛病，将精神风骨写得具体可感；<br>
+            3. <strong>【金句化用】</strong>：我自然化用了课文中的名句“________________________”，在文段中它起到了 ________________ 的关键作用；<br>
+            4. <strong>【模型移植】</strong>：全文框架严格采纳了【破伪立真驳论模型 / 逆境觉醒归纳模型】，各环节字数比例为：________________；<br>
+            5. <strong>【人类自主与AI分工边界】</strong>：AI 辅助我提供了字词训诂思路与行文结构参考；文中所有的真实生活细节、痛苦反思与最终定稿文字，100% 由我亲自独立完成。
+          </p>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 页脚版权与交付标准 -->
+    <footer>
+      <p>深度导读手札 · 统编初中语文八年级上册第六单元《孟子》三章（《得道多助，失道寡助》《富贵不能淫》《生于忧患，死于安乐》）</p>
+      <p style="margin-top:4px; font-size:11.5px;">© 遵照单文件自包含 HTML 规范 · 手机满宽自适应无嵌套边框优化标准交付 · 中学语文深度研读与读写转化工坊</p>
+    </footer>
+
+  </div>
+
+  <!-- 原生轻量自包含交互脚本 -->
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll(".guide-section").forEach(function(s) {
+        s.open = openState;
+      });
+    }
+    function focusTrack(track) {
+      document.querySelectorAll(".guide-section").forEach(function(s, idx) {
+        var secNum = idx + 1;
+        s.open = (track === 'read') ? (secNum <= 8) : (secNum >= 9);
+      });
+      var targetId = (track === 'read') ? 'sec-01' : 'sec-09';
+      var targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
+</body>
+</html>

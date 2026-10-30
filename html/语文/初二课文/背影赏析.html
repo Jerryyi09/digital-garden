@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>《背影》深度赏析与读写结合导读 · 朱自清</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.07);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.11);
+        --bg-warm: rgba(251, 146, 60, 0.11);
+        --bg-danger: rgba(248, 113, 113, 0.11);
+        --bg-success: rgba(74, 222, 128, 0.11);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; }
+    /* 顶部 Hero */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+      font-family: var(--font-serif);
+    }
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: opacity 0.2s;
+    }
+    .t-btn:hover { opacity: 0.85; }
+    .t-btn.read { background: var(--bg-accent); color: var(--primary); }
+    .t-btn.write { background: var(--bg-warm); color: var(--secondary); }
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    /* 手风琴栏目（唯一外框，内部不再套框） */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+      background: var(--bg-card);
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--bg-accent);
+      color: var(--primary);
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+    }
+    .sec-num.warm { background: var(--bg-warm); color: var(--secondary); }
+    .sec-title {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text-main);
+    }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; }
+    }
+    /* 小标题与流式分隔块（替代嵌套框） */
+    .sub-heading {
+      font-family: var(--font-serif);
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; padding-bottom: 0; }
+    /* 仅限短元数据的紧凑双列网格 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+    /* 纯色块区分（无四周边框，内部绝不套框） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+    /* 短公式条与行内标签 */
+    .formula-bar {
+      background: var(--bg-accent);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .formula-tag {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--primary);
+    }
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+    /* 满宽自适应表格（不强制最小宽度） */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .svg-wrap {
+      width: 100%;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 8px 4px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+    ul.bullet-list, ol.num-list { padding-left: 17px; margin: 5px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14.5px; margin-bottom: 5px; line-height: 1.72; }
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      <div class="hero-badges">
+        <span class="badge">现代文轨 · 06 现代写人记事回忆散文</span>
+        <span class="badge badge-warm">统编版初中语文八年级上册 · 第四单元</span>
+      </div>
+      <h1>《背影》深度研读与读写结合导读</h1>
+      <div class="hero-sub">作者：朱自清（1898—1948 · 字佩弦 · 现代著名散文家、诗人、学者、民主战士）</div>
+      <div class="hero-quote">
+        “他肥胖的身子向左微倾，显出努力的样子。这时我看见他的背影，我的泪很快地流下来了。”<br>
+        <span style="font-size:12.5px; color:var(--text-muted); display:block; margin-top:4px;">——以残破家庭的深冬惨淡衬托微茫父爱，以“双重视角温差”解剖成长中的傲慢、顿悟与终身愧疚。</span>
+      </div>
+      <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px; font-size:12px; color:var(--text-muted);">
+        <span>核心分析工具：</span>
+        <span class="formula-tag">🔍 文本显微镜（动作链）</span>
+        <span class="formula-tag">🎬 双重视角温差仪</span>
+        <span class="formula-tag">⚗️ 素材炼金炉</span>
+      </div>
+    </header>
+
+    <!-- 置顶控制工具栏 -->
+    <nav class="toolbar" aria-label="导读导航控制">
+      <button class="t-btn" onclick="toggleAllSections(true)">全部展开</button>
+      <button class="t-btn" onclick="toggleAllSections(false)">全部收起</button>
+      <button class="t-btn read" onclick="focusTrack('read')">📖 读懂篇 (01-08)</button>
+      <button class="t-btn write" onclick="focusTrack('write')">✍️ 转化篇 (09-13)</button>
+    </nav>
+
+    <div class="part-divider">上篇 · 文本深读、叙事解码与文学批评</div>
+
+    <!-- 栏目 01 -->
+    <details class="guide-section" id="sec-01" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">01</span>
+          <span class="sec-title">课文坐标、单元定位与初读破冰</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">所属教材</div>
+            <div class="spec-val">八上第四单元·第13课</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">文体形态</div>
+            <div class="spec-val">现代写人记事回忆散文</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">叙事视点</div>
+            <div class="spec-val">第一人称·双重视角温差</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">核心理论镜头</div>
+            <div class="spec-val">新批评张力+叙事学时间温差</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">考查重点</div>
+            <div class="spec-val">动词特写·反讽反省·意象色彩</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">创作时空坐标</div>
+            <div class="spec-val">1925年于清华园忆1917冬</div>
+          </div>
+        </div>
+
+        <div class="tint-bad">
+          <strong>⚠️ 审美防误读预警</strong>：切忌把《背影》扁平化理解为“慈父爱子、其乐融融”的廉价温情赞歌！课文真实的张力在于<strong>“祸不单行”的衰败绝境</strong>、<strong>父子两代多年的性格裂痕与文化隔膜</strong>，以及作者历经沧桑为人父母后，对昔日“聪明过分”的<strong>剔骨自责与悲悯和解</strong>。
+        </div>
+
+        <div class="sub-heading">初读三问破冰卡（苏格拉底式审读）</div>
+        <div class="item-block">
+          <p><strong>1. 🔥 最打动人心的一处触动点</strong>：<br>
+          <span class="badge-evidence">【文本依据】</span>第六段父亲买橘子爬月台的一组特写动词：“蹒跚地走到铁道边，慢慢探身下去……他用两手攀着上面，两脚再向上缩；他肥胖的身子向左微倾，显出努力的样子。”<br>
+          <em>直觉体验</em>：读者感受到的不是优美，而是一种笨拙到让人心酸、沉重到令人窒息的肉体努力。一个曾经威严专制的旧式父亲，在衰败绝境中用尽全部力气，只为给二十岁的儿子买几个橘子。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>2. ❓ 最容易读滑过去的一处反常点</strong>：<br>
+          <span class="badge-evidence">【文本依据】</span>第四、五段作者连续两次自责：“我那时真是聪明过分”、“我现在想想，那时真是太聪明了！”<br>
+          <em>深层追问</em>：为什么青年时期的“精明、懂世故（自以为会跟脚夫讲价钱、自以为能独当一面）”，在成年后的叙述者笔下竟被定性为奇耻大辱般的“愚蠢”？这种“自作聪明”背后遮蔽了什么？</p>
+        </div>
+        <div class="item-block">
+          <p><strong>3. ✂️ 删改直觉实验</strong>：<br>
+          <em>实验假设</em>：如果将第二段“祖母死了，父亲的差使也交卸了，正是祸不单行的日子……变卖典质，借钱办丧事”全部删去，直接从浦口送别写起，全篇会坍塌什么？<br>
+          <em>结论</em>：散文将彻底沦为普通站台惜别。失去家庭大厦倾塌的荒凉底色，就无法理解父亲“情郁于中，自然要发之于外”的暴躁与脆弱，更无法显影出那几个朱红橘子在灰暗绝境中如火种般的千钧分量。</p>
+        </div>
+
+        <div class="tint-accent">
+          <strong>🌍 本课“看世界的方法”初始猜想</strong>：真正的成熟与爱，往往始于发现“父母也是会衰老、会失措、会走入绝境的普通人”；而人生的第一声痛悔，总是迟到于我们曾经自鸣得意的高傲与“自以为是”。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 02 -->
+    <details class="guide-section" id="sec-02" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">02</span>
+          <span class="sec-title">字词句精粹、语用解码与篇章拓扑 SVG</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">现代文核心词眼与语义场精准解码</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width:22%;">词语锚点</th>
+              <th style="width:38%;">语境含义与训诂源流</th>
+              <th style="width:40%;">不可替代性与语用张力</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>狼藉</strong><br><span style="font-size:11px; color:var(--text-soft);">第2段</span></td>
+              <td>《史记》“杯盘狼藉”。狼群睡觉藉草而卧，去时爪刨草乱。文中指办丧事后院落器具纵横散乱、家破人亡的凄凉惨状。</td>
+              <td>不仅写物理空间的杂乱，更直观呈现家庭经济与精神支柱瞬间坍塌的失序状态，奠定全文凄怆基调。</td>
+            </tr>
+            <tr>
+              <td><strong>惨淡</strong><br><span style="font-size:11px; color:var(--text-soft);">第2段</span></td>
+              <td>光线暗淡、忧愁凄苦。《后汉书》“风悲日惨”。文中兼指生计艰难与心理上的阴霾绝望。</td>
+              <td>“惨淡”与后文买橘时“朱红”形成剧烈的视觉与心理反差，以冷灰惨淡反衬朱红之炽热。</td>
+            </tr>
+            <tr>
+              <td><strong>赋闲</strong><br><span style="font-size:11px; color:var(--text-soft);">第2段</span></td>
+              <td>晋代潘岳作《闲居赋》，后借指失业在家。旧式士绅官僚对自己失职丢官的委婉修辞。</td>
+              <td>书香门第失业者的矜持与体面，折射出旧知识阶层在乱世风暴中的脆弱无力。</td>
+            </tr>
+            <tr>
+              <td><strong>勾留</strong><br><span style="font-size:11px; color:var(--text-soft);">第3段</span></td>
+              <td>因事停留。“勾”含挽留、缠绕牵绊之意。不同于一般的“停留”。</td>
+              <td>南京两日不仅是奔丧后的中转，更是家庭崩解前夕父子共享的最后片刻宁静，带有一种迟滞、滞重的生命叹息。</td>
+            </tr>
+            <tr>
+              <td><strong>迂</strong><br><span style="font-size:11px; color:var(--text-soft);">第4段</span></td>
+              <td>本义曲折，引申为拘泥保守、不合时宜、不通世故。</td>
+              <td>“心里暗笑他的迂”是新文化运动后新青年对传统旧父辈自命不凡的轻蔑，是双重视角反讽的发射点。</td>
+            </tr>
+            <tr>
+              <td><strong>蹒跚</strong><br><span style="font-size:11px; color:var(--text-soft);">第6段</span></td>
+              <td>腿脚不灵便、摇摆吃力。《说文》足部，形容步履艰难。</td>
+              <td>将父亲“肥胖”、“衰老”、“沉重”、“背负债务重压”具象化为沉重的脚步，拉开特写序幕。</td>
+            </tr>
+            <tr>
+              <td><strong>大去</strong><br><span style="font-size:11px; color:var(--text-soft);">第7段</span></td>
+              <td>委婉语，指死亡。语出《论语·公冶长》或古代尺牍，意为永别于世。</td>
+              <td>衰病残年的父亲在来信中的平静绝笔，极具文雅与沧桑感，瞬间击溃叙述者的心理防线。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">标志性句式与潜台词层次剖析</div>
+        <div class="item-block">
+          <p><strong>1. 反讽式自责句</strong>：<br>
+          <span class="badge-evidence">【文本依据】</span>“我那时真是聪明过分，总觉得他说话不大漂亮，非自己插嘴不可，其实他们只认得钱，托他们只是白托！而且我这样大年纪的人，难道还不能料理自己么？唉，我现在想想，那时真是太聪明了！”<br>
+          <span class="badge-comment">【语用密码】</span><strong>两重反讽叠加</strong>：表层用“聪明”反讽当年的幼稚与浅薄；用设问句“难道还不能料理自己么”再现昔日青年的傲慢自负；最后长叹“唉”，以今日历经风霜之成熟，无情鞭笞昔日之浮躁，完成自我审判。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>2. 极简白描与欲言又止的离别句</strong>：<br>
+          <span class="badge-evidence">【文本依据】</span>“我走了，到那边来信！” / “进去吧，里边没人。”<br>
+          <span class="badge-comment">【潜台词解码】</span>中国传统父子之间从不轻易言“爱”。两句极短的日常口语，前一句是悬着的心终于落地的牵挂，后一句是怕儿子东西被偷、独自乘车受委屈的琐碎叮咛。所有深情都被压抑在简短平淡的字句里。</p>
+        </div>
+
+        <div class="sub-heading">篇章结构拓扑与情感波脉图</div>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 720 330" xmlns="http://www.w3.org/2000/svg">
+            <!-- 背景网格与边框 -->
+            <rect x="0" y="0" width="720" height="330" fill="transparent" rx="8"/>
+
+            <!-- 坐标辅助虚线 -->
+            <line x1="40" y1="230" x2="680" y2="230" stroke="rgba(120,120,120,0.2)" stroke-dasharray="4"/>
+            <line x1="40" y1="150" x2="680" y2="150" stroke="rgba(120,120,120,0.2)" stroke-dasharray="4"/>
+            <line x1="40" y1="70" x2="680" y2="70" stroke="rgba(120,120,120,0.2)" stroke-dasharray="4"/>
+            <text x="42" y="224" font-size="10" fill="#7b8794">冷漠/自以为是 (认知低谷)</text>
+            <text x="42" y="144" font-size="10" fill="#7b8794">家庭惨淡/依恋离情 (中位叙事)</text>
+            <text x="42" y="64" font-size="10" fill="#7b8794">顿悟感动/痛悔思念 (情感波峰)</text>
+
+            <!-- 情感波脉曲线：从开篇点题思念，入徐州惨淡，青年自负暗笑，望父买橘大恸，离别依依，暮年读信大恸 -->
+            <path d="M 60 120
+                     C 100 80, 120 180, 170 190
+                     C 220 200, 260 220, 310 225
+                     C 350 230, 370 110, 420 75
+                     C 470 50, 490 140, 530 160
+                     C 570 180, 610 80, 660 65"
+                  fill="none" stroke="#175d7e" stroke-width="3.5" stroke-linecap="round"/>
+
+            <!-- 关键节点 1：开篇点题 -->
+            <circle cx="60" cy="120" r="5" fill="#175d7e" stroke="#fff" stroke-width="2"/>
+            <text x="60" y="105" font-size="11" font-weight="700" fill="#175d7e" text-anchor="middle">开篇点题</text>
+            <text x="60" y="140" font-size="10" fill="#52606d" text-anchor="middle">① 难忘背影</text>
+
+            <!-- 关键节点 2：徐州奔丧 -->
+            <circle cx="170" cy="190" r="5" fill="#c05621" stroke="#fff" stroke-width="2"/>
+            <text x="170" y="175" font-size="11" font-weight="700" fill="#c05621" text-anchor="middle">徐州奔丧</text>
+            <text x="170" y="210" font-size="10" fill="#52606d" text-anchor="middle">💧 悲伤之泪</text>
+            <text x="170" y="223" font-size="9" fill="#7b8794" text-anchor="middle">祸不单行/狼藉</text>
+
+            <!-- 关键节点 3：浦口车站自负 -->
+            <circle cx="310" cy="225" r="5" fill="#b91c1c" stroke="#fff" stroke-width="2"/>
+            <text x="310" y="245" font-size="11" font-weight="700" fill="#b91c1c" text-anchor="middle">浦口拣座嘱托</text>
+            <text x="310" y="260" font-size="10" fill="#b91c1c" text-anchor="middle">暗笑其迂 / 聪明过分</text>
+            <text x="310" y="273" font-size="9" fill="#7b8794" text-anchor="middle">父子认知温差最大</text>
+
+            <!-- 关键节点 4：望父买橘特写 (波峰) -->
+            <circle cx="420" cy="75" r="7" fill="#c05621" stroke="#fff" stroke-width="2.5"/>
+            <text x="420" y="45" font-size="12" font-weight="800" fill="#c05621" text-anchor="middle">望父买橘·特写定格</text>
+            <text x="420" y="60" font-size="10" font-weight="700" fill="#c05621" text-anchor="middle">② 攀月台背影 💧 感动之泪</text>
+            <text x="420" y="98" font-size="9.5" fill="#175d7e" text-anchor="middle">动词链：探/攀/缩/倾</text>
+
+            <!-- 关键节点 5：人海惜别 -->
+            <circle cx="530" cy="160" r="5" fill="#175d7e" stroke="#fff" stroke-width="2"/>
+            <text x="530" y="145" font-size="11" font-weight="700" fill="#175d7e" text-anchor="middle">惜别入人海</text>
+            <text x="530" y="180" font-size="10" fill="#52606d" text-anchor="middle">③ 告别背影 💧 离别之泪</text>
+
+            <!-- 关键节点 6：读信思亲·首尾呼应 -->
+            <circle cx="660" cy="65" r="6" fill="#175d7e" stroke="#fff" stroke-width="2"/>
+            <text x="660" y="40" font-size="11" font-weight="700" fill="#175d7e" text-anchor="middle">北京读家信</text>
+            <text x="660" y="55" font-size="10" font-weight="700" fill="#175d7e" text-anchor="middle">④ 泪光中再现背影</text>
+            <text x="660" y="85" font-size="9.5" fill="#c05621" text-anchor="middle">💧 愧疚痛悔之泪</text>
+
+            <!-- 底部结构进度指示带 -->
+            <rect x="50" y="295" width="620" height="14" rx="7" fill="rgba(23,93,126,0.08)"/>
+            <rect x="50" y="295" width="100" height="14" rx="7" fill="rgba(23,93,126,0.3)"/>
+            <rect x="360" y="295" width="120" height="14" rx="7" fill="rgba(192,86,33,0.5)"/>
+            <rect x="600" y="295" width="70" height="14" rx="7" fill="rgba(23,93,126,0.4)"/>
+            <text x="100" y="306" font-size="9" fill="#175d7e" text-anchor="middle">起：难忘背影</text>
+            <text x="240" y="306" font-size="9" fill="#52606d" text-anchor="middle">承：奔丧送别/代谋差事</text>
+            <text x="420" y="306" font-size="9" font-weight="700" fill="#c05621" text-anchor="middle">转：买橘特写 (文眼核心)</text>
+            <text x="550" y="306" font-size="9" fill="#52606d" text-anchor="middle">合：告别入海</text>
+            <text x="635" y="306" font-size="9" fill="#175d7e" text-anchor="middle">续：思亲闭环</text>
+          </svg>
+        </div>
+        <p style="font-size:12.5px; color:var(--text-muted); text-align:center;">▲ 《背影》全篇“四次背影”与“四次眼泪”交织推进拓扑图（明线记事·暗线抒情）</p>
+      </div>
+    </details>
+
+    <!-- 栏目 03 -->
+    <details class="guide-section" id="sec-03">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">03</span>
+          <span class="sec-title">文本显微镜与语言听诊器：细读批注与改写实验</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <!-- 细读一 -->
+        <div class="item-block">
+          <p><strong>【细读一】攀爬月台买橘的一连串动态分解</strong></p>
+          <p><span class="badge-evidence">【文本依据】</span>“我看见他戴着黑布小帽，穿着黑布大马褂，深青布棉袍，蹒跚地走到铁道边，慢慢探身下去，尚不大难。可是他穿过铁道，要爬上那边月台，就不容易了。他用两手攀着上面，两脚再向上缩；他肥胖的身子向左微倾，显出努力的样子。这时我看见他的背影，我的泪很快地流下来了。”</p>
+          <div class="tint-accent">
+            <strong>🔍 文本显微镜（慢镜头解剖）</strong>：<br>
+            朱自清使用了电影分镜头般的“定格慢动作”——<strong>走、探、穿、爬、攀、缩、倾</strong>。注意“攀”与“缩”的力学协作：手必须抠住冰冷粗糙的水泥台边缘（攀），双腿才能失去地面支撑腾空向上卷曲（缩）；而“向左微倾”是最真实的生理本能——为了将身体重心移向力量更稳的一侧，笨拙却决绝。
+          </div>
+          <div class="tint-warm">
+            <strong>🩺 语言听诊器（声律与句式节奏）</strong>：<br>
+            前半句“慢慢探身下去，尚不大难”语调舒缓；转折后“要爬上那边月台，就不容易了”句式顿挫；随后“两手攀”、“两脚缩”、“向左微倾”全部采用三字、四字短语，节奏紧促压抑，模拟出肉体竭尽全力时的沉重喘息。
+          </div>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版</strong>：“父亲年纪大了，腿脚不便，但为了给我买橘子，他很吃力地爬过了铁道，那一刻我很感动，哭了出来。”
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：原文<strong>绝不直接喊“父爱伟大”</strong>，而是剥离一切抒情形容词，纯靠客观生理动作的艰涩还原，让沉重的“肉身苦行”直接击中读者的神经末梢，形成新批评所谓的“客观对应物（Objective Correlative）”。
+          </div>
+        </div>
+
+        <!-- 细读二 -->
+        <div class="item-block">
+          <p><strong>【细读二】父亲的琐碎叮嘱与儿子的“聪明”反讽</strong></p>
+          <p><span class="badge-evidence">【文本依据】</span>“他嘱我路上小心，夜里要警醒些，不要受凉。又嘱托茶房好好照应我。我心里暗笑他的迂；他们只认得钱，托他们只是白托！而且我这样大年纪的人，难道还不能料理自己么？唉，我现在想想，那时真是太聪明了！”</p>
+          <div class="tint-accent">
+            <strong>🔍 文本显微镜</strong>：父亲的叮嘱全是“不要受凉”、“夜里警醒”等最原始、最琐屑的生理照顾，甚至天真地以为给脚夫小费、多句叮嘱就能换来全心照顾。这是旧式父亲在社会失意时，唯一能调动的微薄爱意。
+          </div>
+          <div class="tint-warm">
+            <strong>🩺 语言听诊器</strong>：“暗笑他的迂”与“太聪明了”构成两极回响。叹词“唉”是整篇散文最重的一个声调，犹如一记沉重的耳光打在当年的自己脸上。
+          </div>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写版</strong>：“父亲在车上反复嘱咐我，我觉得他很啰嗦，现在想来是我太不懂事了。”
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：保留了青年朱自清内心最真实、甚至略带丑陋的“轻蔑”与“自负”，通过两段时间维度的剧烈拉扯，让痛悔具有了剖骨疗毒般的真诚，避免了道德高大全的虚伪。
+          </div>
+        </div>
+
+        <!-- 细读三 -->
+        <div class="item-block">
+          <p><strong>【细读三】衣物材质与色彩冷暖的残酷对立</strong></p>
+          <p><span class="badge-evidence">【文本依据】</span>父亲：“戴着黑布小帽，穿着黑布大马褂，深青布棉袍”；给儿子：“做了一件紫毛大衣……他铺好座位，用他的紫毛大衣铺好座位”；买回的橘子：“朱红的橘子”。</p>
+          <div class="tint-accent">
+            <strong>🔍 文本显微镜</strong>：色彩对比具有惊人的隐喻力量：父亲一身<strong>黑、深青</strong>，既是祖母大丧的重孝颜色，也是社会底层奔波、衰败灰暗的象征；而他给儿子做的是贵重的<strong>紫毛大衣</strong>，甚至舍不得让儿子垫坐，亲自用大衣去垫脏污的火车椅面。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：在青黑沉滞的冬日背景中，突然托出那一抱“朱红的橘子”。朱红是全篇唯一的暖色与亮色，犹如破败生活中父亲拼尽老命捧出的一团火焰。
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 04 -->
+    <details class="guide-section" id="sec-04">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">04</span>
+          <span class="sec-title">结构罗盘与叙事机制：双重视角与处境张力</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">叙事学核心机制：双重视角温差（Double Perspective）</div>
+        <div class="formula-bar">
+          叙事张力公式 = 【昔日体验者之我（20岁北大青年·自负傲慢）】 ⚡ 【今日叙述者之我（28岁为人父学者·自责痛悔）】
+        </div>
+        <p>全文贯穿着两重视角的审视与角力：</p>
+        <ul class="bullet-list">
+          <li><strong>20岁“体验者之我”</strong>：刚走出旧家庭、在北京接受新思潮洗礼的大学生。自以为掌握了现代知识、看透了底层社会的市侩（“他们只认得钱”），觉得父亲说话不得体、处事迂腐，迫不及待想要挣脱父权的庇护与唠叨。</li>
+          <li><strong>28岁“叙述者之我”</strong>：动笔写下《背影》时，朱自清已成家立业、在清华任教，深知乱世谋生之艰难与养育儿女之艰辛。此时回看昔日青年，满眼是对自己“冷血自负”的羞愧。</li>
+        </ul>
+
+        <div class="sub-heading">祸不单行的惨淡背景对父爱的放大效应</div>
+        <p><span class="badge-context">【文学背景】</span>许多读者误以为送行只是寻常家常。然而第二段交代了极度严酷的处境：<strong>祖母去世、父亲革职（公买局长失职亏空）、变卖典质还债、高利贷借钱办丧事</strong>。这是旧官僚家庭断崖式坠入贫困的灭顶之灾。<br>
+        <span class="badge-comment">【延伸评论】</span>在自己人生坠入深渊、前途茫茫（“情郁于中，自然要发之于外”）的至暗时刻，父亲面对即将远行的儿子，不仅没有转嫁一分焦躁，反而强颜欢笑：“事已至此，不必难过，好在天无绝人之路！”<strong>父爱不是在顺境中的锦上添花，而是在自身被生活碾碎时，依然竭力为孩子撑起的一把破伞。</strong></p>
+
+        <div class="sub-heading">人物处境—冲突—选择机制卡</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width:25%;">维度</th>
+              <th style="width:37%;">父亲（朱鸿钧）</th>
+              <th style="width:38%;">儿子（朱自清）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>现实处境</strong></td>
+              <td>丢官失业、老母离世、背负巨债、江河日下。</td>
+              <td>北大学生、家庭变故的受庇护者、前途未定。</td>
+            </tr>
+            <tr>
+              <td><strong>内在两难</strong></td>
+              <td>自身尊严扫地 vs 竭力维持一家之主的庇护尊严。</td>
+              <td>渴望独立自立的新青年 vs 无法摆脱血脉荫庇的内疚。</td>
+            </tr>
+            <tr>
+              <td><strong>关键抉择</strong></td>
+              <td>原本托脚夫送，因“踌躇”再三，最终亲自笨拙过铁道买橘。</td>
+              <td>从暗笑其“迂”到目击背影瞬间心理崩溃、掩面流泪。</td>
+            </tr>
+            <tr>
+              <td><strong>精神落点</strong></td>
+              <td>英雄末路的脆弱，化为几句拙朴的日常叮咛。</td>
+              <td>从少年气盛的叛逆，蜕变为主体精神的顿悟与忏悔。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 05 -->
+    <details class="guide-section" id="sec-05">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">05</span>
+          <span class="sec-title">意象网络、主题三层与文学微评论</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">核心意象网络拓扑（拒绝机械贴标签）</div>
+        <ul class="bullet-list">
+          <li><strong>背影（主导意象·流动密码）</strong>：从“开篇悬念”到“浦口特写（艰难肉身）”，再到“消逝于人海（权力退场）”，最后到“泪光中再现（永恒图腾）”。背影是父爱最含蓄的姿态——当一个人面对你时，他可能带着威严或伪装；只有当他转过身去，毫无防备的佝偻脊背才会暴露他全部的衰老与深情。</li>
+          <li><strong>朱红橘子（生命亮色·爱之隐喻）</strong>：在深青与黑色包围的站台废墟上，朱红橘子是全篇唯一的鲜艳暖色。橘子微酸带甜，正如父子间苦涩沉重却又沁人心脾的爱意。</li>
+          <li><strong>紫毛大衣（倾囊相授·沉重恩情）</strong>：一件昂贵的大衣，在全家典当还债的惨淡家境中显得尤为突兀。这是父亲对长子特权式倾囊付出的物化见证。</li>
+        </ul>
+
+        <div class="sub-heading">主题三层掘进模型</div>
+        <div class="tint-box">
+          <p><strong>1. 表层处境</strong>：1917年冬，南京浦口火车站，父亲送别长子朱自清北上读书时的买橘送车细节。</p>
+          <p><strong>2. 深层困境</strong>：中国传统宗法制家庭走向解体时期，衰朽旧父辈在社会重压下的尊严挣扎，与接受现代新文明的青年一代之间的代沟、误解与隔膜。</p>
+          <p><strong>3. 根本追问</strong>：爱能否跨越代际认知与社会阶层的巨大鸿沟？当子代终于读懂父代的衰老与无能为力时，生命注定无法逆转的时间悲剧（子欲养而亲不待）该如何安顿？</p>
+          <p><strong>核心价值张力公式</strong>：<br>
+          <span class="formula-tag">【传统父权的威严消解与衰朽肉身】</span> ⚡ <span class="formula-tag">【现代青年的启蒙优越感与血缘宿命忏悔】</span></p>
+        </div>
+
+        <div class="sub-heading">大学中文系级文学微评论示范（约 320 字）</div>
+        <div class="tint-accent">
+          <p><strong>《背影：以沉重的肉身消解神圣父权》</strong><br>
+          朱自清《背影》之所以超越同类亲情散文，在于其以惊人的艺术直觉完成了一场“父权神话的去魅与重塑”。五四时期的文学充斥着对封建家长的决绝反叛，而朱自清却在浦口站台剥离了父亲的一切道德光环。作者以近乎冷酷的写实笔触，呈现了一个“穿黑布大马褂、肥胖、蹒跚”的失职旧官僚躯体。月台攀爬的物理艰难，实则是时代转型期落魄父辈生存绝境的微观投射。两重视角的张力在此爆发：昔日二十岁青年的“自以为聪明”，恰好构成了对启蒙知识分子傲慢的无情反讽；而当父亲笨拙地将朱红橘子一股脑儿扑在朱自清怀中时，爱不再源于崇高的伦理统摄，而是诞生自两代人在苦难废墟中的相互悲悯。背影之痛，是成长者终于承认父辈平庸与脆弱时的彻骨战栗。</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 06 -->
+    <details class="guide-section" id="sec-06">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">06</span>
+          <span class="sec-title">阐释边界与不确定性判断尺：确定与合理异读</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">诠释学边界判断尺</div>
+        <div class="tint-good">
+          <strong>🟢 可以确定（铁证如山 · 原文与史料闭环）</strong>：
+          <ul class="bullet-list" style="margin-top:4px;">
+            <li>这是一篇充满深刻自我剖析与自责的忏悔之作，核心并非单纯赞美父爱，而是借由父爱反思自身的年少轻狂。</li>
+            <li>惨淡的家庭背景是全文不可剥离的情感基底，没有徐州破产，就没有浦口车站那一抱橘子的千钧重量。</li>
+            <li>父子之间的沟通存在巨大的断层与欲言又止的沉默（“话不大漂亮”），符合中国传统男性的情感表达范式。</li>
+          </ul>
+        </div>
+        <div class="tint-warm">
+          <strong>🟡 可以推测（合理延伸 · 语境推导）</strong>：
+          <ul class="bullet-list" style="margin-top:4px;">
+            <li>父亲之所以执意亲自去买橘子，深层心理是对“失落的一家之主权力”的代偿——在谋生、前途上他已无法再帮助儿子，买橘子是他唯一还能证明“我依然能保护你”的悲壮尊严行为。</li>
+            <li>朱自清的眼泪中包含着恐惧：他从父亲沉重下坠的身躯中，第一次直视了死亡与衰老的不可抗拒性。</li>
+          </ul>
+        </div>
+        <div class="tint-bad">
+          <strong>🔴 警惕过度阐释与庸俗异读（断章取义）</strong>：
+          <ul class="bullet-list" style="margin-top:4px;">
+            <li><strong>荒谬异读一：“父亲违反交通规则翻越铁道，应予严肃批评或课文移出教材”</strong>——这是典型的用现代城市管理条例粗暴套裁民国初年交通史。1917年的浦口火车站为地面换乘站，旅客横穿股道为当时普遍现象。脱离历史情境的律法审判是文学鉴赏的浅薄化。</li>
+            <li><strong>荒谬异读二：“父亲是个专制控制狂，连儿子喝水、找座位都要管，令人窒息”</strong>——忽略了当时的社会治安环境与家庭濒临绝境的极端状态，将长辈朴素的担忧歪曲为病态心理控制。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">接受视野窗：学术界两大代表性异读交锋</div>
+        <div class="item-block">
+          <p><strong>观点 A（伦理和解派 · 主流传统读法）</strong>：认为《背影》体现了中国传统儒家“孝慈”美德在现代语境下的回响。血浓于水的亲情克服了新旧观念的撕裂，散文是一曲浪子回头、与父辈达成深刻精神和解的挽歌。</p>
+          <p><strong>观点 B（弑父与罪感派 · 现代心理批评视角）</strong>：结合朱自清与父亲后期的真实决裂（父亲私扣朱自清薪水、甚至拒绝朱自清携眷进门），认为《背影》是朱自清在新文化运动反抗封建家庭后的巨大“俄狄浦斯内疚”。正因为他在现实中深深伤害了父亲、逃离了家族责任，才在文字中将父亲的苦难升华为神圣受难，试图以此完成自我心理救赎。</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 07 -->
+    <details class="guide-section" id="sec-07">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">07</span>
+          <span class="sec-title">知人论世：时代背景、家族决裂与和解全相</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="tint-accent">
+          <span class="badge-context">【文学背景】</span><strong>真实历史背景的三重维度</strong>：
+          <ol class="num-list" style="margin-top:4px;">
+            <li><strong>时代风暴下的阶层滑落</strong>：1917年正值军阀割据混战前夕，中国江南士绅小官僚阶层加速破产。父亲朱鸿钧（字小坡）在徐州烟酒公卖局长任上因姨太太争风吃醋导致家庭内讧、官职被革，直接导致祖母气急身亡。</li>
+            <li><strong>父子长达数年的深刻裂痕</strong>：朱自清从北大毕业后在扬州八中任教，父亲倚老卖老，直接通过校长私扣朱自清全部薪水供家庭挥霍。朱自清愤而带着妻儿离开扬州，脱离家庭。1921年朱自清回扬州探亲，父亲甚至闭门不纳。</li>
+            <li><strong>一封家信与迟来的救赎</strong>：1925年秋，朱自清在清华任教，收到老父家信：“我身体平安，唯膀子疼痛厉害，举箸提笔，诸多不便，大约大去之期不远矣。”百感交集之下，朱自清泪如泉涌，写下《背影》。1928年朱自清第一本散文集《背影》出版，三弟将书带给父亲，父亲坐在竹椅上，戴着老花镜一字一句读完，热泪横流，父子终得和解。</li>
+          </ol>
+        </div>
+
+        <div class="sub-heading">现代记人散文的文体源流创新</div>
+        <p><span class="badge-comment">【延伸评论】</span>中国古典散文中写亲情多为祭文或寿序（如韩愈《祭十二郎文》、归有光《先妣事略》），讲究“言行录”式的生平总结与崇高德行褒扬。而朱自清的《背影》开创了现代写人散文的崭新范式：<strong>不写平生功业、不美化人物缺点，而是截取日常时空中的一个微观横截面（Slice of Life），通过一个纯粹的局部生理动作（买橘爬月台），承载浩瀚的情感宇宙。</strong></p>
+      </div>
+    </details>
+
+    <!-- 栏目 08 -->
+    <details class="guide-section" id="sec-08">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">08</span>
+          <span class="sec-title">比较阅读桥：同题异构与群文联读矩阵</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width:20%;">篇目</th>
+              <th style="width:28%;">核心物象与媒介</th>
+              <th style="width:26%;">父/母爱机制</th>
+              <th style="width:26%;">认知反差与情感落点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>朱自清《背影》</strong></td>
+              <td>背影 / 朱红橘子 / 紫毛大衣</td>
+              <td>衰败残年里的笨拙肉身付出；无言的保护欲。</td>
+              <td>青年自诩聪明的傲慢 vs 成年痛悔的温差；自责式悲悯。</td>
+            </tr>
+            <tr>
+              <td><strong>李森祥《台阶》</strong></td>
+              <td>九级台阶 / 凹亮扁担 / 厚茧脚板</td>
+              <td>农民毕生用劳作换取家族尊严与社会认同。</td>
+              <td>梦想达成时的瞬间苍老与精神失落；农耕文明转型的沉重浩叹。</td>
+            </tr>
+            <tr>
+              <td><strong>史铁生《秋天的怀念》</strong></td>
+              <td>北海菊花 / 泼泼洒洒的秋阳</td>
+              <td>身患绝症母亲对残疾暴怒儿子的隐忍包容。</td>
+              <td>暴躁儿子的无视 vs 母亲猝死后的终生创痛与精神“好好儿活”。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="tint-accent">
+          <strong>💡 比读带来的认知刷新</strong>：<br>
+          对比《台阶》与《秋天的怀念》可以看出，《背影》的不可替代性在于<strong>“知识分子儿子的智识优越感如何被最原始的父性肉体击碎”</strong>。《台阶》聚焦于父辈面对社会尊严的徒劳，《秋天的怀念》聚焦于生命创痛中的母性包容，而《背影》提供的是一把剖析“代际傲慢与罪疚”的手术刀。
+        </div>
+      </div>
+    </details>
+
+    <div class="part-divider">下篇 · 读写结合、素材炼金与考场实战</div>
+
+    <!-- 栏目 09 -->
+    <details class="guide-section" id="sec-09" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">09</span>
+          <span class="sec-title">五维金句解码与情境化阶梯仿写支架</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <!-- 金句 1 -->
+        <div class="item-block">
+          <p><strong>【金句 1 · 🌿 景造氛围】</strong><br>
+          <span class="badge-evidence">【文本依据】</span>“到徐州见着父亲，看见满院狼藉的东西，又想起祖母，不禁簌簌地流下眼泪。”</p>
+          <div class="formula-bar">
+            句式骨架：[在特定时空突见物象A] + [目击空间内部凌乱破败细节B] + [关联起逝去人/事C] + [引爆身体生理应激反应D]
+          </div>
+          <p><strong>🏠 迁移情境</strong>：周五傍晚回到暴雨肆虐后的老屋 / 考完试后回到搬迁腾退前的老居所。</p>
+          <p><strong>🧩 填空支架</strong>：跨进__________，看见__________，又想起__________，不禁__________。</p>
+          <p><strong>⚠️ 避坑指南</strong>：不要一上来就写“我心里难过极了”，必须先写出“满院狼藉”这样具象的视觉证据，眼泪才不是虚伪的挤压。</p>
+          <div class="tint-good">
+            <strong>✨ 高分下水文</strong>：“推开老屋吱呀作响的木门，看见满桌积着厚灰的空药瓶与剥落的墙皮，又想起卧病在床时祖父紧握我的枯槁双手，胸口猛地一酸，眼泪便无声地落在了冰冷的青砖上。（以空药瓶和剥落墙皮作为具象证据，情绪推进沉稳而自然。）”
+          </div>
+        </div>
+
+        <!-- 金句 2 -->
+        <div class="item-block">
+          <p><strong>【金句 2 · 👤 人立形象】</strong><br>
+          <span class="badge-evidence">【文本依据】</span>“他用两手攀着上面，两脚再向上缩；他肥胖的身子向左微倾，显出努力的样子。”</p>
+          <div class="formula-bar">
+            句式骨架：[部位A + 动作动词1 + 支点] + [部位B + 动作动词2]；[整体身体状态C + 倾斜/受力动作D]，显出 [心理意志或生理极限E]。
+          </div>
+          <p><strong>🏠 迁移情境</strong>：母亲深夜在油烟弥漫的厨房搬运沉重面粉袋 / 父亲在暴雨中弯腰顶风推推车的瞬间。</p>
+          <p><strong>🧩 填空支架</strong>：他/她用两手__________，两腿__________；他/她__________的身子__________，显出__________。</p>
+          <p><strong>⚠️ 避坑指南</strong>：严禁使用“他很努力地推着”这种抽象判定，必须把“攀、缩、倾”换成其他真实符合力学结构的分解动词（如：抵、蹬、拱）。</p>
+          <div class="tint-good">
+            <strong>✨ 高分下水文</strong>：“母亲用两手死死拽住沉重的蒸笼耳，两脚向外扎着弓步死死蹬地；她单薄的身躯向后狠狠后仰，显出一副与岁月较劲的狠劲。（动词‘拽’、‘扎’、‘蹬’、‘仰’层层递进，瞬间立起母亲吃苦耐劳的坚韧骨架。）”
+          </div>
+        </div>
+
+        <!-- 金句 3 -->
+        <div class="item-block">
+          <p><strong>【金句 3 · ⚡ 事推情节 / 反讽自省】</strong><br>
+          <span class="badge-evidence">【文本依据】</span>“我心里暗笑他的迂；他们只认得钱，托他们只是白托！而且我这样大年纪的人，难道还不能料理自己么？唉，我现在想想，那时真是太聪明了！”</p>
+          <div class="formula-bar">
+            句式骨架：[心理自鸣得意/轻视他人A] + [自诩看透世俗规律的浅薄断语B] + [反问强化傲慢C] + [叹词转折 + 跨时空双重视角反讽自谴D]
+          </div>
+          <p><strong>🏠 迁移情境</strong>：当年嫌弃奶奶用塑料袋层层包好土特产塞进自己行李箱，觉得老土丢人。</p>
+          <p><strong>🧩 填空支架</strong>：我心里暗笑他/她的__________；__________！而且我__________，难道__________？唉，我现在想想，那时真是太__________了！</p>
+          <div class="tint-good">
+            <strong>✨ 高分下水文</strong>：“我当时心里暗笑母亲的土气；外面的超市什么名贵糕点买不到，非要费力炒这黑糊糊的炒米糖！而且我一个堂堂重点高中的中学生，难道还稀罕这点零嘴？唉，我现在独自在异乡深夜啃着冷面包时想想，那时真是太无知轻狂了！（准确复制了双重视角温差，反思切肤深刻。）”
+          </div>
+        </div>
+
+        <!-- 金句 4 -->
+        <div class="item-block">
+          <p><strong>【金句 4 · 💫 情传心声】</strong><br>
+          <span class="badge-evidence">【文本依据】</span>“过铁道时，他先将橘子散放在地上，自己慢慢爬下，再抱起橘子走。”</p>
+          <div class="formula-bar">
+            句式骨架：[在特定危险/局促关口] + [优先保护核心物象的连贯平实动作] + [克制而郑重的动作收尾]
+          </div>
+          <p><strong>🏠 迁移情境</strong>：父亲在暴雨中收伞，宁可自己淋透也要先把雨衣完全裹紧自行车后座的书包。</p>
+          <p><strong>🧩 填空支架</strong>：在__________时，他/她先将__________，自己__________，再__________。</p>
+          <div class="tint-good">
+            <strong>✨ 高分下水文</strong>：“雨势骤猛时，父亲先将自己的宽大雨衣脱下来紧紧裹住我的画板，自己只顶着件单薄的衬衫在暴雨中慢慢蹬车，再伸手护一护画板的棱角。（平实白描胜过千言万语。）”
+          </div>
+        </div>
+
+        <!-- 金句 5 -->
+        <div class="item-block">
+          <p><strong>【金句 5 · 🔺 意升主题】</strong><br>
+          <span class="badge-evidence">【文本依据】</span>“在晶莹的泪光中，又看见那肥胖的、青布棉袍黑布马褂的背影。唉！我不知何时再能与他相见！”</p>
+          <div class="formula-bar">
+            句式骨架：在 [视觉媒介/心境滤镜A] 中，又看见那 [典型特征修饰语B] 的 [核心图腾/物象C]。[感叹词]！我不知 [对于生命终极遗憾的浩叹D]！
+          </div>
+          <p><strong>🏠 迁移情境</strong>：在中考/高考复习深夜，凝视台灯旁旧照片或一件老物件，直面逝去的光阴。</p>
+          <p><strong>🧩 填空支架</strong>：在__________中，又看见那__________的__________。__________！我不知__________！</p>
+          <div class="tint-good">
+            <strong>✨ 高分下水文</strong>：“在昏黄的书桌台灯下，又翻见那枚被磨得发亮的、边缘带着锯齿的黄铜顶针。唉！我不知何时才能再听见奶奶在窗下摇着纺车哼唱的江南童谣！（意象定格，余韵悠长。）”
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 10 -->
+    <details class="guide-section" id="sec-10" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">10</span>
+          <span class="sec-title">作文素材炼金炉与高阶立意库</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">三大高阶立意提炼公式</div>
+        <div class="tint-box">
+          <p><strong>立意 1｜在沉重的肉身苦行中，看见爱的祛魅与神圣（适用考场：亲情/真实的重量/细节的力量）</strong><br>
+          <em>哲学命名</em>：爱不是抽象空洞的道德高标，而是具体生命在苦难裂隙中的笨拙挺立。<br>
+          <em>写作落点</em>：摒弃“母亲深夜送伞、父亲冒雨背我上医院”的套路，写出长辈在现实重压下不完美的“衰老肉身与生活挣扎”。</p>
+          <p><strong>立意 2｜破除年少自负的“双重视角温差”（适用考场：成长/自省/理解与包容）</strong><br>
+          <em>哲学命名</em>：成长的真正标志，是承认并打碎自身年轻时自以为是的“智识优越感”。<br>
+          <em>写作落点</em>：勇敢书写自己曾经对父母土气、迂拙的隐秘嫌弃，并在岁月流转中达成自我反思与痛悔和解。</p>
+          <p><strong>立意 3｜于风雨飘摇处捧出一捧“朱红”（适用考场：困境中的光芒/逆境/担当）</strong><br>
+          <em>哲学命名</em>：在时代与家族大厦将倾的废墟上，普通人用微茫爱意筑起最后的尊严防线。<br>
+          <em>写作落点</em>：探讨普通人在遭遇生活灭顶之灾时，如何通过微小的爱与仪式感抵御人生的荒寒。</p>
+        </div>
+
+        <div class="sub-heading">标准化考场作文素材卡（可直接背诵嵌入）</div>
+        <!-- 素材卡 1 -->
+        <div class="item-block">
+          <p><strong>素材卡 #01 ｜ 浦口站台的朱红橘子：苦难废墟里的微茫火种</strong><br>
+          <span class="badge badge-warm">#逆境担当</span> <span class="badge badge-warm">#父爱深沉</span> <span class="badge badge-warm">#细节与真实</span></p>
+          <div class="tint-accent">
+            <strong>100字核能精述</strong>：<br>
+            1917年冬，大丧甫毕、家道骤落，旧官僚父亲朱鸿钧丢官负债，人生跌入至暗时刻。然而在南京浦口站台，他强咽下悲辛，拖着臃肿病躯穿过冰冷铁道，攀爬粗粝月台，只为给远行的儿子买一兜朱红橘子。那一抹亮色，是废墟里唯一的温暖火种。
+          </div>
+          <p><strong>名句化用公式</strong>：于冰冷铁道间蹒跚买橘，在黑青绝境中捧出朱红。</p>
+          <div class="tint-good">
+            <strong>💎 150字考场议论文嵌入示范</strong>：<br>
+            真正的爱，往往不是顺境时的朗朗晴空，而是大厦倾塌处咬牙擎起的一根断木。正如朱自清笔下的父亲，在丢官丧母、变卖典质的严寒岁末，拖着肥胖衰颓的肉身蹒跚穿过铁轨，拼尽全力攀上月台。那沾满煤灰的黑布马褂与怀中那一捧朱红的橘子，构成了文学史上最动人的色彩对峙——纵使命运以残垣断壁相加，爱也能在尘土与寒风中，为所庇护之人点燃微茫而永恒的火种。
+          </div>
+        </div>
+
+        <!-- 素材卡 2 -->
+        <div class="item-block">
+          <p><strong>素材卡 #02 ｜ 站台上的“聪明”反讽：代际隔膜与终身自谴</strong><br>
+          <span class="badge badge-warm">#成长蜕变</span> <span class="badge badge-warm">#击碎偏见</span> <span class="badge badge-warm">#反思自省</span></p>
+          <div class="tint-accent">
+            <strong>100字核能精述</strong>：<br>
+            二十岁的北大才子朱自清，曾暗笑父亲多嘱茶房是“迂腐”、嫌父亲说话“不大漂亮”，以自鸣得意的“新青年聪明”俯视老父。直至风霜染鬓、为人父者，他方于长叹中幡然醒悟：那场自以为是的轻视，不过是稚嫩灵魂面对深沉父爱时的浅薄无知。
+          </div>
+          <p><strong>名句化用公式</strong>：暗笑其迂的年少轻狂，终化作泪光中彻骨的自省。</p>
+          <div class="tint-good">
+            <strong>💎 150字考场议论文嵌入示范</strong>：<br>
+            青春最隐蔽的盲区，莫过于手握新知的青年常以“启蒙者”的傲慢审视父辈的笨拙。二十岁的朱自清在浦口车厢暗笑老父多事迂腐，自命“聪明”；唯有八年沧桑涤荡、岁月加身，那句“那时真是太聪明了”才化作痛彻心扉的反语。成长的本质，不是高扬理性的利刃割断脐带，而是学会收敛自矜的锋芒，在父辈佝偻的背影中读懂生活的沉重，在痛悔与悲悯中完成对生命源头的回望。
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 11 -->
+    <details class="guide-section" id="sec-11">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">11</span>
+          <span class="sec-title">万能写作模型与读写映射总纲</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">写作模型 1：微观动作定格与多重视角反刍模型</div>
+        <div class="formula-bar">
+          公式：【宏观困境铺垫 15%】 → 【微观动作特写 30%】 → 【昔日浅薄误判 25%】 → 【今日顿悟反思 30%】
+        </div>
+        <p><strong>课文原型对应</strong>：第2-3段徐州惨淡家境（宏观铺垫） → 第6段攀月台买橘动词链（微观特写） → 第4-5段暗笑其迂与插嘴（昔日浅薄） → 第6段落泪与第7段北京读信叹惋（今日反思）。</p>
+        <p><strong>考场作文题目移植大纲（如中考题《原来，你一直都在》）</strong>：</p>
+        <ul class="bullet-list">
+          <li><strong>一、环境铺垫（100字）</strong>：写家庭因变故搬迁至逼仄出租屋，生活一地鸡毛。</li>
+          <li><strong>二、动作定格（250字）</strong>：母亲因腰椎间盘突出无法直立，却跪在粗糙水泥地上，用一块破抹布一点点擦净我脚下的一方小地毯。（动作链：跪、弓、揉、擦）。</li>
+          <li><strong>三、昔日误解（150字）</strong>：当年觉得母亲小家子气，甚至嫌她擦地的姿态难看，自负地戴上耳机拒绝交流。</li>
+          <li><strong>四、反思升华（200字）</strong>：如今自己独立租房、腰酸背痛打扫房间时，才读懂当年那块抹布上承载的全部母爱与尊严。</li>
+        </ul>
+
+        <div class="sub-heading">写作模型 2：色彩冷暖对峙与主导物象辐射模型</div>
+        <div class="formula-bar">
+          公式：【冷色调大背景 20%】 → 【暖色调核心物象切入 25%】 → 【物象背后的沉重代价 30%】 → 【物象作为精神图腾升华 25%】
+        </div>
+        <p><strong>课文原型对应</strong>：深青棉袍与黑布马褂（冷色背景） → 朱红橘子（暖色物象） → 艰难爬铁道与变卖典质（代价） → 泪光中永恒定格（图腾升华）。</p>
+
+        <div class="sub-heading">读写映射总纲表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width:18%;">阅读维度</th>
+              <th style="width:28%;">课文特征密码</th>
+              <th style="width:28%;">写作转化动作</th>
+              <th style="width:26%;">核心素养指向</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>立意提炼</strong></td>
+              <td>绝境中见真情；父爱无须神圣化</td>
+              <td>写亲情必写其现实重压与生理脆弱</td>
+              <td>审美鉴赏与价值判断</td>
+            </tr>
+            <tr>
+              <td><strong>叙事视角</strong></td>
+              <td>双重视角温差；自我暴露与批判</td>
+              <td>在记叙中插入“昔我 vs 今我”的反思</td>
+              <td>思维发展与深度反省</td>
+            </tr>
+            <tr>
+              <td><strong>细节刻画</strong></td>
+              <td>连续高密度动词链；生理力学分解</td>
+              <td>用3-5个高质感动词替代抽象修辞</td>
+              <td>语言建构与精准表达</td>
+            </tr>
+            <tr>
+              <td><strong>色彩构图</strong></td>
+              <td>深青/黑（底色） ⚡ 朱红（高光）</td>
+              <td>全篇设定一组冷暖对立的物象基色</td>
+              <td>文学构思与意象营造</td>
+            </tr>
+            <tr>
+              <td><strong>结尾结构</strong></td>
+              <td>由物入书信；泪光再现背影</td>
+              <td>以一件现实器物或信件形成首尾回声</td>
+              <td>篇章结构与艺术闭环</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 12 -->
+    <details class="guide-section" id="sec-12">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">12</span>
+          <span class="sec-title">五个苏格拉底深想问题与多场景表达协作</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">直击深水区的五个苏格拉底追问</div>
+        <div class="item-block">
+          <p><strong>1. 语言张力问</strong>：为什么父亲在买完橘子回来、扑扑身上的泥土时，感到“心里很轻松似的”？身体明明极度疲惫，为什么“心里轻松”？<br>
+          <em>思考提示</em>：这种“轻松”不是生理的轻松，而是作为父亲终于完成了一件对儿子的照料，在残酷的现实败局中暂时抢回了一点作为父亲的尊严与安全感。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>2. 伦理两难问</strong>：如果朱自清当年没有“暗笑他的迂”，而是直接抢上前去替父亲买橘子，这篇文章的文学价值是提升了还是毁灭了？<br>
+          <em>思考提示</em>：如果儿子抢先去买，文章就变成了“孝子尊亲”的道德楷模小品。恰恰是儿子的冷眼旁观与事后痛悔，揭开了人性与代际之间最真实、最幽微的暗面。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>3. 核心假设挑战问</strong>：现代有评论者认为“朱自清是在自我感动，父亲其实是个纳妾破产、脾气暴躁的劣父”，你如何看待历史真实与文学真实的边界？<br>
+          <em>思考提示</em>：文学不是给历史人物发道德奖惩令。散文的伟大不在于被写对象的完美无瑕，而在于作者如何在生活的泥泞与人性的残缺中，打捞出那一抹真实的爱与忏悔。</p>
+        </div>
+        <div class="item-block">
+          <p><strong>4. 算法与AI时代共振问</strong>：在今天外卖即时送达、高铁瞬息千里的数字时代，还有没有可能产生“买橘子般的背影”？现代人的亲情表达是否退化成了微信转账与表情包？<br>
+          <em>思考提示</em>：技术的便利性消解了肉身跋涉的难度，但也常常稀释了爱的浓度。当一切都可以被一键代办，我们该去哪里寻找沉重的生命确证？</p>
+        </div>
+        <div class="item-block">
+          <p><strong>5. 生命成长自省问</strong>：在你的家庭生活中，是否也曾有过自以为“比父母懂得多、嫌父母说话老土或不得体”的隐秘时刻？你准备何时跨越这层傲慢？</p>
+        </div>
+
+        <div class="sub-heading">多场景表达协作示范</div>
+        <div class="tint-accent">
+          <p><strong>🎙️ 场景 A：30秒课间/饭桌快嘴版</strong><br>
+          “千万别把《背影》只当成写慈父的课文！这篇文真正狠的地方，是朱自清的‘自黑’。二十岁时嫌老爸迂腐落伍，自以为是新青年很懂世故；八年后自己当了爹，才明白老爸当年在破产绝境中爬月台买橘子，是拿命在护着他的尊严。《背影》不是写父爱多伟大，是写我们年轻时有多自以为是，懂事时有多痛悔莫及！”</p>
+        </div>
+        <div class="tint-warm">
+          <p><strong>🎙️ 场景 B：3分钟课堂发言 / 演讲展示版</strong><br>
+          “各位老师、同学：我们在读《背影》时，往往被‘爬月台买橘子’的镜头所感动。但我更想请大家注意一个刺眼的词——‘聪明’。朱自清在文中两次咬牙切齿地说自己‘聪明过分’。他当年聪明在哪？聪明在会跟脚夫还价，聪明在懂世态炎凉，聪明在新思潮带来的智识优越感。正是这种‘小聪明’，让他对父亲琐碎的叮嘱冷眼旁观，甚至在心里‘暗笑他的迂’。<br>
+          直到父亲失职破产、家庭四分五裂，直到父亲戴着老花镜在信里写下‘大约大去之期不远矣’，朱自清才在清华园的书桌前被雷霆击中。他发现，自己的‘新思想’在老父那一抱朱红的橘子面前，显得何其轻浮！《背影》之所以能穿越百年，就是因为它逼着我们每个人照照镜子：在父母日渐衰老、跟不上现代节奏的今天，我们是否也正仗着自己懂点AI、懂点网络，在心里‘暗笑他们的迂’？背影是一面警钟，提醒我们：不要让迟来的痛悔，成为我们对父母最后的注解。”</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 13 -->
+    <details class="guide-section" id="sec-13">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">13</span>
+          <span class="sec-title">综合创作实战、世界方法与元认知说明书</span>
+        </div>
+        <span class="sum-icon">＋</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">双轨实战习作命题与写作脚手架</div>
+        <div class="tint-box">
+          <p><strong>✍️ 任务一：考场级记叙散文（600~800字）</strong><br>
+          <strong>题目</strong>：《那一刻，我暗笑他的“迂”》或《绝境中的朱红》<br>
+          <strong>要求</strong>：
+          1. 必须借鉴《背影》的“双重视角温差”结构，展现昔日之浅薄与今日之顿悟；
+          2. 必须包含一组精细的“动作分解特写”（不少于4个精准动词）；
+          3. 包含一组具有隐喻色彩的冷暖色调对峙。</p>
+          <p><strong>构思脚手架</strong>：
+          ① 起笔设定某个现实生活的艰涩时刻（如雨雪天气、失业或搬迁）；
+          ② 描摹长辈或故人做的一件看似多余、落伍、可笑的琐碎举动；
+          ③ 穿插自己当时内心的自负与暗笑；
+          ④ 放大特写其动作与生理艰难；
+          ⑤ 镜头拉回当下，完成自我反省与情感升华。</p>
+        </div>
+
+        <div class="sub-heading">一周现实观察微行动卡</div>
+        <div class="tint-accent">
+          <p><strong>🔭 任务名称：长辈生理动作慢速快门追踪</strong><br>
+          <strong>观察对象</strong>：父母或祖辈做一件最日常家务的瞬间（如：穿针引线、下蹲洗菜、系鞋带、推电动车）。<br>
+          <strong>记录要求</strong>：连续记录 3 个可观察的生理力学细节（如：手指微颤的频率、扶膝借力的停顿、呼吸的急促叹气），严禁使用情感修辞，只记物理动作。<br>
+          <strong>反思问题</strong>：在这个动作中，他们身体的哪个部位已经明显向岁月妥协？</p>
+        </div>
+
+        <div class="sub-heading">🌍 从《背影》学到的一种看世界的方法</div>
+        <div class="tint-warm">
+          <p><strong>方法命名：【双重视角破除代际傲慢法】（Double-Lens De-arrogance Method）</strong></p>
+          <ul class="bullet-list">
+            <li><strong>核心观察动作</strong>：在对他人（尤其是长辈、弱者）产生“不耐烦”、“嫌弃迂腐”或“自命不凡”的瞬间，强行暂停思维，将镜头推近至对方的<strong>具体生理困局与生活历史背景</strong>，启动“未来之我”对“当下之我”的跨时空审视。</li>
+            <li><strong>适用场景</strong>：亲情冲突调解、两代人代沟沟通、深度人物特写创作、社会学意义上的底层同理心培养。</li>
+            <li><strong>失效边界</strong>：面对真正的家庭暴力、有毒人格控制时，不可滥用此法进行盲目原谅与道德绑架。本方法仅适用于健康伦理关系中因认知局限带来的隔膜。</li>
+            <li><strong>人机分工边界</strong>：AI 可以帮你罗列辞藻与动词库，但<strong>只有你自己肉身直面父母衰老时的那一次心悸与战栗</strong>，才是文学真实性的唯一源泉。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">🛡️ 读写元认知自我标注说明书（模版）</div>
+        <div class="tint-box" style="font-size:13.5px;">
+          <p><strong>【学生写作自查表】</strong></p>
+          <p>□ <strong>1. 视角检验</strong>：我是否写出了自己“不那么完美、甚至幼稚可笑”的真实过去？（避免把小时候的自己写成圣人）<br>
+          □ <strong>2. 动词检验</strong>：在最核心的抒情段落，我是否用 3 个以上的连贯动词完成了动作分解，而不是仅仅使用“他很辛苦”这种概括词？<br>
+          □ <strong>3. 意象检验</strong>：全文是否有 1~2 个贯穿始终的具象器物或色彩载体？<br>
+          □ <strong>4. 节制检验</strong>：在泪点最高处，我是否克制了滥情的感叹号，改用平实的白描与沉默收束？</p>
+        </div>
+      </div>
+    </details>
+
+    <footer>
+      《背影》深度研读与读写结合导读 · 依据《中学语文课文赏析与读写结合深度导读规范》生成<br>
+      让每一篇课文都成为看世界的透镜，炼成考场与人生的写作武器
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+    function focusTrack(track) {
+      document.querySelectorAll('.guide-section').forEach((d, idx) => {
+        const num = idx + 1;
+        d.open = (track === 'read') ? (num <= 8) : (num >= 9);
+      });
+      const target = document.getElementById(track === 'read' ? 'sec-01' : 'sec-09');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+</body>
+</html>

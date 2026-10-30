@@ -29,28 +29,28 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/三篇山水小品文" data-garden-item data-title="三篇山水小品文" data-search="三篇山水小品文 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793350338093">
-  <span class="g-row-text"><strong>三篇山水小品文</strong><small>Library · 语文 · 初二课文</small></span>
+  <div class="g-list"><a class="g-row" href="/html/语文/初二课文/《孟子》三章赏析.html" data-garden-item data-title="《孟子》三章深度赏析与读写结合导读" data-search="《孟子》三章深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《孟子》三章深度赏析与读写结合导读</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》赏析 · 吴均" data-search="《与朱元思书》赏析 · 吴均 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793350338093" data-router-ignore>
-  <span class="g-row-text"><strong>《与朱元思书》赏析 · 吴均</strong><small>Gallery · 语文 · 初二课文</small></span>
+<a class="g-row" href="/html/语文/初二课文/中国石拱桥赏析.html" data-garden-item data-title="《中国石拱桥》深度赏析与读写结合导读 · 茅以升" data-search="《中国石拱桥》深度赏析与读写结合导读 · 茅以升 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《中国石拱桥》深度赏析与读写结合导读 · 茅以升</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/语文/初二课文/藤野先生.html" data-garden-item data-title="《藤野先生》赏析 · 鲁迅" data-search="《藤野先生》赏析 · 鲁迅 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793350338093" data-router-ignore>
-  <span class="g-row-text"><strong>《藤野先生》赏析 · 鲁迅</strong><small>Gallery · 语文 · 初二课文</small></span>
+<a class="g-row" href="/html/语文/初二课文/回忆鲁迅先生赏析.html" data-garden-item data-title="《回忆鲁迅先生》深度赏析与读写结合导读" data-search="《回忆鲁迅先生》深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《回忆鲁迅先生》深度赏析与读写结合导读</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《阿长与〈山海经〉》" data-garden-item data-title="《阿长与〈山海经〉》" data-search="《阿长与〈山海经〉》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1793342497000">
-  <span class="g-row-text"><strong>《阿长与〈山海经〉》</strong><small>Library · 语文 · 初一课文</small></span>
+<a class="g-row" href="/html/语文/初二课文/愚公移山赏析.html" data-garden-item data-title="《愚公移山》深度导读与读写结合手札 · 《列子》" data-search="《愚公移山》深度导读与读写结合手札 · 《列子》 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《愚公移山》深度导读与读写结合手札 · 《列子》</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/《三峡》" data-garden-item data-title="《三峡》" data-search="《三峡》 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793339957000">
-  <span class="g-row-text"><strong>《三峡》</strong><small>Library · 语文 · 初二课文</small></span>
+<a class="g-row" href="/html/语文/初二课文/白杨礼赞赏析.html" data-garden-item data-title="《白杨礼赞》深度赏析与读写结合导读 · 茅盾" data-search="《白杨礼赞》深度赏析与读写结合导读 · 茅盾 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《白杨礼赞》深度赏析与读写结合导读 · 茅盾</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《井冈翠竹》" data-garden-item data-title="《井冈翠竹》" data-search="《井冈翠竹》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
-  <span class="g-row-text"><strong>《井冈翠竹》</strong><small>Library · 语文 · 初一课文</small></span>
+<a class="g-row" href="/html/语文/初二课文/背影赏析.html" data-garden-item data-title="《背影》深度赏析与读写结合导读 · 朱自清" data-search="《背影》深度赏析与读写结合导读 · 朱自清 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《背影》深度赏析与读写结合导读 · 朱自清</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>

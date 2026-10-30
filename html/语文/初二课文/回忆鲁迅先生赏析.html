@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>《回忆鲁迅先生》深度赏析与读写结合导读</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.07);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.11);
+        --bg-warm: rgba(251, 146, 60, 0.11);
+        --bg-danger: rgba(248, 113, 113, 0.11);
+        --bg-success: rgba(74, 222, 128, 0.11);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; }
+
+    /* 顶部 Hero */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 { font-size: 22px; font-weight: 800; line-height: 1.35; margin-bottom: 4px; }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+    }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .t-btn.read { background: var(--bg-accent); color: var(--primary); }
+    .t-btn.write { background: var(--bg-warm); color: var(--secondary); }
+
+    .part-divider {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目（唯一外框，内部不套大盒） */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--bg-accent);
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .sec-num.warm { background: var(--bg-warm); color: var(--secondary); }
+    .sec-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; }
+    }
+
+    /* 小标题与流式分隔块 */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* 仅限短元数据的紧凑双列网格 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+
+    /* 纯色块区分（无四周边框，内部绝不套框） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      border-radius: 6px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 短公式条与行内标签 */
+    .formula-bar {
+      background: var(--bg-accent);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .formula-tag {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--primary);
+    }
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 满宽自适应表格 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .svg-wrap {
+      width: 100%;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 8px 4px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+    ul.bullet-list, ol.num-list { padding-left: 17px; margin: 5px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14.5px; margin-bottom: 5px; line-height: 1.72; }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      <div class="hero-badges">
+        <span class="badge">现代文轨 · 06 现代写人记事与回忆散文</span>
+        <span class="badge badge-warm">统编版八年级上册 · 第二单元</span>
+      </div>
+      <h1>《回忆鲁迅先生》深度赏析</h1>
+      <div class="hero-sub">作者：萧红（1911—1942 · 现代文学天才作家 · 原名张迺莹）｜ 导读：中文系文本批评与读写转化</div>
+      <div class="hero-quote">
+        “鲁迅先生的笑声是明朗的，是从心底欢喜出来的。若有人说了什么可笑的话，鲁迅先生笑得连烟卷都拿不住了，常常是笑得咳嗽起来。”<br>
+        <strong>【文眼点睛】</strong>剥落一切神化的油彩与斗士图腾的铜绿，萧红以孩童般纯澈的北国白描，在极素朴的日常微澜中，还原了一尊有体温、有笑声、疲惫而又决绝的血肉真巨人。
+      </div>
+    </header>
+
+    <!-- 置顶控制工具栏 -->
+    <nav class="toolbar">
+      <button class="t-btn" onclick="toggleAllSections(true)">展开全部</button>
+      <button class="t-btn" onclick="toggleAllSections(false)">收起全部</button>
+      <button class="t-btn read" onclick="focusTrack('read')">📖 读懂篇 (01-08)</button>
+      <button class="t-btn write" onclick="focusTrack('write')">✍️ 读写转化 (09-13)</button>
+    </nav>
+
+    <!-- 分区提示：上篇 -->
+    <div class="part-divider">上篇 · 文本深读、语言剖析与文学批评（01 ~ 08）</div>
+
+    <!-- 栏目 01 -->
+    <details class="guide-section" id="sec-01" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">01</span>
+          <span class="sec-title">课文坐标、单元定位与初读破冰</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">教材归属</div>
+            <div class="spec-val">统编八上 · 第二单元</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">细分类目</div>
+            <div class="spec-val">06 现代写人回忆散文</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">核心笔法</div>
+            <div class="spec-val">片段蒙太奇 · 去神圣化白描</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">理论视角</div>
+            <div class="spec-val">客观对应物 · 零度叙事</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">考查重点</div>
+            <div class="spec-val">细节鉴赏 · 散点聚神 · 情感张力</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">写作迁移</div>
+            <div class="spec-val">生活切片写人 · 癖好微澜</div>
+          </div>
+        </div>
+
+        <div class="tint-bad">
+          <strong>⚠️ 审美与防误读预警</strong>：<span class="badge-evidence">【文本依据】</span> 切莫用传统“战斗图腾”或“横眉冷对”的政治预设去硬套这篇散文，更不能将看似散碎的生活琐事轻率判定为“没有主题的流水账”！萧红在现代文学史上最伟大的创举，就是断然拒绝了“丰碑式纪念文”的高调虚词，把鲁迅从冰冷的汉白玉神坛上请回真实人间。她笔下的鲁迅吃鱼挑刺、给海婴擦嘴、挑青豆、调侃红绿衣裳、笑到咳嗽，<strong>正是这具会疲惫、有偏好、满怀悲悯的血肉之躯，才在风刀霜剑的漫漫长夜里撑起了民族脊梁的真正重量。</strong>
+        </div>
+
+        <div class="sub-heading">初读三问破冰卡（苏格拉底第一轮）</div>
+        <div class="item-block">
+          <ol class="num-list">
+            <li><strong>🔥 最触动人心处</strong>：<span class="badge-evidence">【文本依据】</span> 鲁迅出门时的瞬间定格——“刚抓起帽子来往头上一扣，同时左腿就伸出去了，仿佛不顾一切地走去”。那个“不顾一切”的侧影，没有半句口号，却把一个背负着时代绝望而决绝前行的灵魂永远铭刻在读者心头。</li>
+            <li><strong>❓ 最容易读滑过去的反常处</strong>：文章为何用大量笔墨详写穿衣搭配（大红大绿、格子细条）、做客吃饺子、挑青豆这些看似鸡毛蒜皮的琐事？在鲁迅逝世三周年的重大纪念节点上，萧红为何对鲁迅举世瞩目的论战功绩一字不提？</li>
+            <li><strong>✂️ 删改直觉实验</strong>：如果删去“鲁迅先生评萧红穿衣”或“吃炒青豆一粒一粒挑着吃”这几个生活切片，换成两段总结鲁迅“坚强不屈、热爱生活、关爱青年”的评价性议论，文章会发生什么变化？（答案：全篇原本灵动鲜活的日常生活体温将瞬间冰结，鲁迅重新坍塌为教科书里的扁平塑像，萧红特有的澄澈诗性也将荡然无存）。</li>
+          </ol>
+        </div>
+
+        <div class="tint-warm">
+          <strong>本课“看世界的方法”初始猜想</strong>：从萧红笔下学到——<strong>“用赤子的眼睛平视崇高，在烟火琐屑中辨认神圣”</strong>：真正的伟大不需要神话的铠甲遮掩，唯有敢于直面泥土与日常的灵魂，才具有历经时代涤荡而愈发温热的永恒力量。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 02 -->
+    <details class="guide-section" id="sec-02" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">02</span>
+          <span class="sec-title">字词句精粹、语用解码与篇章拓扑 SVG</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">核心词眼与语义场辨析表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">核心词语</th>
+              <th style="width: 27%;">表层字面 vs 深层语境潜台词</th>
+              <th style="width: 27%;">语言听诊器（机制剖析）</th>
+              <th style="width: 28%;">考点与人物/主题功能</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>“明朗”与“欢喜”</strong></td>
+              <td>表层指笑声清脆宏亮；深层指鲁迅内心对生命、对青年毫无芥蒂与算计的纯粹、坦荡。</td>
+              <td><strong>感官先声夺人</strong>。首句突兀而起，毫无铺垫，直接用亮色感官词确立全篇的情感基调，打破人们预设的冷峻威严。</td>
+              <td>破除图腾化刻板印象；确立鲁迅赤子之心的生命底色。</td>
+            </tr>
+            <tr>
+              <td><strong>“轻捷”与“不顾一切”</strong></td>
+              <td>表层写步伐敏捷迅速；深层写在危难重压与生命限度下分秒必争、义无反顾的精神决绝。</td>
+              <td><strong>动词连缀与副词定调</strong>。“抓、扣、伸、走”四动词高速咬合，继以“仿佛不顾一切”，实现肉身动作向崇高风骨的飞跃。</td>
+              <td>中考经典动作描写考点；以形写神，定格一代先驱的战斗姿态。</td>
+            </tr>
+            <tr>
+              <td><strong>“挑着吃”</strong></td>
+              <td>“炒青豆，鲁迅先生总是一粒一粒用筷子挑着吃”。表层是进食细微动作；深层写重病侵蚀下胃纳衰竭的悲凉与生活从容。</td>
+              <td><strong>量词限制与动词微雕</strong>。“一粒一粒”极度放慢进食节奏，形成强烈的叙事减速，静默中传递出令人屏息的生命消耗感。</td>
+              <td>以琐屑细节投射人物肉身沉痛，克制叙事胜过千言悲悼。</td>
+            </tr>
+            <tr>
+              <td><strong>“一直亮着”</strong></td>
+              <td>“全楼的人都睡了……楼下房间里的电灯一直亮着”。表层指夜半不熄的电灯；深层象征在暗夜中独自为民族照亮前程的孤寂与牺牲。</td>
+              <td><strong>极暗与微光的空间反差</strong>。以整楼的沉睡反衬一室的醒觉，将鲁迅日常写作升华为抵抗时代黑夜的精神守望。</td>
+              <td>环境描写的象征化；由具象日常物件跃迁为精神永恒图腾。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">标志性句法与语体密码</div>
+        <div class="item-block">
+          <ul class="bullet-list">
+            <li><strong>纯粹短句矩阵（童稚白描语体）</strong>：萧红极少使用复杂的复句或长定语，行文多为三五字一顿的短句。如“鲁迅先生吃得很少，但是很爱吃……有红烧肉，鲁迅先生不吃”。这种短促、直白的句式仿若儿童视角的不加掩饰，使文字呈现出如雪原溪流般的清冽透明。</li>
+            <li><strong>印象主义散点剪辑</strong>：全篇不依循编年史的死板时间线，而是凭着深层情感记忆的引线，在笑声、步履、衣着、饮食、写字、会客、病榻之间自由穿梭。各片段看似彼此独立，实则如交响乐的变奏，围绕“鲁迅的生命体温”回旋激荡。</li>
+            <li><strong>零度情感的深情反讽</strong>：<span class="badge-evidence">【文本依据】</span> 全文无一处“哀哉”、“痛煞我也”式的嚎啕大哭，甚至在记叙鲁迅逝世时也只写“先生的安详，就像睡着了一样”。以近乎客观的“零度叙事”，将汪洋般的悲恸紧紧锁在节制的白描之中。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">篇章结构罗盘与情感脉搏 SVG 矢量图</div>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 720 320" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bgGradL" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#175d7e" stop-opacity="0.08"/>
+                <stop offset="50%" stop-color="#c05621" stop-opacity="0.09"/>
+                <stop offset="100%" stop-color="#175d7e" stop-opacity="0.12"/>
+              </linearGradient>
+              <linearGradient id="pulseLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#c05621"/>
+                <stop offset="35%" stop-color="#175d7e"/>
+                <stop offset="70%" stop-color="#c05621"/>
+                <stop offset="100%" stop-color="#52606d"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 整体底框 -->
+            <rect x="10" y="10" width="700" height="300" rx="10" fill="url(#bgGradL)" stroke="#175d7e" stroke-width="1.2" stroke-opacity="0.25"/>
+
+            <!-- 四大结构板块 -->
+            <!-- 阶段 1 -->
+            <rect x="25" y="30" width="155" height="155" rx="6" fill="#ffffff" fill-opacity="0.88" stroke="#175d7e" stroke-width="1.2"/>
+            <text x="102" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#175d7e">一·破冰音符</text>
+            <text x="102" y="74" text-anchor="middle" font-size="11" fill="#7b8794">【去神圣化·开篇定调】</text>
+            <text x="102" y="105" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1c2429">明朗的笑声</text>
+            <text x="102" y="125" text-anchor="middle" font-size="10.5" fill="#52606d">连烟卷都拿不住了</text>
+            <text x="102" y="145" text-anchor="middle" font-size="10.5" fill="#c05621">“不顾一切”地走去</text>
+            <text x="102" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">破除冷酷斗士标签</text>
+
+            <!-- 阶段 2 -->
+            <rect x="195" y="30" width="155" height="155" rx="6" fill="#ffffff" fill-opacity="0.88" stroke="#c05621" stroke-width="1.2"/>
+            <text x="272" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#c05621">二·人间烟火</text>
+            <text x="272" y="74" text-anchor="middle" font-size="11" fill="#7b8794">【生活微澜·父女私谊】</text>
+            <text x="272" y="105" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1c2429">包饺子与吃生鱼</text>
+            <text x="272" y="125" text-anchor="middle" font-size="10.5" fill="#52606d">评萧红衣裳大红怪绿</text>
+            <text x="272" y="145" text-anchor="middle" font-size="10.5" fill="#c05621">炒青豆“一粒一粒挑”</text>
+            <text x="272" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">日常琐屑的真实温热</text>
+
+            <!-- 阶段 3 -->
+            <rect x="365" y="30" width="155" height="155" rx="6" fill="#ffffff" fill-opacity="0.88" stroke="#175d7e" stroke-width="1.2"/>
+            <text x="442" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#175d7e">三·沉夜燃灯</text>
+            <text x="442" y="74" text-anchor="middle" font-size="11" fill="#7b8794">【精神透支·黑夜搏击】</text>
+            <text x="442" y="105" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1c2429">从不休息的藤椅</text>
+            <text x="442" y="125" text-anchor="middle" font-size="10.5" fill="#52606d">深夜校对《海燕》译稿</text>
+            <text x="442" y="145" text-anchor="middle" font-size="10.5" fill="#c05621">楼下电灯“一直亮着”</text>
+            <text x="442" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#b91c1c">以肉身燃料点亮暗夜</text>
+
+            <!-- 阶段 4 -->
+            <rect x="535" y="30" width="155" height="155" rx="6" fill="#ffffff" fill-opacity="0.88" stroke="#52606d" stroke-width="1.2"/>
+            <text x="612" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#52606d">四·永恒静默</text>
+            <text x="612" y="74" text-anchor="middle" font-size="11" fill="#7b8794">【生命止境·零度哀思】</text>
+            <text x="612" y="105" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1c2429">海婴天真与病榻对视</text>
+            <text x="612" y="125" text-anchor="middle" font-size="10.5" fill="#52606d">十月十九日早晨逝世</text>
+            <text x="612" y="145" text-anchor="middle" font-size="10.5" fill="#c05621">安详得“就像睡着了”</text>
+            <text x="612" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">克制留白生成千钧巨响</text>
+
+            <!-- 情感波浪折线与节点 -->
+            <path d="M 40 240 Q 102 210, 160 230 T 272 250 T 442 205 T 612 265 T 680 270" fill="none" stroke="url(#pulseLine)" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- 节点锚点与标记 -->
+            <circle cx="102" cy="215" r="5" fill="#175d7e" stroke="#ffffff" stroke-width="2"/>
+            <text x="102" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#175d7e">明朗笑声(起)</text>
+
+            <circle cx="272" cy="245" r="5" fill="#c05621" stroke="#ffffff" stroke-width="2"/>
+            <text x="272" y="235" text-anchor="middle" font-size="11" font-weight="700" fill="#c05621">烟火微澜(承)</text>
+
+            <circle cx="442" cy="208" r="6" fill="#b91c1c" stroke="#ffffff" stroke-width="2"/>
+            <text x="442" y="195" text-anchor="middle" font-size="11" font-weight="700" fill="#b91c1c">长夜电灯(转·张力极点)</text>
+
+            <circle cx="612" cy="265" r="5" fill="#52606d" stroke="#ffffff" stroke-width="2"/>
+            <text x="612" y="255" text-anchor="middle" font-size="11" font-weight="700" fill="#52606d">如眠安详(合·余韵深锁)</text>
+
+            <!-- 底部说明栏 -->
+            <rect x="25" y="282" width="665" height="20" rx="3" fill="#ffffff" fill-opacity="0.6"/>
+            <text x="355" y="296" text-anchor="middle" font-size="10.5" fill="#52606d">叙事脉搏：从明朗欢快的生活高音 → 琐屑日常的从容舒缓 → 彻夜燃灯的沉重悲壮 → 巨星陨落的静默留白</text>
+          </svg>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 03 -->
+    <details class="guide-section" id="sec-03">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">03</span>
+          <span class="sec-title">文本显微镜与语言听诊器：细读批注与正反改写实验</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <!-- 细读 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span> <strong>原文切片 01 · 破冰之笑</strong><br>
+            “鲁迅先生的笑声是明朗的，是从心底欢喜出来的。若有人说了什么可笑的话，鲁迅先生笑得连烟卷都拿不住了，常常是笑得咳嗽起来。”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：萧红没有从鲁迅伟岸的思想或文学成就起笔，而是从极其具体且具穿透力的听觉细节“笑声”切入。动词“拿不住了”、副词“常常”、生理连带动作“咳嗽起来”，构成了笑声引发的身体震颤连锁反应。在最开朗的欢笑中，猝然带出了病弱肉身的隐痛，明朗与心酸在一秒之内重叠交织。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：“是从心底欢喜出来的”采用的是最质朴的口语语体，剥离了一切文学性藻饰。这种直白宣告，瞬间粉碎了当时国民党文人与世俗社会强加在鲁迅身上的“偏狭、多疑、刻薄、冷血”的妖魔化舆论，用生命深处的欢喜，为鲁迅定格了纯净通透的赤子面容。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写（教辅套话版）</strong>：鲁迅先生平时性格豁达开朗，为人极为和蔼可亲，经常和青年后辈谈笑风生。他对待晚辈毫无架子，欢声笑语总能感染身边的每一个人，展现了一代大师平易近人的崇高风范。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：平庸改写堆砌了一堆干瘪的概念形容词（豁达、和蔼、平易近人），读者根本看不见鲁迅的身影；原文则完全依靠身体动作（夹不住烟卷、笑到咳嗽），让读者直接在耳畔听到了震动空气的笑声，以具象生理真实碾压了抽象道德说教。
+          </div>
+        </div>
+
+        <!-- 细读 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span> <strong>原文切片 02 · 步履风骨</strong><br>
+            “鲁迅先生走路很轻捷，尤其使人记得清楚的，是他刚抓起帽子来往头上一扣，同时左腿就伸出去了，仿佛不顾一切地走去。”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：这是一个高速摄影机般的抓拍特写。两个瞬时动词“抓”、“扣”与下肢动作“左腿就伸出去了”在同一时间维度发生，没有丝毫拖泥带水，最后用一个心理判断“仿佛不顾一切”完成了由外在动作向内在精神的惊险一跃。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：“轻捷”不仅是步履之轻，更是生命节奏之急迫；“不顾一切”则是全句的文眼所在。鲁迅晚年身处特务盯梢、反动军阀与租界巡捕夹缝之中，疾病缠身，但只要出门战斗，便是义无反顾。萧红通过日常动作的精准提炼，捕捉到了大勇者的神髓。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写（概念说明版）</strong>：鲁迅先生做事雷厉风行，生活节奏十分紧张。他总是争分夺秒地投入工作，出门办事时步伐急促、勇往直前，时刻保持着革命斗士的高昂姿态。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：原文赢在“抓、扣、伸”三个骨骼般坚硬的动词所产生的物理张力。读者闭上眼，就能看见那个瘦削的身影戴上帽子、迈开左腿向前冲刺的动态剪影。“不顾一切”四个字，胜过千百句空泛的“英勇无畏”。
+          </div>
+        </div>
+
+        <!-- 细读 3 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span> <strong>原文切片 03 · 穿衣评点与人间至情</strong><br>
+            “‘周先生，你看我的衣裳漂亮不漂亮？’鲁迅先生从眼镜后面，眼睛仔细看了一看：‘不大漂亮。’……‘红上衣要配红裙子，不然就是黑裙子，这就显得浑沉。你这红上衣配了怪绿的裙子，这就显得俗气。……人瘦不要穿大格子，穿细条的显得精神……’鲁迅先生看人很仔细。”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：动作微雕——“从眼镜后面，眼睛仔细看了一看”；语言实录——“不大漂亮”、“显得浑沉”、“显得俗气”。一位名满天下的思想巨人，竟然煞有介事地指点一个穷困年轻姑娘的衣服搭配，从色彩学讲到人体胖瘦视觉规律，神态严肃而语调亲切。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：萧红不避“俗气”之词，原汁原味录下对话。在鲁迅与萧红之间，没有森严的文坛尊卑与师生壁垒，唯有父女般毫无防备的体己关怀。鲁迅的“仔细看”，看出的不仅是衣服的红绿，更是对青年落魄处境的深切洞察与温存庇护。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写（教条汇报版）</strong>：鲁迅先生不仅在文学艺术上成就卓著，在日常生活的美学和衣着品位方面也有独特的见解。他平易近人地指导萧红在服饰色彩搭配上要注重协调与格调，体现了大师无微不至的关怀。
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：教条改写完全丢失了对话的生活情趣与人物的呼吸声。原文以直白幽默的一问一答，呈现了鲁迅作为“生活美学家”和“慈爱长辈”的真实侧面，使崇高的大师真正具备了可亲近的人间质感。
+          </div>
+        </div>
+
+        <!-- 细读 4 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【文本依据】</span> <strong>原文切片 04 · 暗夜长明之灯</strong><br>
+            “夜里两点钟、三点钟，全楼的人都睡了，鲁迅先生还在写字，楼下房间里的电灯一直亮着。”
+          </div>
+          <p><strong>🔍 文本显微镜（看见了什么）</strong>：时空对比——时间是万籁俱寂的“两点钟、三点钟”，空间是整座楼宇的黑暗与楼下一间屋子的光明；状态是众人的“都睡了”与先生一人的“还在写字”。没有华丽形容词，唯有时间的刻度与一盏不眠的灯。</p>
+          <p><strong>🩺 语言听诊器（为什么偏偏这样说）</strong>：“一直亮着”四个字，沉重如磐石。它既是客观纪实，又在读者心中自然激荡起巨大的象征回声：整座沉睡的旧中国黑夜，全靠这盏孤灯下的瘦弱肩膀苦苦支撑。作者的情感不着痕迹地浸润在这片静谧的白光里。</p>
+          <div class="tint-bad">
+            <strong>❌ 平庸改写（煽情拔高版）</strong>：鲁迅先生为了劳苦大众的觉醒和中国革命的胜利，每天夜以继日、通宵达旦地辛勤笔耕。在那漫漫黑夜中，他就像一座永远不知疲倦的灯塔，用手中的如椽巨笔刺破反动统治的黑暗！
+          </div>
+          <div class="tint-good">
+            <strong>✅ 原文胜出机制</strong>：煽情版用尽了空洞的惊叹号与陈旧比喻（灯塔、如椽巨笔），反而显得做作虚浮。原文以静衬动、以暗衬明，仅仅写出“电灯一直亮着”，留白深广，令读者在屏息静听中生出无尽的敬畏与心酸。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 04 -->
+    <details class="guide-section" id="sec-04">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">04</span>
+          <span class="sec-title">结构罗盘与叙事机制：散点透视、视角与处境</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">散点透视与片段蒙太奇架构</div>
+        <div class="item-block">
+          <p>传统写人记事散文往往追求“因果线性链”与“单一核心事件”，而《回忆鲁迅先生》在章法上实现了革命性的破局——<strong>印象主义散点蒙太奇（Impressionist Montage）</strong>：</p>
+          <ul class="bullet-list">
+            <li><strong>电影分镜式剪辑</strong>：全文由数十个独立的生活切片（笑声、走路、穿衣、饮食、夜作、会客、扶病、临终）拼贴而成。段与段之间常无过渡连词，行云流水，似断实连；</li>
+            <li><strong>以气韵贯通形散</strong>：看似散漫无序，实则有一根隐秘的情感红线紧紧拉扯——那就是对鲁迅“生命真实状态”的无保留呈现。每一个看似琐屑的碎片，都是鲁迅人格全息图上的一个光斑；</li>
+            <li><strong>首尾的情感呼吸闭环</strong>：开篇以“明朗欢喜的笑声”冲开记忆闸门，结尾以“安详如眠的静卧”沉入历史长河。从生命的欢歌走向生命的静默，完成了对一位文化英雄最深沉的奠祭。</li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">叙事镜头与双重观察站位</div>
+        <div class="item-block">
+          <ul class="bullet-list">
+            <li><strong>女性视角与赤子之眼</strong>：<span class="badge-evidence">【文本依据】</span> 萧红观察鲁迅，不是从崇拜者的低仰视角，也不是从政治战友的并肩视角，而是以一个“受庇护的漂泊女儿”与“极其敏锐的天才女作家”的双重视线。她能看到男作家们往往视而不见的毛边——许广平踩着缝纫机劳碌的背影、鲁迅桌上放凉的咖啡、海婴吃鱼丸时的任性撒娇；</li>
+            <li><strong>双重视角温差（Double Perspective）</strong>：
+              <div class="tint-accent">
+                <strong>昔日亲历视角</strong>（1934-1936在上海时无拘无束的晚辈，满怀被大师接纳的雀跃与娇憨）<br>
+                ⚡ <strong>今日回望视角</strong>（1940在香港孤岛饱经战乱流离与病痛折磨，深知庇护之所已成绝响，满含克制的沧桑与刺痛）。
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">人物处境—冲突—选择机制卡</div>
+        <div class="item-block">
+          <div class="specs-grid">
+            <div class="spec-item">
+              <div class="spec-label">生理与时代处境</div>
+              <div class="spec-val">重病衰竭 · 白色恐怖 · 战火压境</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">内在核心冲突</div>
+              <div class="spec-val">肉身极限 ⚡ 民族启蒙使命</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-label">行动选择机制</div>
+              <div class="spec-val">不休息 · 夜夜挑灯 · 竭诚待人</div>
+            </div>
+          </div>
+          <p style="margin-top: 6px;"><strong>群像映照机制</strong>：文中不仅写鲁迅，还精妙地勾勒了周围的群像——<strong>许广平</strong>（辛勤操劳的守护者，鲁迅得以持续战斗的后盾）、<strong>周海婴</strong>（天真烂漫的生命幼芽，引出鲁迅作为慈父的无限柔情）、<strong>青年作者群</strong>（如饥似渴索求指导的后来者）。群像的环绕，更凸显了鲁迅作为“大树”庇荫众人的担当。</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 05 -->
+    <details class="guide-section" id="sec-05">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">05</span>
+          <span class="sec-title">意象网络、主题三层与文学批评示范</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">意象网络图谱：拒绝字典式僵化附会</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">核心意象</th>
+              <th style="width: 28%;">文本足迹与感官色调</th>
+              <th style="width: 26%;">与人物处境的互照</th>
+              <th style="width: 26%;">象征生长的审美边界</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>笑声</strong></td>
+              <td>“是从心底欢喜出来的”、“笑得连烟卷都拿不住了”。暖色、高音。</td>
+              <td>直照鲁迅在残酷围剿中从未泯灭的赤子纯真与生命韧性。</td>
+              <td>拒绝理解为“狂妄轻浮”，它是最透彻的生命自信与坦荡。</td>
+            </tr>
+            <tr>
+              <td><strong>烟卷与咖啡</strong></td>
+              <td>“连烟卷都震动起来”、“吃着冷了的咖啡”。灰白、微苦、沉重。</td>
+              <td>透射晚年鲁迅在沉重文字战斗中透支肉身的催化剂与精神抗体。</td>
+              <td>不可简化为“不良嗜好”，它是先驱者燃烧生命的精神燃料。</td>
+            </tr>
+            <tr>
+              <td><strong>长夜孤灯</strong></td>
+              <td>“夜里两点三点……楼下房间里的电灯一直亮着”。冷夜微光。</td>
+              <td>映射在全民麻木沉睡的时代荒原上，孤独守望黎明的启蒙意志。</td>
+              <td>避免拔高为教条政治口号，它是具体血肉之躯在暗夜中的苦行。</td>
+            </tr>
+            <tr>
+              <td><strong>炒青豆</strong></td>
+              <td>“一粒一粒用筷子挑着吃”。素净、平淡、迟缓。</td>
+              <td>投射出重病折磨下肉身衰微的悲凉，以及超然世俗的从容。</td>
+              <td>不可视作“小资情调”，这是大家风范在最简朴饮食中的自然流露。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">主题三层掘进模型</div>
+        <div class="item-block">
+          <ol class="num-list">
+            <li><strong>表层处境</strong>：作者追忆在上海大陆新村鲁迅寓所做客、交往的日常生活细节，记录先生的饮食起居、待人接物、夜半写作直至病逝；</li>
+            <li><strong>深层困境</strong>：在内忧外患、白色恐怖与严重肺结核的多重绞杀下，一个肉体行将枯竭的文化先知，如何在日常生活的鸡毛蒜皮中竭力维持尊严、温情与战斗意志；</li>
+            <li><strong>根本追问</strong>：何为真正的伟大？真正的崇高并不栖身于不食人间烟火的神坛之上，而是敢于露出疲惫的血肉、在烟火琐屑中始终保留爱与热能的心灵。</li>
+          </ol>
+          <div class="formula-bar">
+            核心价值张力公式：【神坛上冷酷僵死的“战斗图腾”】 ⚡ 【人间烟火中温热赤诚的“血肉巨人”】
+          </div>
+        </div>
+
+        <div class="sub-heading">中文系级文学微评论示范（300字）</div>
+        <div class="tint-accent">
+          <strong>《在去神圣化的微澜中重塑崇高：评萧红的白描美学》</strong><br>
+          萧红在《回忆鲁迅先生》中的惊人创见，在于她以一种近乎“天真汉”的零度白描，对鲁迅进行了彻底的“去神圣化（Demythologization）”重构。<span class="badge-evidence">【文本依据】</span> 文本决绝地放弃了宏大的政治修辞与阶级话语，转而沉潜于笑声、步伐、青豆与衣裳大红怪绿的感官毛边。这种“平视”并未矮化鲁迅，反而以新批评的“客观对应物”原理，让崇高从生活琐屑的重力场中赫然浮现——正因他会笑到咳嗽、会一粒一粒挑青豆、会因萧红的红绿衣服认真发表美学评判，那个在深夜“电灯一直亮着”的苦熬身影，才不再是空洞的道德符号，而化作一具用血肉向长夜献祭的真实受难者。萧红以素朴纯净之笔，完成了中国现代回忆散文从“立碑颂圣”到“招魂抚真”的伟大质变。
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 06 -->
+    <details class="guide-section" id="sec-06">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">06</span>
+          <span class="sec-title">阐释边界与不确定性判断尺：确定、推测与合理异读</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">诠释学分级判断尺</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">结论分级</th>
+              <th style="width: 40%;">具体研读论断</th>
+              <th style="width: 40%;">文本依据与边界界定</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>🟢 可以确定<br>（铁证如山）</strong></td>
+              <td>鲁迅在日常生活中极具幽默感与生活情趣，待晚辈至诚深厚；其晚年是在极度繁重的工作与病痛折磨中度过的。</td>
+              <td><span class="badge-evidence">【文本依据】</span> 开篇写笑得拿不住烟卷、评衣裳色彩规律、夜半两三点全楼皆睡依然写字，有密集文本细节相互印证，不容置疑。</td>
+            </tr>
+            <tr>
+              <td><strong>🟡 可以推测<br>（合理延伸）</strong></td>
+              <td>萧红反复书写鲁迅的“明朗”与“笑声”，潜意识中是在用鲁迅散发的生命热量，驱散自己内心深处漂泊流离、缺爱孤苦的阴霾。</td>
+              <td><span class="badge-context">【文学背景】</span> 萧红写此文时身处香港孤岛，国破家亡，个人情感屡遭重创。对鲁迅阳光般笑声的强调，隐现出自我精神疗愈的心理补偿机制。</td>
+            </tr>
+            <tr>
+              <td><strong>🔴 警惕过度阐释<br>（穿凿附会）</strong></td>
+              <td>硬套当代女性主义理论，指责鲁迅对萧红穿衣的评点是“男权社会对女性身体的规训与审视”；或指责萧红不写论战是“思想觉悟不高”。</td>
+              <td><span class="badge-comment">【延伸评论】</span> 脱离时代语境与人物亲密关系的硬套。鲁迅的指点是长辈纯粹的美学点拨与生活关照；萧红的选材是散文文体现代自觉的体现，绝非回避斗争。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-heading">接受视野窗：多元异读交锋</div>
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>核心争议议题：萧红通篇记录“柴米油盐、衣着闲谈”，究竟是“冲淡了伟大人物的思想深度”，还是“提升了散文艺术的文学纯度”？</strong>
+            <ul class="bullet-list" style="margin-top: 6px;">
+              <li><strong>异读视角 A（传统政治社会学读法）</strong>：认为鲁迅是无产阶级文化革命的旗手，散文应当聚焦于他领导左联、痛斥反动派等波澜壮阔的战斗篇章；萧红的写法局限于小资产阶级女性的琐碎闺中眼界，弱化了鲁迅宏大的阶级斗争立场。</li>
+              <li><strong>异读视角 B（现代纯文学细读法 · 通行正解）</strong>：认为概念化的战斗史实可以通过传记和历史专著去了解，而文学回忆录的最高使命是“抢救一个活人”。萧红用细碎的人间烟火，让读者触摸到了鲁迅的心跳与呼吸。没有血肉的伟大只是空洞的木乃伊，唯有真实的人性微澜，才能使崇高具有不可摧毁的情感说服力。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 07 -->
+    <details class="guide-section" id="sec-07">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">07</span>
+          <span class="sec-title">知人论世、文体源流与思想谱系</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">【文学背景】知人论世：1940 香港孤岛的生命哀挽</div>
+        <div class="item-block">
+          <p><span class="badge-context">【文学背景】</span> 1940 年，萧红身患重疾，流寓被日本侵略者铁蹄围困的香港孤岛。此时距离鲁迅逝世已整整四年。在这四年里，萧红经历了抗战烽火的颠沛流离，遭遇了与萧军的情感断裂，承受着肺结核与孤独的啃噬。在生命最凄惶昏暗的时刻，她伏在九龙的寓所中，蘸着泪水写下这篇长达万余字的回忆散文。</p>
+          <p><strong>回扣文本的机制</strong>：这不仅是一篇给逝者的祭文，更是萧红在冰冷绝望的乱世中，对昔日生命庇护所的深情回溯。在鲁迅家里吃到的热饺子、鲁迅朗朗的笑声、先生对自己衣裳的关切，是萧红坎坷苦难的一生中少有的、如金子般温暖的避风港。<strong>字字写鲁迅，其实字字都跳动着萧红渴望爱、渴望理解的孤独灵魂。</strong></p>
+        </div>
+
+        <div class="sub-heading">文体源流演进：现代回忆散文的“断裂”与“破体”</div>
+        <div class="item-block">
+          <table class="term-table">
+            <thead>
+              <tr>
+                <th style="width: 25%;">传统纪念文体惯例</th>
+                <th style="width: 25%;">《回忆鲁迅先生》破体创新</th>
+                <th style="width: 50%;">文章学与文学史价值</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>墓志铭 / 行状 / 挽词</strong><br>依时间排叙生平大事件，堆砌道德溢美之词，重在立言颂德。</td>
+                <td><strong>主观印象剪辑 / 日常实录</strong><br>打碎时空线性，专采微细生活切片，以零度白描替代直接抒情。</td>
+                <td>开创了现代中国散文“私语化”、“日常化”的写人新传统，标志着现代写人散文从神话叙事走向生活美学。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sub-heading">思想谱系坐标：现代人道主义与赤子生命哲学</div>
+        <div class="item-block">
+          <p><span class="badge-comment">【延伸评论】</span> 本文在思想史上构筑了一个独特的坐标点：它融合了<strong>五四现代人道主义的“人的发现”</strong>与中国民间最素朴的<strong>赤子生命哲学</strong>。萧红笔下的鲁迅，不再是俯视苍生的封建神像或图腾化的革命导师，而是一个具有现代平民精神的人道主义者。他把平等、尊重、关怀浸润在日常的杯水一饮、粒粟一啄之间，体现了中国现代知识分子人格中最珍贵、最动人的温润光辉。</p>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 08 -->
+    <details class="guide-section" id="sec-08">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num">08</span>
+          <span class="sec-title">比较阅读桥：同题异构与群文联读矩阵</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">同题异构比读矩阵表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">篇目与作者</th>
+              <th style="width: 26%;">文本依据与核心切口</th>
+              <th style="width: 28%;">叙事策略与语言特质</th>
+              <th style="width: 28%;">比读带来的认知刷新</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>《回忆鲁迅先生》<br>（萧红）</strong></td>
+              <td>笑声、走路、穿衣大红怪绿、挑青豆、深夜孤灯。</td>
+              <td>生活散点蒙太奇；女性平视视角；纯真口语白描；克制留白。</td>
+              <td><strong>见生命体温之真</strong>。破除神坛，在烟火琐屑中还原活生生的大师，深情隐匿于日常。</td>
+            </tr>
+            <tr>
+              <td><strong>《藤野先生》<br>（鲁迅）</strong></td>
+              <td>添改讲义、纠正解剖图、惜别赠照、夜间挂照自省。</td>
+              <td>明暗双线交织；讽刺东京丑态；冷峻白描中饱含良知拷问与救国抉择。</td>
+              <td><strong>见先驱救亡之烈</strong>。师徒之情与弱国之痛交织，写人最终升华为启蒙战斗的精神动力。</td>
+            </tr>
+            <tr>
+              <td><strong>《一面》<br>（阿累）</strong></td>
+              <td>内山书店偶遇、三次外貌特写（瘦瘦瘦）、赠送《毁灭》与《铁流》。</td>
+              <td>工人偶遇视角；近景特写与强烈反差；直抒胸臆的崇高赞颂。</td>
+              <td><strong>见图腾之光之炽</strong>。短促相逢中的震撼，侧重于鲁迅作为黑暗中点亮青年心灯的战斗领袖。</td>
+            </tr>
+            <tr>
+              <td><strong>《怀鲁迅》<br>（郁达夫）</strong></td>
+              <td>“没有伟大的人物出现的民族，是世界上最可怜的生物之群……”</td>
+              <td>政论文体；宏大文化哲学反思；痛切激昂的呼告与思辨。</td>
+              <td><strong>见民族精神之骨</strong>。从宏观文明史高度为鲁迅盖棺定论，与萧红的微观日常构成绝佳互补。</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tint-accent" style="margin-top: 8px;">
+          <strong>比读反思点睛</strong>：阿累写鲁迅，是<strong>仰视</strong>（如见神明）；郁达夫写鲁迅，是<strong>远眺</strong>（如观泰山）；唯有萧红写鲁迅，是<strong>平视</strong>（如坐身侧）。仰视生崇敬，远眺生激昂，平视才生出入骨的体温与心疼。
+        </div>
+      </div>
+    </details>
+
+    <!-- 分区提示：下篇 -->
+    <div class="part-divider">下篇 · 读写结合、素材炼金与写作迁移（09 ~ 13）</div>
+
+    <!-- 栏目 09 -->
+    <details class="guide-section" id="sec-09" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">09</span>
+          <span class="sec-title">五维金句解码与情境化阶梯仿写支架</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+
+        <!-- 金句 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【金句 01 · 🌿景造氛围】</span><br>
+            “夜里两点钟、三点钟，全楼的人都睡了，鲁迅先生还在写字，楼下房间里的电灯一直亮着。”
+          </div>
+          <div class="formula-bar">
+            📐 骨架解剖公式：[沉寂的时空刻度] + [群体的沉寂状态] + [主角的持续动作] + [微茫物象的静止守候]
+          </div>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境</strong>：晚自习放学后空无一人的教室里，某个正在攻克竞赛压轴题的同桌，或者深夜万籁俱寂中仍在灯下备课的乡村教师。
+          </div>
+          <p><strong>🧩 可替换填空支架</strong>：
+            <span class="formula-tag">时近____（极晚时间），整栋楼/整个校园的人都____，____还在____，____里的____一直____。</span>
+          </p>
+          <div class="tint-bad">
+            <strong>⚠️ 仿写避坑指南</strong>：切忌加入“废寝忘食”、“为了理想而拼搏”等概念化的主观赞叹；必须纯粹用客观事实的对比（群黑与独明、皆睡与独醒）让氛围自然弥漫。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文</strong>：时近凌晨两点，整条古巷的窗棂都熄灭了，外公还在老磨坊里拉动风箱，炉膛深处暗红的火炭一直温吞地亮着。（点评：不言劳苦，以古巷皆暗衬托一炉红炭，余韵悠长）。
+          </div>
+        </div>
+
+        <!-- 金句 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【金句 02 · 👤人立形象】</span><br>
+            “鲁迅先生走路很轻捷，尤其使人记得清楚的，是他刚抓起帽子来往头上一扣，同时左腿就伸出去了，仿佛不顾一切地走去。”
+          </div>
+          <div class="formula-bar">
+            📐 骨架解剖公式：[人物核心步态/姿质概括] + [典型抓拍契机] + [瞬时快动词A + B] + [连带动作C] + [精神意蕴副词定格]
+          </div>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境</strong>：写一位性格干练利落的母亲、赶往抢救室的医生，或考场铃响交卷时胸有成竹的大师兄。
+          </div>
+          <p><strong>🧩 可替换填空支架</strong>：
+            <span class="formula-tag">____走路/做事极____，尤其使人难忘的，是他刚____[动作A]，同时____[动作B]，仿佛____地____。</span>
+          </p>
+          <div class="tint-bad">
+            <strong>⚠️ 仿写避坑指南</strong>：动词不能疲软拖沓，必须连珠炮般快速咬合；最后的心态评价必须由前面的肢体动作顺理成章激荡而出，不可生硬拔高。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文</strong>：老班长做事极麻利，尤其使人难忘的，是他刚把哨子往唇边一衔，同时脚后跟就已经狠狠砸向了地面，仿佛迎着风暴就要破浪而去。（点评：衔哨、砸地、破浪，动词铿锵有力，英武之气跃然纸上）。
+          </div>
+        </div>
+
+        <!-- 金句 3 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【金句 03 · ⚡事推情节/理推逻辑】</span><br>
+            “若有人说了什么可笑的话，鲁迅先生笑得连烟卷都拿不住了，常常是笑得咳嗽起来。”
+          </div>
+          <div class="formula-bar">
+            📐 骨架解剖公式：[日常引发诱因] + [极端情绪反应动作] + [连带失控细节物象] + [生理惯性反应反转]
+          </div>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境</strong>：写家庭聚餐时祖父的开怀、辩论赛场上对手因紧张而颤抖的笔尖，或老友相逢时的纵情欢歌。
+          </div>
+          <p><strong>🧩 可替换填空支架</strong>：
+            <span class="formula-tag">若____[诱因]，____便____得连____都____，常常是____得____。</span>
+          </p>
+          <div class="tint-bad">
+            <strong>⚠️ 仿写避坑指南</strong>：不要写“笑得前仰后合”这类嚼烂了的四字成语，一定要抓取人物手中正在握持的具体物件（如笔、杯、茶、眼镜），以物件的失控写出情绪的充沛。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文</strong>：若小妹讲起乡下的泥鳅，爷爷便乐得连手里的紫砂壶盖都扣不准了，常常是笑得呛出一串急促的旱烟烟圈。（点评：扣不准壶盖、呛出旱烟，极具乡村生活质感）。
+          </div>
+        </div>
+
+        <!-- 金句 4 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【金句 04 · 💫情传心声】</span><br>
+            “有一碗菜是炒青豆，鲁迅先生总是一粒一粒用筷子挑着吃……其实并不是休息，他是在想着什么……”
+          </div>
+          <div class="formula-bar">
+            📐 骨架解剖公式：[寻常微末物象] + [极致缓慢/反常的微动作] + [表象转折] + [深层精神潜流猜度]
+          </div>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境</strong>：写父亲在院子里独自修剪盆栽的背影、退休老教师抚摸旧教案时的沉吟，或母亲在灯下择菜时的走神。
+          </div>
+          <p><strong>🧩 可替换填空支架</strong>：
+            <span class="formula-tag">桌上/窗前不过是____，____总是一____一____地____；表面看是____，其实不是____，他是在____。</span>
+          </p>
+          <div class="tint-bad">
+            <strong>⚠️ 仿写避坑指南</strong>：猜度处不要把话说得太满，要用“其实并不是……他是在……”这种轻柔的推测句式，为人物保留神秘深邃的内心私密空间。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文</strong>：窗台上不过是一盆枯干的文竹，外婆总是一茎一茎用细绳小心地系着；表面看是闲坐，其实并不是侍弄花草，她是在数着光阴里那些走散的人。（点评：一茎一茎系绳，写尽晚年孤独与眷念）。
+          </div>
+        </div>
+
+        <!-- 金句 5 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <span class="badge-evidence">【金句 05 · 🔺意升主题】</span><br>
+            “先生的安详，就像睡着了一样……”
+          </div>
+          <div class="formula-bar">
+            📐 骨架解剖公式：[沉重永别时刻] + [去悲戚化的高贵形容] + [至简至柔的日常喻体留白]
+          </div>
+          <div class="tint-warm">
+            <strong>🏠 迁移生活情境</strong>：写一项历经千辛万苦的事业终于落幕、陪伴多年的老屋终被拆除，或向一段刻骨铭心的童年岁月告别。
+          </div>
+          <p><strong>🧩 可替换填空支架</strong>：
+            <span class="formula-tag">____[核心对象]的____，就像____一样……（以极简短句收束全篇）</span>
+          </p>
+          <div class="tint-bad">
+            <strong>⚠️ 仿写避坑指南</strong>：结尾千万不要画蛇添足加一长串抒情独白或大道理总结，要学萧红“掷地有声的休止符”，越平静，震撼力越强。
+          </div>
+          <div class="tint-good">
+            <strong>✨ 标杆下水文</strong>：那艘退役的老护卫舰在夕阳中静静泊定，舰体斑驳的铁锈，就像暮年老兵平静收拢的旧战袍一样……（点评：简静收束，庄严与深情化为永恒定格）。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 10 -->
+    <details class="guide-section" id="sec-10" open>
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">10</span>
+          <span class="sec-title">作文素材炼金炉与高阶立意库</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">三大考场高阶立意提取术</div>
+        <div class="item-block">
+          <ol class="num-list">
+            <li><strong>高阶立意一：于神坛下落处重逢真正的崇高（破除图腾 · 凡人丰碑）</strong>
+              <div class="tint-accent">
+                公式：课文去神圣化日常 + 破除概念化脸谱 + 当代反思英雄崇拜与平凡真实<br>
+                <strong>适用母题</strong>：《偶像的模样》《真实的重量》《平凡中的伟大》《走出虚幻的光环》
+              </div>
+            </li>
+            <li><strong>高阶立意二：微澜细节是灵魂最诚实的指纹（细节美学 · 敬畏日常）</strong>
+              <div class="tint-accent">
+                公式：挑青豆与红绿衣裳 + 琐屑日常承载深情 + 对抗宏大叙事带来的生命虚无<br>
+                <strong>适用母题</strong>：《藏在细节里的爱》《生活中的微澜》《一滴水里的世界》《烟火深处的真味》
+              </div>
+            </li>
+            <li><strong>高阶立意三：在漫漫寒夜里为他人掌灯（温情庇护 · 精神薪火）</strong>
+              <div class="tint-accent">
+                公式：长夜亮灯写字 + 庇护漂泊青年 + 青年一代对文明引路人的感恩与接力<br>
+                <strong>适用母题</strong>：《夜读那盏灯》《致引路人》《点亮微光》《做狂风中的守护者》
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="sub-heading">3 张标准化考场作文素材卡（高密度背诵版）</div>
+
+        <!-- 素材卡 1 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #01｜【去魅存真】烟卷震动处，方见圣贤血肉</strong><br>
+            <span class="badge">#破除脸谱</span> <span class="badge">#真实的崇高</span> <span class="badge">#英雄本色</span>
+          </div>
+          <p><strong>📦 100 字核能精述</strong>：面对被时代涂抹成冰冷战斗图腾的鲁迅，萧红独辟蹊径，用北国白描还其常人真容。她不写惊天动地的文坛论战，专写先生明朗心底的笑声、挑青豆的微动作与对大红大绿衣裳的认真评点。褪去神话光环的大师，因带着体温与疲惫的血肉真实，而更加令人敬畏。</p>
+          <p><strong>🔗 名句化用公式</strong>：“正像萧红在烟卷的震颤与挑青豆的筷梢间触摸到了鲁迅的体温，我们唯有……”</p>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入示范段</strong>：真正的伟大从来不需要虚伪的神话为其镀金。正如萧红在《回忆鲁迅先生》中所昭示的那样，她拂去了一尊偶像身上的铜绿与重铠，让我们在“笑得连烟卷都拿不住”、在挑食青豆与点评红绿衣裳的琐屑微澜里，重逢了一个活生生的人间鲁迅。正是这具会衰老、有偏好、满怀悲悯的血肉之躯，在万马齐喑的暗夜里撑起了民族的精神苍穹。走下神坛，崇高方有坚实的根基。
+          </div>
+        </div>
+
+        <!-- 素材卡 2 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #02｜【决绝步伐】那一记扣帽，踏破千载彷徨</strong><br>
+            <span class="badge">#责任与担当</span> <span class="badge">#勇往直前</span> <span class="badge">#行动的力量</span>
+          </div>
+          <p><strong>📦 100 字核能精述</strong>：萧红笔下最惊心动魄的定格，是鲁迅抓起帽子往头上一扣、左腿伸出、“仿佛不顾一切地走去”的步态。在白色恐怖与肺病残躯的夹击下，这位文化先驱没有半句慷慨激昂的誓言，唯有用决绝的肉身冲刺，在风刀霜剑的世道中踩出一条不退转的突围之路。</p>
+          <p><strong>🔗 名句化用公式</strong>：“如同鲁迅那‘刚抓起帽子一扣便伸出左腿’的决绝步履，真正的勇者在命运面前……”</p>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入示范段</strong>：勇者面对命运的狂涛，从不耽于口号的喧嚣，而是付诸决绝的行动。在萧红的记忆长廊里，鲁迅先生最深刻的剪影，莫过于他刚抓起帽子往头上一扣、左腿伸出、仿佛不顾一切走去的背影。这具瘦弱的躯壳里，激荡着迎击万难的风骨。古往今来，正是这般“不顾一切”的迈步与突围，踏碎了时代的彷徨，撕裂了历史的浓黑。
+          </div>
+        </div>
+
+        <!-- 素材卡 3 -->
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>素材卡 #03｜【长夜孤灯】全楼皆睡时，独燃人间真火</strong><br>
+            <span class="badge">#奉献与牺牲</span> <span class="badge">#暗夜守望</span> <span class="badge">#文明薪火</span>
+          </div>
+          <p><strong>📦 100 字核能精述</strong>：全楼的人都睡了，唯有鲁迅房间里的电灯一直亮着。深夜两点、三点，病痛缠身的先生坐在藤椅上，一边吞吐烟卷，一边在稿纸上挥汗如雨。这盏彻夜不熄的孤灯，是先驱者以肉身为烛芯对漫漫长夜的英勇抵抗，照亮了无数在黑夜中摸索的青年灵魂。</p>
+          <p><strong>🔗 名句化用公式</strong>：“即便时代黑夜如墨，亦总有如鲁迅窗下‘一直亮着的电灯’，以孤勇之火……”</p>
+          <div class="tint-good">
+            <strong>💎 150 字考场议论文嵌入示范段</strong>：每一个觉醒的时代，都依赖那些在沉睡的荒原上独自守夜的擎灯人。夜深至两点、三点，全楼悄寂，而鲁迅先生房间里的电灯却“一直亮着”。那不是一盏普通的电灯，而是一位先驱者用枯竭的心血与透支的生命，在历史长夜里燃起的精神炬火。它抵御着冷寂与虚无，不仅守护着一个落魄女青年的文学梦，更守护着一个古老民族涅槃重生的黎明。
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 栏目 11 -->
+    <details class="guide-section" id="sec-11">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">11</span>
+          <span class="sec-title">万能写作模型与读写映射总纲</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">万能写作模型 01：生活切片蒙太奇写人法（散点聚神模型）</div>
+        <div class="item-block">
+          <div class="formula-bar">
+            结构公式：环节 A 典型体态破题定调（15%） → 环节 B 三轨琐屑切片对撞（50%） → 环节 C 暗夜孤勇重压显质（20%） → 环节 D 静默空镜定格收束（15%）
+          </div>
+          <ul class="bullet-list">
+            <li><strong>课文原型对应</strong>：环节 A（开篇明朗笑声与轻捷步履）；环节 B（饮食挑青豆、穿衣评红绿、包饺子家常）；环节 C（半夜两三点电灯长明写字）；环节 D（逝世安详如眠的永恒定格）。</li>
+            <li><strong>考场实战移植</strong>：拿中考真题《藏在岁月里的光彩》快速搭建大纲：
+              <ol class="num-list">
+                <li><strong>第一段（定调）</strong>：外公标志性的咳嗽声与擦老花镜的滑稽动作，破除老年人凄凉衰败的刻板印象；</li>
+                <li><strong>主体段（切片）</strong>：切片一，在厨房里颠勺炒花生米的执拗火候；切片二，戴着袖套帮我补课本破页时的笨拙手指；切片三，戴着收音机耳机跟着京剧摇头晃脑的自得；</li>
+                <li><strong>高潮段（显质）</strong>：翻出外公压箱底泛黄的抗洪抢险立功勋章与一条布满疤痕的小腿，日常凡人瞬间显露出硬汉底色；</li>
+                <li><strong>结尾段（空镜）</strong>：夕阳里藤椅轻轻摇晃，老花镜搭在石桌上，岁月静好，余味不绝。</li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sub-heading">万能写作模型 02：微澜见骨·去神圣化日常映照模型</div>
+        <div class="item-block">
+          <div class="formula-bar">
+            结构公式：破除人设滤镜 → 捕捉独特微癖好 → 逼近肉身局限与两难处境 → 升华至坚忍纯粹的大美
+          </div>
+          <p><strong>避坑清单</strong>：切忌切片之间毫无内在情感递进；切忌将琐碎细节写成杂乱流水账；每一个切片必须有独特的感官关键词（声音、色彩或气味）锚定。</p>
+        </div>
+
+        <div class="sub-heading">读写映射总纲矩阵表</div>
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;">维度</th>
+              <th style="width: 28%;">本课所读之文学密码</th>
+              <th style="width: 28%;">考场所用之写作技法</th>
+              <th style="width: 29%;">达成之语文核心素养</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>立意</strong></td>
+              <td>走下神坛的血肉巨人，以凡俗烟火见精神崇高。</td>
+              <td>拒绝高大全脸谱，在弱点、偏好与疲惫中掘进真崇高。</td>
+              <td>思维发展与审美鉴赏：辩证审视英雄与常人。</td>
+            </tr>
+            <tr>
+              <td><strong>结构</strong></td>
+              <td>印象主义散点剪辑，段落独立而气韵贯通。</td>
+              <td>镜头蒙太奇拼贴，多生活横截面聚焦人物精神内核。</td>
+              <td>审美创造：突破单线叙事，掌握立体构篇。</td>
+            </tr>
+            <tr>
+              <td><strong>细节</strong></td>
+              <td>“挑着吃”、“连烟卷都拿不住”、“扣帽迈腿”。</td>
+              <td>特写微动作 + 连缀动词咬合 + 物象失控反应。</td>
+              <td>语言建构与运用：具象微雕代替干瘪形容词。</td>
+            </tr>
+            <tr>
+              <td><strong>语言</strong></td>
+              <td>纯粹短句矩阵，口语白描，零度情感叙事。</td>
+              <td>削减复杂长句，控制直接抒情，以克制留白生成千钧张力。</td>
+              <td>文化传承与理解：领会中国现当代素朴语言之美。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 栏目 12 -->
+    <details class="guide-section" id="sec-12">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">12</span>
+          <span class="sec-title">五个苏格拉底深想问题与多场景表达</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">五个直击深水区的苏格拉底追问</div>
+        <div class="item-block">
+          <ol class="num-list">
+            <li><strong>形式张力问</strong>：萧红宁愿花大量笔墨写穿衣服大红怪绿、吃青豆、甚至写鲁迅包饺子，也不愿写一句鲁迅在文坛上的论战胜局，这种“舍大取小”的选材策略，究竟是削弱了大师的份量，还是以四两拨千斤的方式重塑了大师的尊严？</li>
+            <li><strong>处境两难问</strong>：面对身体急剧恶化的肉身与日益险恶的社会现实，鲁迅选择“从不休息”、“夜夜写字到凌晨两三点”。这种对自己肉体近乎残酷的透支，到底是值得赞美的崇高献祭，还是一种让人扼腕痛惜的时代悲剧？如果他选择多休息、活得更久，中国现代文学的结局会更好吗？</li>
+            <li><strong>核心假设挑战问</strong>：如果鲁迅真如传统宣传画里那样——“永远横眉冷对、永远毫无破绽、从来不苟言笑”，他还能成为萧红、萧军等苦闷绝望青年的心灵庇护所吗？一个完美无瑕的神，和一个满身毛边、会咳嗽会疲惫的人，哪一个更能给苦难中的凡人以救赎？</li>
+            <li><strong>当代算法共振问</strong>：在今天这个人设满天飞、网红与公众人物皆被精修滤镜包扎的数字时代，萧红这种“剥落油彩、平视毛边”的白描目光，对我们辨别真实与虚伪有何清醒的启示？</li>
+            <li><strong>生命自省问</strong>：在我们的家庭与校园生活中，我们是否也常常用“父亲”、“母亲”、“老师”这些崇高而抽象的身份标签，遮蔽了他们作为普通人真实的胃痛、叹息、衰老与对生活小确幸的渴望？</li>
+          </ol>
+        </div>
+
+        <div class="sub-heading">多场景表达协作示范（三级缩放）</div>
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>⚡ 30 秒课间快嘴版</strong>：<br>
+            “千万别把《回忆鲁迅先生》读成歌功颂德的套话散文！萧红最绝的地方，是她笔下的鲁迅会笑得连烟卷都拿不住、会嫌弃红上衣配绿裙子太俗气、会一粒一粒挑青豆吃。萧红把鲁迅从冰冷的神坛请回了人间，因为她懂得：只有露出血肉体温的英雄，才真正配得上永恒的敬仰！”
+          </div>
+          <div class="tint-accent" style="margin-top: 8px;">
+            <strong>🎙️ 3 分钟课堂演讲 / 短视频文案版</strong>：<br>
+            “同学们，在翻开这篇课文之前，你心中的鲁迅是什么形象？是不是木刻版画里那个竖着寸头、横眉怒目的冷峻战神？但萧红却用北国雪水般清冽的文字告诉我们：鲁迅的笑声是从心底欢喜出来的，甚至常常笑得咳嗽起来；他抓起帽子往头上一扣、左腿伸出，仿佛不顾一切地走去；全楼的人都睡了，他房间的灯却在凌晨两三点一直亮着。<br>
+            萧红没有写鲁迅写了多少杂文、打了多少胜仗，却写尽了他怎样生活、怎样疲惫、怎样爱护青年。这恰恰是最高级的文学智慧——神话让人敬而远之，真实才让人心疼落泪。当我们看见一代文化巨擘以衰朽之躯在暗夜里竭力为他人掌灯时，我们触摸到的，才是中华民族最硬的脊梁骨！”
+          </div>
+          <div class="tint-warm" style="margin-top: 8px;">
+            <strong>🏛️ 深度读书会开场白</strong>：<br>
+            “各位书友，1940年萧红在香港孤岛动笔写下《回忆鲁迅先生》时，自己也已病骨支离、来日无多。这篇长达万余字的回忆录，表面上是印象派的散点切片，内里却是两个漂泊而孤绝的现代灵魂最深沉的隔空握手。萧红以‘去神圣化’的女性平视视角，完成了对中国现代‘第一偶像’的文学重构。今天，让我们跟随萧红纯净的白描，穿透历史的迷雾，重新认识那个既威严又温存、既疲惫又炽热的人间鲁迅。”
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 栏目 13 -->
+    <details class="guide-section" id="sec-13">
+      <summary class="section-summary">
+        <div class="sum-left">
+          <span class="sec-num warm">13</span>
+          <span class="sec-title">综合创作实战、世界方法与元认知说明书</span>
+        </div>
+        <span class="sum-icon">+</span>
+      </summary>
+      <div class="section-content">
+        <div class="sub-heading">双轨实战习作命题与脚手架</div>
+        <div class="item-block">
+          <div class="tint-box">
+            <strong>✍️ 命题一 · 考场级记叙散文（600~800字）：《走在阳光里的他/她》或《卸下盔甲的瞬间》</strong><br>
+            <strong>写作任务与要求</strong>：
+            <ul class="bullet-list">
+              <li>调用栏目 11 的【生活切片蒙太奇写人模型】，由 3 个互相对照的生活横截面组成；</li>
+              <li>严格融入至少 2 处【微动作微雕】（如抓扣连贯动作、失控细节物象）与 1 处【克制的环境光影对比】；</li>
+              <li>杜绝通篇贴标签式的抽象赞美，结尾采用“零度留白”收束。</li>
+            </ul>
+          </div>
+          <div class="tint-accent" style="margin-top: 8px;">
+            <strong>📝 命题二 · 文学微评论（300~400字）：《以琐屑见宏阔：评萧红笔下的鲁迅日常生活》</strong><br>
+            <strong>写作脚手架</strong>：
+            <ol class="num-list">
+              <li><strong>论点</strong>：去神圣化的日常生活白描，反衬出鲁迅深沉博大的人格力量；</li>
+              <li><strong>文本证据</strong>：引用挑青豆、评衣裳两处具体细节；</li>
+              <li><strong>机制拆解</strong>：运用新批评“客观对应物”与叙事学视角，阐述生活琐屑如何转化为精神崇高；</li>
+              <li><strong>收束</strong>：指出该写法对现代传记散文审美的革新意义。</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="sub-heading">一周现实观察微行动卡</div>
+        <div class="tint-warm">
+          <strong>🔭 行动名称：【捕捉身边至亲的一处“生活毛边”】</strong><br>
+          <strong>观察任务</strong>：本周连续三天，悄悄观察父母、老师或门卫大叔在“非工作/非家长状态”下的一个真实生活细节（如独自泡脚时的发呆、哼唱老歌时的走调、整理杂物时的自言自语）。<br>
+          <strong>记录要求</strong>：记录 3 个可见的生理微动作，坚决不用任何主观抒情形容词，写一段 100 字的纯白描笔记，尝试理解他们盔甲之下的真实疲惫与渴望。
+        </div>
+
+        <div class="sub-heading">从《回忆鲁迅先生》学到的一种看世界的方法</div>
+        <div class="tint-accent">
+          <strong>🌍 方法命名：【去概念化的平视之眼（白描穿透术）】</strong><br>
+          <strong>核心动作</strong>：面对任何被权威、名利或舆论捧上神坛（或打入地狱）的人物或事件时，强行关掉脑海中预装的评价标签，将视线聚焦在那些最不易造假、最琐屑的物理生活毛边（吃什么饭、怎么笑、穿什么鞋、在暗夜中何时亮灯）。在生活琐屑的重力场里，测量一个人真正的精神成色。<br>
+          <strong>适用边界</strong>：适用于写人叙事、深层人际沟通、破解网络造神幻觉；但在需要严密逻辑实证与法理推导的学术论辩中，不可替代严谨的客观论据与数据分析。<br>
+          <strong>人机分工边界</strong>：AI 能够快速梳理历史事实与知识要点，但唯有人类敏锐的心灵，才能在“夹不住的烟卷”与“一粒一粒挑的青豆”里，感受到那份令人落泪的生命体温。
+        </div>
+
+        <div class="sub-heading">🛡️ 读写元认知自我标注说明书模板（结业档案卡）</div>
+        <div class="item-block">
+          <table class="term-table">
+            <thead>
+              <tr>
+                <th style="width: 25%;">评价维度</th>
+                <th style="width: 35%;">自评要点与反思标准</th>
+                <th style="width: 40%;">能力达标等级（L1 ~ L4）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>文本细读与证据锚定</strong></td>
+                <td>能否脱离教辅套话，精准找出原文中的微动作、词义场与潜台词？</td>
+                <td>L1 摘抄语句 → L2 辨析词性 → L3 解码形式生成意义 → <strong>L4 重塑全篇阐释结构</strong></td>
+              </tr>
+              <tr>
+                <td><strong>叙事结构建模</strong></td>
+                <td>能否将课文的散点蒙太奇与去神圣化逻辑，抽象为可迁移的写作模型？</td>
+                <td>L1 机械背诵 → L2 模仿套用 → L3 模块化迁移 → <strong>L4 灵活重构创新表达</strong></td>
+              </tr>
+              <tr>
+                <td><strong>语言克制与留白美学</strong></td>
+                <td>写人记事时能否克制直接抒情的冲动，纯粹依靠客观细节激荡读者共鸣？</td>
+                <td>L1 堆砌形容词 → L2 加修辞修饰 → L3 白描见骨 → <strong>L4 零度叙事下蕴蓄千钧深情</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </details>
+
+    <footer>
+      《回忆鲁迅先生》深度导读 · 统编八上语文 · 专为手机竖屏深度阅读与读写结合设计
+    </footer>
+
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+    function focusTrack(track) {
+      document.querySelectorAll('.guide-section').forEach((d, idx) => {
+        const num = idx + 1;
+        d.open = (track === 'read') ? (num <= 8) : (num >= 9);
+      });
+      const target = document.getElementById(track === 'read' ? 'sec-01' : 'sec-09');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+</body>
+</html>

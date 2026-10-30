@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>《愚公移山》深度导读与读写结合手札 · 《列子》</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe4;
+      --border: rgba(30, 42, 50, 0.09);
+      --border-accent: rgba(23, 93, 126, 0.35);
+      --text-main: #1c2429;
+      --text-muted: #56646e;
+      --text-soft: #7f8e99;
+      --accent: #175d7e;
+      --accent-subtle: rgba(23, 93, 126, 0.08);
+      --accent-warm: #c05621;
+      --accent-warm-subtle: rgba(192, 86, 33, 0.09);
+      --success: #15803d;
+      --danger: #b91c1c;
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #242c34;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --accent: #38bdf8;
+        --accent-subtle: rgba(56, 189, 248, 0.14);
+        --accent-warm: #fb923c;
+        --accent-warm-subtle: rgba(251, 146, 60, 0.14);
+        --success: #4ade80;
+        --danger: #f87171;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    p, li { text-align: justify; }
+
+    /* 顶部 Hero */
+    .hero {
+      text-align: center;
+      padding: 20px 14px 16px;
+      margin-bottom: 10px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge-wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .hero-badge-warm { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .hero-quote {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      padding: 9px 12px;
+      border-radius: 0 6px 6px 0;
+      display: inline-block;
+      width: 100%;
+      line-height: 1.68;
+      border-left: 3px solid var(--accent-warm);
+      text-align: justify;
+    }
+
+    /* 置顶交互工具栏 */
+    .toggle-toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-bottom: 12px;
+      padding: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .toolbar-left, .toolbar-right { display: contents; }
+    .toggle-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .toggle-btn:hover { background: var(--bg-card); color: var(--text-main); }
+    .toggle-btn.btn-read { color: var(--accent); background: var(--accent-subtle); }
+    .toggle-btn.btn-write { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 18px 2px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目 */
+    .guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .section-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 12px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      list-style: none;
+      background: var(--bg-card);
+      gap: 8px;
+    }
+    .section-summary::-webkit-details-marker { display: none; }
+    .summary-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .section-idx {
+      font-family: var(--font-serif);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+    .section-idx-warm { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+    .summary-toggle-icon {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-soft);
+      transition: transform 0.25s ease;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .guide-section[open] .summary-toggle-icon { transform: rotate(45deg); color: var(--accent); }
+    .guide-section[open] .summary-toggle-icon.warm { color: var(--accent-warm); }
+    .section-content {
+      padding: 8px 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.78;
+      color: var(--text-main);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 12px 18px 20px; font-size: 15px; }
+    }
+
+    /* 内部流式排版（扁平无嵌套框） */
+    .sub-heading {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading.warm { color: var(--accent-warm); }
+    .sub-heading::before { content: "▍"; color: var(--accent-warm); font-size: 12px; }
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* 元数据紧凑网格 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    @media (min-width: 560px) { .specs-grid { grid-template-columns: repeat(3, 1fr); } }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 7px 9px;
+      border-radius: 6px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); }
+    .spec-val { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.4; }
+
+    /* 纯色块（左侧3px竖线，绝不嵌套） */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 11px;
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); border-radius: 6px; }
+    .tint-accent { background: var(--accent-subtle); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--accent-warm-subtle); border-left: 3px solid var(--accent-warm); border-radius: 0 6px 6px 0; }
+    .tint-good { background: rgba(21, 128, 61, 0.07); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: rgba(185, 28, 28, 0.06); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 短公式条与徽章 */
+    .formula-bar {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .formula-bar.warm { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+      vertical-align: 1px;
+    }
+    .badge-evidence { background: var(--accent-subtle); color: var(--accent); }
+    .badge-context { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 满宽表格 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 8px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 7px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th { background: var(--bg-subtle); font-weight: 700; color: var(--accent); }
+
+    .svg-wrap {
+      width: 100%;
+      margin: 10px 0;
+      padding: 8px 4px;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .svg-wrap svg { width: 100%; height: auto; display: block; }
+    ul.bullet-list, ol.num-list { padding-left: 17px; margin: 5px 0 8px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14px; margin-bottom: 5px; line-height: 1.72; }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+      border-top: 1px dashed var(--border);
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 顶部 Hero 总览 -->
+  <header class="hero">
+    <div class="hero-badge-wrap">
+      <span class="hero-badge">古诗文轨 · 03 文言先秦诸子与神话寓言</span>
+      <span class="hero-badge hero-badge-warm">统编初中语文八年级上册 · 第六单元</span>
+    </div>
+    <h1>《愚公移山》深度导读与读写转化手札</h1>
+    <p class="hero-sub">战国 · 列御寇《列子·汤问》｜ 寓言极则 · 有限肉身与无限代际的宏大辩证</p>
+    <div class="hero-quote">
+      “子子孙孙无穷匮也，而山不加增，何苦而不平？”<br>
+      <span style="font-size:12.5px;color:var(--text-soft);margin-top:4px;display:inline-block;">—— 导读文眼：山之重在空间之险，人之胜在时间之流。以无限代际之尺，丈量绝境突围之诚。</span>
+    </div>
+  </header>
+
+  <!-- 置顶交互工具栏 -->
+  <div class="toggle-toolbar">
+    <div class="toolbar-left">
+      <button class="toggle-btn" onclick="toggleAllSections(true)">全部展开</button>
+      <button class="toggle-btn" onclick="toggleAllSections(false)">全部收起</button>
+    </div>
+    <div class="toolbar-right">
+      <button class="toggle-btn btn-read" onclick="focusTrack('read')">📖 读懂篇 (01–08)</button>
+      <button class="toggle-btn btn-write" onclick="focusTrack('write')">✍️ 读写转化 (09–13)</button>
+    </div>
+  </div>
+
+  <div class="part-divider" id="sec-01">上篇 · 文本深读、字词训诂与文学批评</div>
+
+  <!-- 栏目 01 · 课文坐标、单元定位与初读破冰 -->
+  <details class="guide-section" open id="sec-01-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">01</span>
+        <h2 class="section-title">课文坐标、单元定位与初读破冰</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">课文核心坐标速览</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">篇目与作者</div>
+          <div class="spec-val">《愚公移山》· 列子</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">教材单元归属</div>
+          <div class="spec-val">八上第六单元（神话寓言）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">十类细分品类</div>
+          <div class="spec-val">先秦诸子论辩与神话寓言</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">核心理论透镜</div>
+          <div class="spec-val">形式反讽 + 结构主义二元对立</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">考场考查抓手</div>
+          <div class="spec-val">词义活用·倒装句法·驳辩逻辑</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">认知防偏警示</div>
+          <div class="spec-val">拒绝庸俗解构与环保空套</div>
+        </div>
+      </div>
+
+      <div class="tint-bad">
+        <strong>⚠️ 审美防误读预警：</strong>切忌将本文矮化为“不畏劳苦的体力劳动赞歌”，更不可套用现代经济学“为什么不直接搬家”或现代环保主义“开山破坏植被”等脱离历史语境的时空错置论调（Anachronism）去消解寓言本身的形而上学思辨本义。本篇核心在于<strong>“有限生命对抗无限阻绝时的人性确立”</strong>。
+      </div>
+
+      <div class="sub-heading">初读三问破冰卡</div>
+
+      <div class="item-block">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>🔥 触动点：微光里的生命雀跃</strong><br>
+        “邻人京城氏之孀妻有遗男，始龀，跳往助之。”——在七百里方圆、高万仞的大山压迫下，一个刚刚换乳牙、父亲早亡的邻家孤儿，没有沉重的利益考量，仅仅听闻移山便“跳往助之”。那一个轻盈跃起的“跳”字，是冷酷物理世界中生命最纯粹的元气。</p>
+      </div>
+
+      <div class="item-block">
+        <p><span class="badge-context">【文学背景】</span> <strong>❓ 困惑点：反常的名字与神仙结局</strong><br>
+        为何立下移山宏愿的大智者被称为“愚公”，而安居算计的精明者却叫“智叟”？为什么全篇以凡人移山开局，结局却由天帝派“夸娥氏二子”把山背走？这究竟是机械降神的烂尾，还是先秦道家寓言中“精诚动天”的独特天人观？</p>
+      </div>
+
+      <div class="item-block">
+        <p><span class="badge-comment">【延伸评论】</span> <strong>✂️ 删改直觉实验：如果删掉“智叟”其人</strong><br>
+        若删去智叟的“笑而止之”与愚公的从容驳斥，这篇课文将从一篇<strong>“充满戏剧张力与哲学交锋的降维驳辩”</strong>，退化为愚公一家纯粹的劳作实录。智叟不是反派，而是世俗平庸理性（功利算计）的化身，没有智叟的阻挠，愚公的“代际数学模型”便无从确立。</p>
+      </div>
+
+      <div class="tint-accent">
+        <strong>🌍 本课“看世界的方法”初始猜想：</strong>在面对看似不可撼动的客观困局（万仞绝壁）时，弱小者唯一的破局法则不是退缩回避，而是<strong>“将无法撼动的空间常数，转换为持续累积的时间变量”</strong>——用系统化、代际化的长期主义瓦解即时算计的虚无。
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 02 · 字词句精粹、训诂对译与篇章拓扑 SVG -->
+  <details class="guide-section" open id="sec-02-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">02</span>
+        <h2 class="section-title">字词句精粹、训诂对译与篇章拓扑</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">文明关键字与古汉语词义场解码</div>
+      <table class="term-table">
+        <thead>
+          <tr>
+            <th style="width:22%;">字词/句式</th>
+            <th style="width:36%;">六书训诂与文言义脉</th>
+            <th style="width:42%;">语境意蕴与文化心理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>阳 / 阴</strong></td>
+            <td><strong>本义：日光向背。</strong>山南水北谓之阳，山北水南谓之阴。如“指通豫南，达于汉阴”。</td>
+            <td>古人的空间坐标映射宇宙阴阳之道。“达于汉阴”即通向汉水之南，显现愚公地理眼界的通达。</td>
+          </tr>
+          <tr>
+            <td><strong>龀</strong> (chèn)</td>
+            <td><strong>形声字。</strong>从齿，匕声。小儿换牙，代指七八岁之幼童。“始龀，跳往助之”。</td>
+            <td>脱落乳齿是生命成长最初的物理标志，遗男以赤子纯真参战，反衬智叟之世故与心理衰朽。</td>
+          </tr>
+          <tr>
+            <td><strong>惩</strong> (chéng)</td>
+            <td><strong>形声字。</strong>从心，征声。本义惩戒，引申为“苦于、为……所苦”。“惩山北之塞”。</td>
+            <td>“从心”之字，点明移山之念发自深沉痛苦之觉醒，非心血来潮，而是主动打破环境禁锢的心灵跃迁。</td>
+          </tr>
+          <tr>
+            <td><strong>固</strong> (gù)</td>
+            <td><strong>会意字。</strong>从囗从古。本义牢固，引申为鄙陋、顽固。“汝心之固，固不可彻”。</td>
+            <td>四面封闭之象。“固不可彻”即心智被功利算计完全封死，在空间上无法移山，在心智上画地为牢。</td>
+          </tr>
+          <tr>
+            <td><strong>曾</strong> (zēng)</td>
+            <td><strong>语气副词。</strong>表让步或强调，“连……都……，尚且”。“曾不能损魁父之丘”。</td>
+            <td>智叟与愚公妻皆用“曾”，但智叟带嘲弄冷笑，愚公妻带忧虑关切，同一虚词折射出完全相反的人情温差。</td>
+          </tr>
+          <tr>
+            <td><strong>亡</strong> (wú)</td>
+            <td><strong>通假字。</strong>通“无”，读 wú。“河曲智叟亡以应”。</td>
+            <td>形体空无。智叟从居高临下的“笑而止之”跌入彻底失语，证明算计的短视在崇高信念面前彻底瓦解。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sub-heading">关键难句句法剖分与括号层次对译</div>
+      <div class="item-block">
+        <p><strong>① 倒装反问句与固定格式：</strong><br>
+        <code>如太行、王屋何？ / 其如土石何？</code><br>
+        <strong>【句法拆解】：</strong>“如……何”，古代文言固定反问格式，译为“把……怎么样”。“太行、王屋”与“土石”均为提前的受事宾语。<br>
+        <strong>【层次直译】：</strong>（你又能）把太行、王屋二山（怎么样呢）？ / （你又能）把这些挖出来的土石（放置到哪里去呢）？<br>
+        <strong>【表达效果】：</strong>反问句式强化了客观困难之艰巨，使对话充满紧绷的现实阻力感。</p>
+      </div>
+
+      <div class="item-block">
+        <p><strong>② 主谓倒装叹惋句：</strong><br>
+        <code>甚矣，汝之不惠！</code><br>
+        <strong>【句法拆解】：</strong>正常语序应为“汝之不惠甚矣”（谓语“甚”前置，主语“汝之不惠”后置，助词“之”取消句子独立性）。<br>
+        <strong>【层次直译】：</strong>太严重啦，你的这种不聪明（糊涂到了极点）！<br>
+        <strong>【表达效果】：</strong>智叟先声夺人，将带有强烈情绪色彩的谓语“甚矣”甩在最前，惟妙惟肖地勾勒出其自命清高、居高临下的嘲弄嘴脸。</p>
+      </div>
+
+      <!-- 原生内联 SVG 篇章拓扑图 -->
+      <div class="sub-heading">篇章结构拓扑与二元对抗辩证模型（原生矢量图）</div>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bgSky" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#175d7e" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#f4efe4" stop-opacity="0.6"/>
+            </linearGradient>
+            <linearGradient id="mountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#7f8e99" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#56646e" stop-opacity="0.95"/>
+            </linearGradient>
+            <linearGradient id="humanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#c05621" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#c05621" stop-opacity="0.05"/>
+            </linearGradient>
+            <marker id="arrowHead" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#c05621"/>
+            </marker>
+            <marker id="arrowBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#175d7e"/>
+            </marker>
+          </defs>
+
+          <!-- 整体背景底板 -->
+          <rect x="10" y="10" width="700" height="300" rx="10" fill="url(#bgSky)" stroke="#175d7e" stroke-opacity="0.2" stroke-width="1"/>
+
+          <!-- 左侧：客观重压（空间维度） -->
+          <rect x="25" y="30" width="200" height="260" rx="8" fill="#ffffff" fill-opacity="0.9" stroke="#7f8e99" stroke-width="1.2"/>
+          <text x="125" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#175d7e">【空间常数 · 物理重压】</text>
+          <path d="M 45 130 L 85 75 L 125 125 L 165 70 L 205 130 Z" fill="url(#mountainGrad)"/>
+          <text x="125" y="105" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="700">太行·王屋</text>
+          <text x="125" y="152" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b91c1c">方七百里 · 高万仞</text>
+          <text x="125" y="172" text-anchor="middle" font-size="10" fill="#56646e">常数性物理阻绝：</text>
+          <text x="125" y="190" text-anchor="middle" font-size="10" fill="#b91c1c">“惩山北之塞，出入之迂”</text>
+          <rect x="40" y="210" width="170" height="60" rx="5" fill="#f4efe4" stroke="#7f8e99" stroke-opacity="0.3"/>
+          <text x="125" y="230" text-anchor="middle" font-size="10" font-weight="700" fill="#56646e">世俗算计：河曲智叟</text>
+          <text x="125" y="246" text-anchor="middle" font-size="9.5" fill="#b91c1c">以残年余力，不能毁一毛</text>
+          <text x="125" y="260" text-anchor="middle" font-size="9" fill="#7f8e99">局限在“即时存量”计算</text>
+
+          <!-- 中间：对抗与突破（辩证转化枢纽） -->
+          <rect x="245" y="30" width="230" height="260" rx="8" fill="#ffffff" fill-opacity="0.9" stroke="#c05621" stroke-width="1.5"/>
+          <text x="360" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#c05621">【时间变量 · 代际升维】</text>
+
+          <rect x="260" y="72" width="200" height="52" rx="6" fill="url(#humanGrad)" stroke="#c05621" stroke-opacity="0.4"/>
+          <text x="360" y="92" text-anchor="middle" font-size="11" font-weight="700" fill="#c05621">北山愚公的降维公式</text>
+          <text x="360" y="112" text-anchor="middle" font-size="10" font-weight="800" fill="#175d7e">山不加增（常数） vs 子孙无穷（变量）</text>
+
+          <!-- 行动群像 -->
+          <circle cx="285" cy="155" r="14" fill="#c05621" fill-opacity="0.15"/>
+          <text x="285" y="159" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c05621">愚公</text>
+
+          <circle cx="335" cy="155" r="14" fill="#175d7e" fill-opacity="0.15"/>
+          <text x="335" y="159" text-anchor="middle" font-size="9.5" font-weight="700" fill="#175d7e">子孙</text>
+
+          <circle cx="385" cy="155" r="14" fill="#15803d" fill-opacity="0.15"/>
+          <text x="385" y="159" text-anchor="middle" font-size="9.5" font-weight="700" fill="#15803d">室人</text>
+
+          <circle cx="435" cy="155" r="14" fill="#c05621" fill-opacity="0.15"/>
+          <text x="435" y="159" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c05621">遗男</text>
+
+          <text x="360" y="190" text-anchor="middle" font-size="10" fill="#56646e">行动载体：箕畚运土，寒暑易节</text>
+
+          <rect x="260" y="206" width="200" height="68" rx="6" fill="#fbf9f4" stroke="#c05621" stroke-dasharray="2,2"/>
+          <text x="360" y="225" text-anchor="middle" font-size="10" font-weight="700" fill="#c05621">顶真回环：无限时间流</text>
+          <text x="360" y="242" text-anchor="middle" font-size="9.5" fill="#1c2429">子生孙 → 孙生子 → 子子孙孙</text>
+          <text x="360" y="260" text-anchor="middle" font-size="9" fill="#15803d">以无限代际之积分，瓦解有限山体</text>
+
+          <!-- 右侧：精神升华与世界新局 -->
+          <rect x="495" y="30" width="200" height="260" rx="8" fill="#ffffff" fill-opacity="0.9" stroke="#175d7e" stroke-width="1.2"/>
+          <text x="595" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#175d7e">【神话超越 · 绝境洞开】</text>
+
+          <rect x="510" y="75" width="170" height="55" rx="5" fill="#f4efe4" stroke="#175d7e" stroke-opacity="0.2"/>
+          <text x="595" y="96" text-anchor="middle" font-size="10.5" font-weight="700" fill="#175d7e">超自然秩序震颤</text>
+          <text x="595" y="114" text-anchor="middle" font-size="9.5" fill="#b91c1c">操蛇之神闻之，惧其不已</text>
+
+          <path d="M 595 135 L 595 160" stroke="#175d7e" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+
+          <rect x="510" y="165" width="170" height="50" rx="5" fill="#175d7e" fill-opacity="0.08" stroke="#175d7e" stroke-opacity="0.3"/>
+          <text x="595" y="185" text-anchor="middle" font-size="10" font-weight="700" fill="#175d7e">天帝感其诚</text>
+          <text x="595" y="202" text-anchor="middle" font-size="9.5" fill="#56646e">夸娥氏二子负山一厝朔东/雍南</text>
+
+          <rect x="510" y="225" width="170" height="50" rx="5" fill="#15803d" fill-opacity="0.1" stroke="#15803d" stroke-opacity="0.4"/>
+          <text x="595" y="246" text-anchor="middle" font-size="10.5" font-weight="800" fill="#15803d">豁然开朗的文明新局</text>
+          <text x="595" y="262" text-anchor="middle" font-size="9.5" fill="#15803d">“冀之南，汉之阴，无陇断焉”</text>
+
+          <!-- 贯穿箭头 -->
+          <path d="M 225 160 L 243 160" stroke="#c05621" stroke-width="2" marker-end="url(#arrowHead)"/>
+          <path d="M 475 160 L 493 160" stroke="#175d7e" stroke-width="2" marker-end="url(#arrowBlue)"/>
+        </svg>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 03 · 文本显微镜与语言听诊器 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">03</span>
+        <h2 class="section-title">文本显微镜与语言听诊器：细读批注与改写实验</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <!-- 细读 1 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【文本依据 1】</span> <strong>“子子孙孙无穷匮也，而山不加增，何苦而不平？”</strong></p>
+        <p><strong>🔍 文本显微镜：</strong>观察其声调与句式的层进构造。愚公先用“虽我之死，有子存焉”作让步切入，紧接着以“子又生孙，孙又生子；子又有子，子又有孙”连续顶真，将单薄的个体肉身层层累迭成滚滚向前的家族长河。最后以“何苦而不平”强力反问作结，气势如千钧之弩引而不发、发则破石。</p>
+        <p><strong>🩺 语言听诊器：</strong>这是先秦散文中极其罕见的<strong>“数学极限思维与音律顶真的神圣结合”</strong>。愚公在话语上建立了一个严密的函数方程：山是体积为常量的定值（$C$），而代际时间是趋向于无穷大的变量（$t \to \infty$）。当变量无限增长，即使单次积分极其微小，最终结果也必然收敛于目标完成。语调从容而冰冷，对智叟的算计形成了降维碾压。</p>
+        <div class="tint-bad">
+          <strong>❌ 平庸改写版：</strong>“只要我们世世代代挖下去，总有一天能把山挖平的，有什么好担心的呢？”<br>
+          <em>（病灶：失去了顶真句法所携带的绵延生命律动，沦为一句单薄且空洞的口号，缺乏不可辩驳的数理威慑力。）</em>
+        </div>
+        <div class="tint-good">
+          <strong>✅ 原文胜出机制：</strong>顶真与反复的复沓声调，模拟了代际相传的沉稳心跳，形式与意义完全合一。
+        </div>
+      </div>
+
+      <!-- 细读 2 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【文本依据 2】</span> <strong>妻之“献疑”与智叟之“笑而止之”的幽微温差</strong></p>
+        <p><strong>🔍 文本显微镜：</strong>愚公之妻是“其妻献疑曰：‘以君之力……且焉置土石？’”；而河曲智叟则是“河曲智叟笑而止之曰：‘甚矣，汝之不惠！……其如土石何？’”。</p>
+        <p><strong>🩺 语言听诊器：</strong>同为对移山现实可行性的质疑，动词与语态蕴藏着惊人的伦理反差。“献”是恭敬的呈献，“献疑”是家人共同体内部<strong>关切细节、解决问题</strong>的建设性协商；其质疑落脚在“且焉置土石”，引发了全家讨论并得出“投诸渤海之尾”的方案。而智叟的“笑”是居高临下、自诩清醒的嘲笑，“止”是霸道否定，首句便给愚公扣上“甚矣，汝之不惠”的智商侮辱标签，其目的不在于解决困难，而在于扑灭狂想、维护世俗冷漠秩序。</p>
+        <div class="tint-bad">
+          <strong>❌ 平庸改写版：</strong>“他的妻子和河曲的智叟都反对他移山，觉得他老了没力气。”<br>
+          <em>（病灶：粗暴地抹平了‘亲人之爱与同盟’同‘外人算计与嘲弄’的本质分野，丢失了文本极其细腻的人情世故。）</em>
+        </div>
+        <div class="tint-good">
+          <strong>✅ 原文胜出机制：</strong>一“献”一“笑”，一“谋”一“止”，三言两语便将真实生活里“同行者的现实忧虑”与“旁观者的刻薄优越感”剥离得透彻见底。
+        </div>
+      </div>
+
+      <!-- 细读 3 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【文本依据 3】</span> <strong>“邻人京城氏之孀妻有遗男，始龀，跳往助之。”</strong></p>
+        <p><strong>🔍 文本显微镜：</strong>注目于“孀妻”（寡妇）、“遗男”（孤儿）、“始龀”（七八岁乳齿方落）与动词“跳”。</p>
+        <p><strong>🩺 语言听诊器：</strong>在先秦社会，“孀妻弱子”是最典型的无依无靠、最无自卫能力的底层边缘群体。如果说愚公移山是为了家族生计与长远通道，那么寡妇孤儿在世俗眼光中毫无获利可能。然而幼童却“跳往助之”——“跳”字不仅是肢体动作的欢悦雀跃，更是一种<strong>完全超越世俗利害计算的生命本能投奔</strong>！它与智叟在河曲之畔冰冷捋须的“笑”构成了整篇寓言中最鲜明的光影交错。</p>
+        <div class="tint-bad">
+          <strong>❌ 平庸改写版：</strong>“邻居寡妇家的小男孩也跑过去帮他们运土石。”<br>
+          <em>（病灶：“跑去帮”只是中性交代情节，“跳往助之”的童真元气、毫无杂质的热情与诗意震撼全失。）</em>
+        </div>
+        <div class="tint-good">
+          <strong>✅ 原文胜出机制：</strong>以最孱弱的生命之“跳”，击碎最坚硬冰冷的功利心智，展现纯粹理想对无暇心灵的天然引力。
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 04 · 结构罗盘与叙事/章法机制 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">04</span>
+        <h2 class="section-title">结构罗盘与寓言机制：反讽、视角与交锋推进</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">叙事推进的五个戏剧节拍</div>
+      <ol class="num-list">
+        <li><strong>巨障横亘（宏大静止）</strong>：起笔交代太行王屋方七百里高万仞，物理阻绝如不可抗拒之宿命。</li>
+        <li><strong>闭门聚室（民主协商）</strong>：九十翁发愿，全家杂然相许，妻子献疑，共谋“渤海之尾”出路，完成行动方案闭环。</li>
+        <li><strong>艰难跋涉（凡人肉身）</strong>：率三夫叩石垦壤，孤儿跳助，寒暑易节始一反焉，呈现真实时间代价的漫长。</li>
+        <li><strong>智者交锋（思想引爆）</strong>：智叟阻挠，愚公以代际哲学破局，完成整篇寓言最核心的精神升维。</li>
+        <li><strong>天倾地阔（神话闭环）</strong>：神惧帝感，移山神迹显现，首尾呼应，冀南汉阴自此坦途无断。</li>
+      </ol>
+
+      <div class="sub-heading">形式主义反讽与命名深意（Defamiliarization）</div>
+      <div class="tint-box">
+        <strong>“愚”与“智”的颠覆性互换：</strong><br>
+        列子在人物命名上实施了极其尖锐的<strong>陌生化命名反讽</strong>：
+        <ul class="bullet-list" style="margin-top:6px;">
+          <li><strong>河曲智叟之“智”</strong>：是局限在当下肉身利益的“局部小聪明”（Short-term calculation），他看到了生命的有限，却由此堕入无所作为的虚无与傲慢；</li>
+          <li><strong>北山愚公之“愚”</strong>：是跳出个体时空、将自我融入人类永恒繁衍的“宇宙大智慧”（Long-term teleology）。他看似以卵击石，实则参透了时间与物质转化的最高规律。</li>
+        </ul>
+        这种命名颠覆，强有力地刺破了读者关于“聪敏”与“迟钝”的常识幻觉。
+      </div>
+
+      <div class="sub-heading">叙事视角的奇妙转移与留白</div>
+      <p>作者在前段保持冷峻的第三人称叙述，而在智叟出场后，完全隐去叙述者声音，将舞台彻底让渡给两段戏剧化对白。愚公驳斥完毕后，课文仅用五个字：<strong>“河曲智叟亡以应”</strong>——没有多余的心理描写，一个长久的、窒息般的沉默定格在河畔。这处留白比任何斥责都更具杀伤力，它标志着世俗平庸理性的彻底破产。</p>
+
+    </div>
+  </details>
+
+  <!-- 栏目 05 · 意象网络、主题三层与寓言哲学微评论 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">05</span>
+        <h2 class="section-title">意象网络、主题三层与寓言哲学微评论</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">核心意象网络的张力拓扑</div>
+      <ul class="bullet-list">
+        <li><strong>太行、王屋（万仞巨山）</strong>：象征外在世界无从选择的宿命阻碍、体制壁垒或历史重负，冰冷、巨大、静止不动。</li>
+        <li><strong>箕畚、荷担、叩石（微末器物）</strong>：象征人类个体面对宏大自然时极其微薄、原始的物理手段，肉身的局限与荒谬感。</li>
+        <li><strong>渤海之尾、隐土之北（渺远虚空）</strong>：吞纳土石的无底归宿，也是凡人意志远征的地理终点。</li>
+        <li><strong>子子孙孙（奔涌血脉）</strong>：超越个体寿命的生命连续体，它是时间对空间的唯一反制力量。</li>
+      </ul>
+
+      <div class="sub-heading">主题三层掘进模型</div>
+      <div class="tint-box">
+        <strong>1. 表层处境：</strong>一个九旬老人带领全家克服交通险阻、凿山通路的古代民间开山传说。<br>
+        <strong>2. 深层困境：</strong>个体肉身年寿之短促（残年余力）同客观物理规律与社会现实阻力之庞大之间的深渊式绝望。<br>
+        <strong>3. 根本追问：</strong>人在意识到自我的渺小与必死性之后，凭什么依然选择投入一场注定看不到终点的崇高行动？人的尊严与行动合法性究竟来自结果，还是来自意志的纯粹？
+      </div>
+
+      <div class="formula-bar">
+        ⚡ 核心价值张力公式：【个体肉身之短促局限】 ⚡ 【代际意志之无限超越】
+      </div>
+
+      <div class="sub-heading">大学中文系级文学微评论示范（约 300 字）</div>
+      <div class="tint-accent">
+        <strong>评《愚公移山》的“时间哲学”与道家反讽机制：</strong><br>
+        《愚公移山》绝非廉价的苦干赞歌，而是一篇冷峻而崇高的存在主义时间寓言。面对太行王屋方七百里高万仞的压迫，智叟的“笑”本质上是功利理性在死亡与必然性面前的妥协——他只看得见“残年余力”这一存量极限。愚公的洞见则在于打破了孤立个体的认知盲区，以“子子孙孙无穷匮”的变量对抗“山不加增”的常量。列子在此完成了对名利巧智的道家反讽：看似精明的智叟实则画地为牢，被囚禁于自我的短暂寿数中；看似笨拙的愚公却将自我融入浩瀚的生命宇宙长河。移山之“神仙结局”更非败笔，而是道家“精诚动天”的具象化——当人类将有限意志提纯为无止境的代际坚守，冷酷的物理世界亦不得不向纯粹的精神意志退让。
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 06 · 阐释边界与不确定性判断尺 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">06</span>
+        <h2 class="section-title">阐释边界与不确定性判断尺</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">不确定性判断尺：确定、推测与过度阐释</div>
+
+      <div class="tint-good">
+        <strong>🟢 可以确定（铁证如山）：</strong><br>
+        1. 愚公的驳论核心在于<strong>“常量（山不加增）与变量（子孙无穷）”</strong>的时空转换，智叟的哑口无言印证了作者在哲学逻辑上对愚公的完全赞同；<br>
+        2. 全文叙事严格遵循诸子寓言的设喻说理法则，重在精神旨归，非纪实史传。
+      </div>
+
+      <div class="tint-warm">
+        <strong>🟡 可以推测（合理延伸）：</strong><br>
+        1. 操蛇之神的“惧其不已”提示我们：超自然力量并非被动垂怜，而是感受到了凡人无休止意志所蕴含的惊人颠覆力，天神背山在某种意义上是“神对人性的敬畏与妥协”；<br>
+        2. 遗男“跳往助之”反映了先秦邻里社群在重大生存困局中的自发动员机制与共生心理。
+      </div>
+
+      <div class="tint-bad">
+        <strong>🔴 警惕过度阐释（反常识偏颇）：</strong><br>
+        1. <strong>“愚公是专制家长、绑架子孙自由”</strong>：用现代个体主义权利观生硬套用宗法血缘共同体，忽视了在古代严酷生存环境下，家族代际协同是唯一的突围机制；<br>
+        2. <strong>“愚公破坏生态环境、智叟才懂顺应自然”</strong>：混淆了神话寓言的象征性与现实水土工程，属于典型的时代错置（Anachronism）。
+      </div>
+
+      <div class="sub-heading">接受视野窗：关于“天帝背山结局”的多元异读</div>
+      <div class="item-block">
+        <p><strong>异读一（传统浪漫主义天道观）：</strong>认为结局体现了中国古代神话“人定胜天”与“天人感应”的互证。人的力量有限，但当人类付出极致诚意时，天道秩序将予以奖赏，展现了朴素的历史乐观主义。</p>
+        <p><strong>异读二（叙事学张力与反讽读法）：</strong>认为天帝搬山是一种反讽性的“解围”。凡人虽然在形而上逻辑中证明了无限代际的胜算，但肉身在现实物理面前依然无比脆弱。神话借由天神介入，恰恰凸显了现实重压之深重——若无超越性力量相助，凡人突围的代价将是永生永世的苦役。</p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 07 · 知人论世、文体源流与文明思想坐标 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">07</span>
+        <h2 class="section-title">知人论世、文体源流与文明思想坐标</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">【文学背景】列子其人与《列子·汤问》的精神底色</div>
+      <p>列御寇，战国前期郑国道家学者，早于庄子。其学本于黄帝、老子，主张贵虚无、守静笃。《列子·汤问》整篇洋溢着极其奇诡壮丽的浪漫主义想象力与宇宙求知欲：商汤与夏革讨论天地之始、两小儿辩日之远近、夸父追日、精卫填海、偃师造人……《愚公移山》正是镶嵌在这样一个<strong>“不断打破人类常识边界、探索天地无穷”</strong>的宏大思想宇宙之中。列子借此探讨的不是单纯的修路技巧，而是“形神、虚实、常变”的形而上学本体论。</p>
+
+      <div class="sub-heading">诸子寓言的文体功能：以卮言见大道</div>
+      <p>先秦寓言（《庄子》《列子》《韩非子》）是中国思辨散文的巅峰形态。它不同于伊索寓言纯粹的道德教训，而是作为<strong>“哲学思想的演武场”</strong>。诸子通过极端的情境设定（九十翁、万仞山、渤海运土）、荒诞的戏剧冲突与反常的人物问答，将深奥的哲学本体论具象为妇孺皆知的叙事。守正之处在于严密的因果逻辑推进，创新之处在于以道家反常识的智慧解构世俗常识。</p>
+
+      <div class="sub-heading">现代思想史转化：毛泽东与革命政治化用</div>
+      <div class="tint-box">
+        <strong>1945 年中共七大闭幕词的历史跃迁：</strong><br>
+        毛泽东在七大作了题为《愚公移山》的著名闭幕词，完成了中国古典寓言在现代政治哲学中极其惊艳的现代性转换：
+        <ul class="bullet-list" style="margin-top:6px;">
+          <li>将“太行、王屋二山”比作压在中国人民头上的<strong>“帝国主义与封建主义”</strong>两大客观历史巨障；</li>
+          <li>将“愚公一家”比作坚持长期奋斗、甘当革命基石的<strong>“中国共产党人”</strong>；</li>
+          <li>最绝妙的创造性转换是将神话中的“天帝”阐释为<strong>“全中国广大的人民大众”</strong>！只要共产党人像愚公一样持之以恒叩石垦壤，就会感动上帝——全国人民大众一齐起来，这两座大山就会被彻底搬掉。</li>
+        </ul>
+        这种阐释将神仙降临彻底人本化、人民化，铸就了中华民族现代奋斗的精神图腾。
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 08 · 比较阅读桥：同题异构与群文联读矩阵 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">08</span>
+        <h2 class="section-title">比较阅读桥：同题异构与群文联读矩阵</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">群文联读深度透视矩阵</div>
+      <table class="term-table">
+        <thead>
+          <tr>
+            <th style="width:25%;">篇目与坐标</th>
+            <th style="width:35%;">【文本依据】与核心对抗机制</th>
+            <th style="width:40%;">比读带来的认知刷新与精神差异</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>《愚公移山》</strong><br>（战国·列子）</td>
+            <td>“子子孙孙无穷匮也，而山不加增”<br>家庭代际协同，以时间积分瓦解空间。</td>
+            <td><strong>代际历史乐观主义：</strong>相信人类通过血脉与事业的接力，能够切实重构世界格局，最终迎来开阔坦途。</td>
+          </tr>
+          <tr>
+            <td><strong>《精卫填海》</strong><br>（先秦·山海经）</td>
+            <td>“常衔西山之木石，以堙于东海”<br>死后灵魂化鸟，以微薄之木石填无量巨海。</td>
+            <td><strong>向死而生的悲壮意志：</strong>毫无功利期待的绝对反抗，即使明知绝无填平之日，亦永不停止对暴烈自然的宣战。</td>
+          </tr>
+          <tr>
+            <td><strong>《西西弗斯的神话》</strong><br>（阿尔贝·加缪）</td>
+            <td>巨石一次次滚落山底，西西弗斯在下山途中意识到荒谬并鄙视诸神。</td>
+            <td><strong>现代西方存在主义：</strong>没有代际传承，巨石永远循环归零。反抗的价值不在于“移山成功”，而在于“清醒承受并热爱这推石的过程”。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tint-accent">
+        <strong>💡 跨文明审视总结：</strong>西西弗斯的悲剧是个体的、圆环形封闭的（荒谬循环）；而愚公的传奇是群体的、直线形向前延伸的（代际递进）。中国先秦文明从一开始就赋予个体一种<strong>“在代际血脉与事业传续中超越个体肉身有限性”</strong>的宏阔宇宙胸襟。
+      </div>
+
+    </div>
+  </details>
+
+  <div class="part-divider" id="sec-09">下篇 · 读写转化、素材炼金与创造行动</div>
+
+  <!-- 栏目 09 · 五维金句解码与情境化阶梯仿写支架 -->
+  <details class="guide-section" open id="sec-09-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">09</span>
+        <h2 class="section-title">五维金句解码与情境化阶梯仿写支架</h2>
+      </div>
+      <span class="summary-toggle-icon warm">+</span>
+    </summary>
+    <div class="section-content">
+
+      <!-- 金句 1 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【金句 1 · 理推逻辑】</span> <strong>“子子孙孙无穷匮也，而山不加增，何苦而不平？”</strong></p>
+        <p><strong>📐 句法骨架解剖：</strong><code>[微观主体的无限代际/时间变量推进] + [而 + 宏大困境/客观常数的静止守恒]，[反问句：何愁/何患/何苦 + 核心终极破局目标]？</code></p>
+        <div class="tint-box">
+          <strong>🏠 迁移生活情境：</strong>高三面对堆积如山的试卷与薄弱学科，或乡村教师面对闭塞蒙昧的代际教育坚守。<br>
+          <strong>🧩 可替换填空支架：</strong>字字行行的积累无断绝也，而难题之库不加增，何患知识之障不破？<br>
+          <strong>⚠️ 避坑指南：</strong>切忌漏掉“一增一减、一动一静”的定量与变量对照，失去反差张力就会退化为普通抒情。<br>
+          <strong>✨ 导师下水文示范：</strong><br>
+          “一灯如豆，墨痕相续无断绝也，而真理之门终有其扃，何虑寒窗之功不克？纵使吾辈肉身如飞萤短促，然思想之炬递传不熄，何苦暗夜之途不辟？”
+        </div>
+      </div>
+
+      <!-- 金句 2 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【金句 2 · 人立形象】</span> <strong>“河曲智叟笑而止之曰：‘甚矣，汝之不惠！’”</strong></p>
+        <p><strong>📐 句法骨架解剖：</strong><code>[世俗算计者/旁观者] + [神态动作：冷笑/嘲笑而阻挠之] + [主谓倒装叹惋：甚矣，汝之 + 贬损特征词]！</code></p>
+        <div class="tint-box">
+          <strong>🏠 迁移生活情境：</strong>在所有人都追逐热门浮躁风口时，某个手艺人或年轻学者偏偏扎进冷门残损文物的修补。<br>
+          <strong>🧩 可替换填空支架：</strong>行色匆匆的过客冷眼而哂之曰：“愚矣，汝之执迷！”<br>
+          <strong>⚠️ 避坑指南：</strong>谓语前置的倒装句式必须保留（如“怪矣”、“悲矣”、“甚矣”），以体现傲慢脱口而出的情绪冲击力。<br>
+          <strong>✨ 导师下水文示范：</strong><br>
+          “周遭喧嚣的看客哂笑而止之曰：‘痴矣，汝之徒劳！以三寸毫颖，安能补百代残篇？’然而那低垂的面容未尝一动，毫尖微落处，仍是千载素绢的呼吸。”
+        </div>
+      </div>
+
+      <!-- 金句 3 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【金句 3 · 事推情节】</span> <strong>“邻人京城氏之孀妻有遗男，始龀，跳往助之。”</strong></p>
+        <p><strong>📐 句法骨架解剖：</strong><code>[社会边缘/弱小无力之群像] + [极简身世/年龄细节白描]，[富有生机动词：跳/奔/趋] + [奔赴宏伟使命]。</code></p>
+        <div class="tint-box">
+          <strong>🏠 迁移生活情境：</strong>灾难来临时，看似最普通的普通人（外卖骑手、退休老人、中学生）主动送物资或参与救援。<br>
+          <strong>🧩 可替换填空支架：</strong>巷陌深处之老妪有残疾孙，才及初蒙，亦抱薪往助之。<br>
+          <strong>⚠️ 避坑指南：</strong>动词必须极其纯粹干脆，切忌添加过多“心理活动描写”或“深明大义的动机修饰”，越本能越动人。<br>
+          <strong>✨ 导师下水文示范：</strong><br>
+          “长街拐角处杂货铺之老叟，背微驼，始闻防汛告急，提锹蹒跚而趋之。无千钧豪言，唯余雨幕中泥泞的身影与沙袋沉沉落地的脆响。”
+        </div>
+      </div>
+
+      <!-- 金句 4 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【金句 4 · 景造氛围】</span> <strong>“太行、王屋二山，方七百里，高万仞，本在冀州之南，河阳之北。”</strong></p>
+        <p><strong>📐 句法骨架解剖：</strong><code>[沉重物象A与B] + [空间面积描述] + [垂直高度测量]，[冷峻定位于地理格局之中]。</code></p>
+        <div class="tint-box">
+          <strong>🏠 迁移生活情境：</strong>描写城市工业丛林的冰冷隔膜，或考场作文中塑造横亘在两代人之间的时代代沟。<br>
+          <strong>🧩 可替换填空支架：</strong>认知与阅历之双峰，袤延半生，深若沟壑，本立于父子之间，岁月之畔。<br>
+          <strong>⚠️ 避坑指南：</strong>数字与量词要具备古典的压迫感（方、仞、千里），不要用拖沓的修饰语削弱物理重压。<br>
+          <strong>✨ 导师下水文示范：</strong><br>
+          “偏见与成见两座巨嶂，纵横数载，高不可涉，本横于两代人促膝之案几，横亘于晨昏相对之门楣，使举步维艰，音容相阻。”
+        </div>
+      </div>
+
+      <!-- 金句 5 -->
+      <div class="item-block">
+        <p><span class="badge-evidence">【金句 5 · 意升主题】</span> <strong>“自此，冀之南，汉之阴，无陇断焉。”</strong></p>
+        <p><strong>📐 句法骨架解剖：</strong><code>自此，[曾经阻隔的空间区域A与B]，[无 + 阻碍/阴霾/关隘] 焉。</code></p>
+        <div class="tint-box">
+          <strong>🏠 迁移生活情境：</strong>一场漫长的误解化解后，或是乡村通了第一条柏油公路、通了互联网后的豁然开朗。<br>
+          <strong>🧩 可替换填空支架：</strong>自此，心扉之界，两代之渊，无芥蒂焉。<br>
+          <strong>⚠️ 避坑指南：</strong>收尾语调要平淡从容，如江河入海，“焉”字带出尘埃落定后的静穆感，忌过度喧嚣狂欢。<br>
+          <strong>✨ 导师下水文示范：</strong><br>
+          “自此，孤岛之隅，世界之衢，无险巇焉。光缆穿过群山褶皱，清风吹过稚子双眸，山川依然苍茫，而心之所向皆成坦途。”
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 10 · 作文素材炼金炉与高阶立意库 -->
+  <details class="guide-section" open id="sec-10-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">10</span>
+        <h2 class="section-title">作文素材炼金炉与高阶立意库</h2>
+      </div>
+      <span class="summary-toggle-icon warm">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading warm">三大高阶思想立意萃取</div>
+      <div class="item-block">
+        <p><strong>立意 1 · 长期主义与升维突围：</strong><br>
+        <code>公式：不可撼动的物理困局 + 引入代际时间的积分累进 = 对即时虚无主义的降维超越</code><br>
+        <strong>适用母题：</strong>#坚守与积累 #面对困境 #慢的智慧 #长期主义的价值<br>
+        <strong>立意点睛：</strong>平庸者被眼前的存量局限所吓倒，智者则敢于在时间的长河中下注。真正的勇敢不是幻想一战功成，而是把有限的生命投掷进无限的代际事业。</p>
+      </div>
+
+      <div class="item-block">
+        <p><strong>立意 2 · 破除世俗“算计”的笃行哲学：</strong><br>
+        <code>公式：聪明人的利害盘算 + 愚拙者的躬身入局 = 大智若愚的实践理性</code><br>
+        <strong>适用母题：</strong>#巧与拙 #知与行 #时代的清醒与执着 #刺破精致利己<br>
+        <strong>立意点睛：</strong>智叟的悲哀在于他的算计太周密，以至于每一步都精准证明了“放弃的合理性”。唯有愚公式的“笨拙”敢于叩石垦壤，在不可能处凿出通路。</p>
+      </div>
+
+      <div class="item-block">
+        <p><strong>立意 3 · 诚意感天与主观能动性：</strong><br>
+        <code>公式：凡人微躯的极致坚持 + 撬动超自然/外界资源的共振 = 必然性向可能性的让步</code><br>
+        <strong>适用母题：</strong>#精诚所至 #理想的光芒 #信念的力量<br>
+        <strong>立意点睛：</strong>所谓的“天帝感其诚”，本质上是人类精神能量极度纯粹时，对外部客观世界规则的改写与重塑。奇迹从来不是求来的，而是被意志逼出来的。</p>
+      </div>
+
+      <div class="sub-heading warm">两张标准化考场素材卡</div>
+
+      <!-- 素材卡 1 -->
+      <div class="item-block">
+        <p><strong>🗂️ 素材卡 #01｜以时间之河，移万仞之山（长期主义）</strong><br>
+        <span class="hero-badge">#长期主义</span> <span class="hero-badge hero-badge-warm">#破局思维</span> <span class="hero-badge">#代际接力</span></p>
+        <p><strong>100 字核能精述：</strong>九旬愚公面对太行、王屋二山方七百里高万仞之巨障，不受即时寿数所限，以“子子孙孙无穷匮，而山不加增”的极限思辨，荷担叩石，运土渤海。他将不可撼动的空间常数转换为无限延伸的时间变量，终使天帝感诚、巨岳分迁。</p>
+        <p><strong>名句化用公式：</strong><code>正如《列子》所昭示，世间最崇高的破局，莫过于深知“山不加增”而笃信“子孙无穷”，以凡人之诚，重塑时空江山。</code></p>
+        <div class="tint-accent">
+          <strong>💎 150 字考场议论文嵌入标杆示范：</strong><br>
+          时代浮躁的洪流中，我们太习惯于智叟式的“算计”——精明地评估投入产出，稍遇阻碍便断言“其如土石何”。然而历史真正的开凿者，往往是那些看似迂阔的愚公。面对万仞高山，愚公洞悉了文明存续的最高秘密：个体生命诚然短促如蜉蝣，但只要精神之薪火代代相继，“子孙无穷”的时间积分终将踏平“不加增”的顽石。拒绝即时反馈的诱惑，在认定的道路上叩石垦壤，时间自会赠予破局者开阔无垠的平川。
+        </div>
+      </div>
+
+      <!-- 素材卡 2 -->
+      <div class="item-block">
+        <p><strong>🗂️ 素材卡 #02｜刺破算计的执拙之力（知行哲学）</strong><br>
+        <span class="hero-badge">#大智若愚</span> <span class="hero-badge hero-badge-warm">#拒绝浮躁</span> <span class="hero-badge">#知行合一</span></p>
+        <p><strong>100 字核能精述：</strong>河曲智叟以“残年余力不能毁山一毛”冷笑止之，自居理性顶峰，却沦为画地为牢的看客；邻家遗男才及换齿，欢欣跳助，荷担箕畚。愚公以拙破巧，让精明算计者“亡以应”，以笃定践行证明：最远大的智慧，往往深藏于最质朴的行动。</p>
+        <p><strong>名句化用公式：</strong><code>当智叟在岸边嘲弄残年余力的微薄，愚公已荷担叩石于万仞崖下；生活从不犒赏精致的清谈，唯有躬身入局的泥泞能照亮前路。</code></p>
+        <div class="tint-accent">
+          <strong>💎 150 字考场议论文嵌入标杆示范：</strong><br>
+          当今社会充斥着各色各样的“河曲智叟”，他们擅长用概率论证失败的必然，用功利剪裁理想的翅膀。如果一切都以“不能毁山之一毛”来衡量，人类文明将永远困锁在山北之塞。我们需要遗男“始龀跳往助之”的赤子热忱，更需要愚公“指通豫南”的决绝执拗。大智若愚不是盲目的蛮干，而是看透现实艰险之后依然选择“叩石垦壤”的庄严担当。唯有刺破精致利己的泡沫，生命才能在沉实的大地上生根开花。
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 11 · 万能写作模型与读写映射总纲 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">11</span>
+        <h2 class="section-title">万能写作模型与读写映射总纲</h2>
+      </div>
+      <span class="summary-toggle-icon warm">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading warm">🏛️ 品牌模型 1：愚公降维驳辩反常模型（Shatter & Transcendence）</div>
+      <div class="tint-box">
+        <strong>结构公式：</strong><br>
+        <code>现实宿命重压（描摹巨障之不可动摇） → 2. 世俗平庸算计（借旁人之口提出无可辩驳的放弃理由） → 3. 维度升维绝杀（引入时间、代际或精神新变量） → 4. 留白反讽收束（常识破产与境界洞开）</code><br><br>
+        <strong>课文原型对应：</strong>太行王屋万仞（第1段） → 智叟笑而止之（第3段前半） → 愚公子孙无穷、山不加增长息而驳（第3段后半） → 智叟亡以应、天开汉阴（第3段末至第4段）。<br>
+        <strong>作文题移植示范（如高考题《时间的答卷》）：</strong><br>
+        首段描绘某项传统手艺或科研攻关在当下面临的庞大资本冷遇；次段写周遭好友精明的成本收益劝退；第三段笔锋一转，提出手艺的价值在于跨越代际的文明记忆而非季度财报，以时间的尺度重新定义胜负；末段写静坐案头的一笔一划，让喧嚣的算计声悄然退散。
+      </div>
+
+      <div class="sub-heading warm">🏛️ 品牌模型 2：长期主义笃行螺旋模型（Long-term Spiral）</div>
+      <div class="tint-box">
+        <strong>结构公式：</strong><br>
+        <code>痛感觉醒（惩……之塞，不甘于平庸困厄） → 2. 聚力建构（民主商议与方案落地） → 3. 笨拙践行（荷担叩石，寒暑易节，承受漫长无声代价） → 4. 诚意破壁（从内在坚守引发外部环境的宏大共振）</code><br><br>
+        <strong>适用文体：</strong>考场记叙文、写人散文、励志性议论文。<br>
+        <strong>避坑清单：</strong>切忌跳过“寒暑易节、始一反焉”的漫长代价直接写奇迹降临；没有过程的坚韧，结局的胜利便成了虚妄的鸡汤。
+      </div>
+
+      <div class="sub-heading warm">📊 本课读写迁移全息映射表</div>
+      <table class="term-table">
+        <thead>
+          <tr>
+            <th style="width:20%;">文本观察维度</th>
+            <th style="width:40%;">课文经典技法解码</th>
+            <th style="width:40%;">考场读写转化操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>立意破局</strong></td>
+            <td>陌生化反讽命名（愚公大智 vs 智叟小愚）</td>
+            <td>审视考题常识，通过反差对立刺破平庸立意。</td>
+          </tr>
+          <tr>
+            <td><strong>论辩逻辑</strong></td>
+            <td>常量与变量的函数式辩驳（山不增 vs 人无穷）</td>
+            <td>议论文写作中通过升维引入新变量破除死循环。</td>
+          </tr>
+          <tr>
+            <td><strong>细节刻画</strong></td>
+            <td>“献疑”与“笑止”的微妙人情动词温差</td>
+            <td>记叙文中拒绝贴标签，用极简动词刻画人性层次。</td>
+          </tr>
+          <tr>
+            <td><strong>语言气势</strong></td>
+            <td>顶真回环（子生孙，孙生子）与谓语倒装（甚矣）</td>
+            <td>写出具有音乐律动感与压迫力的高分议论排比段。</td>
+          </tr>
+          <tr>
+            <td><strong>升华收束</strong></td>
+            <td>天帝感诚、无陇断焉的开阔静穆</td>
+            <td>结尾收束在天地开阔的境界，拒绝空洞喊口号。</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </details>
+
+  <!-- 栏目 12 · 五个苏格拉底深想问题与多场景表达 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">12</span>
+        <h2 class="section-title">五个苏格拉底深想问题与多场景表达</h2>
+      </div>
+      <span class="summary-toggle-icon warm">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading warm">直击思维深水区的五个追问</div>
+      <ol class="num-list">
+        <li><strong>文本张力追问：</strong>愚公移山的第一动机是“惩山北之塞，出入之迂”，这本是一个纯粹功利性的交通需求；但为何到最后他驳斥智叟时，却升华为近乎神圣的“子孙无穷匮”的形而上学辩驳？功利始端何以孕育出超越性信仰？</li>
+        <li><strong>伦理两难追问：</strong>愚公替未出生的“子子孙孙”预订了永生永世荷担运石的命运，这在现代伦理学中是否构成对后代个体自由与选择权的剥夺？我们该如何在古代共同体生存伦理与现代权利观之间寻找解释平衡？</li>
+        <li><strong>核心假设挑战：</strong>如果操蛇之神没有害怕、天帝没有感其诚，太行王屋直到千年后依然横亘原地，愚公的移山还具有崇高性吗？行动的意义究竟是由“山移”的结果定义的，还是由“叩石”的姿态定义的？</li>
+        <li><strong>AI与算法时代共振：</strong>在大模型算力能在一秒内给出最优路径规划（比如直接算出搬家避险的最优解）的时代，人类还需要像愚公这样违背“最优效益比”的愚拙坚持吗？当效率至上统治一切，人类精神还剩下什么？</li>
+        <li><strong>个体生命自省：</strong>在你当下的生活与学业中，哪一座“太行、王屋”正让你感到窒息与难以逾越？你是在扮演智叟用理智给自己找借口，还是拥有移山的一铲一石之勇气？</li>
+      </ol>
+
+      <div class="sub-heading warm">🎙️ 多场景表达协作示范（核心证据链的三级缩放）</div>
+
+      <div class="item-block">
+        <p><strong>⚡ 30 秒课间快嘴版（核心洞察 + 反常识推导）：</strong><br>
+        “很多人把《愚公移山》当成苦干童话，其实它是一场严密的时间降维打击！九十岁的愚公面对七百里大山，没有跟智叟争辩体力，而是提出了一个震撼的数学模型：山是不会增高的定值，而人的代际繁殖是趋向无限的变量。用无限的时间积分去磨损有限的物理山体，胜利是数学上的必然。聪明的智叟困在自己的残年里，而愚公早已站在人类永恒繁衍的宇宙长河里了。”</p>
+      </div>
+
+      <div class="item-block">
+        <p><strong>🎤 3 分钟课堂演讲/短视频文案版（情境导入 + 机制拆解 + 现实共振）：</strong><br>
+        “老师、同学们好！今天我们重读《愚公移山》，想问大家一个问题：如果你是愚公的邻居，你会支持他还是嘲笑他？<br>
+        老实说，按照现代经济学的算法，智叟才是理性的——九十岁的老人，敲一辈子石头也赶不上山体自然风化。智叟的笑，代表了世俗世界里最庞大的那群‘聪明人’，他们算无遗策，所以他们永远选择退缩与妥协。<br>
+        可列子为什么偏偏给老人命名为‘愚’，给智者命名为‘叟’？请注意文中文眼：‘子子孙孙无穷匮也，而山不加增’。这不仅是顶真修辞，更是东方文明对‘生命与时间’的终极宣誓！西方有西西弗斯推石上山的永恒荒谬，而中国有愚公移山的代际超越。愚公把个体的微末肉身，焊接进了家族与人类生生不息的巨链之中。当变量无限延伸，一切固若金汤的坚硬现实都将被重新洗牌。<br>
+        在这个习惯于‘立刻要结果’、稍遇挫折就‘躺平退避’的时代，我们比任何时候都更需要这一份敢于向时间下注的愚拙。愿我们都能刺破智叟式的冷眼，做自己命运里叩石垦壤的愚公！”</p>
+      </div>
+
+      <div class="item-block">
+        <p><strong>🏛️ 深度读书会开场白（学术批评与存在主义思辨）：</strong><br>
+        “欢迎来到《列子》文本研读会。今天我们要重新审视被教辅过度简化的《愚公移山》。在结构主义叙事学视野下，太行与王屋不仅是两座物理山峰，更是冷酷客观规律与有限生命处境的终极隐喻。值得我们深思的是，列子作为一位崇尚虚静的道家先哲，为何会构思出一个如此刚烈不息的劳作寓言？智叟之笑与愚公之息，本质上是两种宇宙观的决裂：一种是局限于肉身孤岛的机械经验论，另一种是将个体存在融入天地生生之化的大道体悟。让我们顺着字词训诂与论辩机制，探寻中国先哲如何在荒谬的现实绝壁前，筑起一座以时间为基石的人性丰碑。”</p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 13 · 综合创作实战、世界方法与元认知说明书 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">13</span>
+        <h2 class="section-title">综合创作实战、世界方法与元认知说明书</h2>
+      </div>
+      <span class="summary-toggle-icon warm">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading warm">✍️ 双轨实战习作命题与写作支架</div>
+
+      <div class="item-block">
+        <p><strong>命题一：考场大作文（600–800字）</strong><br>
+        <strong>题目：</strong>《叩石者的回声》<br>
+        <strong>写作要求：</strong>生活中总有一些事情看似笨拙徒劳、短期难见成效，却因有人默默坚守而悄然改变。请调用本课习得的<strong>“愚公降维驳辩反常模型”</strong>或<strong>“长期主义笃行螺旋模型”</strong>，写一篇记叙文或思辨性散文。必须包含至少一处人情温差细节对比（如妻之疑 vs 叟之笑）。</p>
+      </div>
+
+      <div class="item-block">
+        <p><strong>命题二：文学微评论（250–350字）</strong><br>
+        <strong>题目：</strong>评《愚公移山》中遗男“跳往助之”的叙事美学功能。<br>
+        <strong>写作框架：</strong>论点（跳往助之是崇高使命的人性解冻） → 文本依据（孀妻弱子、始龀之年与‘跳’的动感） → 机制解析（与智叟之笑的冷暖对立） → 精神升华（理想对赤子心灵的天然召引）。</p>
+      </div>
+
+      <div class="sub-heading warm">🔭 一周现实观察微行动卡</div>
+      <div class="tint-box">
+        <strong>行动任务：</strong>在接下来的七天里，寻找你生活周边（校园、家庭、社区）一个<strong>“看似最不聪明、却一直在默默坚持”</strong>的人（如每天给流浪猫做绝育记录的学姐、十年如一日擦拭黑板缝隙的校工、在快节奏社会中坚持手工磨豆腐的老人）。<br>
+        <strong>记录 3 个真实细节：</strong>其一，他最常使用的微小工具；其二，旁人对他的一句典型“智叟式评价”；其三，他面对评价时最习惯的一个肢体小动作。暂缓给出功利性成败结论，体会其内心的平静。
+      </div>
+
+      <div class="sub-heading warm">🌍 从《愚公移山》学到的一种看世界的方法</div>
+      <div class="tint-accent">
+        <strong>【方法命名】：变量重构法（Variable Reconstruction Method）</strong><br>
+        <strong>【原型溯源】：</strong>北山愚公面对太行王屋之固，将物理常数转换为代际变量。<br>
+        <strong>【核心观察与思考动作】：</strong><br>
+        每当你遭遇巨大困境感到绝望无力时，先拿出一张白纸，划分两列：
+        <ul class="bullet-list" style="margin-top:6px;">
+          <li><strong>左列写下“客观常数”</strong>：那些你短期内绝对无法改变的现实壁垒（如出身、天赋局限、考题难度、环境偏见）；</li>
+          <li><strong>右列写下“时间变量”</strong>：那些只要你持续行动就能无限累积的微小动作（如每日5页阅读、错题归因积累、晨间锻炼、稳定情绪复盘）。</li>
+        </ul>
+        <strong>【思维跃迁】：</strong>停止在左列的常数绝壁前自怨自艾或功利算计，把全部算力聚焦于右列变量的每一次持续推进。时间自会把常数的压迫碾磨成通向远方的平原。
+      </div>
+
+      <div class="sub-heading warm">🛡️ 读写元认知自我标注说明书（结业评价量表）</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">L1 基础记忆</div>
+          <div class="spec-val">准确掌握龀、惩、固、阳阴文言训诂与倒装句</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">L2 结构阐释</div>
+          <div class="spec-val">能绘制空间常数与代际变量二元对抗拓扑模型</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">L3 辩证批判</div>
+          <div class="spec-val">能辨析神话结局的道家天人观与拒绝时空错置</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">L4 迁移创造</div>
+          <div class="spec-val">能在考场作文中自如调用顶真金句与长期主义模型</div>
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 尾部版权与说明 -->
+  <footer>
+    <p>《愚公移山》深度导读与读写结合手札 · 手机原生阅读自适应版</p>
+    <p style="margin-top:4px;color:var(--text-soft);">基于统编初中语文教材八年级上册第六单元 · 《列子·汤问》</p>
+  </footer>
+
+</div>
+
+<script>
+  function toggleAllSections(openState) {
+    document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+  }
+  function focusTrack(track) {
+    document.querySelectorAll('.guide-section').forEach((d, idx) => {
+      const num = idx + 1;
+      d.open = (track === 'read') ? (num <= 8) : (num >= 9);
+    });
+    const target = document.getElementById(track === 'read' ? 'sec-01' : 'sec-09');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>

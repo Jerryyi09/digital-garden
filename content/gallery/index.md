@@ -15,7 +15,7 @@ cssclasses:
 
 <header class="g-page-head">
   <h1>Gallery</h1>
-  <span class="g-count" data-garden-count>4 项</span>
+  <span class="g-count" data-garden-count>11 项</span>
 </header>
 
 <div class="g-tools">
@@ -28,8 +28,36 @@ cssclasses:
 
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
-  <summary><span>语文 · 初二课文</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》赏析 · 吴均" data-search="《与朱元思书》赏析 · 吴均 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793350338093" data-router-ignore>
+  <summary><span>语文 · 初二课文</span><em>9</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/语文/初二课文/《孟子》三章赏析.html" data-garden-item data-title="《孟子》三章深度赏析与读写结合导读" data-search="《孟子》三章深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《孟子》三章深度赏析与读写结合导读</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/中国石拱桥赏析.html" data-garden-item data-title="《中国石拱桥》深度赏析与读写结合导读 · 茅以升" data-search="《中国石拱桥》深度赏析与读写结合导读 · 茅以升 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《中国石拱桥》深度赏析与读写结合导读 · 茅以升</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/回忆鲁迅先生赏析.html" data-garden-item data-title="《回忆鲁迅先生》深度赏析与读写结合导读" data-search="《回忆鲁迅先生》深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《回忆鲁迅先生》深度赏析与读写结合导读</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/愚公移山赏析.html" data-garden-item data-title="《愚公移山》深度导读与读写结合手札 · 《列子》" data-search="《愚公移山》深度导读与读写结合手札 · 《列子》 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《愚公移山》深度导读与读写结合手札 · 《列子》</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/白杨礼赞赏析.html" data-garden-item data-title="《白杨礼赞》深度赏析与读写结合导读 · 茅盾" data-search="《白杨礼赞》深度赏析与读写结合导读 · 茅盾 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《白杨礼赞》深度赏析与读写结合导读 · 茅盾</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/背影赏析.html" data-garden-item data-title="《背影》深度赏析与读写结合导读 · 朱自清" data-search="《背影》深度赏析与读写结合导读 · 朱自清 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《背影》深度赏析与读写结合导读 · 朱自清</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/苏州园林赏析.html" data-garden-item data-title="《苏州园林》深度赏析与读写结合导读 · 叶圣陶" data-search="《苏州园林》深度赏析与读写结合导读 · 叶圣陶 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
+  <span class="g-row-text"><strong>《苏州园林》深度赏析与读写结合导读 · 叶圣陶</strong><small>10月30日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/语文/初二课文/与朱元思书.html" data-garden-item data-title="《与朱元思书》赏析 · 吴均" data-search="《与朱元思书》赏析 · 吴均 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793350338093" data-router-ignore>
   <span class="g-row-text"><strong>《与朱元思书》赏析 · 吴均</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
