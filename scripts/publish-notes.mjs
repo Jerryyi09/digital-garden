@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process"
+import { createHash } from "node:crypto"
 import fs from "node:fs/promises"
 import path from "node:path"
 import process from "node:process"
@@ -5,9 +7,13 @@ import process from "node:process"
 const projectRoot = path.resolve(import.meta.dirname, "..")
 const contentDir = path.join(projectRoot, "content")
 const backupRoot = path.join(projectRoot, ".publish-backups")
+const htmlDir = path.join(projectRoot, "html")
+// Publish dates are recorded here at publish time and committed, so every build
+// (Mac -> NUC, Cloudflare's own clone) shows the same dates instead of re-deriving
+// them from checkout mtimes or however much git history the builder happens to have.
+const datesPath = path.join(projectRoot, "publish-dates.json")
 const vaultPath =
-  process.env.VAULT_PATH ??
-  "/Users/jerryyi/Library/Mobile Documents/iCloud~md~obsidian/Documents"
+  process.env.VAULT_PATH ?? "/Users/jerryyi/Library/Mobile Documents/iCloud~md~obsidian/Documents"
 
 const ignoredDirs = new Set([
   ".git",
@@ -95,6 +101,79 @@ async function buildAssetIndex(files) {
   return index
 }
 
+function sha(text) {
+  return createHash("sha256").update(text).digest("hex").slice(0, 16)
+}
+
+function git(args) {
+  try {
+    return execFileSync("git", ["-c", "core.quotePath=false", ...args], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+  } catch {
+    return undefined
+  }
+}
+
+async function loadDates() {
+  try {
+    return JSON.parse(await fs.readFile(datesPath, "utf8"))
+  } catch {
+    return {}
+  }
+}
+
+async function saveDates(dates) {
+  const sorted = Object.fromEntries(
+    Object.keys(dates)
+      .sort()
+      .map((key) => [key, dates[key]]),
+  )
+  await fs.writeFile(datesPath, `${JSON.stringify(sorted, null, 2)}\n`)
+}
+
+// Date of the published version of a file (key is repo-relative, e.g. "content/a.md").
+// Unchanged content keeps its recorded date; new or changed content is dated now.
+// Files published before this ledger existed are backfilled from their last commit,
+// provided the committed copy is identical to what is being published.
+function publishDate(dates, key, text, now) {
+  const hash = sha(text)
+  const entry = dates[key]
+  if (entry?.sha === hash) return entry.modified
+
+  let modified = now
+  if (!entry && git(["show", `HEAD:${key}`]) === text) {
+    modified = git(["log", "-1", "--format=%cI", "--", key])?.trim() || now
+  }
+  dates[key] = { sha: hash, modified }
+  return modified
+}
+
+function frontmatterDate(markdown) {
+  const match = markdown.match(/^---\n([\s\S]*?)\n---/)
+  return match?.[1].match(/^(?:modified|updated):\s*["']?([^"'\n]+)["']?\s*$/m)?.[1]?.trim()
+}
+
+function withModified(markdown, modified) {
+  if (frontmatterDate(markdown)) return markdown
+  if (markdown.startsWith("---\n"))
+    return markdown.replace(/^---\n/, `---\nmodified: ${modified}\n`)
+  return `---\nmodified: ${modified}\n---\n\n${markdown}`
+}
+
+async function walkHtml(dir, files = []) {
+  if (!(await pathExists(dir))) return files
+  for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name)
+    if (entry.isDirectory()) await walkHtml(fullPath, files)
+    else if (entry.name.toLowerCase().endsWith(".html")) files.push(fullPath)
+  }
+  return files
+}
+
 async function backupExistingContent() {
   if (!(await pathExists(contentDir))) return
 
@@ -112,6 +191,9 @@ async function main() {
   const markdownFiles = files.filter((file) => file.endsWith(".md"))
   const assetIndex = await buildAssetIndex(files)
   const publishedNotes = []
+  const dates = await loadDates()
+  const seen = new Set()
+  const now = new Date().toISOString()
 
   await backupExistingContent()
   await fs.mkdir(contentDir, { recursive: true })
@@ -122,10 +204,12 @@ async function main() {
 
     const relativePath = path.relative(vaultPath, file)
     const outputPath = path.join(contentDir, relativePath)
+    const key = path.relative(projectRoot, outputPath).split(path.sep).join("/")
+    seen.add(key)
+    const modified = frontmatterDate(markdown) || publishDate(dates, key, markdown, now)
+    if (frontmatterDate(markdown)) dates[key] = { sha: sha(markdown), modified }
     await fs.mkdir(path.dirname(outputPath), { recursive: true })
-    await fs.writeFile(outputPath, markdown)
-    const sourceStat = await fs.stat(file)
-    await fs.utimes(outputPath, sourceStat.atime, sourceStat.mtime)
+    await fs.writeFile(outputPath, withModified(markdown, modified))
 
     const link = relativePath.replace(/\.md$/, "")
     publishedNotes.push({ title: titleFromFile(file), link })
@@ -140,6 +224,16 @@ async function main() {
   }
 
   await fs.writeFile(path.join(contentDir, "index.md"), createIndex(publishedNotes))
+
+  // Standalone gallery pages live in html/ and are dated the same way.
+  for (const file of await walkHtml(htmlDir)) {
+    const key = path.relative(projectRoot, file).split(path.sep).join("/")
+    seen.add(key)
+    publishDate(dates, key, await fs.readFile(file, "utf8"), now)
+  }
+
+  for (const key of Object.keys(dates)) if (!seen.has(key)) delete dates[key]
+  await saveDates(dates)
 
   console.log(`Vault: ${vaultPath}`)
   console.log(`Published notes: ${publishedNotes.length}`)

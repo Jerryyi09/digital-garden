@@ -148,11 +148,21 @@ function gitTimes() {
 
 const history = gitTimes()
 
+// Recorded by scripts/publish-notes.mjs at publish time; authoritative on every builder.
+let publishDates = {}
+try {
+  publishDates = JSON.parse(await fs.readFile(path.join(projectRoot, "publish-dates.json"), "utf8"))
+} catch {
+  // No ledger yet: fall back to git / filesystem below.
+}
+
 async function updatedTime(file, frontmatter = {}) {
-  const declared = Date.parse(frontmatter.updated || frontmatter.modified || "")
+  const relative = path.relative(projectRoot, file).split(path.sep).join("/")
+  const declared = Date.parse(
+    frontmatter.updated || frontmatter.modified || publishDates[relative]?.modified || "",
+  )
   if (!Number.isNaN(declared)) return declared
 
-  const relative = path.relative(projectRoot, file).split(path.sep).join("/")
   if (!history.dirty.has(relative) && history.times.has(relative))
     return history.times.get(relative)
 
