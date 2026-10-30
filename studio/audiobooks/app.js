@@ -350,11 +350,11 @@ function scheduleUserSync() {
   clearTimeout(syncTimer)
   syncTimer = setTimeout(() => {
     if (!userSync) return
-    userSync.sync().then((changed) => {
+    userSync.sync().then((remoteChanged) => {
       // A periodic sync commonly finds no remote changes. Rebuilding the home
       // dashboard in that case restarts its cover image loads and makes the
       // three recent cards visibly jump.
-      if (changed) render()
+      if (remoteChanged) render()
       return renderSyncItems()
     }).catch(() => {
       $("sync-status").textContent = "同步未连接，记录保存在本机"
@@ -2584,7 +2584,7 @@ async function init() {
 
   // Register Service Worker with cache busting & auto-reload on update
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js?v=30").then((reg) => {
+    navigator.serviceWorker.register("./sw.js?v=31").then((reg) => {
       reg.update().catch(() => {})
     }).catch(() => {})
     let refreshing = false

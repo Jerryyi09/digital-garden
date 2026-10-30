@@ -46,7 +46,9 @@ export class UserSync {
   }
 
   async performSync() {
-    let changed = false
+    // Only remote reconciliation needs the caller to repaint. A local progress
+    // upload is already reflected in the UI and happens while audio is playing.
+    let remoteChanged = false
     const remote = await this.request('GET')
     await this.exclusive(async () => {
       const local = await this.list()
@@ -61,7 +63,7 @@ export class UserSync {
         if (row) {
           await this.put(row)
           this.onChange(row)
-          changed = true
+          remoteChanged = true
         }
       }
       const remoteKeys = new Set(remote.items.map(item => JSON.stringify([item.kind, item.id])))
@@ -70,7 +72,7 @@ export class UserSync {
           const row = { ...existing, dirty: true, conflict: { revision: 0, value: null, missing: true } }
           await this.put(row)
           this.onChange(row)
-          changed = true
+          remoteChanged = true
         }
       }
     })
@@ -85,7 +87,6 @@ export class UserSync {
           const row = { ...current, revision: result.revision, dirty: current.generation !== snapshot.generation }
           await this.put(row)
           this.onChange(row)
-          changed = true
         })
       } catch (error) {
         if (error.status !== 409) throw error
@@ -96,11 +97,11 @@ export class UserSync {
           const row = { ...current, conflict: error.current || { revision: 0, value: null, missing: true } }
           await this.put(row)
           this.onChange(row)
-          changed = true
+          remoteChanged = true
         })
       }
     }
-    return changed
+    return remoteChanged
   }
 
   resolve(kind, id, choice) {

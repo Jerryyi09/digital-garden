@@ -129,10 +129,10 @@ test('independent devices receive the same progress and bookmark from the shared
   assert.equal(f.local.get(JSON.stringify(['progress', 'track'])).value.position, 7)
 })
 
-test('a no-op periodic sync reports no change', async () => {
+test('a local upload acknowledgement does not request a redraw', async () => {
   const f = fixture()
   await f.sync.save('progress', 'track', { position: 15 })
-  assert.equal(await f.sync.sync(), true)
+  assert.equal(await f.sync.sync(), false)
   assert.equal(await f.sync.sync(), false)
 })
 
