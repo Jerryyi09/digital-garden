@@ -1,0 +1,28 @@
+services:
+  garden-audiobook-sync:
+    image: ghcr.io/home-assistant/home-assistant:latest
+    container_name: garden-audiobook-sync
+    restart: unless-stopped
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    entrypoint: /usr/local/bin/python3
+    command: /app/server.py
+    environment:
+      GARDEN_SYNC_HOST: 0.0.0.0
+      GARDEN_SYNC_PORT: "8791"
+      GARDEN_SYNC_DB: /data/sync.sqlite3
+      GARDEN_ALIST_ME: http://alist:5244/alist/api/me
+    volumes:
+      - /home/hp/.local/lib/garden-sync:/app:ro
+      - /home/hp/.local/share/garden-sync:/data
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    external: true
+    name: proxy_network
