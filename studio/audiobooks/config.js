@@ -1,4 +1,4 @@
-export const ROOT = "/750HD/有声书"
+export const ROOT = "/多媒体/750HD/有声书"
 export const EXTERNAL_ALIST = "https://melyi.uk:8089/alist"
 export const LAN_ALIST = "http://10.0.0.85:8088/alist"
 

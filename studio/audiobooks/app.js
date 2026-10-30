@@ -486,7 +486,7 @@ async function api(route, body = {}, token = auth?.token) {
 }
 
 async function list(path) {
-  if (!isWithinRoot(path)) throw new Error("只能浏览 /750HD/有声书 下的目录")
+  if (!isWithinRoot(path)) throw new Error(`只能浏览 ${ROOT} 下的目录`)
   const content = []
   let hasReadalongInFolder = false
   let pdfInFolder = null
