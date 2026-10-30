@@ -93,6 +93,21 @@ class SyncTests(unittest.TestCase):
     with self.assertRaises(FileExistsError):
       backup_module.backup(server.DB_PATH, path)
 
+  def test_records_survive_service_restart(self):
+    item = {'kind': 'progress', 'id': 'track', 'revision': 0, 'value': {'position': 31}}
+    self.assertEqual(self.request('one', item)[0], 200)
+    self.http.shutdown()
+    self.http.server_close()
+    self.thread.join()
+    server.initialize_database()
+    self.http = server.ThreadingHTTPServer(('127.0.0.1', 0), server.Handler)
+    self.thread = threading.Thread(target=self.http.serve_forever, daemon=True)
+    self.thread.start()
+    self.base = f'http://127.0.0.1:{self.http.server_port}/sync/v1/items'
+    result = self.request('one')[1]['items']
+    self.assertEqual(result[0]['revision'], 1)
+    self.assertEqual(result[0]['value']['position'], 31)
+
 
 class AuthenticationTests(unittest.TestCase):
   def test_alist_account_roles_and_disabled_users(self):

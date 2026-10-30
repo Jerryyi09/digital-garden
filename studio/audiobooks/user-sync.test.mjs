@@ -108,3 +108,23 @@ test('a missing server record does not silently discard previously synced local 
   await f.sync.sync()
   assert.equal([...f.remote.values()][0].value.position, 22)
 })
+
+test('independent devices receive the same progress and bookmark from the shared service', async () => {
+  const f = fixture()
+  const second = new Map()
+  const client = new UserSync({
+    request: f.sync.request,
+    list: async () => [...second.values()].map(row => structuredClone(row)),
+    put: async row => second.set(JSON.stringify([row.kind, row.id]), structuredClone(row)),
+  })
+  await f.sync.save('progress', 'track', { position: 15 })
+  await f.sync.save('bookmark', 'mark', { position: 9, deleted: false })
+  await f.sync.sync()
+  await client.sync()
+  assert.equal(second.get(JSON.stringify(['progress', 'track'])).value.position, 15)
+  assert.equal(second.get(JSON.stringify(['bookmark', 'mark'])).value.position, 9)
+  await client.save('progress', 'track', { position: 7 })
+  await client.sync()
+  await f.sync.sync()
+  assert.equal(f.local.get(JSON.stringify(['progress', 'track'])).value.position, 7)
+})
