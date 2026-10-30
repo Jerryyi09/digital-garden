@@ -60,7 +60,7 @@ async function walk(dir, files = []) {
 function hasPublishTrue(markdown) {
   const match = markdown.match(/^---\n([\s\S]*?)\n---/)
   if (!match) return false
-  return /^publish:\s*["']?true["']?\s*$/im.test(match[1])
+  return /^(?:publish|published):\s*["']?true["']?\s*$/im.test(match[1])
 }
 
 function titleFromFile(filePath) {
@@ -124,6 +124,8 @@ async function main() {
     const outputPath = path.join(contentDir, relativePath)
     await fs.mkdir(path.dirname(outputPath), { recursive: true })
     await fs.writeFile(outputPath, markdown)
+    const sourceStat = await fs.stat(file)
+    await fs.utimes(outputPath, sourceStat.atime, sourceStat.mtime)
 
     const link = relativePath.replace(/\.md$/, "")
     publishedNotes.push({ title: titleFromFile(file), link })

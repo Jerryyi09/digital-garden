@@ -122,15 +122,17 @@ async function getNotes() {
     const slug = relativePath.replace(/\.md$/, "").split(path.sep).join("/")
 
     notes.push({
-      title: frontmatter.title || firstHeading(markdown) || path.basename(file, ".md"),
+      title: frontmatter.title || path.basename(file, ".md"),
       summary: frontmatter.description || firstParagraph(markdown) || "A note from Rosemary Garden.",
       url: `/${slug}`,
       type: "Note",
       room: "Library",
+      category: path.dirname(relativePath) === "." ? "未分类" : path.dirname(relativePath),
+      updated: (await fs.stat(file)).mtimeMs,
     })
   }
 
-  return notes.sort((a, b) => a.title.localeCompare(b.title, "zh-CN"))
+  return notes.sort((a, b) => b.updated - a.updated)
 }
 
 async function getHtmlPages() {
@@ -147,10 +149,12 @@ async function getHtmlPages() {
       url: publicHtmlUrl(relativePath),
       type: "Gallery",
       room: "Gallery",
+      category: path.dirname(relativePath) === "." ? "未分类" : path.dirname(relativePath),
+      updated: (await fs.stat(file)).mtimeMs,
     })
   }
 
-  return pages.sort((a, b) => a.title.localeCompare(b.title, "zh-CN"))
+  return pages.sort((a, b) => b.updated - a.updated)
 }
 
 async function getStudioItems() {
@@ -183,10 +187,8 @@ async function getStudioItems() {
 function card(item) {
   const routerIgnore = item.standalone || /^https?:\/\//i.test(item.url) ? " data-router-ignore" : ""
 
-  return `<a class="garden-card" href="${escapeHtml(item.url)}"${routerIgnore}>
-  <span class="garden-card-kicker">${escapeHtml(item.room)} / ${escapeHtml(item.type)}</span>
+  return `<a class="garden-card" href="${escapeHtml(item.url)}" data-garden-item data-title="${escapeHtml(item.title)}" data-category="${escapeHtml(item.category || item.room)}" data-updated="${Number(item.updated) || 0}"${routerIgnore}>
   <strong>${escapeHtml(item.title)}</strong>
-  <span>${escapeHtml(item.summary)}</span>
 </a>`
 }
 
@@ -212,7 +214,7 @@ function nav({ isHome = false } = {}) {
 }
 
 function homePage(notes, gallery, studio) {
-  const featured = [...gallery, ...notes, ...studio].slice(0, 6)
+  const featured = [...gallery, ...notes, ...studio].slice(0, 4)
   const recent = [...gallery, ...notes].slice(0, 6)
 
   return pageFrame({
@@ -220,9 +222,8 @@ function homePage(notes, gallery, studio) {
     cssClass: "garden-home",
     body: `<section class="garden-hero">
   <div class="garden-hero-copy">
-    <p class="garden-eyebrow">Personal Portal / Little Wings</p>
+    <p class="garden-eyebrow">学习 · 阅读 · 创作</p>
     <h1>Rosemary Garden</h1>
-    <p class="garden-subtitle">A Personal Portal for Growing, Making, Learning, and Wondering</p>
     ${nav({ isHome: true })}
   </div>
   <figure class="garden-hero-art">
@@ -234,56 +235,108 @@ function homePage(notes, gallery, studio) {
 
 <section class="garden-section">
   <div class="garden-section-head">
-    <p class="garden-eyebrow">Garden Rooms</p>
-    <h2>Four doors for growing work</h2>
+    <p class="garden-eyebrow">探索花园</p>
+    <h2>今天想从哪里开始？</h2>
   </div>
   <div class="garden-room-grid">
-    ${roomCard("Library", "Obsidian notes, reading traces, ideas, and collected thoughts.", "/library/")}
-    ${roomCard("Gallery", "Interactive pages, visual works, slides, and growing projects.", "/gallery/")}
-    ${roomCard("Studio", "Downloads, resource hubs, and future learning tools.", "/studio/")}
+    ${roomCard("Library", "课程笔记与阅读发现", "/library/")}
+    ${roomCard("Gallery", "作品、网页与创意实验", "/gallery/")}
+    ${roomCard("Studio", "工具、资源与听书", "/studio/")}
   </div>
 </section>
 
 <section class="garden-section">
   <div class="garden-section-head">
-    <p class="garden-eyebrow">Featured</p>
-    <h2>Selected blooms</h2>
+    <p class="garden-eyebrow">最近更新</p>
+    <h2>新鲜上架</h2>
   </div>
   <div class="garden-card-grid">${featured.map(card).join("\n")}</div>
 </section>
 
 <section class="garden-section">
   <div class="garden-section-head">
-    <p class="garden-eyebrow">Recent Blooms</p>
-    <h2>Newly opened paths</h2>
+    <p class="garden-eyebrow">接着逛</p>
+    <h2>最近浏览</h2>
   </div>
-  <div class="garden-card-grid compact">${recent.map(card).join("\n")}</div>
-</section>`,
+  <div class="garden-list" data-recent-list data-fallback="${escapeHtml(JSON.stringify(recent))}">${recent.map(card).join("\n")}</div>
+</section>
+${recentBrowserScript()}`,
   })
 }
 
 function roomCard(title, summary, url) {
   return `<a class="garden-room" href="${url}">
   <span>${title}</span>
-  <p>${summary}</p>
 </a>`
 }
 
 function listingPage({ title, eyebrow, intro, cssClass, items }) {
+  const categories = [...new Set(items.map((item) => item.category || item.room))]
   return pageFrame({
     title,
     cssClass,
     body: `<section class="garden-listing-hero">
   <p class="garden-eyebrow">${escapeHtml(eyebrow)}</p>
   <h1>${escapeHtml(title)}</h1>
-  <p>${escapeHtml(intro)}</p>
   ${nav()}
 </section>
 
 <section class="garden-section">
-  <div class="garden-card-grid">${items.map(card).join("\n") || emptyState()}</div>
-</section>`,
+  <div class="garden-tools">
+    <label class="garden-search"><span>搜索</span><input type="search" data-garden-search placeholder="搜索标题或目录" /></label>
+    <label class="garden-sort"><span>排序</span><select data-garden-sort><option value="updated">最近更新</option><option value="title">标题 A–Z</option></select></label>
+    <span class="garden-count" data-garden-count>${items.length} 项</span>
+  </div>
+  <div class="garden-directory" data-garden-directory>${categories.map((category) => `<section class="garden-folder" data-folder="${escapeHtml(category)}"><h2>${escapeHtml(category)}</h2><div class="garden-list">${items.filter((item) => (item.category || item.room) === category).map(card).join("\n")}</div></section>`).join("\n")}</div>
+</section>
+${recentBrowserScript()}`,
   })
+}
+
+function recentBrowserScript() {
+  return `<script>
+(() => {
+  const key = "rosemary-garden-recent-v1";
+  const read = () => { try { return JSON.parse(localStorage.getItem(key) || "[]") } catch { return [] } };
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[data-garden-item]");
+    if (!link || !link.dataset.title || link.href.startsWith("javascript:")) return;
+    const items = read().filter((item) => item.url !== link.href);
+    items.unshift({ title: link.dataset.title, url: link.href, category: link.dataset.category, updated: Number(link.dataset.updated) || 0 });
+    localStorage.setItem(key, JSON.stringify(items.slice(0, 24)));
+  });
+  const recent = document.querySelector("[data-recent-list]");
+  if (recent) {
+    const fallback = JSON.parse(recent.dataset.fallback || "[]");
+    const items = read();
+    const source = items.length ? items : fallback;
+    recent.replaceChildren();
+    for (const item of source.slice(0, 6)) {
+      const link = document.createElement("a"); link.className = "garden-row"; link.href = item.url;
+      const title = document.createElement("strong"); title.textContent = item.title;
+      link.append(title); recent.append(link);
+    }
+  }
+  const search = document.querySelector("[data-garden-search]");
+  const sort = document.querySelector("[data-garden-sort]");
+  if (!search || !sort) return;
+  const rows = [...document.querySelectorAll("[data-garden-item]")];
+  const count = document.querySelector("[data-garden-count]");
+  const update = () => {
+    const query = search.value.trim().toLocaleLowerCase();
+    let visible = 0;
+    for (const folder of document.querySelectorAll("[data-folder]")) {
+      const list = folder.querySelector(".garden-list");
+      const folderRows = [...list.querySelectorAll("[data-garden-item]")];
+      folderRows.sort((a, b) => sort.value === "title" ? a.dataset.title.localeCompare(b.dataset.title, "zh-CN") : Number(b.dataset.updated) - Number(a.dataset.updated));
+      for (const row of folderRows) { list.append(row); const text = (row.dataset.title + " " + folder.dataset.folder).toLocaleLowerCase(); row.hidden = !text.includes(query); if (!row.hidden) visible++; }
+      folder.hidden = !folderRows.some((row) => !row.hidden);
+    }
+    count.textContent = visible + " 项";
+  };
+  search.addEventListener("input", update); sort.addEventListener("change", update); update();
+})();
+</script>`
 }
 
 function emptyState() {
