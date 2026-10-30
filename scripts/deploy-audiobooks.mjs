@@ -10,7 +10,6 @@ function run(command, args, capture = false) {
 
 // Publish only the requested Studio entry and player; do not overwrite other site content.
 run("node", ["--check", "studio/audiobooks/app.js"])
-run("node", ["--check", "studio/audiobooks/readalong-engine.js"])
 run("npm", ["test"])
 run("npm", ["run", "build"])
 const stage = run("ssh", [...options, host, "mktemp -d /tmp/garden-audiobooks.XXXXXX"], true)

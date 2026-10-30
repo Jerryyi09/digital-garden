@@ -128,3 +128,19 @@ test('independent devices receive the same progress and bookmark from the shared
   await f.sync.sync()
   assert.equal(f.local.get(JSON.stringify(['progress', 'track'])).value.position, 7)
 })
+
+test('a no-op periodic sync reports no change', async () => {
+  const f = fixture()
+  await f.sync.save('progress', 'track', { position: 15 })
+  assert.equal(await f.sync.sync(), true)
+  assert.equal(await f.sync.sync(), false)
+})
+
+test('a remote update reports a change', async () => {
+  const f = fixture()
+  await f.sync.save('progress', 'track', { position: 15 })
+  await f.sync.sync()
+  const key = JSON.stringify(['progress', 'track'])
+  f.remote.set(key, { ...f.remote.get(key), revision: 2, value: { position: 44 } })
+  assert.equal(await f.sync.sync(), true)
+})

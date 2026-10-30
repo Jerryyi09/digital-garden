@@ -350,7 +350,13 @@ function scheduleUserSync() {
   clearTimeout(syncTimer)
   syncTimer = setTimeout(() => {
     if (!userSync) return
-    userSync.sync().then(() => { render(); return renderSyncItems() }).catch(() => {
+    userSync.sync().then((changed) => {
+      // A periodic sync commonly finds no remote changes. Rebuilding the home
+      // dashboard in that case restarts its cover image loads and makes the
+      // three recent cards visibly jump.
+      if (changed) render()
+      return renderSyncItems()
+    }).catch(() => {
       $("sync-status").textContent = "同步未连接，记录保存在本机"
     })
   }, 1500)
@@ -2553,11 +2559,14 @@ async function init() {
   render()
 
   if (auth?.token) {
-    startUserSync()
     browse(ROOT).catch((err) => {
       console.warn("Initial browse failed:", err)
       $("list-status").textContent = "未连接书库，请点击右上角设置登录"
       render()
+    }).finally(() => {
+      // The library listing determines the first usable screen. Avoid competing
+      // with it for the same external connection during first paint.
+      startUserSync()
     })
   } else {
     $("list-status").textContent = "未连接家庭书库，请点击右上角设置登录"
@@ -2575,7 +2584,7 @@ async function init() {
 
   // Register Service Worker with cache busting & auto-reload on update
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js?v=29").then((reg) => {
+    navigator.serviceWorker.register("./sw.js?v=30").then((reg) => {
       reg.update().catch(() => {})
     }).catch(() => {})
     let refreshing = false

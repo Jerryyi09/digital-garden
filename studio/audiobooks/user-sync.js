@@ -46,6 +46,7 @@ export class UserSync {
   }
 
   async performSync() {
+    let changed = false
     const remote = await this.request('GET')
     await this.exclusive(async () => {
       const local = await this.list()
@@ -57,7 +58,11 @@ export class UserSync {
         else if (!existing.dirty && item.revision > existing.revision) row = { ...existing, value: item.value, revision: item.revision, conflict: null }
         else if (!existing.dirty && item.revision < existing.revision) row = { ...existing, dirty: true, conflict: item }
         else if (existing.dirty && item.revision !== existing.revision) row = { ...existing, conflict: item }
-        if (row) { await this.put(row); this.onChange(row) }
+        if (row) {
+          await this.put(row)
+          this.onChange(row)
+          changed = true
+        }
       }
       const remoteKeys = new Set(remote.items.map(item => JSON.stringify([item.kind, item.id])))
       for (const existing of local) {
@@ -65,6 +70,7 @@ export class UserSync {
           const row = { ...existing, dirty: true, conflict: { revision: 0, value: null, missing: true } }
           await this.put(row)
           this.onChange(row)
+          changed = true
         }
       }
     })
@@ -79,6 +85,7 @@ export class UserSync {
           const row = { ...current, revision: result.revision, dirty: current.generation !== snapshot.generation }
           await this.put(row)
           this.onChange(row)
+          changed = true
         })
       } catch (error) {
         if (error.status !== 409) throw error
@@ -89,9 +96,11 @@ export class UserSync {
           const row = { ...current, conflict: error.current || { revision: 0, value: null, missing: true } }
           await this.put(row)
           this.onChange(row)
+          changed = true
         })
       }
     }
+    return changed
   }
 
   resolve(kind, id, choice) {
