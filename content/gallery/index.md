@@ -18,9 +18,19 @@ cssclasses:
 </section>
 
 <section class="garden-section">
-  <div class="garden-card-grid"><a class="garden-card" href="/html/未选择的路/">
+  <div class="garden-card-grid"><a class="garden-card" href="/html/语文/初二课文/藤野先生.html">
+  <span class="garden-card-kicker">Gallery / Gallery</span>
+  <strong>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</strong>
+  <span>An interactive page or visual work from the gallery.</span>
+</a>
+<a class="garden-card" href="/html/未选择的路/">
   <span class="garden-card-kicker">Gallery / Gallery</span>
   <strong>《未选择的路》· 罗伯特·弗罗斯特诗歌解读</strong>
+  <span>An interactive page or visual work from the gallery.</span>
+</a>
+<a class="garden-card" href="/html/语文/初二课文/与朱元思书.html">
+  <span class="garden-card-kicker">Gallery / Gallery</span>
+  <strong>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</strong>
   <span>An interactive page or visual work from the gallery.</span>
 </a>
 <a class="garden-card" href="/html/math_to_movie/">

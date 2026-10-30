@@ -48,6 +48,11 @@ cssclasses:
   <strong>《驿路梨花》</strong>
   <span>**前言**：《驿路梨花》是当代军旅作家彭荆风（1929—2018）创作的一篇短篇小说，写于1977年5月，发表于同年11月27日《光明日报》。这是彭荆风在经历&quot;文革&quot;磨难、被剥夺创作权22年之后重新舒展写作双翼的第一篇作品。文章以云南哀牢山深处一所供过往行人遮风避雨的小茅屋为核心意象，以&quot;谁是小茅屋的主人&quot;为悬念驱动，通过&quot;我&quot;和老余一</span>
 </a>
+<a class="garden-card" href="/学习笔记/01 Areas/语文/初二课文/《答谢中书书》《记承天寺夜游》《与朱元思书》">
+  <span class="garden-card-kicker">Library / Note</span>
+  <strong>跨越初高的鸿沟：三篇山水小品文的高中语文教学设计</strong>
+  <span>本章节旨在依据用户研究目标，对《答谢中书书》《记承天寺夜游》《与朱元思书》三篇课文中选取的重点字词，从繁体字形、六书构造及权威字典义项三个层面进行系统性的文字学分析。此分析严格限定于重点疑难字词，旨在提升高中生对古汉语词汇的深度理解能力 [[67,68]]。</span>
+</a>
 <a class="garden-card" href="/学习笔记/01 Areas/语文/初一课文/七下文言文">
   <span class="garden-card-kicker">Library / Note</span>
   <strong>七下文言文</strong>
@@ -82,5 +87,10 @@ cssclasses:
   <span class="garden-card-kicker">Library / Note</span>
   <strong>一、文本深度解读</strong>
   <span>**前言**：宗璞（1928—），当代著名女作家，哲学家冯友兰之女，以&quot;学者散文&quot;的典雅深邃著称。《紫藤萝瀑布》写于1982年，是一篇借景抒情、托物言志的典范散文。作者于弟弟身患绝症的焦虑悲痛中，偶见一树繁盛的紫藤萝，由花的盛衰感悟生命的永恒，完成了一次从&quot;停步&quot;到&quot;前行&quot;的精神蜕变。本文入选人教版七年级下册第五单元，承担&quot;学习托物言志，</span>
+</a>
+<a class="garden-card" href="/学习笔记/01 Areas/语文/初二课文/《三峡》">
+  <span class="garden-card-kicker">Library / Note</span>
+  <strong>一、文字与文化</strong>
+  <span>人教版八年级上册，郦道元《水经注·江水》</span>
 </a></div>
 </section>

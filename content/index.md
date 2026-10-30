@@ -50,9 +50,19 @@ cssclasses:
     <p class="garden-eyebrow">Featured</p>
     <h2>Selected blooms</h2>
   </div>
-  <div class="garden-card-grid"><a class="garden-card" href="/html/未选择的路/">
+  <div class="garden-card-grid"><a class="garden-card" href="/html/语文/初二课文/藤野先生.html">
+  <span class="garden-card-kicker">Gallery / Gallery</span>
+  <strong>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</strong>
+  <span>An interactive page or visual work from the gallery.</span>
+</a>
+<a class="garden-card" href="/html/未选择的路/">
   <span class="garden-card-kicker">Gallery / Gallery</span>
   <strong>《未选择的路》· 罗伯特·弗罗斯特诗歌解读</strong>
+  <span>An interactive page or visual work from the gallery.</span>
+</a>
+<a class="garden-card" href="/html/语文/初二课文/与朱元思书.html">
+  <span class="garden-card-kicker">Gallery / Gallery</span>
+  <strong>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</strong>
   <span>An interactive page or visual work from the gallery.</span>
 </a>
 <a class="garden-card" href="/html/math_to_movie/">
@@ -69,16 +79,6 @@ cssclasses:
   <span class="garden-card-kicker">Library / Note</span>
   <strong>《登幽州台歌》</strong>
   <span>**《登幽州台歌》（陈子昂·唐）**</span>
-</a>
-<a class="garden-card" href="/学习笔记/01 Areas/阅读成长/科普作品/《科学的故事》导读">
-  <span class="garden-card-kicker">Library / Note</span>
-  <strong>《科学的故事》（*The Story of Science*）导读</strong>
-  <span>作者：Joy Hakim | 出版：Smithsonian Books（与 National Science Teachers Association 联合出版） 三卷本：《Aristotle Leads the Way》(2004) / 《Newton at the Center》(2005) / 《Einstein Adds a Ne</span>
-</a>
-<a class="garden-card" href="/学习笔记/01 Areas/语文/初一课文/《骆驼祥子》">
-  <span class="garden-card-kicker">Library / Note</span>
-  <strong>《骆驼祥子》</strong>
-  <span>老舍先生的“老北京味”语言风格，确实是现代文学中一座值得深挖的富矿。要总结并仿写这种风格，关键在于抓住其**“京味”**、**“幽默”**和**“通俗”**这三个核心维度。</span>
 </a></div>
 </section>
 
@@ -87,9 +87,19 @@ cssclasses:
     <p class="garden-eyebrow">Recent Blooms</p>
     <h2>Newly opened paths</h2>
   </div>
-  <div class="garden-card-grid compact"><a class="garden-card" href="/html/未选择的路/">
+  <div class="garden-card-grid compact"><a class="garden-card" href="/html/语文/初二课文/藤野先生.html">
+  <span class="garden-card-kicker">Gallery / Gallery</span>
+  <strong>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</strong>
+  <span>An interactive page or visual work from the gallery.</span>
+</a>
+<a class="garden-card" href="/html/未选择的路/">
   <span class="garden-card-kicker">Gallery / Gallery</span>
   <strong>《未选择的路》· 罗伯特·弗罗斯特诗歌解读</strong>
+  <span>An interactive page or visual work from the gallery.</span>
+</a>
+<a class="garden-card" href="/html/语文/初二课文/与朱元思书.html">
+  <span class="garden-card-kicker">Gallery / Gallery</span>
+  <strong>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</strong>
   <span>An interactive page or visual work from the gallery.</span>
 </a>
 <a class="garden-card" href="/html/math_to_movie/">
@@ -106,15 +116,5 @@ cssclasses:
   <span class="garden-card-kicker">Library / Note</span>
   <strong>《登幽州台歌》</strong>
   <span>**《登幽州台歌》（陈子昂·唐）**</span>
-</a>
-<a class="garden-card" href="/学习笔记/01 Areas/阅读成长/科普作品/《科学的故事》导读">
-  <span class="garden-card-kicker">Library / Note</span>
-  <strong>《科学的故事》（*The Story of Science*）导读</strong>
-  <span>作者：Joy Hakim | 出版：Smithsonian Books（与 National Science Teachers Association 联合出版） 三卷本：《Aristotle Leads the Way》(2004) / 《Newton at the Center》(2005) / 《Einstein Adds a Ne</span>
-</a>
-<a class="garden-card" href="/学习笔记/01 Areas/语文/初一课文/《骆驼祥子》">
-  <span class="garden-card-kicker">Library / Note</span>
-  <strong>《骆驼祥子》</strong>
-  <span>老舍先生的“老北京味”语言风格，确实是现代文学中一座值得深挖的富矿。要总结并仿写这种风格，关键在于抓住其**“京味”**、**“幽默”**和**“通俗”**这三个核心维度。</span>
 </a></div>
 </section>

@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>《与朱元思书》深度赏析与读写结合导读手札 · 吴均</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe4;
+      --border: rgba(30, 42, 50, 0.09);
+      --border-accent: rgba(23, 93, 126, 0.35);
+      --text-main: #1c2429;
+      --text-muted: #56646e;
+      --text-soft: #7f8e99;
+      --accent: #175d7e;
+      --accent-subtle: rgba(23, 93, 126, 0.08);
+      --accent-warm: #c05621;
+      --accent-warm-subtle: rgba(192, 86, 33, 0.09);
+      --success: #15803d;
+      --danger: #b91c1c;
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #242c34;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --accent: #38bdf8;
+        --accent-subtle: rgba(56, 189, 248, 0.14);
+        --accent-warm: #fb923c;
+        --accent-warm-subtle: rgba(251, 146, 60, 0.14);
+        --success: #4ade80;
+        --danger: #f87171;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.82;
+      padding: 24px 16px 88px;
+    }
+    .container { max-width: 760px; margin: 0 auto; }
+    .hero {
+      text-align: center;
+      padding: 30px 20px 24px;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+    }
+    .hero-badge-wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .hero-badge-warm {
+      background: var(--accent-warm-subtle);
+      color: var(--accent-warm);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px; }
+    .hero-quote {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      padding: 11px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 96%;
+      line-height: 1.7;
+      border-left: 3px solid var(--accent-warm);
+      text-align: left;
+    }
+    .toggle-toolbar {
+      position: sticky;
+      top: 8px;
+      z-index: 30;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .toolbar-left, .toolbar-right { display: flex; gap: 6px; flex-wrap: wrap; }
+    .toggle-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+    .toggle-btn:hover { background: var(--bg-card); color: var(--text-main); border-color: var(--text-soft); }
+    .toggle-btn.btn-read { color: var(--accent); background: var(--accent-subtle); }
+    .toggle-btn.btn-write { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 24px 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 13px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .guide-section[open] {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-accent);
+    }
+    .section-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 18px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      list-style: none;
+      background: var(--bg-card);
+      transition: background-color 0.2s ease;
+    }
+    .section-summary::-webkit-details-marker { display: none; }
+    .section-summary:hover { background-color: var(--bg-subtle); }
+    .summary-left { display: flex; align-items: center; gap: 11px; }
+    .section-idx {
+      font-family: var(--font-serif);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .section-idx-warm {
+      color: var(--accent-warm);
+      background: var(--accent-warm-subtle);
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.2px;
+    }
+    .summary-toggle-icon {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-soft);
+      transition: transform 0.25s ease;
+      width: 20px;
+      text-align: center;
+    }
+    .guide-section[open] .summary-toggle-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    .section-content {
+      padding: 10px 18px 22px;
+      border-top: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.82;
+      color: var(--text-main);
+    }
+    .sub-heading {
+      font-family: var(--font-serif);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 16px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sub-heading::before { content: "◆"; color: var(--accent-warm); font-size: 11px; }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 9px;
+      margin: 12px 0;
+    }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 9px 11px;
+      border-radius: 8px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); margin-bottom: 2px; }
+    .spec-val { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .card-box {
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .card-box-accent {
+      background: var(--accent-subtle);
+      border-left: 3.5px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 11px 15px;
+      margin: 10px 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .card-box-warm {
+      background: var(--accent-warm-subtle);
+      border-left: 3.5px solid var(--accent-warm);
+      border-radius: 0 8px 8px 0;
+      padding: 11px 15px;
+      margin: 10px 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .step-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+      margin: 12px 0;
+    }
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+      vertical-align: 1px;
+    }
+    .badge-evidence { background: var(--accent-subtle); color: var(--accent); }
+    .badge-context { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border); }
+    .formula-tag {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    .formula-bar {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13.5px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      margin: 10px 0;
+      border: 1px solid var(--border-accent);
+    }
+    .table-scroll { width: 100%; overflow-x: auto; margin: 12px 0; }
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 520px;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    table.term-table th { background: var(--bg-subtle); font-weight: 700; color: var(--text-main); }
+    .svg-wrap {
+      width: 100%;
+      margin: 14px 0;
+      padding: 14px 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .svg-wrap svg { max-width: 100%; height: auto; display: inline-block; }
+    ul.bullet-list, ol.num-list { padding-left: 20px; margin: 6px 0 10px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; line-height: 1.75; }
+    ul.bullet-list li strong, ol.num-list li strong { color: var(--text-main); }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    @media (max-width: 580px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-bad {
+      background: rgba(185, 28, 28, 0.06);
+      border-left: 3px solid var(--danger);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .compare-good {
+      background: rgba(21, 128, 61, 0.06);
+      border-left: 3px solid var(--success);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+      border-top: 1px dashed var(--border);
+      margin-top: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 顶部 Hero 总览 -->
+  <header class="hero">
+    <div class="hero-badge-wrap">
+      <span class="hero-badge">古诗文轨 · 02 文言山水游记与书序小品</span>
+      <span class="hero-badge hero-badge-warm">统编初中语文八年级上册 · 第三单元</span>
+    </div>
+    <h1>《与朱元思书》深度导读与读写转化手札</h1>
+    <p class="hero-sub">南朝梁 · 吴均（469–520）｜ 骈文极则 · 富春山水清音与六朝文人幽微心境</p>
+    <div class="hero-quote">
+      “风烟俱净，天山共色。从流飘荡，任意东西。自富阳至桐庐一百许里，奇山异水，天下独绝。”<br>
+      <span style="font-size:12.5px;color:var(--text-soft);margin-top:4px;display:inline-block;">—— 导读文眼：山水非逃避之丘壑，乃洗涤机心之镜鉴。百许里水色峰影，铸就骈俪小品千古神品。</span>
+    </div>
+  </header>
+
+  <!-- 置顶交互工具栏 -->
+  <div class="toggle-toolbar">
+    <div class="toolbar-left">
+      <button class="toggle-btn" onclick="toggleAllSections(true)">全部展开</button>
+      <button class="toggle-btn" onclick="toggleAllSections(false)">全部收起</button>
+    </div>
+    <div class="toolbar-right">
+      <button class="toggle-btn btn-read" onclick="focusTrack('read')">📖 读懂篇 (01–08)</button>
+      <button class="toggle-btn btn-write" onclick="focusTrack('write')">✍️ 读写转化 (09–13)</button>
+    </div>
+  </div>
+
+  <div class="part-divider" id="sec-01">上篇 · 文本深读、字词训诂与文学批评</div>
+
+  <!-- 栏目 01 · 课文坐标、单元定位与初读破冰 -->
+  <details class="guide-section" open id="sec-01-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">01</span>
+        <h2 class="section-title">课文坐标、单元定位与初读破冰</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">课文元数据速览与考纲坐标</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">篇目与出处</div>
+          <div class="spec-val">《与朱元思书》/《艺文类聚》卷七</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">作者与朝代</div>
+          <div class="spec-val">吴均（字叔庠）/ 南朝梁</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">文体特征</div>
+          <div class="spec-val">山水骈文小品（骈散结合）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">单元任务群</div>
+          <div class="spec-val">古代诗文游记 · 感受山水之美</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">核心理论镜头</div>
+          <div class="spec-val">声律文章学 · 视听动静对位 · 隐逸心境</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">中考考查核心</div>
+          <div class="spec-val">虚实动静赏析 · 重点虚实词 · 炼字借景抒情</div>
+        </div>
+      </div>
+
+      <div class="card-box-accent">
+        <strong>一句话学科坐标与防误读预警</strong><br>
+        <strong>学科坐标</strong>：中国古代山水小品之冠冕。吴均以骈俪四六句式突破汉大赋的铺张僵滞，以纯粹的自然审美完成对魏晋南朝门阀政治压抑的诗性解构。<br>
+        <strong>误读警示</strong>：<span class="badge-evidence">【文本依据】</span> 切莫将“鸢飞戾天者，望峰息心；经纶世务者，窥谷忘反”简单贴上“消极避世”或“封建士大夫无病呻吟”的标签！吴均出身寒素（“好学有俊才，沈约见其文而叹美”），在讲究门第血统的萧梁王朝屡受排挤，甚至因私撰《齐春秋》触怒梁武帝焚其书。此处借山水发出的浩叹，实为寒门士子对庸俗功名、浮躁官场的决绝审视与精神自我救赎。
+      </div>
+
+      <div class="sub-heading">初读三问破冰卡（苏格拉底第一轮）</div>
+      <div class="step-card">
+        <ol class="num-list">
+          <li><strong>🔥 最触动处</strong>：<span class="formula-tag">“急湍甚箭，猛浪若奔”</span> 与 <span class="formula-tag">“水皆缥碧，千丈见底”</span>。前一句极言其静与澈，后一句突转为极迅与烈。一静一动，同写一水，直慑人心。</li>
+          <li><strong>❓ 最困惑处</strong>：既然是山水佳境，为何写树木是 <span class="formula-tag">“负势竞上，互相轩邈，争高直指，千百成峰”</span>？草木本无情，为何用充满竞争、扩张、甚至是机巧傲慢的词语来描摹？</li>
+          <li><strong>✂️ 删改直觉实验</strong>：如果删去结尾 <span class="formula-tag">“横柯上蔽，在昼犹昏；疏条交映，有时见日”</span> 这十六字，全篇由极度喧腾的禽鸟鸣响戛然而止，全篇境界立刻由幽邃变为单薄，失却了六朝文特有的空灵幽微之美。</li>
+        </ol>
+      </div>
+
+      <div class="card-box-warm">
+        <strong>本课“看世界的方法”猜想</strong>：从吴均笔下学到——<strong>“以物态化心境”</strong>：面对现实中的焦灼与竞争，不直接硬抗，而是移情于造化，在天地绝景的自足运转中，照见自身欲望的荒诞与局限。
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 02 · 原文精粹、字词训诂与篇章拓扑 SVG -->
+  <details class="guide-section" open>
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">02</span>
+        <h2 class="section-title">字词句精粹、训诂对译与篇章拓扑</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">文明关键字与六书字源训诂</div>
+      <div class="table-scroll">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 14%;">关键字</th>
+              <th style="width: 22%;">六书构形与本义</th>
+              <th style="width: 32%;">语境义与引申链</th>
+              <th style="width: 32%;">考点与文化心理</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>缥</strong> (piǎo)</td>
+              <td>形声。从糸(mì)，票声。本义为轻浅淡青之帛。</td>
+              <td>“水皆缥碧”：借青白色丝织品喻水色之极度青澈澄明，非浑浊深蓝，而是泛着青绿微光的灵动透彻。</td>
+              <td><strong>中考必考词</strong>。展现南朝文士对色彩幽微层级的极高审美敏锐度。</td>
+            </tr>
+            <tr>
+              <td><strong>邈</strong> (miǎo)</td>
+              <td>形声。从辵(chuò)，貌声。本义为遥远。</td>
+              <td>“互相轩邈”：<span class="badge-evidence">【文本依据】</span> 词类活用，形容词作动词，比高远、向远处伸展。草木皆有争竞之势。</td>
+              <td><strong>语法难点</strong>。“轩”（高）与“邈”（远）对举活用，赋予静止植物以内在张力。</td>
+            </tr>
+            <tr>
+              <td><strong>奔</strong> (bēn)</td>
+              <td>会意。甲骨文字形如一人振臂疾走，下有三足，极言奔驰之急。</td>
+              <td>“猛浪若奔”：动词作名词，飞奔的骏马。将无形之浪化作群马奔腾之神骏。</td>
+              <td><strong>常考活用</strong>。与李白“朝辞白帝彩云间，千里江陵一日还”同出一辙。</td>
+            </tr>
+            <tr>
+              <td><strong>戾</strong> (lì)</td>
+              <td>会意。从犬，在户下。本义为狗从门缝凶猛钻出，引申为到达、至、顶撞。</td>
+              <td>“鸢飞戾天者”：飞达、到达。语出《诗经·大雅·旱麓》“鸢飞戾天，鱼跃于渊”。</td>
+              <td><strong>典故化用</strong>。借《诗经》盛赞君子之典，反化为追名逐利极度贪婪者之肖像。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sub-heading">特殊句法剖分与括号层次对译</div>
+      <div class="card-box">
+        <strong>1. 动词使动/意动与省略句剖分</strong>：<br>
+        <span class="formula-tag">原文</span>：风烟俱净，天山共色。从流飘荡，任意东西。<br>
+        <span class="formula-tag">括号层次对译</span>：风尘和烟雾全部散净，天色与山色交融为一色。（我的扁舟）顺着江流自由飘荡，任凭（舟楫）向东（或者）向西。<br>
+        <span style="font-size:12.5px;color:var(--text-soft);">【赏析】主语“舟”完全隐匿，读者直接化身为主观视角镜头，营造纯粹逍遥的沉浸感。</span>
+      </div>
+      <div class="card-box">
+        <strong>2. 形容词使动用法剖分</strong>：<br>
+        <span class="formula-tag">原文</span>：望峰息心；窥谷忘反。<br>
+        <span class="formula-tag">括号层次对译</span>：（看到这些雄奇的）山峰，（追逐名利的执念）平息了（躁动的）狂心；探视幽深的峡谷，（流连忘返以至于）忘记了返回。<br>
+        <span style="font-size:12.5px;color:var(--text-soft);">【赏析】“息”为使动用法（使……平息）。自然造化不再是被动客体，而成为具有道德净化能力的治疗力量。</span>
+      </div>
+
+      <div class="sub-heading">篇章结构罗盘与情感脉搏 SVG 矢量图</div>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 720 320" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gWater" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#175d7e" stop-opacity="0.1"/>
+              <stop offset="50%" stop-color="#175d7e" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#175d7e" stop-opacity="0.1"/>
+            </linearGradient>
+            <linearGradient id="gMountain" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#c05621" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#c05621" stop-opacity="0.05"/>
+            </linearGradient>
+            <marker id="arrowB" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#175d7e"/>
+            </marker>
+          </defs>
+
+          <!-- 结构三部曲底框 -->
+          <rect x="15" y="20" width="215" height="270" rx="8" fill="url(#gWater)" stroke="#175d7e" stroke-width="1.2" stroke-opacity="0.4"/>
+          <rect x="252" y="20" width="215" height="270" rx="8" fill="url(#gMountain)" stroke="#c05621" stroke-width="1.2" stroke-opacity="0.4"/>
+          <rect x="490" y="20" width="215" height="270" rx="8" fill="url(#gWater)" stroke="#175d7e" stroke-width="1.2" stroke-opacity="0.4"/>
+
+          <!-- 阶段标题 -->
+          <text x="122" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#175d7e">一·总括全景（提纲挈领）</text>
+          <text x="360" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#c05621">二·异水与奇山（分承剖析）</text>
+          <text x="597" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#175d7e">三·抒怀与收束（哲思余韵）</text>
+
+          <!-- 节点 1 内容 -->
+          <text x="122" y="78" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1c2429">【空间概览】</text>
+          <text x="122" y="100" text-anchor="middle" font-size="11" fill="#56646e">风烟俱净，天山共色</text>
+          <text x="122" y="122" text-anchor="middle" font-size="11" fill="#56646e">从流飘荡，任意东西</text>
+          <rect x="35" y="145" width="175" height="48" rx="6" fill="#ffffff" fill-opacity="0.8" stroke="#175d7e" stroke-opacity="0.2"/>
+          <text x="122" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#175d7e">总纲：奇山异水，天下独绝</text>
+          <text x="122" y="182" text-anchor="middle" font-size="9.5" fill="#7f8e99">（百许里富春江风流）</text>
+          <text x="122" y="220" text-anchor="middle" font-size="10.5" fill="#56646e">心境：物我两忘 · 自由无滞</text>
+
+          <!-- 节点 2 内容 -->
+          <text x="360" y="75" text-anchor="middle" font-size="11.5" font-weight="600" fill="#c05621">【异水】静与动的辩证</text>
+          <text x="360" y="94" text-anchor="middle" font-size="10.5" fill="#56646e">千丈见底（静/澈）⇄ 急湍甚箭（动/烈）</text>
+          <line x1="270" y1="108" x2="450" y2="108" stroke="#border" stroke-width="1" stroke-dasharray="2,2"/>
+          <text x="360" y="128" text-anchor="middle" font-size="11.5" font-weight="600" fill="#c05621">【奇山】形与声的盛宴</text>
+          <text x="360" y="146" text-anchor="middle" font-size="10.5" fill="#56646e">负势竞上，互相轩邈（形动态）</text>
+          <text x="360" y="166" text-anchor="middle" font-size="10.5" fill="#56646e">泉水冷冷 · 好鸟相鸣（声灵动）</text>
+          <text x="360" y="186" text-anchor="middle" font-size="10.5" fill="#56646e">蝉转无穷 · 猿则百叫（大交响）</text>
+          <rect x="270" y="205" width="180" height="42" rx="6" fill="#ffffff" fill-opacity="0.8" stroke="#c05621" stroke-opacity="0.3"/>
+          <text x="360" y="224" text-anchor="middle" font-size="10.5" font-weight="700" fill="#c05621">以动写静 · 众籁反衬幽寂</text>
+          <text x="360" y="239" text-anchor="middle" font-size="9.5" fill="#56646e">山峦有神，木石有灵</text>
+
+          <!-- 节点 3 内容 -->
+          <text x="597" y="78" text-anchor="middle" font-size="11.5" font-weight="600" fill="#175d7e">【生命超越】</text>
+          <rect x="508" y="95" width="180" height="58" rx="6" fill="#ffffff" fill-opacity="0.8" stroke="#175d7e" stroke-opacity="0.2"/>
+          <text x="597" y="115" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b91c1c">鸢飞戾天者，望峰息心</text>
+          <text x="597" y="132" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b91c1c">经纶世务者，窥谷忘反</text>
+          <text x="597" y="146" text-anchor="middle" font-size="9.5" fill="#7f8e99">（士人名利执念的自我瓦解）</text>
+          <text x="597" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#175d7e">【幽微余韵】</text>
+          <text x="597" y="206" text-anchor="middle" font-size="10.5" fill="#56646e">横柯上蔽，在昼犹昏</text>
+          <text x="597" y="226" text-anchor="middle" font-size="10.5" fill="#56646e">疏条交映，有时见日</text>
+          <text x="597" y="250" text-anchor="middle" font-size="9.5" fill="#7f8e99">光影交织 · 归于静穆虚无</text>
+
+          <!-- 衔接箭头 -->
+          <path d="M 230 155 L 250 155" stroke="#175d7e" stroke-width="2" marker-end="url(#arrowB)"/>
+          <path d="M 468 155 L 488 155" stroke="#c05621" stroke-width="2" marker-end="url(#arrowB)"/>
+        </svg>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 03 · 文本显微镜与语言听诊器 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">03</span>
+        <h2 class="section-title">文本显微镜与语言听诊器：细读批注与改写实验</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">细读点 1：静极与动极的极致对位</div>
+      <div class="step-card">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>“水皆缥碧，千丈见底。游鱼细石，直视无碍。急湍甚箭，猛浪若奔。”</strong></p>
+        <p>🔍 <strong>文本显微镜</strong>：前四句视线垂直下插，从宏观水色（缥碧）拉近到百米深处微渺的“细石”与游弋的“鱼鳃”，用视线无阻隔反衬水之虚空。紧接着镜头突然水平推拉，江流暴涨，飞沫拍石，声音轰然作响。六个短语，二十四字，完成静美与狂暴的剧烈对撞。</p>
+        <p>🩺 <strong>语言听诊器</strong>：两组四字骈句先缓后促。“直视无碍”平稳舒缓，“急湍甚箭，猛浪若奔”短促铿锵，音节急促上扬，模拟出水流撞击礁石的击节之感。</p>
+        <div class="compare-grid">
+          <div class="compare-bad">
+            <strong>❌ 平庸改写（丢失了形式张力）</strong><br>
+            “富春江的水非常清澈，深得可以看到底下的鱼和石头。有些地方水流又非常急，像飞箭一样快。”——平铺直叙，毫无镜头感与情绪反差。
+          </div>
+          <div class="compare-good">
+            <strong>✅ 原文胜出机制</strong><br>
+            先以“静态极视”建立晶莹透明的安详宇宙，旋即以“动态极速”撕裂宁静。<strong>以绝对的静衬托绝对的动</strong>，让水的生命力瞬间饱和。
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-heading">细读点 2：拟物为人的竞争狂想曲</div>
+      <div class="step-card">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>“夹岸高山，皆生寒树，负势竞上，互相轩邈，争高直指，千百成峰。”</strong></p>
+        <p>🔍 <strong>文本显微镜</strong>：“负（凭借）”、“竞（争竞）”、“轩（高）”、“邈（远）”、“争”、“指”。吴均一连使用六个充满意志、力量、竞争欲的动词来写草木群山。静止的地貌地表，仿佛在万年前的一场大角力中凝固成峰。</p>
+        <p>🩺 <strong>语言听诊器</strong>：运用**陌生化（Defamiliarization）**理论。人们习惯于将山水看作静止温顺之物，吴均却将山林写成一个充满生命意志的竞技场。但奇妙的是，这种“争”发生在天界自然中，没有世俗倾轧的龌龊，只有雄强饱满的天地生机。</p>
+        <div class="compare-grid">
+          <div class="compare-bad">
+            <strong>❌ 平庸改写</strong><br>
+            “两岸的高山长着苍绿的树木，山峰一座比一座高，连绵不绝形成群山。”——失去了内在张力，变成了死板的地质描摹。
+          </div>
+          <div class="compare-good">
+            <strong>✅ 原文胜出机制</strong><br>
+            赋予自然界以人格化力量。<strong>山木的“竞”与“争”纯粹出于生命本能的向上舒展</strong>，恰恰反照出人类社会钩心斗角之虚妄。
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-heading">细读点 3：山林大交响背后的幽邃静穆</div>
+      <div class="step-card">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>“泉水激石，泠泠作响；好鸟相鸣，嘤嘤成韵。蝉则千转穷，猿则百叫无绝。”</strong></p>
+        <p>🔍 <strong>文本显微镜</strong>：作者布设了四重声音景观：高山清泉击石（清脆高频）→ 幽鸟合唱（婉转和声）→ 盛夏群蝉鸣噪（持续长音）→ 峡谷长猿悲啼（空灵低回）。由近及远，由幽及旷，由声入心。</p>
+        <p>🩺 <strong>语言听诊器</strong>：“泠泠”、“嘤嘤”为拟声叠字，带入听觉清润感；“千转穷”、“百叫无绝”极言其多，却运用了南朝王籍“蝉噪林逾静，鸟鸣山更幽”的艺术辩证法：<strong>以动衬静，以喧嚣反衬荒野的大寂寞</strong>。</p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 04 · 结构罗盘与叙事/章法机制 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">04</span>
+        <h2 class="section-title">结构罗盘与章法机制：空间运镜与心境位移</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">结构罗盘：三叠式递进运镜法</div>
+      <p>全文仅 144 字，结构章法严谨无匹，采用典范的<strong>“总起统领 → 具象两歧 → 哲思点睛 → 幽邃收束”</strong>四步空间推移模型：</p>
+      <ul class="bullet-list">
+        <li><strong>第一层 · 远景极目（开卷入画）</strong>：先从宏观着笔，天、山、风、烟、江流融为一体，交代“从富阳至桐庐一百许里”的游历半径，以“天下独绝”立定全篇脊骨。</li>
+        <li><strong>第二层 · 中近景特写（水分两态，山呈多重）</strong>：
+          <br>— 俯视视角：水之澄碧无瑕（静）与急湍雷奔（动）；
+          <br>— 仰视视角：山林草木争高（形）与泉鸟蝉猿交织（声）。</li>
+        <li><strong>第三层 · 内景心境跃迁（物境转化为心境）</strong>：视听刺激达到饱和之际，笔锋陡转，直刺社会现实中汲汲于功名的两类典型人物（飞禽如鸢贪食者 / 筹划世务者），完成一次道德与审美的当头棒喝。</li>
+        <li><strong>第四层 · 尾声光影沉淀（余音绕梁）</strong>：并未停留在高调抒怀，而是收束于“横柯在昼，疏条见日”的微观密林光影中，天地再度归于静寂。</li>
+      </ul>
+
+      <div class="sub-heading">观察焦点与审美距离的调控</div>
+      <div class="card-box-accent">
+        <span class="badge-evidence">【文本依据】</span> <strong>从“任意东西”的散漫自由，到“直视无碍”的细致专注，再到“望峰窥谷”的震撼顿悟</strong>。<br>
+        吴均的目光不是固定在某个观景台上，而是在颠簸起伏的小舟上完成全方位全景拍摄。这种随波逐流的移动视角，使整个富春江山水成为流动的立体画卷。
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 05 · 意象网络、主题三层与文学批评示范 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">05</span>
+        <h2 class="section-title">意象网络、主题三层与文学批评示范</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">核心意象拓扑网络</div>
+      <p>文中山水物象并非互不关联的风景明信片，而是构成了一组紧密呼应的<strong>精神符号网络</strong>：</p>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">澄水 · 鱼石</div>
+          <div class="spec-val">澄澈透明 · 纯洁无垢的心灵原型</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">寒树 · 奇峰</div>
+          <div class="spec-val">傲岸劲拔 · 寒素文人孤高风骨</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">泉鸣 · 蝉猿</div>
+          <div class="spec-val">天籁清音 · 洗涤市井喧嚣机心</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">横柯 · 细日</div>
+          <div class="spec-val">幽林蔽日 · 隐秘沉静的归宿安顿</div>
+        </div>
+      </div>
+
+      <div class="sub-heading">主题三层掘进模型</div>
+      <ol class="num-list">
+        <li><strong>表层处境</strong>：作者乘一叶扁舟，泛游于富春江富阳至桐庐段，用书信向友人朱元思绘声绘色描摹沿途奇山异水。</li>
+        <li><strong>深层困境</strong>：南朝门阀森严，阶层固化。寒门士子若欲有所作为，必须在“经纶世务”与“谄媚权贵”中耗尽心血，但往往换来猜忌与贬谪。精神的疲惫与现实的逼仄构成深刻痛苦。</li>
+        <li><strong>根本追问</strong>：人的真正安宁来自世俗功名对权力的垄断，还是来自与伟大自然的审美合一？
+          <br><strong>核心价值张力</strong>：<span class="formula-tag">【世俗权柄之网（经纶世务/鸢飞戾天）】 ⚡ 【造化天籁之自由（息心忘反/任意东西）】</span>
+        </li>
+      </ol>
+
+      <div class="sub-heading">大学中文系级“文学微评论”示范</div>
+      <div class="step-card">
+        <div class="card-box-accent" style="margin-top:0;">
+          <strong>论题：论《与朱元思书》中“声色辩证法”对隐逸美学的形式重构</strong><br>
+          <span style="font-size:12px;color:var(--text-soft);">（适宜中学生揣摩的高阶微论文示范 · 280字）</span>
+        </div>
+        <p style="text-indent:2em;margin-top:8px;">
+          吴均在《与朱元思书》中建立的隐逸空间，绝非枯寂死灭的空山，而是一座由感官盛宴构筑的生命圣殿。文本采用精妙的<strong>声色辩证法</strong>：先以“水皆缥碧”建立视觉纯粹之极境，复以“急湍甚箭”击碎静止；继而在奇峰之间铺排泉声、鸟韵、蝉转、猿啼四重天籁交响。新批评理论所谓的“张力”，在此体现为喧闹与寂静的奇妙统一——<strong>造化因充盈而幽深，万类因放浪而自足</strong>。正是在这种自然全知全在的庞大生机面前，作者水到渠成地祭出“息心忘反”之叹。山水在此不再是士人逃避现实的隐居洞窟，而是照破“经纶世务者”蝇营狗苟的明镜，骈骊偶句因承载了人性的觉醒与超越而获得了穿透历史的千古风骨。
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 06 · 阐释边界与不确定性判断尺 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">06</span>
+        <h2 class="section-title">阐释边界与不确定性判断尺：确定与推测</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">诠释学循环与判断分级矩阵</div>
+      <div class="step-card">
+        <p><strong>🟢 可以高度确定（文本铁证支撑）</strong>：</p>
+        <ul class="bullet-list">
+          <li>吴均具备登峰造极的文字写景功力，全文音律铿锵，四六句对仗天然工稳；</li>
+          <li>作者对自然山水抱有深切的热爱，其泛舟心境是放松、惬意、超脱的；</li>
+          <li>“望峰息心”二句表达了对汲汲于名利者的警示与讽喻，带有对世俗政争的厌倦。</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>🟡 可以合理解释（需结合语境的推测）</strong>：</p>
+        <ul class="bullet-list">
+          <li>吴均是否真的下定决心辞官归隐？<span class="badge-comment">【延伸评论】</span> 魏晋南朝文人常有“身在朝廷，心驰魏阙”的隐逸抒情传统，“寄书友人言志”更多是一种审美姿态和精神排遣，不能直接等同于现实中立刻辞官结庐。</li>
+          <li>收信人“朱元思”生平不详，推测同为当时文士，此信既是朋友间私信，亦兼具展示自身骈文绝艺以求声誉的交际功能。</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>🔴 警惕过度阐释（无证据的牵强附会）</strong>：</p>
+        <ul class="bullet-list">
+          <li>断言吴均在文中“暗讽梁武帝专权暗弱”——文本全无任何政治指向证据，属于诛心之论；</li>
+          <li>将“在昼犹昏，有时见日”硬套为“统治阶级黑暗，偶有正义光芒”——这是典型的机械反映论过度阐释，完全违背了写景赋文的审美常理。</li>
+        </ul>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 07 · 知人论世、文体源流与文明思想坐标 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">07</span>
+        <h2 class="section-title">知人论世、文体源流与思想坐标</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">知人论世：寒素才子的骨鲠与无奈</div>
+      <div class="card-box">
+        <span class="badge-context">【文学背景】</span> 《梁书·吴均传》载：<strong>“均少沉深，好学有俊才，沈约见其文而叹美之。”</strong>然而南朝士族如王、谢门阀垄断高位，吴均虽官至奉朝请，却始终被视作门外人。更为致命的是，他因崇敬史学而私撰《齐春秋》，如实记录齐梁禅代之际的宫廷丑闻与政变真相，梁武帝萧衍勃然大怒，下令将其免官并焚毁全书。这一记政治重击让吴均深刻看清了皇权专制的虚伪与暴戾。游历富春江之时，正值其在宦海起伏中心力交瘁之际，故笔下的清流峻岭，皆带有一层寒凉而高傲的底色。
+      </div>
+
+      <div class="sub-heading">文体源流：从“汉赋重枷”到“齐梁体小品”的破茧</div>
+      <p>汉魏大赋动辄万言，堆砌奇字名物，旨在向帝王“劝百讽一”，沉重不堪；晋宋山水诗（如谢灵运）则往往前段铺排写景、末尾生硬粘贴玄理，景与理两张皮。吴均此篇<strong>骈散结合、篇幅极小、气韵流通</strong>：保留骈文的音律对仗之美，却剔除了晦涩典故，开创了明清性灵小品的千古源头，鲁迅在《汉文学史纲要》中赞南朝美文“清拔有致”，吴均实居前列。</p>
+
+      <div class="sub-heading">思想坐标：庄子“逍遥游”与玄学隐逸的融合</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">庄子逍遥</div>
+          <div class="spec-val">“从流飘荡，任意东西”化用《庄子》乘物以游心</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">玄学洗心</div>
+          <div class="spec-val">澄澈山水对应王弼、郭象之“澄怀味象”</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">儒家达则兼济</div>
+          <div class="spec-val">“望峰息心”实为退避自保，守住独立人格</div>
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 08 · 比较阅读桥：群文联读矩阵 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">08</span>
+        <h2 class="section-title">比较阅读桥：同题异构与群文联读矩阵</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="table-scroll">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 18%;">篇目与作者</th>
+              <th style="width: 24%;">山水形态与描写机制</th>
+              <th style="width: 28%;">寄托心境与价值指向</th>
+              <th style="width: 30%;">比读认知刷新</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>《与朱元思书》</strong><br>吴均（南朝梁）</td>
+              <td>骈文偶对，明丽奇险；水皆缥碧、奇峰互竞，兼备视听动静。</td>
+              <td><strong>自足超然</strong>：物我两忘，借山水自证高洁，劝慰名利客平息机心。</td>
+              <td>山水作为审美圣殿，纯粹而空灵，文人与自然完全平等互融。</td>
+            </tr>
+            <tr>
+              <td><strong>《三峡》</strong><br>郦道元（北魏）</td>
+              <td>地理专著（散文为主）；按春夏秋冬四时水势铺叙，兼写渔歌悲秋。</td>
+              <td><strong>客观雄浑</strong>：重在考辨地理山势之壮美险绝，兼带历史地理学家的深邃关切。</td>
+              <td>两文同写水流之急（急湍甚箭 vs 朝发白帝暮到江陵），郦文显其宏大雄阔，吴文现其幽丽灵动。</td>
+            </tr>
+            <tr>
+              <td><strong>《答谢中书书》</strong><br>陶弘景（南朝梁）</td>
+              <td>“山川之美，古来共谈”；重在提炼山水之“仙气”与四时常青之生机。</td>
+              <td><strong>高蹈出尘</strong>：“自康乐以来未复有能与其奇者”，流露身为“山中宰相”的自矜与孤芳自赏。</td>
+              <td>陶文重在“证悟山水之道”，吴文重在“感官愉悦与执念消解”。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </details>
+
+  <div class="part-divider" id="sec-09">下篇 · 读写转化、素材炼金与创造行动</div>
+
+  <!-- 栏目 09 · 五维金句解码与情境化阶梯仿写支架 -->
+  <details class="guide-section" open id="sec-09-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">09</span>
+        <h2 class="section-title">五维金句解码与情境化阶梯仿写支架</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="formula-bar">五维功能口诀：🌿景造氛围 ➔ 👤人立形象 ➔ ⚡事推情节 ➔ 💫情传心声 ➔ 🔺意升主题</div>
+
+      <!-- 金句 1 · 景造氛围 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 1 · 🌿 景造氛围】</span> <strong>“风烟俱净，天山共色。从流飘荡，任意东西。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：极净空间起笔 + 散漫动作收束。先用双四字短语抽空视线中所有杂质，营造空灵透亮的背景；再以双动作写主观之散淡逍遥。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写一次放学后或暴雨后的黄昏）</strong><br>
+          <strong>🏠 生活情境</strong>：晚自习结束走出教学楼，或是夏日暴雨初歇的街道。<br>
+          <strong>🧩 句式支架</strong>：<span class="formula-tag">[喧嚣/尘埃] 俱净，[物象A] 与 [物象B] 共色。顺着 [人流/晚风] 漫步，任凭思绪 [动作C]。</span><br>
+          <strong>⚠️ 避坑提示</strong>：前两句必须是对偶或整齐短句，意境需保持纯净开朗，切莫强行塞入阴郁词汇。<br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“雨沫俱净，晚霞与天际共色。逆着归家车流缓步骑行，任由车轮任意东西。（借空净天色与自在骑行，写尽考试重压卸去后的身心大释放）”</em>
+        </div>
+      </div>
+
+      <!-- 金句 2 · 👤 人立形象 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 2 · 👤 人立形象 / 物象人格化】</span> <strong>“夹岸高山，皆生寒树，负势竞上，互相轩邈，争高直指，千百成峰。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：动词连环轰炸法。用充满竞争竞争感的动词群（负、竞、轩、邈、争、指），刻画静态物象内在蓄积的昂扬骨力。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写教室里苦读的群像，或考场上的少年）</strong><br>
+          <strong>🏠 生活情境</strong>：清晨或深夜，教室里伏案刷题的同窗少年。<br>
+          <strong>🧩 句式支架</strong>：<span class="formula-tag">满室 [人群/事物]，皆 [特征描述]；负着 [压力/梦想] 竞上，互相 [动作A]，[动作B] 直指 [远方目标]，[收束形成巍峨群像]。</span><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“放眼教室，皆是年轻的背影；负着疲惫与晨光竞起，互相追赶较劲，笔尖直指六月的考卷，无声成林。（将静止枯燥的自习场景写出了千帆竞发的气魄）”</em>
+        </div>
+      </div>
+
+      <!-- 金句 3 · ⚡ 事推情节/动静转换 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 3 · ⚡ 动静突转】</span> <strong>“游鱼细石，直视无碍。急湍甚箭，猛浪若奔。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：极致微观静止 ➔ 极致宏观奔腾。前两句微距慢镜头，后两句高速冲击镜头，形成心跳与视角的急促剧变。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写一场体育赛事的哨响瞬间，或一段灵感顿悟）</strong><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“起跑线前，呼吸与汗珠清晰可辨。发令枪响，身形如离弦之箭，冲刺步伐如裂帛惊雷。（用极静之屏息烘托极动之爆发）”</em>
+        </div>
+      </div>
+
+      <!-- 金句 4 · 💫 情传心声 / 视听大交响 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 4 · 💫 情传心声】</span> <strong>“泉水激石，泠泠作响；好鸟相鸣，嘤嘤成韵。蝉则千转穷，猿则百叫无绝。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：四重自然声响编织网。双声叠字拟声（泠泠、嘤嘤） + 夸张长音（千转、百叫），以众籁写大静。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写老家旧巷或深夜书房的声音记忆）</strong><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“檐溜滴石，嗒嗒作响；穿堂弄风，细细成旋。钟摆则千回不乱，远犬则三两成吠。越是声声入耳，长夜越显深邃安恬。”</em>
+        </div>
+      </div>
+
+      <!-- 金句 5 · 🔺 意升主题 / 哲思断喝 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 5 · 🔺 意升主题】</span> <strong>“鸢飞戾天者，望峰息心；经纶世务者，窥谷忘反。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：对举典型世俗群体 + 递进式心理断喝。上句写野心家面对高洁群峰的羞惭收敛，下句写权谋者跌入幽深大谷后的贪恋顿悟。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（议论文结尾升华 / 审视当代内卷焦虑）</strong><br>
+          <strong>🧩 句式支架</strong>：<span class="formula-tag">[汲汲于某物者]，[面对崇高客体A] 应当 [顿悟动作]；[困囿于某境者]，[探寻深邃客体B] 自会 [超越动作]。</span><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“汲汲于分数排位者，望苍茫星河当息浮躁之争心；困顿于眼前得失者，窥历史长河必忘蜗角之微利。（极富哲思与批判力量的高考议论文压轴句）”</em>
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 10 · 作文素材炼金炉与高阶立意库 -->
+  <details class="guide-section" open>
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">10</span>
+        <h2 class="section-title">作文素材炼金炉与高阶立意库</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">三大高阶思想立意库（拒绝平庸鸡汤）</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">立意方向 01</div>
+          <div class="spec-val">【自然净心与精神祛魅】</div>
+          <div class="spec-label" style="margin-top:4px;">适用母题：快与慢、内心的宁静、拒绝浮躁</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">立意方向 02</div>
+          <div class="spec-val">【逆境困顿中的审美突围】</div>
+          <div class="spec-label" style="margin-top:4px;">适用母题：寒门与风骨、困境中的超越、不妥协</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">立意方向 03</div>
+          <div class="spec-val">【删繁就简的极简美学】</div>
+          <div class="spec-label" style="margin-top:4px;">适用母题：留白艺术、简单与充盈、做减法</div>
+        </div>
+      </div>
+
+      <div class="sub-heading">考场核能素材卡（可直接背诵化用）</div>
+
+      <!-- 素材卡 01 -->
+      <div class="step-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="color:var(--accent);">素材卡 #01 ｜ 寒木争高：身处尘垢而魂系清流</strong>
+          <span class="formula-tag">标签：风骨 · 超越逆境</span>
+        </div>
+        <p><strong>100 字核能叙事压缩</strong>：
+          南朝寒士吴均，生于门阀森严之萧梁，因私修史书直言真相而遭梁武帝焚书削职。世路逼仄如此，他泛舟富春江上，笔底山水却不见片缕酸腐与自怜。山木负势竞上，百鸟自成清韵。他未曾将灵魂抵押给名利权贵，而是在山川绝美处淬炼出一腔不可剥夺的高迈风骨。
+        </p>
+        <p style="margin-top:6px;"><strong>考场议论文 150 字嵌入示范段</strong>：</p>
+        <div class="quote-block">
+          真正的精神高贵，从不由外部境遇的优渥所施舍，而是在被命运击碎后依然葆有仰望天际的傲岸。正如南朝文人吴均，即便因私撰史书触怒龙颜、焚书斥退，跌入仕途谷底，他乘一叶扁舟泛于富春江上，写下的依然是“奇山异水，天下独绝”的万丈豪情。在“互相轩邈”的群峰面前，他没有发出受难者的啜泣，而是借自然之大美化解世路之逼仄，于破碎处筑起了寒士精神的不朽飞檐。
+        </div>
+      </div>
+
+      <!-- 素材卡 02 -->
+      <div class="step-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="color:var(--accent-warm);">素材卡 #02 ｜ 望峰息心：算法喧嚣中的精神止语</strong>
+          <span class="formula-tag">标签：审视内卷 · 精神自守</span>
+        </div>
+        <p><strong>100 字核能叙事压缩</strong>：
+          吴均面对富春江千丈缥碧与叠翠奇峰，吐出八字微言大义：“望峰息心，窥谷忘反”。千百年来，名利场如奔雷烈马，人皆以为占有即幸福。吴均却提醒世人：最高阶的心灵成长，不是在欲望泥潭里无限膨胀，而是在崇高造化面前猛然照见自身的狭隘，学会从容止步。
+        </p>
+        <p style="margin-top:6px;"><strong>考场议论文 150 字嵌入示范段</strong>：</p>
+        <div class="quote-block">
+          身处数字算法编织的狂欢时代，我们日夜被包裹在信息洪流与成功学的焦虑裹挟中，人人争当“飞戾天者”，唯恐落后一步。然而，当吴均在一千五百年前伫立富春江头，面对“泉水激石，好鸟相鸣”的天地清音，他发出的警策至今震耳欲聋——“望峰息心，窥谷忘反”。唯有学会向天地的大美与崇高低头，我们才能在喧嚣的内卷时代找到锚定灵魂的定海神针，重获不被数据支配的清澈自由。
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 11 · 万能写作模型与读写映射总纲 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">11</span>
+        <h2 class="section-title">万能写作模型与读写映射总纲</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">万能写作模型 1：【由色入神·三层递进立体写景模型】</div>
+      <div class="step-card">
+        <p><strong>📐 结构公式</strong>：<span class="formula-tag">宏观色调（开阔境界） ➔ 微距动静交错（多感官交响） ➔ 哲思断喝收束（精神留白）</span></p>
+        <ul class="bullet-list">
+          <li><strong>第一段 · 视域定位（约 15%）</strong>：交代行程机缘，用两句色彩/光影特征确立全景基调（如“风烟俱净，天山共色”）；</li>
+          <li><strong>第二段 · 物象动静对位（约 50%）</strong>：选两组核心物象，一组极静（纤毫毕现），一组极动（气势奔腾），穿插声响与触觉；</li>
+          <li><strong>第三段 · 精神超拔升华（约 25%）</strong>：跳出风景，由景及人，直击现代人或自我的心理隐痛与释怀（“息心忘反”）；</li>
+          <li><strong>第四段 · 余韵闭环（约 10%）</strong>：回到一两处细微光影或声音，在含蓄中终局。</li>
+        </ul>
+        <p style="margin-top:6px;"><strong>移植实战示范（中考作文题《走在乡间的小路上》）</strong>：</p>
+        <div class="card-box">
+          <small>
+            ① 开头：炊烟俱散，青瓦与远黛共色。我放下做不完的试卷，任由脚步散漫于祖父的老麦田。<br>
+            ② 中间：渠水极澈，水草青荇纤毫见底；转过石桥，却见麦浪如怒涛奔涌，蛙鸣连成浩瀚合唱。<br>
+            ③ 升华：平日里纠结于分数排位的得失之念，在这千亩沉甸甸的麦穗前豁然息心。<br>
+            ④ 结尾：余晖渐敛，老槐树的繁枝漏下斑驳的光斑，在暮色里格外温柔。
+          </small>
+        </div>
+      </div>
+
+      <div class="sub-heading">本课「读什么特征 ➔ 写什么技巧 ➔ 达成什么素养」映射表</div>
+      <div class="table-scroll">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">读到的文本特征</th>
+              <th style="width: 40%;">转化的写作武器与句法</th>
+              <th style="width: 35%;">达成的核心语文素养</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>“风烟俱净，天山共色”</td>
+              <td><strong>极简开篇法</strong>：一字不涉主观抒情，纯以视觉纯净度压阵</td>
+              <td>审美鉴赏 · 意境营造力</td>
+            </tr>
+            <tr>
+              <td>“千丈见底” vs “急湍甚箭”</td>
+              <td><strong>动静极差对照术</strong>：极静与极动并置，制造阅读休克张力</td>
+              <td>思维发展 · 辩证观察力</td>
+            </tr>
+            <tr>
+              <td>“负势竞上，互相轩邈”</td>
+              <td><strong>拟物为人动态赋形</strong>：将静态地质写出意志与雄强生命感</td>
+              <td>语言建构 · 动词精准锤炼</td>
+            </tr>
+            <tr>
+              <td>“泠泠、嘤嘤、千转、百叫”</td>
+              <td><strong>以声衬寂四重奏</strong>：多重天籁交响反衬终极旷野大宁静</td>
+              <td>审美创造 · 空间声场调度</td>
+            </tr>
+            <tr>
+              <td>“望峰息心，窥谷忘反”</td>
+              <td><strong>警策对举断喝法</strong>：议论文结尾用对仗句提炼时代通病与出路</td>
+              <td>文化传承 · 传统哲思现代表达</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 12 · 五个苏格拉底式深想问题与多场景表达协作 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">12</span>
+        <h2 class="section-title">五个苏格拉底式深想问题与多场景表达</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">五个直击灵魂的苏格拉底式追问</div>
+      <ol class="num-list">
+        <li><strong>文本自相矛盾问</strong>：作者写山林草木用的是“负势竞上，互相轩邈，争高直指”——这分明是一场激烈的“争名逐利”大竞争；为何转头却要求人类“望峰息心”？自然界的“争”与人类社会的“争”，本质差异究竟在哪里？</li>
+        <li><strong>审美特权省思问</strong>：吴均能够“从流飘荡，任意东西”，前提是他拥有一艘舟楫、闲暇时间与士大夫身份。对于当时在江边拖纤拉网的贫苦纤夫或渔民而言，富春江的“急湍甚箭”究竟是诗意的审美，还是吞噬生命的凶险深渊？文学美感的阶层边界何在？</li>
+        <li><strong>现代内卷反诘问</strong>：如果一个现代中学生在面临升学压力时，真去“望峰息心”，放弃竞争与世务，这究竟是真正的清醒顿悟，还是一种精致的逃避主义？我们当如何在“经纶世务的责任”与“息心忘反的澄澈”间保有平衡？</li>
+        <li><strong>AI 与文学形式问</strong>：当代 AI 已经能一秒生成对仗极其工稳的骈俪诗赋，但为什么我们依然能被吴均这篇 140 余字的小品深深触动？AI 无法替代的那层“作者肉身遭逢困厄后的生命长叹”究竟藏在哪个字眼之后？</li>
+        <li><strong>自我精神审判问</strong>：在你的日常生活中，是否有哪一件你日夜追逐、甚至为此寝食难安的“名利小事”（如一次班干部竞选、朋友圈点赞数、虚荣的球鞋），在面对某种伟大事物（如星空、旷野、亲人病痛）的瞬间，显得微不足道、令你哑然失笑？</li>
+      </ol>
+
+      <div class="sub-heading">多场景表达协作示范（同一核心洞见的自由缩放）</div>
+      <div class="step-card">
+        <strong>⚡ 30 秒课间快嘴版</strong>：
+        <p style="margin-top:4px;">
+          “吴均的《与朱元思书》绝不是普通游记！作者是个因讲真话被皇帝免官焚书的倒霉文人，但他跑到富春江上，没抱怨一句，反而用骈文把江水写得比水晶还透、把山峰写得像猛兽一样往天上争抢。他在最热闹的大山交响里大喝一声：‘追名逐利的人，看看这山，你的贪心该醒了！’这是六朝寒士最高级的精神反杀。”
+        </p>
+      </div>
+      <div class="step-card">
+        <strong>🎙️ 3 分钟晨读演讲/读书会发言版</strong>：
+        <p style="margin-top:4px;">
+          “老师、同学们：今天大家走进《与朱元思书》，往往惊叹于‘水皆缥碧’的美景，却容易错过南朝文人最隐蔽的一滴心头血。公元六世纪初，寒门出身的吴均因直笔写史得罪梁武帝萧衍，遭受焚书免官之奇耻大辱。当世俗的上升通道彻底关闭，换作常人或许早已怨天尤人。但吴均选择乘一叶扁舟驶入富春江。在一百许里的清流峡谷中，他看见了‘急湍甚箭’的狂浪，听见了‘千转百叫’的天籁。吴均突然意识到：人类在庙堂之上的勾心斗角，在造化自然的浩瀚律动面前是多么可笑。于是他留下了那句千古警策——‘鸢飞戾天者，望峰息心；经纶世务者，窥谷忘反’。读《与朱元思书》，绝不仅是背诵几个通假字和实词，而是学习如何在最深的挫败中，借助自然的大美，重塑一具不被尘世绑架的高贵灵魂。”
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 13 · 综合创作实战、世界方法与元认知说明书 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">13</span>
+        <h2 class="section-title">综合创作实战、世界方法与元认知说明书</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">考场实战写作命题（两选一演练）</div>
+      <div class="step-card">
+        <p><strong>✍️ 任务 A · 中考考场大作文（600–800字记叙/散文）</strong></p>
+        <p><strong>题目</strong>：《那一刻，我的心平静下来》 或 《天地间的清音》<br>
+        <strong>写作硬性要求</strong>：
+        <br>1. 必须运用本课提炼的【由色入神·三层递进立体写景模型】；
+        <br>2. 必须包含一处极静细节与一处极动细节的剧烈对撞（化用“游鱼细石”与“急湍甚箭”）；
+        <br>3. 结尾必须包含一句对自我焦虑或盲目执念的深刻断喝。</p>
+      </div>
+      <div class="step-card">
+        <p><strong>✍️ 任务 B · 200字微评论专项练笔</strong></p>
+        <p><strong>题目</strong>：评吴均《与朱元思书》中“横柯上蔽，在昼犹昏；疏条交映，有时见日”十六字的结穴之妙。<br>
+        <strong>支架提示</strong>：从光影变幻、情感沉淀、意境留白三个维度切入，必须引用原文词句分析。</p>
+      </div>
+
+      <div class="sub-heading">《从〈与朱元思书〉学到的一种看世界的方法》结业档案</div>
+      <div class="card-box-accent">
+        <strong>🌍 我的方法命名</strong>：<strong>【造化解缚法（The Sublime Detachment Method）】</strong><br>
+        <strong>一、观察动作</strong>：当自己陷入人际倾轧、考试名次焦虑或不可解的挫败时，强制中止头脑中的情绪反刍；置身于一个宏大的物理客体面前（高山、急流、古树、星空或一场大风暴）。<br>
+        <strong>二、解码机制</strong>：
+        <ol class="num-list" style="margin-top:4px;">
+          <li>第一步：<strong>极视微观</strong>（寻找类似于“游鱼细石”的纯净客观细节，阻断内心胡思乱想）；</li>
+          <li>第二步：<strong>倾听复调</strong>（记录环境中的各种声音，体验非人为世界庞大的自足运转）；</li>
+          <li>第三步：<strong>自省降维</strong>（以自然百千万年的演化尺，量度眼前执念的短暂与微不足道）；</li>
+          <li>第四步：<strong>从容折返</strong>（收拾心境，重返世务，但内心已多了一层不受侵犯的清凉底线）。</li>
+        </ol>
+        <strong>三、适用场景</strong>：月考失利后、与同伴发生攀比恶性竞争时、身心俱疲的周日黄昏。<br>
+        <strong>四、失效与避坑边界</strong>：此方法是帮人“清醒”，而非教人“彻底躺平与逃避责任”。如果把“望峰息心”变成不做作业、不思进取的挡箭牌，则是对吴均的恶劣曲解。
+      </div>
+
+      <div class="sub-heading">🛡️ 元认知自我标注说明书（模版）</div>
+      <div class="step-card">
+        <p><em>（学生在完成仿写或习作后，附于文末的自我审视工具）</em></p>
+        <p>
+          1. <strong>【工具调用】</strong>：我在第 ___ 段调用了【文本显微镜】，精准捕捉了 __________________ 这一细节；<br>
+          2. <strong>【理论镜头】</strong>：我在第 ___ 段实践了【陌生化/动静张力】，将原本平庸的 __________ 写出了意想不到的动感；<br>
+          3. <strong>【金句化用】</strong>：我化用了课文中的金句“________________________”，在我的文章中它起到了 ________________ 的作用；<br>
+          4. <strong>【思维模型】</strong>：全文结构采纳了【由色入神·三层递进模型】，行文层次为：________________________；<br>
+          5. <strong>【AI 分工清醒度】</strong>：AI 帮我梳理了词句对比和结构框架；文中所有的真实生活细节、情感体验与最终文字定稿，100% 由我亲自完成。
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 页脚版权与交付标准 -->
+  <footer>
+    <p>深度导读手札 · 统编初中语文八年级上册《与朱元思书》（吴均）</p>
+    <p style="margin-top:4px; font-size:11.5px;">© 基于单文件自包含 HTML 规范与手机端阅读优化标准交付 · 语文全科深度研读与读写转化工坊</p>
+  </footer>
+
+</div>
+
+<!-- 原生交互控制脚本 -->
+<script>
+  function toggleAllSections(openState) {
+    document.querySelectorAll(".guide-section").forEach(s => s.open = openState);
+  }
+  function focusTrack(track) {
+    document.querySelectorAll(".guide-section").forEach((s, idx) => {
+      const num = idx + 1;
+      s.open = (track === 'read') ? (num <= 8) : (num >= 9);
+    });
+    const targetId = (track === 'read') ? 'sec-01' : 'sec-09';
+    const target = document.getElementById(targetId);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>

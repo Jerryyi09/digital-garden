@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>《藤野先生》深度赏析与读写结合导读手札 · 鲁迅</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe4;
+      --border: rgba(30, 42, 50, 0.09);
+      --border-accent: rgba(23, 93, 126, 0.35);
+      --text-main: #1c2429;
+      --text-muted: #56646e;
+      --text-soft: #7f8e99;
+      --accent: #175d7e;
+      --accent-subtle: rgba(23, 93, 126, 0.08);
+      --accent-warm: #c05621;
+      --accent-warm-subtle: rgba(192, 86, 33, 0.09);
+      --success: #15803d;
+      --danger: #b91c1c;
+      --font-serif: "Songti SC", "Source Han Serif CN", Georgia, "Noto Serif CJK SC", serif;
+      --font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #242c34;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --accent: #38bdf8;
+        --accent-subtle: rgba(56, 189, 248, 0.14);
+        --accent-warm: #fb923c;
+        --accent-warm-subtle: rgba(251, 146, 60, 0.14);
+        --success: #4ade80;
+        --danger: #f87171;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.82;
+      padding: 24px 16px 88px;
+    }
+    .container { max-width: 760px; margin: 0 auto; }
+    .hero {
+      text-align: center;
+      padding: 30px 20px 24px;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+    }
+    .hero-badge-wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .hero-badge-warm {
+      background: var(--accent-warm-subtle);
+      color: var(--accent-warm);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .hero-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px; }
+    .hero-quote {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      padding: 11px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 96%;
+      line-height: 1.7;
+      border-left: 3px solid var(--accent-warm);
+      text-align: left;
+    }
+    .toggle-toolbar {
+      position: sticky;
+      top: 8px;
+      z-index: 30;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+      padding: 8px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .toolbar-left, .toolbar-right { display: flex; gap: 6px; flex-wrap: wrap; }
+    .toggle-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+    .toggle-btn:hover { background: var(--bg-card); color: var(--text-main); border-color: var(--text-soft); }
+    .toggle-btn.btn-read { color: var(--accent); background: var(--accent-subtle); }
+    .toggle-btn.btn-write { color: var(--accent-warm); background: var(--accent-warm-subtle); }
+    .part-divider {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 24px 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 13px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .guide-section[open] {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-accent);
+    }
+    .section-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 18px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      list-style: none;
+      background: var(--bg-card);
+      transition: background-color 0.2s ease;
+    }
+    .section-summary::-webkit-details-marker { display: none; }
+    .section-summary:hover { background-color: var(--bg-subtle); }
+    .summary-left { display: flex; align-items: center; gap: 11px; }
+    .section-idx {
+      font-family: var(--font-serif);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .section-idx-warm {
+      color: var(--accent-warm);
+      background: var(--accent-warm-subtle);
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.2px;
+    }
+    .summary-toggle-icon {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-soft);
+      transition: transform 0.25s ease;
+      width: 20px;
+      text-align: center;
+    }
+    .guide-section[open] .summary-toggle-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    .section-content {
+      padding: 10px 18px 22px;
+      border-top: 1px solid var(--border);
+      font-size: 14.5px;
+      line-height: 1.82;
+      color: var(--text-main);
+    }
+    .sub-heading {
+      font-family: var(--font-serif);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 16px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sub-heading::before { content: "◆"; color: var(--accent-warm); font-size: 11px; }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 9px;
+      margin: 12px 0;
+    }
+    .spec-item {
+      background: var(--bg-subtle);
+      padding: 9px 11px;
+      border-radius: 8px;
+    }
+    .spec-label { font-size: 11px; color: var(--text-soft); margin-bottom: 2px; }
+    .spec-val { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .card-box {
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .card-box-accent {
+      background: var(--accent-subtle);
+      border-left: 3.5px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 11px 15px;
+      margin: 10px 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .card-box-warm {
+      background: var(--accent-warm-subtle);
+      border-left: 3.5px solid var(--accent-warm);
+      border-radius: 0 8px 8px 0;
+      padding: 11px 15px;
+      margin: 10px 0;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .step-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+      margin: 12px 0;
+    }
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+      vertical-align: 1px;
+    }
+    .badge-evidence { background: var(--accent-subtle); color: var(--accent); }
+    .badge-context { background: var(--accent-warm-subtle); color: var(--accent-warm); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border); }
+    .formula-tag {
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    .formula-bar {
+      background: var(--accent-subtle);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13.5px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      margin: 10px 0;
+      border: 1px solid var(--border-accent);
+    }
+    .table-scroll { width: 100%; overflow-x: auto; margin: 12px 0; }
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 520px;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    table.term-table th { background: var(--bg-subtle); font-weight: 700; color: var(--text-main); }
+    .svg-wrap {
+      width: 100%;
+      margin: 14px 0;
+      padding: 14px 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      overflow-x: auto;
+    }
+    .svg-wrap svg { max-width: 100%; height: auto; display: inline-block; }
+    ul.bullet-list, ol.num-list { padding-left: 20px; margin: 6px 0 10px; }
+    ul.bullet-list li, ol.num-list li { font-size: 14px; color: var(--text-muted); margin-bottom: 5px; line-height: 1.75; }
+    ul.bullet-list li strong, ol.num-list li strong { color: var(--text-main); }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    @media (max-width: 580px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-bad {
+      background: rgba(185, 28, 28, 0.06);
+      border-left: 3px solid var(--danger);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .compare-good {
+      background: rgba(21, 128, 61, 0.06);
+      border-left: 3px solid var(--success);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+      border-top: 1px dashed var(--border);
+      margin-top: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 顶部 Hero 总览 -->
+  <header class="hero">
+    <div class="hero-badge-wrap">
+      <span class="hero-badge">现代文轨 · 06 现代写人记事散文与回忆录</span>
+      <span class="hero-badge hero-badge-warm">统编初中语文八年级上册 · 第二单元 · 散文诗与回忆叙事</span>
+    </div>
+    <h1>《藤野先生》深度导读与读写转化手札</h1>
+    <p class="hero-sub">鲁迅（1881–1936）｜ 选自《朝花夕拾》｜ 双重视角温差 · 弃医从文之枢纽与民族灵魂的照妖镜</p>
+    <div class="hero-quote">
+      “但不知怎地，我总还时时记起他，在我所认为我师的之中，他是最使我感激，给我鼓励的一个。……每当夜间疲倦，正想偷懒时，仰面在灯光中瞥见他黑瘦的面貌，似乎正要说出抑扬顿挫的话来，便使我忽又良心发现，而且增加勇气了。”<br>
+      <span style="font-size:12.5px;color:var(--text-soft);margin-top:4px;display:inline-block;">—— 导读文眼：怀人是显线，觉醒是脊骨。一幅挂在壁上的照片，丈量出一个现代知识分子的灵魂重量与良知长征。</span>
+    </div>
+  </header>
+
+  <!-- 置顶交互工具栏 -->
+  <div class="toggle-toolbar">
+    <div class="toolbar-left">
+      <button class="toggle-btn" onclick="toggleAllSections(true)">全部展开</button>
+      <button class="toggle-btn" onclick="toggleAllSections(false)">全部收起</button>
+    </div>
+    <div class="toolbar-right">
+      <button class="toggle-btn btn-read" onclick="focusTrack('read')">📖 读懂篇 (01–08)</button>
+      <button class="toggle-btn btn-write" onclick="focusTrack('write')">✍️ 读写转化 (09–13)</button>
+    </div>
+  </div>
+
+  <div class="part-divider" id="sec-01">上篇 · 文本深读、叙事解构与文学批评</div>
+
+  <!-- 栏目 01 · 课文坐标、单元定位与初读破冰 -->
+  <details class="guide-section" open id="sec-01-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">01</span>
+        <h2 class="section-title">课文坐标、单元定位与初读破冰</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">课文元数据速览与考纲坐标</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">篇目出处</div>
+          <div class="spec-val">散文集《朝花夕拾》（原名《旧事重提》）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">作者身份</div>
+          <div class="spec-val">鲁迅（周树人）· 现代文学奠基人</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">体裁定位</div>
+          <div class="spec-val">回忆性叙事散文（双重视角）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">单元任务群</div>
+          <div class="spec-val">精读怀人散文 · 把握人物风骨与时代风云</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">核心理论镜头</div>
+          <div class="spec-val">叙事学视角温差 · 反讽修辞 · 启蒙现代性</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">中考考查核心</div>
+          <div class="spec-val">明暗双线交织 · 白描与反语 · 弃医从文原因</div>
+        </div>
+      </div>
+
+      <div class="card-box-accent">
+        <strong>一句话学科坐标与防误读预警</strong><br>
+        <strong>学科坐标</strong>：中国现代回忆叙事散文的珠峰。鲁迅将个人自传、师徒私谊、弱国屈辱、留学生浮世绘与“改造国民性”的历史转折融铸于一炉，既有金刚怒目之锋芒，亦有菩萨低眉之温厚。<br>
+        <strong>误读警示</strong>：<span class="badge-evidence">【文本依据】</span> 切莫将本文读成纯粹的“尊师重道记叙文”！许多教辅将文章前三段“东京烂醉、清国留学生速成班”看作“可有可无的背景闲笔”，完全割裂了全篇的批判结构。鲁迅开篇以辛辣反讽描写清国留学生“头顶上盘着大辫子，顶得便帽的红顶子高高耸起，形成一座富士山”，正是为了交代他逃离东京、远赴偏僻仙台的根本动因——对本民族虚浮麻木的绝望。<strong>没有东京的恶浊与刺痛，就没有仙台相遇藤野先生的清澈与震撼；没有幻灯片事件中同胞的看客嘴脸，就没有弃医从文的绝决告别。</strong>
+      </div>
+
+      <div class="sub-heading">初读三问破冰卡（苏格拉底第一轮）</div>
+      <div class="step-card">
+        <ol class="num-list">
+          <li><strong>🔥 最触动处</strong>：在严苛冰冷的异国他乡，藤野先生用红笔逐字逐句批改鲁迅的讲义——“从头到末，都用红笔添改过了，不但增加了许多脱漏的地方，连文法的错误，也都一一订正。这样一直继续到他教完了他所担任的功课”。一位日本教授对一个弱国青年毫无偏见的至诚，何其滚烫。</li>
+          <li><strong>❓ 最困惑处</strong>：文章标题是《藤野先生》，为何花了大量篇幅写“匿名信事件”与“看幻灯片事件”？这两件事甚至连藤野先生都没有直接出场，鲁迅为何将其置于全篇最惊心动魄的高潮位置？</li>
+          <li><strong>✂️ 删改直觉实验</strong>：如果删去最后三段“回到北京寓所，在东墙上挂着藤野先生照片，每当夜间疲倦正想偷懒便良心发现增加勇气”，全文就只是记录了一段尘封的师生往事，失去了《朝花夕拾》“朝花”（青年往事）向“夕拾”（中年战斗）注入精神动力的崇高质感。</li>
+        </ol>
+      </div>
+
+      <div class="card-box-warm">
+        <strong>本课“看世界的方法”猜想</strong>：从鲁迅笔下学到——<strong>“在创痛中辨认同盟者，把愧疚转化为良知长征”</strong>：看清时代的卑劣与同胞的麻木并不走向虚无，而是以至诚之人（藤野）为镜鉴，以笔为投枪，终生与平庸的自己、冷酷的世界死战到底。
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 02 · 核心语汇解码、反讽语义场与篇章拓扑 SVG -->
+  <details class="guide-section" open>
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">02</span>
+        <h2 class="section-title">核心语汇、反讽修辞与篇章结构拓扑</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">核心词眼与反讽语义场辨析表</div>
+      <div class="table-scroll">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 16%;">核心词语</th>
+              <th style="width: 26%;">表层语义 vs 深层潜台词</th>
+              <th style="width: 28%;">修辞机制（语言听诊器）</th>
+              <th style="width: 30%;">考点与人物/主题功能</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>“标致”</strong></td>
+              <td>表层为标致漂亮；深层为滑稽、丑陋、不男不女的怪胎。</td>
+              <td><strong>反语（Irony）</strong>。“还要将脖子扭几扭。实在标致极了。”以极度赞美的词汇表达极度的生理厌恶。</td>
+              <td>揭露清国留学生徒具出洋镀金虚名，内里依然是拖着辫子、醉生梦死的满清奴才。</td>
+            </tr>
+            <tr>
+              <td><strong>“精通时事”</strong></td>
+              <td>表层指熟稔天下大势；深层指市侩逢迎、无聊八卦。</td>
+              <td><strong>词义反讽</strong>。指留学生每天只关心“逛公园”、“吃油豆腐”、“学跳华尔兹”。</td>
+              <td>讽刺所谓官派留学生的思想浅薄与政治投机，反衬鲁迅求索真理之孤寂。</td>
+            </tr>
+            <tr>
+              <td><strong>“大概”</strong> 与 <strong>“确”</strong></td>
+              <td>“但我印象深刻的，大概是冬天换了由旧毡做底……冬天是一件旧棉袍……这大概是托辞，但确是很有名誉的。”</td>
+              <td><strong>词语分寸感与记忆真实性</strong>。“大概”写记忆时间久远的推测，“确”写藤野学问声望之确凿。</td>
+              <td>展现鲁迅回忆性散文叙事严谨克制，绝不为神化人物而虚构事实的求真品格。</td>
+            </tr>
+            <tr>
+              <td><strong>“看客”</strong></td>
+              <td>“在这一个鬼子被枪毙的画片里，围着看的也是一群中国人……神情麻木。”</td>
+              <td><strong>启蒙批判概念</strong>。将同胞身体之被屠戮与同胞精神之麻木冷漠并置。</td>
+              <td><strong>全书核心转折</strong>。引爆“弱小民族其愚弱的根性，非医学所能医治”的现代灵魂大觉醒。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sub-heading">篇章结构罗盘与精神脉搏 SVG 矢量图</div>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 720 340" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bgGradL" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#175d7e" stop-opacity="0.08"/>
+              <stop offset="50%" stop-color="#c05621" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#175d7e" stop-opacity="0.15"/>
+            </linearGradient>
+            <marker id="arrowR" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#175d7e"/>
+            </marker>
+          </defs>
+
+          <!-- 整体底框 -->
+          <rect x="15" y="15" width="690" height="310" rx="10" fill="url(#bgGradL)" stroke="#175d7e" stroke-width="1.2" stroke-opacity="0.3"/>
+
+          <!-- 阶段 1：东京 -->
+          <rect x="28" y="35" width="145" height="270" rx="6" fill="#ffffff" fill-opacity="0.85" stroke="#b91c1c" stroke-width="1.2"/>
+          <text x="100" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">一·东京厌弃</text>
+          <text x="100" y="80" text-anchor="middle" font-size="10.5" fill="#7f8e99">（失望·逃离）</text>
+          <text x="100" y="112" text-anchor="middle" font-size="11" fill="#1c2429">清国留学生群丑相</text>
+          <text x="100" y="132" text-anchor="middle" font-size="10" fill="#56646e">“富士山式”辫子</text>
+          <text x="100" y="152" text-anchor="middle" font-size="10" fill="#56646e">学跳舞 · 混文凭</text>
+          <text x="100" y="180" text-anchor="middle" font-size="10.5" font-weight="600" fill="#b91c1c">心境：窒息与反感</text>
+          <path d="M 45 220 C 70 240, 130 240, 155 220" fill="none" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="100" y="260" text-anchor="middle" font-size="10.5" font-weight="700" fill="#175d7e">决意远赴仙台 ➔</text>
+
+          <!-- 阶段 2：仙台相识相知 -->
+          <rect x="195" y="35" width="220" height="270" rx="6" fill="#ffffff" fill-opacity="0.9" stroke="#175d7e" stroke-width="1.2"/>
+          <text x="305" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#175d7e">二·仙台师道暖流</text>
+          <text x="305" y="80" text-anchor="middle" font-size="10.5" fill="#7f8e99">（相遇·四件事）</text>
+          <text x="305" y="110" text-anchor="middle" font-size="10.5" fill="#1c2429">① 添改讲义（从头至尾）</text>
+          <text x="305" y="130" text-anchor="middle" font-size="10.5" fill="#1c2429">② 纠正骨骼解剖图</text>
+          <text x="305" y="150" text-anchor="middle" font-size="10.5" fill="#1c2429">③ 关切解剖实习与信仰</text>
+          <text x="305" y="170" text-anchor="middle" font-size="10.5" fill="#1c2429">④ 了解女人裹脚真相</text>
+          <rect x="210" y="195" width="190" height="42" rx="4" fill="#175d7e" fill-opacity="0.08"/>
+          <text x="305" y="213" text-anchor="middle" font-size="10.5" font-weight="700" fill="#175d7e">毫无民族偏见的博大胸怀</text>
+          <text x="305" y="228" text-anchor="middle" font-size="9.5" fill="#56646e">严谨科学求真 · 纯粹师表</text>
+          <text x="305" y="270" text-anchor="middle" font-size="10.5" font-weight="600" fill="#c05621">显线：异国温情与师徒深情</text>
+
+          <!-- 阶段 3：两大冲击与弃医从文 -->
+          <rect x="435" y="35" width="135" height="270" rx="6" fill="#ffffff" fill-opacity="0.85" stroke="#c05621" stroke-width="1.2"/>
+          <text x="502" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c05621">三·灵魂剧变</text>
+          <text x="502" y="80" text-anchor="middle" font-size="10.5" fill="#7f8e99">（暗线高潮）</text>
+          <text x="502" y="112" text-anchor="middle" font-size="10.5" font-weight="600" fill="#b91c1c">匿名信风波</text>
+          <text x="502" y="128" text-anchor="middle" font-size="9.5" fill="#56646e">弱国子民蒙冤歧视</text>
+          <line x1="450" y1="145" x2="555" y2="145" stroke="#border" stroke-width="1"/>
+          <text x="502" y="165" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b91c1c">看幻灯片事件</text>
+          <text x="502" y="182" text-anchor="middle" font-size="9.5" fill="#56646e">体格强壮而精神愚昧</text>
+          <rect x="445" y="205" width="115" height="38" rx="4" fill="#c05621" fill-opacity="0.12"/>
+          <text x="502" y="222" text-anchor="middle" font-size="10" font-weight="700" fill="#c05621">大决裂：弃医从文</text>
+          <text x="502" y="235" text-anchor="middle" font-size="9" fill="#56646e">医治精神重于医身</text>
+          <text x="502" y="275" text-anchor="middle" font-size="10" font-weight="600" fill="#175d7e">惜别赠照 · 寄语“惜别”</text>
+
+          <!-- 阶段 4：北京寓所良知投枪 -->
+          <rect x="588" y="35" width="105" height="270" rx="6" fill="#ffffff" fill-opacity="0.95" stroke="#175d7e" stroke-width="1.5"/>
+          <text x="640" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#175d7e">四·怀念战斗</text>
+          <text x="640" y="80" text-anchor="middle" font-size="10" fill="#7f8e99">（北京寓所）</text>
+          <text x="640" y="120" text-anchor="middle" font-size="10" fill="#1c2429">东墙上的照片</text>
+          <text x="640" y="140" text-anchor="middle" font-size="10" fill="#56646e">黑瘦面庞 · 目光</text>
+          <text x="640" y="180" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b91c1c">“良心发现”</text>
+          <text x="640" y="200" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15803d">“增加勇气”</text>
+          <text x="640" y="235" text-anchor="middle" font-size="9.5" fill="#175d7e">写作作为武器</text>
+          <text x="640" y="250" text-anchor="middle" font-size="9" fill="#7f8e99">“正人君子”深恶痛疾</text>
+          <text x="640" y="285" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c05621">终身战斗</text>
+
+          <!-- 箭头连接 -->
+          <path d="M 175 160 L 192 160" stroke="#175d7e" stroke-width="2" marker-end="url(#arrowR)"/>
+          <path d="M 417 160 L 432 160" stroke="#c05621" stroke-width="2" marker-end="url(#arrowR)"/>
+          <path d="M 572 160 L 585 160" stroke="#175d7e" stroke-width="2" marker-end="url(#arrowR)"/>
+        </svg>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 03 · 文本显微镜与语言听诊器 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">03</span>
+        <h2 class="section-title">文本显微镜与语言听诊器：白描、反讽与心理微澜</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">细读点 1：漫画式白描刻画藤野出场</div>
+      <div class="step-card">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>“进来的是一个黑瘦的先生，八字须，戴着眼镜，挟着便死也便不肯放下的讲义。……穿衣服太模糊了，有时竟会忘记带领结；冬天是一件旧棉袍，寒颤颤的，有一回上火车去，致使管车的疑心他是扒手，叫人看住他。”</strong></p>
+        <p>🔍 <strong>文本显微镜</strong>：不写华丽容貌，直取特异特征：“黑瘦”、“八字须”、“模糊（不拘小节）”、“寒颤颤”。特别是“管车疑心是扒手”一节，极富幽默感的自嘲逸事，瞬间勾勒出一个醉心医学、不修边幅、近乎痴拙的纯粹学者肖像。</p>
+        <p>🩺 <strong>语言听诊器</strong>：鲁迅的白描（Sketching）手法深得《水浒传》与司马迁史传真传，不用形容词堆砌，纯用动作与生活细节立人。<strong>表面是调侃其寒酸可笑，骨子里是对其纯粹学者品格的由衷敬佩</strong>。</p>
+        <div class="compare-grid">
+          <div class="compare-bad">
+            <strong>❌ 平庸改写</strong><br>
+            “藤野先生是一位非常严谨朴素的教授，平时不太讲究穿戴，一心扑在医学研究上。”——抽象赞美，形象彻底沦为概念。
+          </div>
+          <div class="compare-good">
+            <strong>✅ 原文胜出机制</strong><br>
+            以“扒手疑云”这种富有市井趣味的尴尬反差，反衬其超拔于世俗虚荣之上的大纯粹。
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-heading">细读点 2：幻灯片事件中的戏剧性蒙太奇</div>
+      <div class="step-card">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>“有一回，我竟在画片上忽见一个陌生的同胞，也是给俄国人做侦探，被日本军队捉住，要枪毙了，围着看的也是一群中国人；在讲堂里的还有一个我。‘万岁！’他们都拍掌欢呼起来。这种欢呼，是每看一片都有的，但在我，这一声却特别听得刺耳。”</strong></p>
+        <p>🔍 <strong>文本显微镜</strong>：此处呈现极具现代电影感的**四重嵌套视角**：
+          <br>① 画片内部：被绑的同胞待决，围观的同胞麻木冷笑；
+          <br>② 教室现实：日本军国主义青年拍掌狂呼“万岁”；
+          <br>③ 此时此刻：“我”夹杂在狂欢人群中的肉身与窒息感；
+          <br>④ 记忆反思：“特别听得刺耳”——从肉身之痛跃升为民族灵魂之痛。</p>
+        <p>🩺 <strong>语言听诊器</strong>：“竟”、“忽见”、“还有”、“特别刺耳”。词语极冷，情绪极沸。鲁迅将屈辱转化为手术刀，解剖中国国民的“看客”心理。</p>
+      </div>
+
+      <div class="sub-heading">细读点 3：离别赠照的极简深情</div>
+      <div class="step-card">
+        <p><span class="badge-evidence">【文本依据】</span> <strong>“‘我将不能常教你看解剖了。’他叹息说。……他送我到车站，并且递给我一张他的照相，后面写着两个字道：‘惜别’。还说希望我也送他一张，我答应了，但后来因为没有照，终于没有送。”</strong></p>
+        <p>🔍 <strong>文本显微镜</strong>：“叹息”、“惜别”、“终于没有送”。没有惊天动地的山盟海誓，只有克制平淡的日常辞令。尤其是“终于没有送”五个字，饱含了作者此后二十年漂泊动荡、愧对恩师、欲语还休的深切自责。</p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 04 · 结构罗盘与叙事/章法机制 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">04</span>
+        <h2 class="section-title">结构罗盘与叙事机制：双线交织与双重视角温差</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">结构罗盘：明暗双线交织网络</div>
+      <p>看似散漫的回忆，内部由两条严密的线索交织咬合：</p>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">明线（情感与空间脉络）</div>
+          <div class="spec-val">东京 ➔ 仙台 ➔ 离别 ➔ 北京寓所（怀念藤野）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">暗线（思想觉醒脉络）</div>
+          <div class="spec-val">寻找救国路 ➔ 匿名信受挫 ➔ 看幻灯觉醒 ➔ 弃医从文执笔战斗</div>
+        </div>
+      </div>
+      <p style="margin-top:8px;">明线提供故事的肌理与温情，暗线提供文章的骨骼与锋芒。两线在“弃医从文”处交汇碰撞，形成了巨大的精神张力。</p>
+
+      <div class="sub-heading">叙事学镜头：双重视角温差（Double Perspective）</div>
+      <div class="card-box-accent">
+        <span class="badge-evidence">【文本依据】</span> 回忆散文的魅力在于<strong>“昔日之我（体验者）”</strong>与<strong>“今日之我（叙述者）”</strong>之间的时间与认知温差：
+        <ul class="bullet-list" style="margin-top:6px;">
+          <li><strong>昔日的青年周树人</strong>：带着实业与科学救国的质朴愿望，初到仙台感到孤独，但对藤野先生的热情关怀感到受宠若惊，面对匿名信委屈愤怒，面对幻灯片痛彻心扉；</li>
+          <li><strong>今日的中年鲁迅（1926年写于厦门大学图书楼）</strong>：早已饱经风霜，目睹了“三·一八”惨案的流血与北洋军阀的反动，正遭受所谓“正人君子”陈西滢等人的群起围攻。在南方孤寂潮湿的暗夜中，中年鲁迅回望青年时代，藤野先生的照片不仅是回忆，更是支撑他在黑暗绝望中继续向旧世界投掷标枪的精神力量。</li>
+        </ul>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 05 · 意象网络、主题三层与文学批评示范 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">05</span>
+        <h2 class="section-title">意象网络、主题三层与文学批评示范</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">核心意象拓扑网络</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">红笔修改的讲义</div>
+          <div class="spec-val">师道至诚 · 科学严谨之光</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">富士山状的清国长辫</div>
+          <div class="spec-val">愚昧虚荣 · 奴性未改之国丑</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">黑白幻灯画片</div>
+          <div class="spec-val">看客杀戮 · 精神麻木之脓疮</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">东墙上的黑瘦照片</div>
+          <div class="spec-val">道德良心 · 战斗到底的图腾</div>
+        </div>
+      </div>
+
+      <div class="sub-heading">主题三层掘进模型</div>
+      <ol class="num-list">
+        <li><strong>表层处境</strong>：追述二十年前在日本仙台医专留学时，一位没有民族偏见、治学严谨、待人至诚的解剖学教授藤野严九郎对中国留学生的悉心教导与深切期望。</li>
+        <li><strong>深层困境</strong>：弱小国家子民在强权时代不可避免遭遇的系统性种族歧视，以及由此诱发的对本民族同胞愚弱麻木精神沉疴的绝望。</li>
+        <li><strong>根本追问</strong>：知识分子应当如何救国？当一个群体的身体强壮而精神瘫痪时，真正的治疗从何开始？
+          <br><strong>核心价值张力</strong>：<span class="formula-tag">【狭隘民族国家偏见 ⚡ 纯粹师道与大爱】 ； 【身体疗救之医术 ⚡ 灵魂觉醒之启蒙】</span>
+        </li>
+      </ol>
+
+      <div class="sub-heading">大学中文系级“文学微评论”示范</div>
+      <div class="step-card">
+        <div class="card-box-accent" style="margin-top:0;">
+          <strong>论题：论《藤野先生》中“东墙照片”的忏悔伦理与战斗重构</strong><br>
+          <span style="font-size:12px;color:var(--text-soft);">（文学批评规范示范 · 310字）</span>
+        </div>
+        <p style="text-indent:2em;margin-top:8px;">
+          在《朝花夕拾》的整体精神脉络中，《藤野先生》绝非一般意义上的感念师恩之作，而是一场极其庄严的<strong>道德忏悔与战斗重构</strong>。鲁迅巧妙地让文章在深切的“负疚感”中收束——“运命多舛，未曾照相送去”，“讲义在战火中遗失”，这种未能践诺的遗憾，构成了叙述者心头永久的隐痛。然而，作者并未沉湎于哀伤，而是将藤野先生赠予的照片悬挂在寓所东墙。照片在此完成了从“纪念物”到“超越性良知法庭”的蜕变。当黑瘦而严肃的目光在灯影里注视着“我”时，“偷懒”被判定为道德背叛，“良心发现”与“增加勇气”转化为向“正人君子”猛烈开火的现实行动力。鲁迅借此证明：伟大的师友无需以神圣面目降临，他是在绝望废墟上唤醒我们内心那份不敢苟且的终极力量。
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 06 · 阐释边界与不确定性判断尺 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">06</span>
+        <h2 class="section-title">阐释边界与不确定性判断尺：确定与推测</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">诠释学边界检验矩阵</div>
+      <div class="step-card">
+        <p><strong>🟢 可以高度确定（文本直接与史料互证）</strong>：</p>
+        <ul class="bullet-list">
+          <li>鲁迅对藤野先生的感恩与敬仰纯出至诚；日本学者后来在福井县探访藤野先生后人，藤野先生晚年回忆周树人“是一个非常用功的学生”，史实完全吻合；</li>
+          <li>“匿名信事件”与“看幻灯片事件”是促成鲁迅人生轨迹发生根本逆转（弃医从文）的决定性契机；</li>
+          <li>文章结尾对“所谓‘正人君子’也罢，反正是深恶痛疾”的抨击，直接指向当时北京学界围攻鲁迅的现代评论派文人。</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>🟡 可以合理解释（需结合语境的推测）</strong>：</p>
+        <ul class="bullet-list">
+          <li>藤野先生对鲁迅的特殊关照，是否带有某种早期日本泛亚主义学者对中国文明的同情？<span class="badge-comment">【延伸评论】</span> 藤野出身医道世家，兼学汉学，其关心更接近于传统儒医“医者仁心”与现代科学理性的结合，不必过度拔高为某种自觉的政治思想。</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>🔴 警惕过度阐释（无依据的主观硬套）</strong>：</p>
+        <ul class="bullet-list">
+          <li>把藤野先生拔高为“早期反战斗士”——藤野本质上是一位专注于解剖学的学者与师长，并未介入政治斗争；</li>
+          <li>将写东京樱花“望去确也像绯红的轻云”硬说成“暗示革命初期的美好幻灭”——这是无视自然景物描写的胡乱象征化。</li>
+        </ul>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 07 · 知人论世、时代风云与思想坐标 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">07</span>
+        <h2 class="section-title">知人论世、时代风云与启蒙思想坐标</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">知人论世：1926年厦大图书楼里的暗夜执笔</div>
+      <div class="card-box">
+        <span class="badge-context">【文学背景】</span> 本文写于 1926 年 10 月 12 日，鲁迅时客居厦门大学。此前在北京，鲁迅亲历了段祺瑞执政府屠杀请愿学生的“三·一八惨案”（其学生刘和珍罹难），并在鲁迅被通缉、受反动文人攻讦的绝境中南下避难。在海风呼啸、孤寂岑寂的厦大集美楼上，鲁迅抚今追昔，百感交集。他写《朝花夕拾》，是在极度恶浊现实的窒息中，“借往日的温情，来抵御今日的风寒”。藤野先生的形象，不仅是一曲异国挽歌，更是鲁迅为自己点燃的一座不熄的灯塔。
+      </div>
+
+      <div class="sub-heading">启蒙现代性思想坐标：从“器物/科技”走向“立人/立魂”</div>
+      <p>晚清洋务运动主张“师夷长技以制夷”，洋务派以为中国之弱弱在船坚炮利、科学不兴，故送留学生学矿务、铁路、医学。鲁迅青年时代的求学史，恰恰是一部<strong>“中国启蒙思想的缩影”</strong>：</p>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">第一步 · 科学救国</div>
+          <div class="spec-val">江南水师学堂 ➔ 矿路学堂（学工程）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">第二步 · 医学救国</div>
+          <div class="spec-val">赴日进仙台医专（救治像父亲一样的病人）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">第三步 · 文学立人</div>
+          <div class="spec-val">幻灯顿悟：首在立人，人立而后凡事举！</div>
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 08 · 比较阅读桥：群文联读矩阵 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx">08</span>
+        <h2 class="section-title">比较阅读桥：群文联读矩阵</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="table-scroll">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">篇目与作者</th>
+              <th style="width: 26%;">叙事机制与刻画手法</th>
+              <th style="width: 26%;">师徒/人际情感特质</th>
+              <th style="width: 28%;">比读认知刷新</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>《藤野先生》</strong><br>鲁迅</td>
+              <td>讽刺开篇，白描师容；双线交织，宏大时代事件（弃医从文）与私密记忆交融。</td>
+              <td><strong>超越国界的敬畏与自省</strong>：不仅是师恩，更是终身良知的照妖镜。</td>
+              <td>怀人散文的极高境界：不是单向赞美对方，而是借对方照见自己的软弱与觉醒。</td>
+            </tr>
+            <tr>
+              <td><strong>《从百草园到三味书屋》</strong><br>鲁迅</td>
+              <td>乐园童趣 vs 塾馆威严；寿镜吾老先生方正、质朴、博学，但不愿回答“怪哉”问题。</td>
+              <td><strong>温和隔膜的怀念</strong>：对传统旧式知识分子的尊敬中带着启蒙者的同情与反思。</td>
+              <td>两文对照可看鲁迅对“师长”的不同认知：寿先生是旧传统的守旧标本，藤野是现代科学理性的纯正化身。</td>
+            </tr>
+            <tr>
+              <td><strong>《我的老师》</strong><br>魏巍</td>
+              <td>儿童纯真视角；选蔡芸芝老师排除纠纷、教跳舞、送贺卡等细密日常。</td>
+              <td><strong>依恋与母性温暖</strong>：典型的“如母师恩”，温存细腻，充满童趣。</td>
+              <td>对比可见文学文体之分工：魏巍文重在情感抚慰与童真呼应，鲁迅文重在思想铸炼与灵魂决裂。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </details>
+
+  <div class="part-divider" id="sec-09">下篇 · 读写转化、素材炼金与创造行动</div>
+
+  <!-- 栏目 09 · 五维金句解码与情境化阶梯仿写支架 -->
+  <details class="guide-section" open id="sec-09-det">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">09</span>
+        <h2 class="section-title">五维金句解码与情境化阶梯仿写支架</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="formula-bar">五维功能口诀：🌿景造氛围 ➔ 👤人立形象 ➔ ⚡事推情节 ➔ 💫情传心声 ➔ 🔺意升主题</div>
+
+      <!-- 金句 1 · 景造氛围 / 反讽讽喻 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 1 · 🌿 景中带讽 / 氛围刻画】</span> <strong>“上野的樱花烂熳的时节，望去确也像绯红的轻云，但花下也缺不了成群结队的‘清国留学生’的速成班，头顶上盘着大辫子，顶得便帽的红顶子高高耸起，形成一座富士山。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：美景与丑态的剧烈反差剪接。先用“绯红轻云”写异国春光之烂漫，转折词“但”字陡落，将镜头对准成群结队留学生的荒唐辫子，以“富士山”作夸张讽喻，辛辣至极。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写景区里的不良游人，或热闹场合中的违和现象）</strong><br>
+          <strong>🏠 生活情境</strong>：春日公园花海中折枝拍照、大声喧哗的游客，或安静图书馆里玩手机外放者。<br>
+          <strong>🧩 句式支架</strong>：<span class="formula-tag">[美好自然环境] 的时节，[景致描摹]，但 [场景] 也少不了 [特定人群]，[荒唐滑稽的动作/装束]，硬生生将 [诗意氛围] 撕成 [反差隐喻]。</span><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“林荫道落叶铺金的时节，踏上去本如踩着柔软的乐章，但树下也绝少不了成群结队举着丝巾摆拍的游人，为了争抢一缕逆光，将落叶踢得漫天乱扬，生生将静穆的秋意捣成一锅喧腾的闹剧。（以雅景衬俗人，反差立现）”</em>
+        </div>
+      </div>
+
+      <!-- 金句 2 · 👤 人立形象 / 特征白描 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 2 · 👤 人立形象】</span> <strong>“穿衣服太模糊了，有时竟会忘记带领结；冬天是一件旧棉袍，寒颤颤的，有一回上火车去，致使管车的疑心他是扒手，叫人看住他。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：极简抓特征 + 戏剧性误会。抓住人物不拘小节的标志性细节，辅以一次啼笑皆非的旁人误解，瞬间使人物活脱脱立在纸上。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写身边一位痴迷于某事、不修边幅的奇人同学或长辈）</strong><br>
+          <strong>🏠 生活情境</strong>：痴迷于画画的同桌、沉浸于修理器械的爷爷、或者忘我解题的数学老师。<br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“同桌对穿着实在太漫不经心了，鞋带常常散开拖在地上也浑然不觉；校服袖口总沾着未干的蓝黑墨水，有一回他神情恍惚地端着饭盆排队，竟习惯性地掏出一根铅笔去夹红烧肉，引得打菜阿姨以为遇到了怪人。（以憨痴之态写其热爱之纯）”</em>
+        </div>
+      </div>
+
+      <!-- 金句 3 · ⚡ 事推情节 / 细致动笔 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 3 · ⚡ 动作细节】</span> <strong>“拿过我的讲义去，他从头到末，都用红笔添改过了，不但增加了许多脱漏的地方，连文法的错误，也都一一订正。这样一直继续到他教完了他所担任的功课。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：递进式罗列 + 时间跨度定格。从局部（脱漏）到深层（文法），再以“一直继续到……”将一次性的善意升华为恒常的担当。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写一位师长或教练长期默默付出的动作）</strong><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“接过我凌乱的乐谱，他戴上老花镜，从第一个小节起便用红铅笔细细勾画，不但标出了所有错漏的踏板符号，连指法的微小别扭也一一写明替代方案。这样的逐行推敲，一直持续到我完成那年考级的整个溽热盛夏。”</em>
+        </div>
+      </div>
+
+      <!-- 金句 4 · 💫 情传心声 / 顿悟决绝 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 4 · 💫 思想顿悟】</span> <strong>“从那一回以后，我便觉得医学并非一件紧要事，凡是愚弱的国民，即使体格如何健全，如何茁壮，也只能做毫无意义的示众的材料和看客，病死多少是不必以为不幸的。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：否定常识 + 假设转折 + 决绝判词。否定人人认为崇高的医学，撕开肉体健壮背后的精神朽烂，展示思想质变的爆裂瞬间。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（写一次打破原有认知偏见的心灵顿悟）</strong><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“从那一刻起，我便明白盲目追求卷面上的高分并非至关重要之事。一个人若内心失去了对真实的敬畏与对他人的同理心，即便简历如何光鲜、履历如何出众，也终究不过是一台精致运转的空心机器，名次再高也是不必引以为傲的。”</em>
+        </div>
+      </div>
+
+      <!-- 金句 5 · 🔺 意升主题 / 暗夜注视 -->
+      <div class="step-card">
+        <p><span class="badge-evidence">【金句 5 · 🔺 意升主题】</span> <strong>“每当夜间疲倦，正想偷懒时，仰面在灯光中瞥见他黑瘦的面貌，似乎正要说出抑扬顿挫的话来，便使我忽又良心发现，而且增加勇气了，于是点上一支烟，再继续写些为‘正人君子’之流所深恶痛疾的文字。”</strong></p>
+        <p>📐 <strong>技法解码</strong>：疲倦偷懒的真实人性 ➔ 目光对视的灵魂震颤 ➔ 良心发现的道德觉醒 ➔ 提笔战斗的决绝行动。</p>
+        <div class="card-box">
+          <strong>🎯 阶梯仿写任务（中高考作文压轴升华段）</strong><br>
+          <strong>✨ 标杆下水文示范</strong>：
+          <em>“每当深夜解题受挫、心生懈怠想要放弃之时，仰头望见书架上父亲留下的那枚生锈圆规，似乎还能触摸到他指尖粗粝的茧子与期望，便使我胸中忽又涌起一股愧意，而且重燃斗志了，于是揉了揉酸痛的双眼，在台灯下继续伏案，向着那座看似不可逾越的知识险峰再次泅渡。（真实克制而力量千钧）”</em>
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 10 · 作文素材炼金炉与高阶立意库 -->
+  <details class="guide-section" open>
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">10</span>
+        <h2 class="section-title">作文素材炼金炉与高阶立意库</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">三大高阶思想立意库（中高考议论文武器）</div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-label">立意方向 01</div>
+          <div class="spec-val">【超越偏见的纯粹之爱】</div>
+          <div class="spec-label" style="margin-top:4px;">适用母题：包容、跨越隔阂、真正的博爱、良知</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">立意方向 02</div>
+          <div class="spec-val">【拒绝平庸的看客之恶】</div>
+          <div class="spec-label" style="margin-top:4px;">适用母题：担当与冷漠、公共关怀、警惕从众</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">立意方向 03</div>
+          <div class="spec-val">【把良知化作终身长征】</div>
+          <div class="spec-label" style="margin-top:4px;">适用母题：偶像的力量、内心的标尺、不懈战斗</div>
+        </div>
+      </div>
+
+      <div class="sub-heading">考场核能素材卡（可直接背诵化用）</div>
+
+      <!-- 素材卡 01 -->
+      <div class="step-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="color:var(--accent);">素材卡 #01 ｜ 悬于东墙的目光：从道德自省到终身冲锋</strong>
+          <span class="formula-tag">标签：信仰 · 自我审视 · 骨气</span>
+        </div>
+        <p><strong>100 字核能叙事压缩</strong>：
+          鲁迅在厦门大学的凄风冷雨中写作《藤野先生》，面对反动军阀的屠杀与文丐走狗的围剿，他未曾言弃。在东墙之上，挂着二十年前日本老师藤野严九郎手书“惜别”的照片。那张黑瘦而庄严的面容，成了鲁迅一生照鉴软弱的无形法庭，驱使他在暗夜里良心发现、增加勇气，笔耕不辍，战斗终生。
+        </p>
+        <p style="margin-top:6px;"><strong>考场议论文 150 字嵌入示范段</strong>：</p>
+        <div class="quote-block">
+          一个人的精神海拔，取决于他心底安放着怎样的标尺。当鲁迅在厦门大学的寒夜中备受政客构陷、筋疲力竭之时，他在寓所东墙挂起的，是远在东瀛的恩师藤野先生的照片。那黑瘦严肃的目光，不是廉价的温情抚慰，而是一面高悬于灵魂头顶的明镜，逼视着一切苟且与偷懒。正是在那一声无言的叮嘱中，鲁迅忽又良心发现、重添勇气，将愧疚化作投枪，在暗夜里继续写下令一切虚伪者胆寒的铮铮文字。
+        </div>
+      </div>
+
+      <!-- 素材卡 02 -->
+      <div class="step-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="color:var(--accent-warm);">素材卡 #02 ｜ 幻灯片的刺痛：从治体之医到立人之笔</strong>
+          <span class="formula-tag">标签：选择与抉择 · 时代担当 · 抓根因</span>
+        </div>
+        <p><strong>100 字核能叙事压缩</strong>：
+          仙台医专的一堂微生物课上，幻灯片里被斩首的同胞与神情麻木的围观国人，如巨雷震碎了周树人的“医学救国”迷梦。他痛感：如果国民精神愚昧，体格再健壮也只能做毫无意义的看客与示众材料。他毅然撕碎解剖笔记，弃医从文，将锋利的解剖刀从肉体转向了整个民族深层的劣根性。
+        </p>
+        <p style="margin-top:6px;"><strong>考场议论文 150 字嵌入示范段</strong>：</p>
+        <div class="quote-block">
+          真正的先驱，总敢于在历史的关键节点砸碎既有的安稳轨道，直击时代最深层的病灶。青年鲁迅曾矢志学医，试图以手术刀拯救国人肉体，然而仙台课室里那张记录看客麻木嘴脸的幻灯片，犹如一记惊雷击穿了他的幻象。他深刻洞悉：身体之羸弱犹可药医，精神之瘫痪则无药可救。于是他毅然绝决地弃医从文，将冰冷的柳叶刀熔铸为滚烫的如椽巨笔，用文字解剖灵魂，唤醒沉睡千年的沉沦民族。
+        </div>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 11 · 万能写作模型与读写映射总纲 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">11</span>
+        <h2 class="section-title">万能写作模型与读写映射总纲</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">万能写作模型 2：【光芒倒影·双线交织怀人叙事模型】</div>
+      <div class="step-card">
+        <p><strong>📐 结构公式</strong>：<span class="formula-tag">反差环境切入（逆境铺垫） ➔ 核心人物相遇（典型白描细节） ➔ 外部创痛事件（灵魂震颤抉择） ➔ 告别与时空闭环（精神图腾化）</span></p>
+        <ul class="bullet-list">
+          <li><strong>第一幕 · 环境逆境（15%）</strong>：不直接写入，先写自己身处的浮躁、冷漠或失落环境，形成渴望被理解的心理缺口（如东京之厌）；</li>
+          <li><strong>第二幕 · 细节相遇（35%）</strong>：精选 2–3 个带有“微瑕疵”的生活真实细节（如不修边幅的穿戴、红笔订正讲义），以微光驱散阴霾；</li>
+          <li><strong>第三幕 · 灵魂淬炼（30%）</strong>：引入一次外在的误解、打击或重大事件，在危机中凸显人物给予自己的精神支撑，促成自身关键决断；</li>
+          <li><strong>第四幕 · 遗存与长征（20%）</strong>：多年之后，某一件信物（照片/书信/旧物）成为心中的不灭星火，驱使自己走向成熟。</li>
+        </ul>
+        <p style="margin-top:6px;"><strong>移植实战示范（中考作文题《那盏灯，一直亮着》）</strong>：</p>
+        <div class="card-box">
+          <small>
+            ① 开头：初二转学那阵，因方言口音被周围同学暗自取笑，我把自己紧紧封闭在教室后排的阴影里。<br>
+            ② 中间：遇到了满头白发的图书管理员老林。他总穿着洗得褪色的蓝布工装，却在闭馆后悄悄为我留下一盏台灯，耐心地在便签纸上为我标注普通话的正音与好书索引。<br>
+            ③ 高潮：在一次激烈的演讲比赛前夕，我因怯场险些临阵脱逃，老林递来一杯温水，平静地说：“读出你心底的声音，不必讨好所有人。”那一刻，怯弱被击碎。<br>
+            ④ 结尾：如今老林早已退休，但每当我在生活考场上想要退缩妥协之时，眼前便浮现出那间昏黄阅览室里的灯火，良心发现，复又昂首向前。
+          </small>
+        </div>
+      </div>
+
+      <div class="sub-heading">本课「读什么特征 ➔ 写什么技巧 ➔ 达成什么素养」映射表</div>
+      <div class="table-scroll">
+        <table class="term-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">读到的文本特征</th>
+              <th style="width: 40%;">转化的写作武器与句法</th>
+              <th style="width: 35%;">达成的核心语文素养</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>东京留学生的“富士山辫子”</td>
+              <td><strong>反讽白描入题法</strong>：以辛辣反语揭露虚伪环境，反衬主角纯粹</td>
+              <td>语言建构 · 幽默与反语修辞</td>
+            </tr>
+            <tr>
+              <td>“黑瘦八字须、管车疑扒手”</td>
+              <td><strong>真实微瑕立人术</strong>：拒绝伟光正神化，用生活拙态写大爱大纯</td>
+              <td>审美鉴赏 · 人物立体塑造</td>
+            </tr>
+            <tr>
+              <td>“红笔添改讲义，直至教完”</td>
+              <td><strong>恒定动作定格法</strong>：用持续性日常动作展现人格基底</td>
+              <td>思维发展 · 细节与本质推论</td>
+            </tr>
+            <tr>
+              <td>幻灯片事件与弃医从文</td>
+              <td><strong>戏剧性顿悟转折</strong>：将个体抉择置于时代痛感之中，提升立意</td>
+              <td>文化传承 · 时代担当与批判精神</td>
+            </tr>
+            <tr>
+              <td>“仰面瞥见照片，忽又良心发现”</td>
+              <td><strong>精神图腾收束法</strong>：以实物定格永恒目光，将怀人转化为现实战斗力</td>
+              <td>思维发展 · 道德自省与元认知</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 12 · 五个苏格拉底式深想问题与多场景表达协作 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">12</span>
+        <h2 class="section-title">五个苏格拉底式深想问题与多场景表达</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">五个直击灵魂的苏格拉底式追问</div>
+      <ol class="num-list">
+        <li><strong>关于“看客心理”的当代审视</strong>：鲁迅在 1906 年的幻灯片上痛斥国人看杀头时的麻木欢呼；一百二十年后的今天，在互联网社交平台的一起起网络暴力、恶意围观与吃瓜热搜中，我们自己是否在某个时刻也无意识地沦为了敲击键盘、神情亢奋的“数字看客”？</li>
+        <li><strong>关于“匿名信”与偏见的根源</strong>：日本学生给鲁迅写匿名信，根本原因是断定“支那人不可能考 60 分以上，漏题是唯一的解释”。这种“当被歧视者展现出优秀时，歧视者反而更坚信其作弊”的心理机制，在今天的国际竞争或日常生活评价中，是否依然在隐蔽地发生？</li>
+        <li><strong>藤野先生视角的反向重构</strong>：如果由藤野先生来写一篇回忆周树人的散文，在他眼中，这个来自古老羸弱邻邦、神情孤傲、勤奋记笔记、却在中途突然宣布退学弃医的年轻中国青年，会留下怎样的困惑、惋惜与期许？</li>
+        <li><strong>人性的复杂与善意</strong>：藤野先生对鲁迅的关爱，是否能抵消当时整个日本军国主义甚嚣尘上带来的民族仇恨？我们当如何区分一个国家统治集团的狂妄反动，与该国普通知识分子身上闪烁的人性微光？</li>
+        <li><strong>关于内心的“东墙照片”</strong>：在你的生命成长中，是否有那么一位师长、朋友或已故亲人，只要你闭上眼睛想起他（她），便不敢让自己在泥潭中彻底摆烂沉沦，甚至会感到一种“忽又良心发现”的圣洁鞭策？</li>
+      </ol>
+
+      <div class="sub-heading">多场景表达协作示范</div>
+      <div class="step-card">
+        <strong>⚡ 30 秒中考口语展示/日常分享</strong>：
+        <p style="margin-top:4px;">
+          “很多人以为鲁迅的《藤野先生》就是篇普通的感谢老师的文章，其实大错特错！鲁迅在文章里其实干了一件惊天动地的事：他交代了自己为什么扔掉手术刀去当作家。在那个看同胞被杀头却跟着日本人拍掌欢呼的课堂上，鲁迅彻底被痛醒了——身体无病灵魂麻木，才是最绝望的绝症。而那个唯一真诚对待他的日本老教授的照片，成了鲁迅一生战斗到底的无形良心。”
+        </p>
+      </div>
+      <div class="step-card">
+        <strong>🎙️ 3 分钟课堂演讲/课文精读汇报</strong>：
+        <p style="margin-top:4px;">
+          “老师、同学们：今天我们重读《藤野先生》，最该记住的绝不只是‘标致’这个反语，或是红笔批改讲义的温情，而是鲁迅先生留在文末那声沉重的叹息。在文章的后半段，鲁迅写道，他答应送给藤野先生一张自己的相片，但后来‘终于没有送’。这五个字里，藏着二十年的愧疚与风尘。周树人离开了仙台，没有成为救死扶伤的良医，而是成了横眉冷对千夫指的文学硬汉。在军阀屠杀、小人围攻的暗夜里，他把藤野先生的照片挂在寓所东墙。鲁迅说：‘仰面在灯光中瞥见他黑瘦的面貌，便使我忽又良心发现，而且增加勇气了。’同学们，这就是真正伟大的师道力量——它不给你承诺荣华富贵，它是在你最想退缩、最想妥协、最想放弃良知的时候，有一道清澈严肃的目光从虚空中注视着你，让你羞于苟且，逼你重新拔出利刃，向着光明的方向继续冲锋！”
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 栏目 13 · 综合创作实战、世界方法与元认知说明书 -->
+  <details class="guide-section">
+    <summary class="section-summary">
+      <div class="summary-left">
+        <span class="section-idx section-idx-warm">13</span>
+        <h2 class="section-title">综合创作实战、世界方法与元认知说明书</h2>
+      </div>
+      <span class="summary-toggle-icon">+</span>
+    </summary>
+    <div class="section-content">
+
+      <div class="sub-heading">考场实战写作命题</div>
+      <div class="step-card">
+        <p><strong>✍️ 任务 A · 中考考场大作文（600–800字写人记事散文）</strong></p>
+        <p><strong>题目</strong>：《目光》 或 《那一刻，我选择了另一种开始》<br>
+        <strong>写作硬性要求</strong>：
+        <br>1. 必须运用本课提炼的【光芒倒影·双线交织怀人叙事模型】；
+        <br>2. 刻画人物必须使用白描微瑕法，拒绝概念化全能赞美；
+        <br>3. 必须包含一次思想认知的重大破壁转折，结尾落脚于精神层面的持久鞭策。</p>
+      </div>
+      <div class="step-card">
+        <p><strong>✍️ 任务 B · 250字微评论专项练笔</strong></p>
+        <p><strong>题目</strong>：结合课文，谈谈鲁迅如何在《藤野先生》前三段中运用反语讽刺实现叙事蓄势？</p>
+      </div>
+
+      <div class="sub-heading">《从〈藤野先生〉学到的一种看世界的方法》结业档案</div>
+      <div class="card-box-accent">
+        <strong>🌍 我的方法命名</strong>：<strong>【良知镜像反思法（The Moral Mirroring Method）】</strong><br>
+        <strong>一、观察动作</strong>：在面对复杂、冷漠或不公的外部社会环境时，不随波逐流于集体的麻木，而是寻找一位具有纯粹人格特质的“对照客体”（如藤野）。<br>
+        <strong>二、解码机制</strong>：
+        <ol class="num-list" style="margin-top:4px;">
+          <li>第一步：<strong>脱敏剥离</strong>（警惕流行群体的虚浮习气，像鲁迅厌恶东京留学生的辫子一样保持清醒疏离）；</li>
+          <li>第二步：<strong>锚定至诚</strong>（在细微琐事中辨认真正的纯正与善意，将其凝固为心中的道德锚点）；</li>
+          <li>第三步：<strong>直面剧痛</strong>（敢于承认自身的局限与环境的残酷，不粉饰太平，完成认知跃迁）；</li>
+          <li>第四步：<strong>内化为尺度</strong>（将他人之光转化为自身暗夜自省的法庭，以行动履行对崇高人格的承诺）。</li>
+        </ol>
+        <strong>三、适用场景</strong>：迷茫自厌时、受到无端偏见攻讦时、想要偷懒放弃原则时。<br>
+        <strong>四、失效与避坑边界</strong>：怀念不能止步于廉价的情感自嗨。如果只是在作文里把老师夸得天花乱坠，现实中却依然懒惰、虚伪、对人漠不关心，那么这种怀念便是对鲁迅精神的最大侮辱。
+      </div>
+
+      <div class="sub-heading">🛡️ 元认知自我标注说明书（模版）</div>
+      <div class="step-card">
+        <p><em>（学生在完成仿写或习作后，附于文末的自我审视工具）</em></p>
+        <p>
+          1. <strong>【双线交织】</strong>：我的文章明线是 __________________，暗线是 __________________；<br>
+          2. <strong>【视角温差】</strong>：我通过昔日之我（幼稚/冲动）与今日之我（反思/沉稳）的对比，在第 ___ 段实现了情感沉淀；<br>
+          3. <strong>【反俗套白描】</strong>：我没有把主人公写成完人，而是抓住了他（她）__________________ 的微瑕特征；<br>
+          4. <strong>【核心信物】</strong>：文章结尾通过信物 __________________，将对个人的思念升华为 __________________ 的行动力；<br>
+          5. <strong>【AI 分工清醒度】</strong>：我借助 AI 梳理了反语修辞与叙事骨架；文中所有的真实师生经历与最终文字抒发，100% 由我亲手写就。
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <!-- 页脚版权与交付标准 -->
+  <footer>
+    <p>深度导读手札 · 统编初中语文八年级上册《藤野先生》（鲁迅）</p>
+    <p style="margin-top:4px; font-size:11.5px;">© 基于单文件自包含 HTML 规范与手机端阅读优化标准交付 · 语文全科深度研读与读写转化工坊</p>
+  </footer>
+
+</div>
+
+<!-- 原生交互控制脚本 -->
+<script>
+  function toggleAllSections(openState) {
+    document.querySelectorAll(".guide-section").forEach(s => s.open = openState);
+  }
+  function focusTrack(track) {
+    document.querySelectorAll(".guide-section").forEach((s, idx) => {
+      const num = idx + 1;
+      s.open = (track === 'read') ? (num <= 8) : (num >= 9);
+    });
+    const targetId = (track === 'read') ? 'sec-01' : 'sec-09';
+    const target = document.getElementById(targetId);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>
