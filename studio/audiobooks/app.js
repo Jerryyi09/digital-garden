@@ -2115,6 +2115,7 @@ function loadReadalongDoc(docRelPath, expectedEpoch) {
 }
 
 let selectedReadalongText = ""
+const ENABLE_SELECTION_TOOLBAR = false
 
 function hideSelectionToolbar() {
   const tb = $("readalong-selection-toolbar")
@@ -2122,6 +2123,7 @@ function hideSelectionToolbar() {
 }
 
 function showSelectionToolbar(text, rect, frame) {
+  if (!ENABLE_SELECTION_TOOLBAR) return
   const tb = $("readalong-selection-toolbar")
   const viewport = frame?.parentElement
   if (!tb || !viewport || !text) return
