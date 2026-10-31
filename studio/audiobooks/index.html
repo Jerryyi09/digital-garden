@@ -360,6 +360,21 @@
         <div class="readalong-viewport">
           <iframe id="readalong-frame" title="电子书跟读正文" sandbox="allow-same-origin allow-scripts"></iframe>
           <div id="readalong-loading" class="readalong-loading" hidden>正在准备电子书正文…</div>
+          <!-- 选词划词浮动工具栏（支持 Google 翻译、复制、搜索） -->
+          <div id="readalong-selection-toolbar" class="readalong-selection-toolbar" hidden>
+            <button id="rst-translate-btn" class="rst-btn" type="button" title="在 Google 翻译中打开">
+              <svg viewBox="0 0 24 24" class="rst-icon"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+              <span>Google 翻译</span>
+            </button>
+            <button id="rst-copy-btn" class="rst-btn" type="button" title="复制选中文字">
+              <svg viewBox="0 0 24 24" class="rst-icon"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              <span id="rst-copy-text">复制</span>
+            </button>
+            <button id="rst-search-btn" class="rst-btn" type="button" title="在 Google 中搜索">
+              <svg viewBox="0 0 24 24" class="rst-icon"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>搜索</span>
+            </button>
+          </div>
         </div>
         <!-- 微信读书风格：跟读页面悬浮黑胶唱片挂件（点击切换播放/暂停） -->
         <div id="readalong-floating-player" class="readalong-floating-player" title="点击播放 / 暂停" role="button" aria-label="控制播放与暂停">

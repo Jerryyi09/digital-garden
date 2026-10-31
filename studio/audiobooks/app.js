@@ -846,7 +846,7 @@ function renderHomeDashboard(categoryItems) {
   // 2. 若不足 3 本，从书库经典已上线图书中补齐满 3 本！
   if (recentCardsData.length < 3) {
     const fallbackFeatured = [
-      { bookName: "思考快与慢", cat: "心智成长", trackName: "01 Chapter 1.mp3", pos: 350, dur: 1200 },
+      { bookName: "思考快与慢", cat: "心智成长", trackName: "Thinking, Fast and Slow.mp3", pos: 350, dur: 1200 },
       { bookName: "1984 乔治 奥威尔", cat: "文学作品", trackName: "01 Part 1 Chapter 1.mp3", pos: 420, dur: 1500 },
       { bookName: "Why Machines Learn", cat: "计算机与AI", trackName: "Why Machines Learn꞉ The Elegant Maths Behind Modern AI - 06 - Chapter 1꞉ Desperately Seeking Patterns.m4b", pos: 180, dur: 1800 },
     ]
@@ -2048,6 +2048,7 @@ function openReadalong() {
 function closeReadalong() {
   invalidateReadalong()
   readalongActive = false
+  hideSelectionToolbar()
   $("readalong").hidden = true
 }
 
@@ -2113,6 +2114,43 @@ function loadReadalongDoc(docRelPath, expectedEpoch) {
   })
 }
 
+let selectedReadalongText = ""
+
+function hideSelectionToolbar() {
+  const tb = $("readalong-selection-toolbar")
+  if (tb) tb.hidden = true
+}
+
+function showSelectionToolbar(text, rect, frame) {
+  const tb = $("readalong-selection-toolbar")
+  const viewport = frame?.parentElement
+  if (!tb || !viewport || !text) return
+  selectedReadalongText = text
+  const copyText = $("rst-copy-text")
+  if (copyText) copyText.textContent = "复制"
+
+  const frameRect = frame.getBoundingClientRect()
+  const vpRect = viewport.getBoundingClientRect()
+
+  let centerX = (frameRect.left - vpRect.left) + rect.left + rect.width / 2
+  let topY = (frameRect.top - vpRect.top) + rect.top - 8
+  let isBelow = false
+
+  if (topY < 48) {
+    topY = (frameRect.top - vpRect.top) + rect.bottom + 8
+    isBelow = true
+  }
+
+  const minX = 85
+  const maxX = vpRect.width - 85
+  centerX = Math.max(minX, Math.min(centerX, maxX))
+
+  tb.style.left = `${centerX}px`
+  tb.style.top = `${topY}px`
+  tb.classList.toggle("toolbar-below", isBelow)
+  tb.hidden = false
+}
+
 function attachReadalongFrameHandlers(frame) {
   const doc = frame.contentDocument
   if (!doc) return
@@ -2120,6 +2158,7 @@ function attachReadalongFrameHandlers(frame) {
   if (doc.body) doc.body.style.fontSize = `${size}px`
 
   const onUserScroll = () => {
+    hideSelectionToolbar()
     if (!readalongFollowing) return
     readalongFollowing = false
     const followBtn = $("readalong-follow")
@@ -2130,8 +2169,44 @@ function attachReadalongFrameHandlers(frame) {
 
   frame.contentWindow?.addEventListener("wheel", onUserScroll, { passive: true })
   frame.contentWindow?.addEventListener("touchmove", onUserScroll, { passive: true })
+  frame.contentWindow?.addEventListener("scroll", hideSelectionToolbar, { passive: true })
+
+  const checkSelection = () => {
+    try {
+      const sel = frame.contentWindow?.getSelection()
+      const text = sel ? sel.toString().trim() : ""
+      if (text && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0)
+        const rect = range.getBoundingClientRect()
+        if (rect.width > 0 || rect.height > 0) {
+          showSelectionToolbar(text, rect, frame)
+          return
+        }
+      }
+    } catch { /* ignore */ }
+    hideSelectionToolbar()
+  }
+
+  doc.addEventListener("mouseup", () => setTimeout(checkSelection, 10))
+  doc.addEventListener("touchend", () => setTimeout(checkSelection, 50))
+  doc.addEventListener("keyup", (e) => {
+    if (e.key === "Escape") hideSelectionToolbar()
+    else setTimeout(checkSelection, 10)
+  })
+  doc.addEventListener("mousedown", (e) => {
+    if (e.button !== 2) hideSelectionToolbar()
+  })
+  doc.addEventListener("contextmenu", (e) => {
+    const sel = frame.contentWindow?.getSelection()
+    const text = sel ? sel.toString().trim() : ""
+    if (text && sel.rangeCount > 0) {
+      showSelectionToolbar(text, sel.getRangeAt(0).getBoundingClientRect(), frame)
+    }
+  })
 
   doc.addEventListener("click", (e) => {
+    const sel = doc.getSelection()
+    if (sel && sel.toString().trim().length > 0) return
     const target = e.target.closest("[id]")
     if (!target || !target.id) return
     const seg = readalongTimeline.find((s) => s.fragment === target.id || s.sourceSentenceFragment === target.id)
@@ -2407,6 +2482,40 @@ on("readalong-size", "change", () => {
   const size = $("readalong-size").value
   const doc = $("readalong-frame").contentDocument
   if (doc?.body) doc.body.style.fontSize = `${size}px`
+})
+
+// Readalong Selection Toolbar (划词翻译/复制/搜索)
+on("rst-translate-btn", "click", (e) => {
+  e.stopPropagation()
+  if (!selectedReadalongText) return
+  const url = `https://translate.google.com/?sl=auto&tl=zh-CN&text=${encodeURIComponent(selectedReadalongText)}&op=translate`
+  window.open(url, "_blank")
+  hideSelectionToolbar()
+})
+on("rst-copy-btn", "click", async (e) => {
+  e.stopPropagation()
+  if (!selectedReadalongText) return
+  try {
+    await navigator.clipboard.writeText(selectedReadalongText)
+    const copyText = $("rst-copy-text")
+    if (copyText) copyText.textContent = "已复制 ✓"
+    setTimeout(hideSelectionToolbar, 800)
+  } catch {
+    hideSelectionToolbar()
+  }
+})
+on("rst-search-btn", "click", (e) => {
+  e.stopPropagation()
+  if (!selectedReadalongText) return
+  const url = `https://www.google.com/search?q=${encodeURIComponent(selectedReadalongText)}`
+  window.open(url, "_blank")
+  hideSelectionToolbar()
+})
+document.addEventListener("mousedown", (e) => {
+  const tb = $("readalong-selection-toolbar")
+  if (tb && !tb.hidden && !tb.contains(e.target)) {
+    hideSelectionToolbar()
+  }
 })
 
 // Navigation & Search

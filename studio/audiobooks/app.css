@@ -1317,6 +1317,77 @@ button:active { opacity: 0.7; }
   font-size: 14px;
 }
 
+/* 选词划词浮动工具栏 (Selection Toolbar) */
+.readalong-selection-toolbar {
+  position: absolute;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(30, 32, 38, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 4px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 13px;
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.readalong-selection-toolbar[hidden] {
+  display: none !important;
+}
+.readalong-selection-toolbar::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(30, 32, 38, 0.92) transparent transparent transparent;
+}
+.readalong-selection-toolbar.toolbar-below {
+  transform: translate(-50%, 0);
+}
+.readalong-selection-toolbar.toolbar-below::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent rgba(30, 32, 38, 0.92) transparent;
+}
+.rst-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 0;
+  color: #f0f2f5;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rst-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+.rst-btn:active {
+  background: rgba(255, 255, 255, 0.28);
+}
+.rst-icon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
 .player-expand-pill {
   background: var(--brand-blue-bg) !important;
   color: var(--brand-blue) !important;
