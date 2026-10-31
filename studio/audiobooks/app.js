@@ -17,6 +17,8 @@ const IMG = /\.(jpg|jpeg|png|webp)$/i
 const PREF = "garden-listen-prefs-v2"
 const AUTH = "garden-listen-auth-v1"
 const JOURNAL = "garden-listen-journal-v1"
+const ROOT_CACHE = "garden-listen-root-v1"
+const startupTime = performance.now()
 
 let prefs = read(localStorage, PREF, { mode: "auto", username: "", speed: 1 })
 let auth = read(sessionStorage, AUTH, null) || read(localStorage, AUTH, null)
@@ -180,6 +182,34 @@ function durationText(seconds) {
 }
 
 const coverSignedCache = new Map()
+const coverObjectUrls = new Map()
+const COVER_CACHE = "garden-cover-images-v1"
+
+async function cachedCoverUrl(path) {
+  const owner = account()
+  const key = JSON.stringify([owner, endpoint, path])
+  if (coverObjectUrls.has(key)) return coverObjectUrls.get(key)
+  try {
+    const cache = await caches.open(COVER_CACHE)
+    const cacheKey = new Request(`${location.origin}/__audiobook_cover__/${encodeURIComponent(key)}`)
+    let response = await cache.match(cacheKey)
+    if (!response) {
+      const signed = await getSignedCoverUrl(path)
+      if (!signed || owner !== account()) return signed
+      response = await fetch(signed, { credentials: "omit" })
+      if (!response.ok || !response.headers.get("content-type")?.startsWith("image/")) return signed
+      const keys = await cache.keys()
+      if (keys.length >= 100) await cache.delete(keys[0])
+      await cache.put(cacheKey, response.clone())
+    }
+    if (owner !== account()) return ""
+    const url = URL.createObjectURL(await response.blob())
+    coverObjectUrls.set(key, url)
+    return url
+  } catch {
+    return getSignedCoverUrl(path)
+  }
+}
 
 function resolveBookCoverPath(parentDir, bookName) {
   if (!parentDir) return ""
@@ -201,8 +231,9 @@ let activeCoverRequests = 0
 const MAX_CONCURRENT_COVER_REQUESTS = 4
 
 function enqueueCoverRequest(fn) {
+  const queuedAt = performance.now()
   return new Promise((resolve, reject) => {
-    coverQueue.push({ fn, resolve, reject })
+    coverQueue.push({ fn: () => { console.info("[audiobooks performance] cover queue ms", Math.round(performance.now() - queuedAt)); return fn() }, resolve, reject })
     processCoverQueue()
   })
 }
@@ -247,7 +278,7 @@ const coverObserver = typeof IntersectionObserver !== "undefined"
           const imgPath = wrap.dataset.coverPath
           const img = wrap.querySelector(".cover-real-img")
           if (imgPath && img) {
-            getSignedCoverUrl(imgPath).then((signedUrl) => {
+            cachedCoverUrl(imgPath).then((signedUrl) => {
               if (signedUrl) img.src = signedUrl
               else img.remove()
             }).catch(() => img.remove())
@@ -296,13 +327,11 @@ function createBookCoverElement(bookTitle, sizeClass = "size-row", fullImgPath =
     coverWrap.append(img)
 
     // Load with sign
-    if (coverSignedCache.has(fullImgPath)) {
-      img.src = coverSignedCache.get(fullImgPath)
-    } else if (coverObserver) {
+    if (coverObserver) {
       coverWrap.dataset.coverPath = fullImgPath
       coverObserver.observe(coverWrap)
     } else {
-      getSignedCoverUrl(fullImgPath).then((signedUrl) => {
+      cachedCoverUrl(fullImgPath).then((signedUrl) => {
         if (signedUrl) {
           img.src = signedUrl
         } else {
@@ -608,23 +637,40 @@ async function list(path) {
 
 async function browse(path = folder) {
   const request = ++browseRequest
+  const owner = account()
+  const started = performance.now()
+  let cached = false
+  if (path === ROOT && auth?.token) {
+    const snapshot = read(localStorage, ROOT_CACHE, null)
+    if (snapshot?.owner === owner && snapshot.endpoint === endpoint && Array.isArray(snapshot.entries) && snapshot.entries.every(item => item.is_dir && isWithinRoot(item.path))) {
+      entries = snapshot.entries
+      folder = ROOT
+      cached = true
+      render()
+      console.info("[audiobooks performance] cached home ms", Math.round(performance.now() - startupTime))
+    }
+  }
   $("list-status").textContent = "正在读取目录..."
   const refreshBtn = $("refresh")
   if (refreshBtn) refreshBtn.disabled = true
   try {
     const result = await list(path)
-    if (request !== browseRequest) return
+    if (request !== browseRequest || owner !== account()) return
+    console.info("[audiobooks performance] directory request ms", Math.round(performance.now() - started), { path, cached })
+    if (path === ROOT) write(localStorage, ROOT_CACHE, { owner, endpoint, entries: result.filter(item => item.is_dir), savedAt: Date.now() })
+    if (cached && $("search").value.trim()) return
+    const unchanged = cached && JSON.stringify(entries) === JSON.stringify(result)
     entries = result
     folder = path
     $("search").value = ""
     $("search-clear").hidden = true
-    render()
+    if (!unchanged) render()
   } catch (err) {
     if (request === browseRequest) {
-      entries = []
+      if (!cached) entries = []
       $("list-status").textContent = "未连接书库或登录已过期，请点击右上角设置登录"
       notice(err.message || "无法连接书库，请登录 AList。")
-      render()
+      if (!cached) render()
     }
   } finally {
     if (request === browseRequest) {
@@ -2629,6 +2675,9 @@ on("logout", "click", () => {
 on("logout-btn", "click", logout)
 
 function logout() {
+  for (const url of coverObjectUrls.values()) URL.revokeObjectURL(url)
+  coverObjectUrls.clear()
+  coverSignedCache.clear()
   saveProgress()
   syncAccount = ""
   userSync = null
