@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>几何刻画思维快速反应块：等边三角形与轴对称</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --accent: #2563eb;
+      --g1: #7c3aed;
+      --g2: #0284c7;
+      --g3: #0d9488;
+      --g4: #d97706;
+      --g5: #dc2626;
+      --g6: #16a34a;
+      --g7: #db2777;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .reflex-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .reflex-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .reflex-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .reflex-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .reflex-grid {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 1.5rem;
+    }
+    @media (max-width: 820px) {
+      .reflex-grid { grid-template-columns: 1fr; }
+    }
+
+    .reflex-mantra {
+      background: #f1f5f9;
+      border-left: 4px solid var(--accent);
+      padding: 0.65rem 1rem;
+      border-radius: 0 6px 6px 0;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #1e293b;
+      margin-bottom: 1.25rem;
+    }
+
+    .reaction-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .step-item {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 0.75rem;
+      align-items: baseline;
+      font-size: 0.92rem;
+    }
+    .step-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .diagram-panel {
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .diagram-panel svg {
+      width: 100%;
+      height: auto;
+      max-height: 220px;
+    }
+    .diagram-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.25rem;
+      font-size: 0.88rem;
+    }
+    .matrix-table th, .matrix-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+    }
+    .matrix-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+    }
+    .matrix-table td strong {
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ==================== 反应块 1：等边三角形 ==================== -->
+  <div class="reflex-block">
+    <div class="reflex-header">
+      <div class="reflex-title">
+        <span>⚡ 快速反应块 01：等边三角形（Equilateral Matrix）</span>
+      </div>
+      <span class="reflex-tag">高频核心母体</span>
+    </div>
+
+    <div class="reflex-mantra">
+      口诀：见六十度想等边，共点旋转手拉手；带根号三造垂线，化折为直费马现。
+    </div>
+
+    <div class="reflex-grid">
+      <div class="reaction-steps">
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g1);">触发信号</span>
+          <div>出现 \(60^\circ\) / \(120^\circ\) 角、等边三角形、共端点等长线段夹 \(60^\circ\)、线段系数含 \(\frac{\sqrt{3}}{2}\) 或 \(\sqrt{3}\)。</div>
+        </div>
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g4);">心智定型</span>
+          <div>
+            <strong>手拉手全等</strong>（共顶点等边顺/逆旋转 \(60^\circ\)）或 <strong>特殊直角投影</strong>（\(1:\sqrt{3}:2\) 轴对称三线合一）。
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g5);">秒画辅助线</span>
+          <div>
+            <ol style="margin-left: 1.2rem;">
+              <li><strong>若有单角 \(60^\circ\) 且两侧等长</strong> \(\to\) 连底边闭合为正三角形。</li>
+              <li><strong>若有等边绕顶点旋转</strong> \(\to\) 连结对应从动点构成手拉手全等（\(\triangle ABD \cong \triangle ACE\)）。</li>
+              <li><strong>若见 \(PA + PB + PC\) 线段和</strong> \(\to\) 绕端点将某段连同动点旋转 \(60^\circ\)“拉直折线”。</li>
+            </ol>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g7);">极值本能</span>
+          <div>涉及点到两边距离或含 \(\sin 60^\circ\) 系数最值时，极值必在<strong>垂线段位置</strong>、<strong>三点共线（旋转后拉直）</strong>或<strong>外接圆弧切点</strong>处取得。</div>
+        </div>
+      </div>
+
+      <div class="diagram-panel">
+        <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Equilateral ABC: A(100,20), B(40,124), C(160,124) -->
+          <polygon points="100,20 40,124 160,124" fill="none" stroke="#1e293b" stroke-width="2"/>
+          <!-- Rotated ADE: D(75,124), AD=(25, -104) rotated -60deg -> E(146, 52) approx -->
+          <polygon points="100,20 75,124 153,89" fill="rgba(37,99,235,0.08)" stroke="#2563eb" stroke-width="1.8"/>
+          <!-- Line CE -->
+          <line x1="160" y1="124" x2="153" y2="89" stroke="#dc2626" stroke-width="2"/>
+          <!-- Rotation arc -->
+          <path d="M 95,45 A 25 25 0 0 1 115,40" fill="none" stroke="#d97706" stroke-dasharray="2,2" stroke-width="1.5"/>
+          <text x="100" y="55" font-size="10" fill="#d97706" font-weight="bold">60°</text>
+          <!-- Labels -->
+          <text x="96" y="15" font-size="11" font-weight="bold">A</text>
+          <text x="26" y="128" font-size="11" font-weight="bold">B</text>
+          <text x="165" y="128" font-size="11" font-weight="bold">C</text>
+          <text x="70" y="139" font-size="11" font-weight="bold" fill="#2563eb">D</text>
+          <text x="159" y="88" font-size="11" font-weight="bold" fill="#2563eb">E</text>
+        </svg>
+        <div class="diagram-note">核心手拉手：\(\triangle ABD \cong \triangle ACE\)，恒生 \(CE \parallel AB\)</div>
+      </div>
+    </div>
+
+    <!-- 刻画矩阵表 -->
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="width: 20%;">残缺场景</th>
+          <th style="width: 32%;">结构补全动作（G5）</th>
+          <th style="width: 28%;">恒等推论链（G2/G6）</th>
+          <th style="width: 20%;">退化/极限（G7）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>等边外侧有一点，连三顶点</strong></td>
+          <td>绕顶点逆时针旋转 \(60^\circ\)，将线段转移至同一直线上。</td>
+          <td>构造共线线段，直接应用两点之间线段最短。</td>
+          <td>点落在线段上退化为截长补短。</td>
+        </tr>
+        <tr>
+          <td><strong>等边边上动点 \(D\)，含 \(k \cdot CD\)</strong></td>
+          <td>当 \(k = \frac{\sqrt{3}}{2}\) 时，过点 \(D\) 向邻边作垂线转化为垂线段。</td>
+          <td>\(\sin 60^\circ = \frac{\sqrt{3}}{2}\)，转折线为直角三角形投影。</td>
+          <td>垂足落在延长线上（需核验端点）。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== 反应块 2：轴对称 ==================== -->
+  <div class="reflex-block">
+    <div class="reflex-header">
+      <div class="reflex-title">
+        <span>⚡ 快速反应块 02：轴对称与翻折（Axial Symmetry Matrix）</span>
+      </div>
+      <span class="reflex-tag">高频核心母体</span>
+    </div>
+
+    <div class="reflex-mantra">
+      口诀：角分垂线必倍长，中垂连端换线长；动点求和找对称，折痕翻转抓全等。
+    </div>
+
+    <div class="reflex-grid">
+      <div class="reaction-steps">
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g1);">触发信号</span>
+          <div>出现角平分线、垂直平分线（中垂线）、垂直且相交、折叠纸片（折痕）、直线同侧双定点求距离和。</div>
+        </div>
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g4);">心智定型</span>
+          <div>
+            <strong>等腰三线合一残缺体</strong>（角平分线遇垂线）或 <strong>将军饮马极值体</strong>（对称拉直折线）。
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g5);">秒画辅助线</span>
+          <div>
+            <ol style="margin-left: 1.2rem;">
+              <li><strong>角平分线 + 垂线</strong> \(\to\) <strong>毫不犹豫顺向延长（倍长垂线）</strong>，与另一边相交，直接补全等腰三角形与中点。</li>
+              <li><strong>角平分线 + 边上一点</strong> \(\to\) 向两边作垂线，或在另一边截取等长线段造全等。</li>
+              <li><strong>线段垂直平分线</strong> \(\to\) 立即连结中垂线上点与两端点（制造等腰三角形：\(PA = PB\)）。</li>
+              <li><strong>图形折叠</strong> \(\to\) 标出对称轴两侧全等元素，重合边相等、重合角相等。</li>
+            </ol>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-badge" style="background: var(--g7);">极值本能</span>
+          <div>动点在对称轴（或基准线）上滑动时，求 \(PA+PB\) 最小值必作<strong>对称点连线（两点之间线段最短）</strong>；求 \(|PA-PB|\) 最大值必在<strong>两定点连线延长线交点处（三点共线）</strong>。</div>
+        </div>
+      </div>
+
+      <div class="diagram-panel">
+        <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Angle sides -->
+          <line x1="30" y1="140" x2="200" y2="140" stroke="#1e293b" stroke-width="2"/>
+          <line x1="30" y1="140" x2="160" y2="30" stroke="#1e293b" stroke-width="2"/>
+          <!-- Angle Bisector -->
+          <line x1="30" y1="140" x2="195" y2="70" stroke="#2563eb" stroke-width="2"/>
+          <!-- Point P on upper arm, Perpendicular to Bisector -->
+          <!-- P(110, 72). Bisector angle is approx 25 deg. Perp line from P has angle 115 deg. -->
+          <line x1="88" y1="91" x2="155" y2="140" stroke="#dc2626" stroke-width="2"/>
+          <!-- Extended line to lower arm (Dotted) -->
+          <line x1="126" y1="119" x2="155" y2="140" stroke="#dc2626" stroke-dasharray="3,3" stroke-width="2"/>
+          <!-- Right angle symbol -->
+          <rect x="120" y="110" width="8" height="8" fill="none" stroke="#dc2626" stroke-width="1.2" transform="rotate(25 120 110)"/>
+          <!-- Labels -->
+          <text x="18" y="148" font-size="11" font-weight="bold">O</text>
+          <text x="80" y="85" font-size="11" font-weight="bold">P</text>
+          <text x="122" y="105" font-size="11" font-weight="bold" fill="#2563eb">H</text>
+          <text x="160" y="155" font-size="11" font-weight="bold" fill="#dc2626">P'</text>
+          <text x="200" y="68" font-size="10" fill="#2563eb">角分线</text>
+        </svg>
+        <div class="diagram-note">经典母体：倍长垂线 \(PH\) 交于 \(P'\)，天然生成等腰 \(\triangle OPP'\) 与中点 \(H\)</div>
+      </div>
+    </div>
+
+    <!-- 刻画矩阵表 -->
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="width: 20%;">残缺场景</th>
+          <th style="width: 32%;">结构补全动作（G5）</th>
+          <th style="width: 28%;">恒等推论链（G2/G6）</th>
+          <th style="width: 20%;">退化/极限（G7）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>角平分线 + 垂线段 \(AH \perp BP\)</strong></td>
+          <td>延长 \(AH\) 与对边交于点 \(A'\)（倍长垂线）。</td>
+          <td>生成等腰三角形，\(H\) 自动成为底边中点，触发<strong>中位线模型</strong>。</td>
+          <td>若交点落在反向延长线，模型依然守恒。</td>
+        </tr>
+        <tr>
+          <td><strong>折叠矩形使顶点落在边上</strong></td>
+          <td>作对应顶点连线，该连线必被折痕<strong>垂直平分</strong>。</td>
+          <td>设未知数 \(x\)，沿直角三角形应用勾股定理构建方程。</td>
+          <td>折痕恰好过矩形顶点（临界值验证）。</td>
+        </tr>
+        <tr>
+          <td><strong>同侧双定点 \(A, B\)，动点 \(P\) 在定线上</strong></td>
+          <td>作点 \(A\) 关于定线的对称点 \(A'\)，连接 \(A'B\) 交定线于 \(P\)。</td>
+          <td>\(PA + PB = PA' + PB = A'B\)（两点之间线段最短）。</td>
+          <td>三点共线时取等，需检验交点是否在限制线段内。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>

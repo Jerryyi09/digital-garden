@@ -29,7 +29,11 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/刻画思维训练题.html" data-garden-item data-title="初中平面几何刻画思维（G1-G7）高阶特训题集" data-search="初中平面几何刻画思维（G1-G7）高阶特训题集 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793506508319" data-router-ignore>
+  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/刻画思维训练之二.html" data-garden-item data-title="几何刻画思维快速反应块：等边三角形与轴对称" data-search="几何刻画思维快速反应块：等边三角形与轴对称 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793513721124" data-router-ignore>
+  <span class="g-row-text"><strong>几何刻画思维快速反应块：等边三角形与轴对称</strong><small>Gallery · 数学 · 平面几何</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/数学/平面几何/刻画思维训练题.html" data-garden-item data-title="初中平面几何刻画思维（G1-G7）高阶特训题集" data-search="初中平面几何刻画思维（G1-G7）高阶特训题集 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793506508319" data-router-ignore>
   <span class="g-row-text"><strong>初中平面几何刻画思维（G1-G7）高阶特训题集</strong><small>Gallery · 数学 · 平面几何</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
@@ -47,10 +51,6 @@ cssclasses:
 </a>
 <a class="g-row" href="/html/语文/初二课文/中国石拱桥赏析.html" data-garden-item data-title="《中国石拱桥》深度赏析与读写结合导读 · 茅以升" data-search="《中国石拱桥》深度赏析与读写结合导读 · 茅以升 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
   <span class="g-row-text"><strong>《中国石拱桥》深度赏析与读写结合导读 · 茅以升</strong><small>Gallery · 语文 · 初二课文</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/html/语文/初二课文/回忆鲁迅先生赏析.html" data-garden-item data-title="《回忆鲁迅先生》深度赏析与读写结合导读" data-search="《回忆鲁迅先生》深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
-  <span class="g-row-text"><strong>《回忆鲁迅先生》深度赏析与读写结合导读</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>
