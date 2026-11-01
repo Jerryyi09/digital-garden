@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process"
 import process from "node:process"
+import { homeServerRsyncArgs } from "./publish-transfer.mjs"
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -45,15 +46,7 @@ function deployHomeServer() {
   if (!target) return
 
   console.log(`Copying built site to home server: ${target}`)
-  run("scp", [
-    "-r",
-    "-P",
-    "2222",
-    "-i",
-    "/Users/jerryyi/.ssh/id_rsa",
-    "public/.",
-    target,
-  ])
+  run("rsync", homeServerRsyncArgs(target))
 }
 
 const message =
