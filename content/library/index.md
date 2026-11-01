@@ -15,7 +15,7 @@ cssclasses:
 
 <header class="g-page-head">
   <h1>Library</h1>
-  <span class="g-count" data-garden-count>15 项</span>
+  <span class="g-count" data-garden-count>16 项</span>
 </header>
 
 <div class="g-tools">
@@ -27,6 +27,13 @@ cssclasses:
 </div>
 
 <div class="g-directory" data-garden-directory>
+<details class="g-folder" data-folder open>
+  <summary><span>数学 · 方法经验</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/方法经验/刻画思维训练" data-garden-item data-title="刻画思维训练" data-search="刻画思维训练 学习笔记/01 Areas/数学/方法经验 数学 · 方法经验" data-room="Library" data-updated="1793502292910">
+  <span class="g-row-text"><strong>刻画思维训练</strong><small>11月1日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
 <details class="g-folder" data-folder open>
   <summary><span>语文 · 初二课文</span><em>2</em></summary>
   <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/三篇山水小品文" data-garden-item data-title="三篇山水小品文" data-search="三篇山水小品文 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793350338093">
