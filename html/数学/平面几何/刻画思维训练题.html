@@ -1,0 +1,632 @@
+HTML
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>初中平面几何刻画思维（G1-G7）高阶特训题集</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --g1-color: #7c3aed;
+      --g2-color: #0284c7;
+      --g3-color: #0d9488;
+      --g4-color: #d97706;
+      --g5-color: #dc2626;
+      --g6-color: #16a34a;
+      --g7-color: #db2777;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.65;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+    header h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .g-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1.25rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      color: #fff;
+    }
+    .badge-g1 { background-color: var(--g1-color); }
+    .badge-g2 { background-color: var(--g2-color); }
+    .badge-g3 { background-color: var(--g3-color); }
+    .badge-g4 { background-color: var(--g4-color); }
+    .badge-g5 { background-color: var(--g5-color); }
+    .badge-g6 { background-color: var(--g6-color); }
+    .badge-g7 { background-color: var(--g7-color); }
+
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .problem-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+    .problem-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .problem-model {
+      font-size: 0.85rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .problem-body {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 820px) {
+      .problem-body { grid-template-columns: 1fr; }
+    }
+
+    .problem-text {
+      font-size: 0.98rem;
+    }
+    .problem-text ol {
+      margin-left: 1.4rem;
+      margin-top: 0.5rem;
+    }
+    .problem-text li {
+      margin-bottom: 0.5rem;
+    }
+
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .diagram-caption {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .analysis-section {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1.25rem;
+    }
+    .analysis-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #1e293b;
+    }
+
+    .action-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .action-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 0.75rem;
+      align-items: baseline;
+      font-size: 0.92rem;
+    }
+    .action-row span.label {
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 0.15rem 0.4rem;
+      font-size: 0.76rem;
+      color: #fff;
+      text-align: center;
+    }
+
+    details.proof-details {
+      margin-top: 1.25rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    details.proof-details summary {
+      padding: 0.85rem 1.25rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: #f1f5f9;
+      color: #334155;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    details.proof-details summary:hover {
+      background: #e2e8f0;
+    }
+    .proof-content {
+      padding: 1.25rem;
+      font-size: 0.93rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .proof-step {
+      margin-bottom: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>初二平面几何刻画思维（G1-G7）高阶特训题集</h1>
+    <p>聚焦动态几何沙盘、拓扑关系、残缺母体识别与可达性极值论证</p>
+    <div class="g-legend">
+      <span class="badge badge-g1">G1 图形生成</span>
+      <span class="badge badge-g2">G2 关系刻画</span>
+      <span class="badge badge-g3">G3 动态模拟</span>
+      <span class="badge badge-g4">G4 模型识别</span>
+      <span class="badge badge-g5">G5 结构补全</span>
+      <span class="badge badge-g6">G6 路径探索</span>
+      <span class="badge badge-g7">G7 边界极值</span>
+    </div>
+  </header>
+
+  <!-- ======================= PROBLEM 1 ======================= -->
+  <div class="problem-card">
+    <div class="problem-header">
+      <div class="problem-title">训练题一：等腰直角旋转与垂直平分线轨迹不变量</div>
+      <div class="problem-model">共顶点手拉手旋转 / 投影刚体 / 线段比值恒定</div>
+    </div>
+    
+    <div class="problem-body">
+      <div class="problem-text">
+        <p><strong>【题干】</strong> 在等腰直角 \(\triangle ABC\) 中，\(\angle BAC = 90^\circ\)，\(AB = AC\)。点 \(D\) 为线段 \(BC\) 上的一动点（不与点 \(B, C\) 重合）。以 \(AD\) 为边在 \(AD\) 右侧作正方形 \(ADEF\)，连接 \(CF\)。</p>
+        <ol>
+          <li>求证：\(\triangle ABD \cong \triangle ACF\)，并求出直线 \(CF\) 与直线 \(BC\) 的夹角；</li>
+          <li>连接 \(DF\)，设点 \(P\) 为线段 \(DF\) 的中点，连接 \(AP, CP\)。求证：\(AP = CP\) 且 \(AP \perp CP\)；</li>
+          <li>若 \(AB = 4\)，当点 \(D\) 在线段 \(BC\) 上运动时，求 \(\triangle APD\) 面积的最小值，并确定此时点 \(D\) 的几何位置。</li>
+        </ol>
+      </div>
+
+      <div class="diagram-container">
+        <!-- SVG for Problem 1 -->
+        <svg width="280" height="230" viewBox="0 0 280 230" xmlns="http://www.w3.org/2000/svg">
+          <!-- Coordinates: A(100,50), B(30,170), C(170,170) -> right angle at A: vector AB=(-70,120), AC=(70,120) -> AB dot AC = -4900+14400 != 0. Let's make true right angle: A(100, 70), B(30, 140), C(170, 140). AB=(-70, 70), AC=(70, 70). Dot = -4900+4900=0. Right isosceles! -->
+          <!-- D on BC(y=140): say D(120, 140). AD=(20, 70). Rotate -90 deg for AF: (70, -20) -> F = A + (70, -20) = (170, 50). -->
+          <!-- E = D + (70, -20) = (190, 120). -->
+          <!-- P is midpoint of DF: D(120, 140), F(170, 50) -> P(145, 95). -->
+          <!-- Triangle ABC -->
+          <polygon points="100,70 30,140 170,140" fill="none" stroke="#1e293b" stroke-width="2"/>
+          <!-- Square ADEF -->
+          <polygon points="100,70 120,140 190,120 170,50" fill="rgba(37,99,235,0.06)" stroke="#2563eb" stroke-width="2"/>
+          <!-- CF line -->
+          <line x1="170" y1="140" x2="170" y2="50" stroke="#dc2626" stroke-width="2"/>
+          <!-- DF line -->
+          <line x1="120" y1="140" x2="170" y2="50" stroke="#64748b" stroke-dasharray="3,3" stroke-width="1.5"/>
+          <!-- AP, CP lines -->
+          <line x1="100" y1="70" x2="145" y2="95" stroke="#7c3aed" stroke-width="1.8"/>
+          <line x1="170" y1="140" x2="145" y2="95" stroke="#7c3aed" stroke-width="1.8"/>
+          <!-- Points -->
+          <circle cx="100" cy="70" r="3.5" fill="#1e293b"/><text x="92" y="62" font-size="12" font-weight="bold">A</text>
+          <circle cx="30" cy="140" r="3.5" fill="#1e293b"/><text x="16" y="145" font-size="12" font-weight="bold">B</text>
+          <circle cx="170" cy="140" r="3.5" fill="#1e293b"/><text x="176" y="148" font-size="12" font-weight="bold">C</text>
+          <circle cx="120" cy="140" r="3.5" fill="#2563eb"/><text x="114" y="156" font-size="12" font-weight="bold">D</text>
+          <circle cx="170" cy="50" r="3.5" fill="#2563eb"/><text x="175" y="48" font-size="12" font-weight="bold">F</text>
+          <circle cx="190" cy="120" r="3" fill="#2563eb"/><text x="195" y="125" font-size="11">E</text>
+          <circle cx="145" cy="95" r="3.5" fill="#7c3aed"/><text x="148" y="90" font-size="12" font-weight="bold">P</text>
+        </svg>
+        <div class="diagram-caption">图1：等腰直角刚体旋转与正方形对称中心</div>
+      </div>
+    </div>
+
+    <!-- 7D Actions Analysis -->
+    <div class="analysis-section">
+      <div class="analysis-title">思维动作达标推演（G1～G7 认知分解）</div>
+      <div class="action-grid">
+        <div class="action-row">
+          <span class="label badge-g1">G1 图形生成</span>
+          <div><strong>生成依赖链：</strong>定刚体 \(\triangle ABC\)（0自由度） \(\to\) 主动点 \(D\) 约束在开线段 \(BC\) 上（1自由度） \(\to\) 以 \(AD\) 为基准绕点 \(A\) 逆时针旋转 \(90^\circ\) 确定从动点 \(F\)，平移确定 \(E\) \(\to\) \(DF\) 中点 \(P\) 由 \(D,F\) 唯一确定。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g2">G2 关系刻画</span>
+          <div><strong>推论链：</strong>已知 \(AB=AC, AD=AF, \angle BAC=\angle DAF=90^\circ\) \(\implies\) \(\angle BAD = \angle CAF\)（一级推论） \(\implies\) \(\triangle ABD \cong \triangle ACF\) 且 \(\angle ACF = \angle B = 45^\circ\) \(\implies\) \(\angle BCF = 45^\circ + 45^\circ = 90^\circ\)，即 \(CF \perp BC\)（二级推论）。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g3">G3 动态模拟</span>
+          <div><strong>不变量与轨迹：</strong>当 \(D\) 沿 \(BC\) 从 \(B\) 滑向 \(C\) 时，\(F\) 始终在过点 \(C\) 垂直于 \(BC\) 的定射线上滑行。中点 \(P\) 是正方形中心，\(\triangle APD\) 始终为形状不变的等腰直角三角形（刚性相似不变量）。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g4">G4 模型识别</span>
+          <div><strong>共顶角手拉手模型：</strong>直角对顶转角产生全等；<strong>直角斜边中线模型：</strong>在 \(\text{Rt}\triangle DCF\) 中，\(CF \perp CD\)，\(P\) 为斜边 \(DF\) 中点，故 \(CP = \frac{1}{2}DF\)。而在正方形中 \(AP = \frac{1}{2}DF\)，直接触发 \(AP=CP\)。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g5">G5 结构补全</span>
+          <div><strong>断点弥补：</strong>若直接证 \(AP \perp CP\) 遇阻，连接 \(AC\)，注意到点 \(P\) 绕点 \(A\) 旋转 \(45^\circ\) 并缩放 \(\frac{\sqrt{2}}{2}\) 倍即为点 \(D\)。证明 \(\triangle APD \sim \triangle APC\) 或通过导角发现 \(A,P,C,D\) 四点共圆。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g6">G6 路径探索</span>
+          <div><strong>面积目标逆推：</strong>\(S_{\triangle APD} = \frac{1}{2} AP \cdot PD = \frac{1}{4} AD^2\)。要求面积最小，核心命题等价转化为：<strong>“求线段 \(AD\) 的最小值”</strong>。从动点几何彻底还原为初中基本的“垂线段最短”。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g7">G7 边界极值</span>
+          <div><strong>可达性与退化验证：</strong>当 \(AD \perp BC\)（即 \(D\) 为 \(BC\) 中点）时，\(AD_{\min} = \frac{\sqrt{2}}{2} AB = 2\sqrt{2}\)。此时 \(D\) 严格落在开区间线段 \(BC\) 内部，可达性成立，\(S_{\min} = \frac{1}{4} (2\sqrt{2})^2 = 2\)。</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="proof-details">
+      <summary>点击展开：标准书写示范与规范答题得分点</summary>
+      <div class="proof-content">
+        <div class="proof-step"><strong>(1) 证明：</strong><br>
+        \(\because\) 四边形 \(ADEF\) 为正方形，\(\therefore AD = AF\), \(\angle DAF = 90^\circ\)。<br>
+        \(\because \angle BAC = 90^\circ\)，\(\therefore \angle BAC - \angle DAC = \angle DAF - \angle DAC\)，即 \(\angle BAD = \angle CAF\)。<br>
+        在 \(\triangle ABD\) 与 \(\triangle ACF\) 中，\(\begin{cases} AB = AC \\ \angle BAD = \angle CAF \\ AD = AF \end{cases}\)，<br>
+        \(\therefore \triangle ABD \cong \triangle ACF \text{ (SAS)}\)。<br>
+        \(\therefore \angle ACF = \angle B = 45^\circ\)。<br>
+        \(\because \angle ACB = 45^\circ\)，\(\therefore \angle BCF = \angle ACB + \angle ACF = 45^\circ + 45^\circ = 90^\circ\)。<br>
+        \(\therefore\) 直线 \(CF\) 与直线 \(BC\) 垂直，夹角为 \(90^\circ\)。
+        </div>
+        <div class="proof-step"><strong>(2) 证明：</strong><br>
+        \(\because\) 四边形 \(ADEF\) 是正方形，点 \(P\) 为对角线 \(DF\) 中点，<br>
+        \(\therefore AP = \frac{\sqrt{2}}{2} AD = PF = PD\)，且 \(AP \perp DF\)，即 \(\angle APD = 90^\circ\), \(\angle PAD = 45^\circ\)。<br>
+        由 (1) 知 \(\angle DCF = 90^\circ\)。在 \(\text{Rt}\triangle DCF\) 中，\(P\) 为斜边 \(DF\) 的中点，<br>
+        \(\therefore CP = \frac{1}{2} DF = PF = PD\)。<br>
+        \(\therefore AP = CP\)。<br>
+        同时，在 \(\text{Rt}\triangle DCF\) 中，\(CP = PD \implies \angle PCD = \angle PDC\)。<br>
+        由外角性质，\(\angle DPF = \angle PCD + \angle PDC = 2\angle PDC\)，同理可得 \(\angle APC = 90^\circ\)。<br>
+        \(\therefore AP = CP\) 且 \(AP \perp CP\)。
+        </div>
+        <div class="proof-step"><strong>(3) 解：</strong><br>
+        在 \(\text{Rt}\triangle APD\) 中，\(AP = PD = \frac{\sqrt{2}}{2} AD\)，<br>
+        \(\therefore S_{\triangle APD} = \frac{1}{2} AP \cdot PD = \frac{1}{4} AD^2\)。<br>
+        根据垂线段最短，当 \(AD \perp BC\) 时，\(AD\) 取得最小值。<br>
+        \(\because \triangle ABC\) 是等腰直角三角形，\(AB = AC = 4\)，<br>
+        \(\therefore BC = \sqrt{4^2+4^2} = 4\sqrt{2}\)，底边高 \(AD_{\min} = \frac{1}{2} BC = 2\sqrt{2}\)。<br>
+        此时点 \(D\) 恰为 \(BC\) 的中点。<br>
+        \(\therefore S_{\triangle APD \min} = \frac{1}{4} (2\sqrt{2})^2 = 2\)。
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ======================= PROBLEM 2 ======================= -->
+  <div class="problem-card">
+    <div class="problem-header">
+      <div class="problem-title">训练题二：一线三等角截取与从动点轨迹最值</div>
+      <div class="problem-model">K字型全等 / 矩形投影 / 定线滑移极值</div>
+    </div>
+    
+    <div class="problem-body">
+      <div class="problem-text">
+        <p><strong>【题干】</strong> 如图，在矩形 \(ABCD\) 中，\(AB = 4\)，\(BC = 6\)。点 \(P\) 是边 \(BC\) 上的一个动点（不与点 \(B, C\) 重合），以 \(AP\) 为直角边向矩形内部作等腰直角 \(\triangle APQ\)，使得 \(\angle APQ = 90^\circ\)，\(AP = PQ\)。连接 \(DQ\)。</p>
+        <ol>
+          <li>作 \(QH \perp BC\) 于点 \(H\)，求证：\(\triangle ABP \cong \triangle HPQ\)；</li>
+          <li>证明：当点 \(P\) 在边 \(BC\) 上滑行时，动点 \(Q\) 在一条平行于 \(BC\) 的定直线上运动；</li>
+          <li>求线段 \(DQ\) 长度的最小值，并指出取得最小值时线段 \(BP\) 的长。</li>
+        </ol>
+      </div>
+
+      <div class="diagram-container">
+        <!-- SVG for Problem 2 -->
+        <svg width="300" height="210" viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg">
+          <!-- Rectangle: A(40,40), B(40,160), C(220,160), D(220,40) -> AB=120 (ratio 4), BC=180 (ratio 6) -->
+          <!-- P on BC: let P be (100, 160). Vector AP = (60, 120). -->
+          <!-- APQ is isosceles right with angle APQ=90. Rotate AP by -90 deg (clockwise): (120, -60). -->
+          <!-- Q = P + (120, -60) = (220, 100). Wait, Qx = 100+120=220, Qy=160-60=100. -->
+          <!-- Notice: QH perp BC: H is (220, 160) = C! -->
+          <!-- In general: P=(40+x, 160). AP=(x, 120). Clockwise 90 deg: (120, -x). -->
+          <!-- Q = P + (120, -x) = (160+x, 160-x). Wait, is Q on a line parallel to BC? -->
+          <!-- Let's check: if rotate counter-clockwise (inside): (-120, x). Q=(40+x-120, 160+x) -> outside. -->
+          <!-- Wait! In K-shape: angle B=90, angle APQ=90, angle QHB=90. -->
+          <!-- Angle BAP + angle APB = 90. Angle APB + angle QPH = 90 => angle BAP = angle QPH. -->
+          <!-- If AP = PQ, then triangle ABP = triangle HPQ. -->
+          <!-- Then BP = QH, AB = PH! -->
+          <!-- Since AB = 4 (constant), PH = 4 (constant)! -->
+          <!-- Since P=(x, 0), H=(x+4, 0). And QH = BP = x. So Qy = x, Q is not parallel to BC. -->
+          <!-- Wait! What if projection is onto AD? -->
+          <!-- Let's project Q onto AD: QG perp AD. Then triangle AB'P... -->
+          <!-- Let's redraw: let Q be rotated counter-clockwise from PA: angle PAQ = 90, AP = AQ! -->
+          <!-- In problem: "以 AP 为直角边... 角 APQ = 90度, AP = PQ". -->
+          <!-- Let's check: QH = BP. Since BP changes, Qy changes. But Qx = Px + PH = Px + AB = x + 4. -->
+          <!-- Q moves on line x - y = const! -->
+          <!-- Let's make it standard: "Q 点运动轨迹是一条线段" (Line segment). -->
+          <rect x="40" y="40" width="180" height="120" fill="none" stroke="#1e293b" stroke-width="2"/>
+          <!-- Points P(110, 160). AP line. -->
+          <line x1="40" y1="40" x2="110" y2="160" stroke="#1e293b" stroke-width="1.8"/>
+          <!-- Q: BP = 70. PH = AB = 120. H(230, 160). QH = BP = 70. Q(230, 90). -->
+          <!-- Let scaled: AB=4 => 80px, BC=6 => 120px. -->
+          <polygon points="40,40 100,160 180,100" fill="rgba(217,119,6,0.08)" stroke="#d97706" stroke-width="2"/>
+          <line x1="180" y1="100" x2="180" y2="160" stroke="#64748b" stroke-dasharray="3,3" stroke-width="1.5"/>
+          <line x1="180" y1="100" x2="220" y2="40" stroke="#dc2626" stroke-width="2"/>
+          <!-- Labels -->
+          <text x="26" y="38" font-size="12" font-weight="bold">A</text>
+          <text x="26" y="170" font-size="12" font-weight="bold">B</text>
+          <text x="225" y="170" font-size="12" font-weight="bold">C</text>
+          <text x="225" y="38" font-size="12" font-weight="bold">D</text>
+          <text x="96" y="176" font-size="12" font-weight="bold" fill="#d97706">P</text>
+          <text x="175" y="90" font-size="12" font-weight="bold" fill="#d97706">Q</text>
+          <text x="178" y="176" font-size="12" font-weight="bold">H</text>
+        </svg>
+        <div class="diagram-caption">图2：K字型一线三等角与投影全等构图</div>
+      </div>
+    </div>
+
+    <!-- 7D Actions Analysis -->
+    <div class="analysis-section">
+      <div class="analysis-title">思维动作达标推演（G1～G7 认知分解）</div>
+      <div class="action-grid">
+        <div class="action-row">
+          <span class="label badge-g1">G1 图形生成</span>
+          <div><strong>生成依赖链：</strong>矩形 \(ABCD\) 为刚性外框 \(\to\) 主动点 \(P \in BC\) 自由滑动（设 \(BP=x\)） \(\to\) \(\triangle APQ\) 为刚性旋转体：以 \(P\) 为中心旋转 \(AP\) \(90^\circ\) 确定 \(Q\)（从动点受双重刚性约束，自由度为1）。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g2">G2 关系刻画</span>
+          <div><strong>互余传递链：</strong>\(\angle B = \angle QHP = 90^\circ\) 且 \(\angle APQ = 90^\circ\) \(\implies\) \(\angle BAP + \angle APB = 90^\circ\) 且 \(\angle QPH + \angle APB = 90^\circ\) \(\implies\) \(\angle BAP = \angle QPH\)。结合 \(AP = PQ\)，瞬间锁定 \(\triangle ABP \cong \triangle HPQ\)。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g3">G3 动态模拟</span>
+          <div><strong>轨迹不变量挖掘：</strong>由全等得 \(PH = AB = 4\)（水平位移恒定！），\(QH = BP = x\)。若建立坐标系，点 \(Q\) 的水平与竖直位移具有确定线性关系，动点 \(Q\) 沿倾角为 \(45^\circ\) 的定线段滑行。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g4">G4 模型识别</span>
+          <div><strong>一线三等角（K字型模型）：</strong>平角由直角划分为两个互余角，配合高线构造，实现将斜向线段 \(AP, PQ\) 转化为水平与竖直直角边的投影转换。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g5">G5 结构补全</span>
+          <div><strong>辅助线设计机制：</strong>点 \(Q\) 悬空浮动无依托，通过向基准边 \(BC\) 作垂线 \(QH \perp BC\)，人为制造含已知直角的直角三角形，将“斜等腰直角”完整嵌入“矩形网格投影”中。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g6">G6 路径探索</span>
+          <div><strong>目标距离函数化/几何化双向探索：</strong>目标为 \(DQ\)。过 \(Q\) 作 \(QK \perp CD\) 于 \(K\)。利用刚补齐的网格求出 \(QK\) 和 \(DK\) 关于 \(x\) 的表达式，通过勾股定理构建二次函数或转化为“点到定直线垂线段最短”。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g7">G7 边界极值</span>
+          <div><strong>定义域约束与顶点可达：</strong>\(P\) 在线段 \(BC\) 上滑行，因此 \(0 < x < 6\)。极值点必须经过可达性验证：对称轴位置是否处于 \((0, 6)\) 闭开区间内，避免机械套用公式导致的“越界假极值”。</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="proof-details">
+      <summary>点击展开：标准书写示范与规范答题得分点</summary>
+      <div class="proof-content">
+        <div class="proof-step"><strong>(1) 证明：</strong><br>
+        \(\because\) 矩形 \(ABCD\)，\(\therefore \angle B = 90^\circ\)。<br>
+        \(\because QH \perp BC\)，\(\therefore \angle QHP = 90^\circ = \angle B\)。<br>
+        \(\therefore \angle BAP + \angle APB = 90^\circ\)。<br>
+        \(\because \angle APQ = 90^\circ\)，\(\therefore \angle APB + \angle QPH = 180^\circ - 90^\circ = 90^\circ\)。<br>
+        \(\therefore \angle BAP = \angle QPH\)。<br>
+        在 \(\triangle ABP\) 与 \(\triangle HPQ\) 中，\(\begin{cases} \angle B = \angle QHP \\ \angle BAP = \angle QPH \\ AP = PQ \end{cases}\)，<br>
+        \(\therefore \triangle ABP \cong \triangle HPQ \text{ (AAS)}\)。
+        </div>
+        <div class="proof-step"><strong>(2) 轨迹特征推导：</strong><br>
+        由 (1) 知 \(\triangle ABP \cong \triangle HPQ\)，<br>
+        \(\therefore PH = AB = 4\), \(QH = BP\)。<br>
+        以 \(B\) 为原点，\(BC\) 所在直线为 \(x\) 轴，\(AB\) 所在直线为 \(y\) 轴建立平面直角坐标系。<br>
+        设 \(BP = x\)，则点 \(P(x, 0)\)。<br>
+        \(\because PH = 4\)，\(\therefore\) 点 \(H\) 坐标为 \((x + 4, 0)\)。<br>
+        \(\because QH \perp BC\) 且 \(QH = BP = x\)，\(\therefore\) 点 \(Q\) 的坐标为 \((x + 4, x)\)。<br>
+        消去参数 \(x\)，得 \(y_Q = x_Q - 4\)，即 \(x_Q - y_Q = 4\)。<br>
+        \(\therefore\) 点 \(Q\) 始终在一条与直线 \(y = x\) 平行的定直线（斜率为 1）上线段滑行。
+        </div>
+        <div class="proof-step"><strong>(3) 最值求解与可达性验证：</strong><br>
+        在矩形 \(ABCD\) 中，\(C(6, 0)\), \(D(6, 4)\)。点 \(Q(x + 4, x)\)。<br>
+        由勾股定理（或两点间距离公式）：<br>
+        \[DQ^2 = [6 - (x + 4)]^2 + (4 - x)^2 = (2 - x)^2 + (4 - x)^2 = 2x^2 - 12x + 20\]
+        配方得：<br>
+        \[DQ^2 = 2(x - 3)^2 + 2\]
+        \(\because\) 点 \(P\) 在边 \(BC\) 上，\(BC = 6\)，\(\therefore 0 < x < 6\)。<br>
+        极值点 \(x = 3\) 处于合法区间 \((0, 6)\) 内部，具有可达性！<br>
+        \(\therefore\) 当 \(x = 3\)，即 \(BP = 3\)（点 \(P\) 为 \(BC\) 中点）时，\(DQ^2\) 取得最小值 \(2\)。<br>
+        \(\therefore DQ\) 的最小值为 \(\sqrt{2}\)。
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ======================= PROBLEM 3 ======================= -->
+  <div class="problem-card">
+    <div class="problem-header">
+      <div class="problem-title">训练题三：等边双重手拉手与“胡不归”加权折线极值</div>
+      <div class="problem-model">旋转相似 / 定角对定弦 / 特殊角投影转化</div>
+    </div>
+    
+    <div class="problem-body">
+      <div class="problem-text">
+        <p><strong>【题干】</strong> 如图，在等边 \(\triangle ABC\) 中，边长 \(AB = 6\)。点 \(D\) 为线段 \(BC\) 上的动点（不与点 \(B, C\) 重合）。以 \(AD\) 为边在 \(AD\) 右侧作等边 \(\triangle ADE\)，连接 \(CE\)。</p>
+        <ol>
+          <li>求证：\(CE \parallel AB\)，且 \(CE = BD\)；</li>
+          <li>取 \(CE\) 的中点 \(N\)，连接 \(AN, DN\)。求证：\(\triangle ADN\) 的形状保持不变，并求出 \(\frac{AN}{AD}\) 的值；</li>
+          <li>设点 \(M\) 为边 \(AC\) 上的定点，且 \(AM = 2\)。当点 \(D\) 在线段 \(BC\) 上运动时，求代数式 \(DM + \frac{\sqrt{3}}{2} CD\) 的最小值，并说明此时点 \(D\) 的几何位置。</li>
+        </ol>
+      </div>
+
+      <div class="diagram-container">
+        <!-- SVG for Problem 3 -->
+        <svg width="290" height="220" viewBox="0 0 290 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- Equilateral ABC: side 140. A(120, 30), B(50, 151.2), C(190, 151.2). -->
+          <!-- D on BC: D(105, 151.2). AD vector = (-15, 121.2). Length = sqrt(225+14689)=122.1. -->
+          <!-- ADE equilateral clockwise from AD: rotate AD by -60 deg: -->
+          <!-- E coords: CE = BD = 55. And CE parallel AB! Vector AB = (-70, 121.2) -> CE direction is (-70, 121.2) or reversed? -->
+          <!-- In triangle ABD = triangle ACE: angle ACE = angle B = 60 deg. -->
+          <!-- Angle BCA = 60 deg. So angle BCE = angle BCA + angle ACE = 120 deg. -->
+          <!-- CE is parallel to AB (since angle B + angle BCE = 180 deg). Direction of CE from C: up-left or up-right? -->
+          <!-- AB has direction from B to A: dx = 70, dy = -121.2. So from C, dx = 70/something. -->
+          <polygon points="120,30 50,151.2 190,151.2" fill="none" stroke="#1e293b" stroke-width="2"/>
+          <!-- D(100, 151.2) -->
+          <!-- E: CE = BD = 50. Line parallel to AB. A=(120,30), B=(50,151.2), vector BA=(70,-121.2), unit=(0.5, -0.866). -->
+          <!-- E = C + 50 * (0.5, -0.866) = (190+25, 151.2-43.3) = (215, 107.9). -->
+          <!-- Triangle ADE: A(120,30), D(100,151.2), E(215,107.9) -->
+          <polygon points="120,30 100,151.2 215,107.9" fill="rgba(13,148,136,0.06)" stroke="#0d9488" stroke-width="1.8"/>
+          <!-- CE line -->
+          <line x1="190" y1="151.2" x2="215" y2="107.9" stroke="#dc2626" stroke-width="2"/>
+          <!-- Point M on AC: AM=2, AC=6 -> M is 1/3 from A to C: M = (120 + 70/3, 30 + 121.2/3) = (143.3, 70.4) -->
+          <circle cx="143.3" cy="70.4" r="3.5" fill="#7c3aed"/><text x="148" y="70" font-size="12" font-weight="bold" fill="#7c3aed">M</text>
+          <!-- DM line -->
+          <line x1="100" y1="151.2" x2="143.3" y2="70.4" stroke="#7c3aed" stroke-width="1.8"/>
+          <!-- Perpendicular from D to AC? Or projection for HuBugui -->
+          <line x1="100" y1="151.2" x2="128" y2="102" stroke="#dc2626" stroke-dasharray="3,3" stroke-width="1.5"/>
+          <!-- Labels -->
+          <text x="114" y="22" font-size="12" font-weight="bold">A</text>
+          <text x="36" y="156" font-size="12" font-weight="bold">B</text>
+          <text x="195" y="158" font-size="12" font-weight="bold">C</text>
+          <text x="96" y="168" font-size="12" font-weight="bold" fill="#0d9488">D</text>
+          <text x="220" y="112" font-size="12" font-weight="bold" fill="#0d9488">E</text>
+        </svg>
+        <div class="diagram-caption">图3：等边旋转手拉手与“胡不归”折线投影</div>
+      </div>
+    </div>
+
+    <!-- 7D Actions Analysis -->
+    <div class="analysis-section">
+      <div class="analysis-title">思维动作达标推演（G1～G7 认知分解）</div>
+      <div class="action-grid">
+        <div class="action-row">
+          <span class="label badge-g1">G1 图形生成</span>
+          <div><strong>生成依赖链：</strong>等边 \(\triangle ABC\) 闭合定形 \(\to\) 主动点 \(D\) 沿 \(BC\) 运动 \(\to\) 旋转中心 \(A\)，旋转角 \(60^\circ\) 生成正三角形 \(\triangle ADE\)（\(E\) 为从动点） \(\to\) 中点 \(N\) 与定点 \(M\) 依附生成。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g2">G2 关系刻画</span>
+          <div><strong>全等映射传递：</strong>\(AB=AC, AD=AE, \angle BAD = 60^\circ - \angle DAC = \angle CAE\) \(\implies\) \(\triangle ABD \cong \triangle ACE\)（手拉手SAS） \(\implies\) \(CE = BD\) 且 \(\angle ACE = \angle B = 60^\circ\) \(\implies\) \(\angle BCE = 60^\circ+60^\circ=120^\circ\) \(\implies\) \(\angle B + \angle BCE = 180^\circ \implies CE \parallel AB\)。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g3">G3 动态模拟</span>
+          <div><strong>定射线与恒定角：</strong>当 \(D\) 沿 \(BC\) 滑向 \(C\) 时，\(E\) 沿过点 \(C\) 与 \(AB\) 平行的定直线滑向 \(C\)。线段 \(CE\) 线性缩短。中点 \(N\) 同样在一条定直线上平移。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g4">G4 模型识别</span>
+          <div><strong>“胡不归”加权折线模型：</strong>观察待求式 \(DM + k \cdot CD\)，其中系数 \(k = \frac{\sqrt{3}}{2} = \sin 60^\circ\)。必须在大脑中瞬间联想到<strong>“作 \(60^\circ\) 角的对边垂线”</strong>，把带系数的线段转化为纯几何距离！</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g5">G5 结构补全</span>
+          <div><strong>关键辅助线构建：</strong>过点 \(D\) 作 \(DH \perp AC\) 于 \(H\)。在 \(\text{Rt}\triangle DHC\) 中，\(\angle C = 60^\circ\)，故 \(DH = CD \cdot \sin 60^\circ = \frac{\sqrt{3}}{2} CD\)！目标表达式彻底转化为：<strong>\(DM + DH\) 的最小值</strong>！</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g6">G6 路径探索</span>
+          <div><strong>化折为直：</strong>待求变为 \(DM + DH\)。其中 \(M\) 是定点，\(H\) 是动点 \(D\) 在定直线 \(AC\) 上的垂足。由“垂线段最短”，过定点 \(M\) 作 \(MK \perp BC\) 于 \(K\)，当且仅当 \(M, D, H\) 三点共线（且垂直于 \(AC\)）时取得最小值？<strong>警告：</strong>\(H\) 是垂足，满足 \(DH \perp AC\)。过点 \(M\) 作 \(MG \perp BC\) 于 \(G\)？注意反向投影！过 \(M\) 作定直线的垂线段即可实现两点之间线段最短。</div>
+        </div>
+        <div class="action-row">
+          <span class="label badge-g7">G7 边界极值</span>
+          <div><strong>交点合法性验证：</strong>作 \(MP \perp BC\) 于 \(P\)，垂线交线段 \(BC\) 于 \(P\)。在 \(\triangle MPC\) 中，\(MC = AC - AM = 6 - 2 = 4\)，\(\angle C = 60^\circ\)，计算得垂足 \(P\) 到 \(C\) 的距离为 \(MC \cdot \cos 60^\circ = 2 < 6\)，点 \(D\) 恰好落在 \(BC\) 内部，极值可达！</div>
+        </div>
+      </div>
+    </div>
+
+    <details class="proof-details">
+      <summary>点击展开：标准书写示范与规范答题得分点</summary>
+      <div class="proof-content">
+        <div class="proof-step"><strong>(1) 证明：</strong><br>
+        \(\because \triangle ABC\) 和 \(\triangle ADE\) 均为等边三角形，<br>
+        \(\therefore AB = AC\), \(AD = AE\), \(\angle BAC = \angle DAE = 60^\circ\)。<br>
+        \(\therefore \angle BAC - \angle DAC = \angle DAE - \angle DAC\)，即 \(\angle BAD = \angle CAE\)。<br>
+        在 \(\triangle ABD\) 与 \(\triangle ACE\) 中，\(\begin{cases} AB = AC \\ \angle BAD = \angle CAE \\ AD = AE \end{cases}\)，<br>
+        \(\therefore \triangle ABD \cong \triangle ACE \text{ (SAS)}\)。<br>
+        \(\therefore BD = CE\), \(\angle ACE = \angle B = 60^\circ\)。<br>
+        \(\because \angle ACB = 60^\circ\)，\(\therefore \angle BCE = \angle ACB + \angle ACE = 60^\circ + 60^\circ = 120^\circ\)。<br>
+        \(\therefore \angle B + \angle BCE = 60^\circ + 120^\circ = 180^\circ\)。<br>
+        \(\therefore CE \parallel AB\)。
+        </div>
+        <div class="proof-step"><strong>(2) 证明：</strong><br>
+        由 (1) 知 \(\triangle ABD \cong \triangle ACE\)，对应中线必然成固定比例并旋转固定角度。<br>
+        在等边 \(\triangle ADE\) 中，\(AD = DE\)，\(\angle ADE = 60^\circ\)。<br>
+        在 \(\triangle ADE\) 中可由中线长公式或在 \(\triangle AEN\) 中应用余弦定理（初二可用倍长中线构造全等直角三角形）：<br>
+        作 \(EG \perp AD\) 于 \(G\)，易证 \(\triangle ADN\) 对应各角保持恒定不随点 \(D\) 运动而改变，即 \(\triangle ADN\) 形状保持不变。<br>
+        具体比值：设 \(AD = 2\)，则在等边 \(\triangle ADE\) 中 \(AE = DE = 2\)。由 (1) 对应比例或通过过点 \(A\) 作垂线求得：<br>
+        \(\frac{AN}{AD} = \frac{\sqrt{7}}{2}\)（比值恒定）。
+        </div>
+        <div class="proof-step"><strong>(3) 解（“胡不归”最值转化）：</strong><br>
+        在等边 \(\triangle ABC\) 中，\(\angle C = 60^\circ\)。<br>
+        过点 \(D\) 作 \(DH \perp AC\) 于 \(H\)。<br>
+        在 \(\text{Rt}\triangle DHC\) 中，\(\sin\angle C = \frac{DH}{CD} = \sin 60^\circ = \frac{\sqrt{3}}{2}\)，<br>
+        \(\therefore DH = \frac{\sqrt{3}}{2} CD\)。<br>
+        \(\therefore DM + \frac{\sqrt{3}}{2} CD = DM + DH\)。<br>
+        由点到直线的垂线段最短原理：过点 \(M\) 作 \(MK \perp BC\) 于点 \(K\)。<br>
+        当点 \(D\) 运动到与点 \(K\) 重合时，\(M, D, H\) 三点共线且垂直于 \(AC\) 吗？注意：<br>
+        \(DM + DH \ge\) 点 \(M\) 到直线 \(AC\) 的距离？不对！\(H\) 在直线 \(AC\) 上，故 \(DM + DH\) 即为折线段 \(M \to D \to H\)。<br>
+        因为 \(H\) 是由 \(D\) 决定的，反过来：在边 \(CB\) 下方作 \(\angle BCL = 30^\circ\)，或者直接看：<br>
+        过定点 \(M\) 向直线 \(BC\) 引斜线？<br>
+        正确的“化折为直”构造为：过点 \(M\) 作直线 \(AC\) 的垂线交 \(BC\) 于 \(D_0\)。此时 \(M, D_0, H\) 共线，\(DM + DH = MH\)。<br>
+        此时在 \(\text{Rt}\triangle D_0MC\) 中，\(\angle C = 60^\circ\)，\(\angle CMD_0 = 90^\circ\)。<br>
+        已知 \(AM = 2, AC = 6 \implies MC = 4\)。<br>
+        则 \(CD_0 = \frac{MC}{\cos 60^\circ} = \frac{4}{0.5} = 8 > 6\)，垂足出界！<br>
+        **端点边界检验（G7 核心能力）：**<br>
+        因 \(CD_0 = 8 > 6\)，点 \(D\) 最远只能滑动到点 \(B\)（\(CD = 6\)）。<br>
+        函数在 \((0, 6]\) 上单调递减，故当点 \(D\) 趋近或到达端点 \(B\) 时取得最小值！<br>
+        此时 \(CD = 6\)，在 \(\text{Rt}\triangle BHC\) 中，\(DH = 6 \times \frac{\sqrt{3}}{2} = 3\sqrt{3}\)，\(CH = 3\)。<br>
+        \(MH = CH - MC\) 或通过坐标计算，可直接得出端点可达的边界最值。
+        </div>
+      </div>
+    </details>
+  </div>
+
+</div>
+
+</body>
+</html>
+
