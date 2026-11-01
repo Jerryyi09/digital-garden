@@ -29,12 +29,12 @@ cssclasses:
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
   <summary><span>数学 · 平面几何</span><em>3</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/刻画思维训练之二.html" data-garden-item data-title="几何刻画思维快速反应块：等边三角形与轴对称" data-search="几何刻画思维快速反应块：等边三角形与轴对称 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793513721124" data-router-ignore>
-  <span class="g-row-text"><strong>几何刻画思维快速反应块：等边三角形与轴对称</strong><small>11月1日</small></span>
+  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/刻画思维训练题.html" data-garden-item data-title="初二平面几何刻画思维（G1-G7）高阶特训题集（修订审校版）" data-search="初二平面几何刻画思维（G1-G7）高阶特训题集（修订审校版） 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793515247141" data-router-ignore>
+  <span class="g-row-text"><strong>初二平面几何刻画思维（G1-G7）高阶特训题集（修订审校版）</strong><small>11月1日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/数学/平面几何/刻画思维训练题.html" data-garden-item data-title="初中平面几何刻画思维（G1-G7）高阶特训题集" data-search="初中平面几何刻画思维（G1-G7）高阶特训题集 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793506508319" data-router-ignore>
-  <span class="g-row-text"><strong>初中平面几何刻画思维（G1-G7）高阶特训题集</strong><small>11月1日</small></span>
+<a class="g-row" href="/html/数学/平面几何/刻画思维训练之二.html" data-garden-item data-title="几何刻画思维快速反应块：等边三角形与轴对称" data-search="几何刻画思维快速反应块：等边三角形与轴对称 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793513721124" data-router-ignore>
+  <span class="g-row-text"><strong>几何刻画思维快速反应块：等边三角形与轴对称</strong><small>11月1日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
 <a class="g-row" href="/html/数学/平面几何/geometry_4week_training.html" data-garden-item data-title="初中平面几何刻画思维｜四周专项训练" data-search="初中平面几何刻画思维｜四周专项训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793503744955" data-router-ignore>
