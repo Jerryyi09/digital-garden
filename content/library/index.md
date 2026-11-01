@@ -29,7 +29,7 @@ cssclasses:
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
   <summary><span>数学 · 方法经验</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/方法经验/刻画思维训练" data-garden-item data-title="刻画思维训练" data-search="刻画思维训练 学习笔记/01 Areas/数学/方法经验 数学 · 方法经验" data-room="Library" data-updated="1793502292910">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/方法经验/刻画思维训练" data-garden-item data-title="刻画思维训练" data-search="刻画思维训练 学习笔记/01 Areas/数学/方法经验 数学 · 方法经验" data-room="Library" data-updated="1793503744955">
   <span class="g-row-text"><strong>刻画思维训练</strong><small>11月1日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>

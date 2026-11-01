@@ -29,8 +29,12 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/方法经验/刻画思维训练" data-garden-item data-title="刻画思维训练" data-search="刻画思维训练 学习笔记/01 Areas/数学/方法经验 数学 · 方法经验" data-room="Library" data-updated="1793502292910">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/方法经验/刻画思维训练" data-garden-item data-title="刻画思维训练" data-search="刻画思维训练 学习笔记/01 Areas/数学/方法经验 数学 · 方法经验" data-room="Library" data-updated="1793503744955">
   <span class="g-row-text"><strong>刻画思维训练</strong><small>Library · 数学 · 方法经验</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/数学/平面几何/geometry_4week_training.html" data-garden-item data-title="初中平面几何刻画思维｜四周专项训练" data-search="初中平面几何刻画思维｜四周专项训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793503744955" data-router-ignore>
+  <span class="g-row-text"><strong>初中平面几何刻画思维｜四周专项训练</strong><small>Gallery · 数学 · 平面几何</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
 <a class="g-row" href="/html/语文/初二课文/《孟子》三章赏析.html" data-garden-item data-title="《孟子》三章深度赏析与读写结合导读" data-search="《孟子》三章深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
@@ -47,10 +51,6 @@ cssclasses:
 </a>
 <a class="g-row" href="/html/语文/初二课文/愚公移山赏析.html" data-garden-item data-title="《愚公移山》深度导读与读写结合手札 · 《列子》" data-search="《愚公移山》深度导读与读写结合手札 · 《列子》 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
   <span class="g-row-text"><strong>《愚公移山》深度导读与读写结合手札 · 《列子》</strong><small>Gallery · 语文 · 初二课文</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/html/语文/初二课文/白杨礼赞赏析.html" data-garden-item data-title="《白杨礼赞》深度赏析与读写结合导读 · 茅盾" data-search="《白杨礼赞》深度赏析与读写结合导读 · 茅盾 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
-  <span class="g-row-text"><strong>《白杨礼赞》深度赏析与读写结合导读 · 茅盾</strong><small>Gallery · 语文 · 初二课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>

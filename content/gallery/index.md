@@ -15,7 +15,7 @@ cssclasses:
 
 <header class="g-page-head">
   <h1>Gallery</h1>
-  <span class="g-count" data-garden-count>11 项</span>
+  <span class="g-count" data-garden-count>12 项</span>
 </header>
 
 <div class="g-tools">
@@ -27,6 +27,13 @@ cssclasses:
 </div>
 
 <div class="g-directory" data-garden-directory>
+<details class="g-folder" data-folder open>
+  <summary><span>数学 · 平面几何</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/geometry_4week_training.html" data-garden-item data-title="初中平面几何刻画思维｜四周专项训练" data-search="初中平面几何刻画思维｜四周专项训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793503744955" data-router-ignore>
+  <span class="g-row-text"><strong>初中平面几何刻画思维｜四周专项训练</strong><small>11月1日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
 <details class="g-folder" data-folder open>
   <summary><span>语文 · 初二课文</span><em>9</em></summary>
   <div class="g-list"><a class="g-row" href="/html/语文/初二课文/《孟子》三章赏析.html" data-garden-item data-title="《孟子》三章深度赏析与读写结合导读" data-search="《孟子》三章深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
