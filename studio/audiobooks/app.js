@@ -1,6 +1,6 @@
 import { UserSync } from "./user-sync.js"
 import { openSyncStore } from "./sync-store.js"
-import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl } from "./config.js"
+import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl, showBookOverview } from "./config.js"
 import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
 import { timelinePathForSource } from "./timeline-loader.js"
@@ -62,6 +62,7 @@ let currentGuidePath = ""
 let currentGuideTitle = ""
 let guideViewerActive = false
 let currentFolderGuidePath = ""
+let currentFolderHasSummary = false
 
 // Sleep Timer State
 let sleepTimerId = null
@@ -611,8 +612,7 @@ async function list(path) {
     "runtime-snapshot",
     "__pycache__",
   ])
-  currentFolderGuidePath = guideInFolder ? `${path}/${guideInFolder}` : ""
-  return content
+  const items = content
     .filter((item) => {
       if (ignoredNames.has(item.name)) return false
       return item.is_dir || AUDIO.test(item.name)
@@ -633,6 +633,11 @@ async function list(path) {
         coverFile: coverFile || null,
       }
     })
+  return {
+    items,
+    guidePath: guideInFolder ? `${path}/${guideInFolder}` : "",
+    hasSummary: content.some(item => !item.is_dir && item.name === "summary.txt"),
+  }
 }
 
 async function browse(path = folder) {
@@ -654,8 +659,11 @@ async function browse(path = folder) {
   const refreshBtn = $("refresh")
   if (refreshBtn) refreshBtn.disabled = true
   try {
-    const result = await list(path)
+    const listing = await list(path)
     if (request !== browseRequest || owner !== account()) return
+    const result = listing.items
+    currentFolderGuidePath = listing.guidePath
+    currentFolderHasSummary = listing.hasSummary
     console.info("[audiobooks performance] directory request ms", Math.round(performance.now() - started), { path, cached })
     if (path === ROOT) write(localStorage, ROOT_CACHE, { owner, endpoint, entries: result.filter(item => item.is_dir), savedAt: Date.now() })
     if (cached && $("search").value.trim()) return
@@ -1060,7 +1068,7 @@ function render() {
   // Display full book overview banner if inside a book folder
   const currentDirName = folder.slice(ROOT.length).split("/").filter(Boolean).pop() || ""
   const currentSummary = getBookSummary(currentDirName)
-  const isBookFolder = folder !== ROOT && entries.some((item) => !item.is_dir)
+  const isBookFolder = showBookOverview(folder, entries, currentFolderHasSummary, Boolean(currentFolderGuidePath), currentSummary)
 
   if (isBookFolder) {
     $("banner-title").textContent = currentDirName
@@ -1247,7 +1255,7 @@ async function prepareNext(request) {
   if ($("btn-next")) $("btn-next").disabled = true
   try {
     const parent = current.path.slice(0, current.path.lastIndexOf("/"))
-    const tracks = (parent === folder ? entries : await list(parent))
+    const tracks = (parent === folder ? entries : (await list(parent)).items)
       .filter((item) => !item.is_dir)
       .sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
     const index = tracks.findIndex((item) => item.path === current?.path)
@@ -1702,7 +1710,7 @@ async function renderDrawerTrackList() {
   const container = $("drawer-track-list")
   container.replaceChildren()
   if (!currentBookFolder) return
-  const tracks = (await list(currentBookFolder))
+  const tracks = (await list(currentBookFolder)).items
     .filter((i) => !i.is_dir)
     .sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
 

@@ -2,6 +2,12 @@ export const ROOT = "/多媒体/750HD/有声书"
 export const EXTERNAL_ALIST = "https://melyi.uk:8089/alist"
 export const LAN_ALIST = "http://10.0.0.85:8088/alist"
 
+export function showBookOverview(path, entries, hasSummary, hasGuide, staticSummary) {
+  return path !== ROOT && (
+    entries.some(item => !item.is_dir) || hasSummary || hasGuide || Boolean(staticSummary)
+  )
+}
+
 export function resolveEndpoint(mode = "auto", location = window.location) {
   const isHttps = location.protocol === "https:"
   const local = /^(10\.|192\.168\.|127\.|localhost$|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname)

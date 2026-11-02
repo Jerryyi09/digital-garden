@@ -1,6 +1,6 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
-import { ROOT, resolveEndpoint, isWithinRoot, mediaUrl, trackId } from "./config.js"
+import { ROOT, resolveEndpoint, isWithinRoot, mediaUrl, trackId, showBookOverview } from "./config.js"
 
 function location(origin) {
   const url = new URL(origin)
@@ -64,3 +64,14 @@ test("production resolver reports unmapped intro and outro honestly", async () =
   assert.equal(resolvePlaybackSegment(timeline, 50).segment, null)
 })
 
+test("book overview supports direct audio and metadata-only multivolume folders", () => {
+  const book = `${ROOT}/心智成长/心流`
+  const volumes = [{ is_dir: true }]
+  assert.equal(showBookOverview(book, volumes, true, true, ""), true)
+  assert.equal(showBookOverview(`${ROOT}/心智成长/Great Mental Models`, volumes, true, false, ""), true)
+  assert.equal(showBookOverview(book, volumes, false, true, ""), true)
+  assert.equal(showBookOverview(book, volumes, false, false, "A summary"), true)
+  assert.equal(showBookOverview(book, [{ is_dir: false }], false, false, ""), true)
+  assert.equal(showBookOverview(`${ROOT}/心智成长`, volumes, false, false, ""), false)
+  assert.equal(showBookOverview(ROOT, [{ is_dir: false }], true, true, "summary"), false)
+})
