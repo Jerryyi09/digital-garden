@@ -1,5 +1,5 @@
-const CACHE = "garden-audiobooks-v56-network-first"
-const SHELL = ["./", "./app.js", "./user-sync.js", "./sync-store.js", "./readalong-sync.js", "./timeline-loader.js", "./search-client.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
+const CACHE = "garden-audiobooks-v57-network-first"
+const SHELL = ["./", "./app.js", "./guide-math.js", "./user-sync.js", "./sync-store.js", "./readalong-sync.js", "./timeline-loader.js", "./search-client.js", "./config.js", "./summaries.js", "./app.css", "./pdf-viewer.html", "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"]
 
 // Precache bypasses the browser HTTP cache: app.js is served with max-age=14400, and a plain
 // cache.addAll() would store that stale copy under the new cache name, so a deploy only reached
@@ -24,8 +24,9 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url)
   const cleanHref = url.origin + url.pathname
   const shell = SHELL.map(file => new URL(file, self.registration.scope).href.split("?")[0])
+  const mathAsset = cleanHref.startsWith(new URL("./vendor/katex/", self.registration.scope).href)
   // Never intercept API calls, signed streams, Range requests, or other Garden pages.
-  if (event.request.method !== "GET" || event.request.headers.has("Range") || !shell.includes(cleanHref)) return
+  if (event.request.method !== "GET" || event.request.headers.has("Range") || (!shell.includes(cleanHref) && !mathAsset)) return
 
   // Network-first for the app shell (revalidated, 304 when unchanged), cache only when offline,
   // so a deploy takes effect on the next load instead of after the HTTP cache expires.

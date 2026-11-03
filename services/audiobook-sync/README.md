@@ -4,7 +4,7 @@ The service validates each request against Alist `/api/me`, then stores each acc
 
 The NUC deployment runs the `garden-audiobook-sync` Docker container on the existing `proxy_network`. The Nginx HTTPS location in `nginx-location.conf` proxies to that container; it has no published host port. Its Python code is mounted read-only from `~/.local/lib/garden-sync/`, and the SQLite database is mounted from `~/.local/share/garden-sync/`. Keep SQLite on a local disk and protect both directories with user-only permissions. Back up using `backup.py` and SQLite's online backup API, including regular restore tests; do not copy the database file alone while WAL writes are active.
 
-Authentication is mandatory on every request; CORS is restricted to the two configured frontends. A reverse proxy is required for TLS and access from clients. The initial host user service was retained alongside the container; it is not used by Nginx. The container setup is recorded in `compose.yaml` and must be reviewed against existing server paths and the configured network before reuse.
+Authentication is mandatory on every request; CORS is restricted to the configured HTTPS origins: `https://notes.melyi.uk`, `https://melyi.uk:8089`, and `https://melyi.uk`. A reverse proxy is required for TLS and access from clients. The initial host user service was retained alongside the container; it is not used by Nginx. The container setup is recorded in `compose.yaml` and must be reviewed against existing server paths and the configured network before reuse.
 
 Deploy the service with `node services/audiobook-sync/deploy-nuc.mjs`. It creates a SQLite online-backup and copies the previous service and Nginx configuration into a dated NUC backup folder before changing anything.
 

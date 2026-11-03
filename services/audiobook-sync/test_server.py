@@ -69,11 +69,23 @@ class SyncTests(unittest.TestCase):
     self.assertTrue(self.request('one')[1]['items'][0]['value']['deleted'])
 
   def test_preflight_only_allows_configured_origins(self):
-    for origin, allowed in [('https://notes.melyi.uk', True), ('https://other.example', False)]:
+    for origin, allowed in [
+      ('https://notes.melyi.uk', True), ('https://melyi.uk:8089', True),
+      ('https://melyi.uk', True), ('https://other.example', False),
+      ('https://melyi.uk.evil.example', False), ('http://melyi.uk', False),
+    ]:
       req = urllib.request.Request(self.base, method='OPTIONS', headers={'Origin': origin})
       with urllib.request.urlopen(req) as response:
         self.assertEqual(response.status, 204)
         self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), origin if allowed else None)
+
+  def test_new_origin_still_requires_authentication(self):
+    req = urllib.request.Request(self.base, headers={'Origin': 'https://melyi.uk'})
+    with self.assertRaises(urllib.error.HTTPError) as caught:
+      urllib.request.urlopen(req)
+    with caught.exception as response:
+      self.assertEqual(response.code, 401)
+      self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), 'https://melyi.uk')
 
   def test_concurrent_edits_only_one_wins(self):
     def write(position):

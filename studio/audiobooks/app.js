@@ -5,6 +5,7 @@ import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from 
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
 import { timelinePathForSource } from "./timeline-loader.js"
 import { canSearch, normalizedSearchQuery, searchUrl } from "./search-client.js"
+import { renderGuideMath } from "./guide-math.js"
 
 const manifestMemoryCache = new Map()
 const timelineMemoryCache = new Map()
@@ -2049,6 +2050,11 @@ async function openGuideViewer(explicitPath, explicitTitle) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const htmlText = await res.text()
     if (!htmlText.trim()) throw new Error("导读内容为空")
+    $("guide-frame").onload = () => {
+      renderGuideMath($("guide-frame").contentDocument).catch(() => {
+        notice("公式排版未能加载，导读原文仍可阅读，请联网后重新打开。")
+      })
+    }
     $("guide-frame").srcdoc = htmlText
   } catch (err) {
     notice(`加载导读失败: ${err.message}`)
@@ -2061,6 +2067,7 @@ async function openGuideViewer(explicitPath, explicitTitle) {
 function closeGuideViewer() {
   guideViewerActive = false
   $("guide-viewer").hidden = true
+  $("guide-frame").onload = null
   $("guide-frame").removeAttribute("srcdoc")
 }
 

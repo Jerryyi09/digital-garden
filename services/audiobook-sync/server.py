@@ -14,7 +14,7 @@ from library_index import ensure_schema, search
 
 DB_PATH = os.environ.get('GARDEN_SYNC_DB', 'garden-sync.sqlite3')
 ALIST_ME = os.environ.get('GARDEN_ALIST_ME', 'http://127.0.0.1:5244/alist/api/me')
-ALLOWED_ORIGINS = {'https://notes.melyi.uk', 'https://melyi.uk:8089'}
+ALLOWED_ORIGINS = {'https://notes.melyi.uk', 'https://melyi.uk:8089', 'https://melyi.uk'}
 MAX_BODY = 131072
 MAX_SEARCH_QUERY = 100
 MAX_SEARCH_RESULTS = 40
