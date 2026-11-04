@@ -2,6 +2,19 @@ export const ROOT = "/多媒体/750HD/有声书"
 export const EXTERNAL_ALIST = "https://melyi.uk:8089/alist"
 export const LAN_ALIST = "http://10.0.0.85:8088/alist"
 
+export async function findGuideInPages(fetchPage, isCurrent = () => true) {
+  const size = 50
+  for (let page = 1; isCurrent(); page++) {
+    const data = await fetchPage(page, size)
+    if (!isCurrent()) return null
+    const items = data?.content || []
+    const guide = items.find(item => !item.is_dir && /^guide\.html$/i.test(item.name))
+    if (guide) return guide
+    if (!items.length || (Number.isFinite(data?.total) ? page * size >= data.total : items.length < size)) return null
+  }
+  return null
+}
+
 export function showBookOverview(path, entries, hasSummary, hasGuide, staticSummary) {
   return path !== ROOT && (
     entries.some(item => !item.is_dir) || hasSummary || hasGuide || Boolean(staticSummary)

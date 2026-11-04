@@ -1,6 +1,20 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
-import { ROOT, resolveEndpoint, isWithinRoot, mediaUrl, trackId, showBookOverview } from "./config.js"
+import { ROOT, resolveEndpoint, isWithinRoot, mediaUrl, trackId, showBookOverview, findGuideInPages } from "./config.js"
+
+test("guide lookup scans later pages and stops after cancellation or the last page", async () => {
+  const audio = Array.from({ length: 50 }, (_, i) => ({ name: `Chapter ${i}.mp3`, is_dir: false }))
+  let calls = 0
+  const fetchPage = async page => { calls++; return { content: page === 1 ? audio : [{ name: "guide.html", is_dir: false }], total: 51 } }
+  assert.equal((await findGuideInPages(fetchPage)).name, "guide.html")
+  assert.equal(calls, 2)
+  calls = 0
+  assert.equal(await findGuideInPages(async () => ({ content: audio, total: 50 })), null)
+  assert.equal(await findGuideInPages(fetchPage, () => false), null)
+  assert.equal(calls, 0)
+  let current = true
+  assert.equal(await findGuideInPages(async () => { current = false; return { content: [{ name: "guide.html" }] } }, () => current), null)
+})
 
 function location(origin) {
   const url = new URL(origin)

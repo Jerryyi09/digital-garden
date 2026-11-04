@@ -1,6 +1,6 @@
 import { UserSync } from "./user-sync.js"
 import { openSyncStore } from "./sync-store.js"
-import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl, showBookOverview } from "./config.js"
+import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl, showBookOverview, findGuideInPages } from "./config.js"
 import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
 import { timelinePathForSource } from "./timeline-loader.js"
@@ -1999,19 +1999,17 @@ async function setupGuide(track, request) {
     let validParent = ""
 
     for (const p of candidates) {
-      const data = await api("fs/list", {
+      guideItem = await findGuideInPages((page, perPage) => api("fs/list", {
         path: p,
         password: directoryPassword,
-        page: 1,
-        per_page: 50,
+        page,
+        per_page: perPage,
         refresh: false,
-      }).catch(() => null)
-      if (data?.content) {
-        guideItem = data.content.find((item) => !item.is_dir && /^guide\.html$/i.test(item.name))
-        if (guideItem) {
-          validParent = p
-          break
-        }
+      }), () => request === playRequest).catch(() => null)
+      if (request !== playRequest) return
+      if (guideItem) {
+        validParent = p
+        break
       }
     }
 
@@ -2024,7 +2022,7 @@ async function setupGuide(track, request) {
       dockGuide.title = "书籍深度导读"
     }
   } catch {
-    if (dockGuide) {
+    if (dockGuide && request === playRequest) {
       dockGuide.disabled = true
       dockGuide.classList.add("disabled")
       dockGuide.title = "暂无深度导读"
