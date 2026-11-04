@@ -214,3 +214,17 @@ class PracticalPublicationTests(unittest.TestCase):
       for p in (self.book/'readalong').rglob('*') if p.is_file()}
     self.assertEqual(restored, previous_payload)
     self.assertFalse((self.book/'readalong/text/added-by-release.html').exists())
+
+  def test_flat_publication_install_failure_restores_entry(self):
+    import os
+    original = (self.book/'readalong/readalong.manifest.json').read_bytes()
+    replace = os.replace
+    def fail_install(source, dest):
+      if Path(source).name.startswith('.readalong_stage_'):
+        raise OSError('injected tree install failure')
+      return replace(source, dest)
+    with patch('tools.readalong.tree_swap.os.replace', side_effect=fail_install):
+      with self.assertRaisesRegex(OSError, 'injected tree install failure'):
+        publish_practical(self.book, self.candidate)
+    self.assertEqual((self.book/'readalong/readalong.manifest.json').read_bytes(), original)
+    self.assertFalse((self.book/'.readalong-swap.json').exists())

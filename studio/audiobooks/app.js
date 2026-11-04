@@ -7,8 +7,10 @@ import { timelinePathForSource } from "./timeline-loader.js"
 import { canSearch, normalizedSearchQuery, searchUrl } from "./search-client.js"
 import { renderGuideMath } from "./guide-math.js"
 
-const manifestMemoryCache = new Map()
-const timelineMemoryCache = new Map()
+import { ReadalongCache, manifestDirectories, matchAudioSource, segmentsForTrack, findEpubInPages } from "./readalong-loader.js"
+
+const manifestMemoryCache = new ReadalongCache({ maxEntries: 32, ttl: 30000 })
+const timelineMemoryCache = new ReadalongCache({ weight: value => Array.isArray(value) ? value.length : 1, ttl: 30000 })
 
 const $ = (id) => document.getElementById(id)
 const audio = $("audio")
@@ -1762,11 +1764,13 @@ function readalongFragmentForSegment(seg, doc) {
 }
 
 async function setupReadalong(track, request) {
+  if (request !== playRequest) return
   invalidateReadalong()
   const releaseBadge = $("readalong-release-status")
   if (releaseBadge) {
     releaseBadge.textContent = "跟读模式"
     releaseBadge.title = ""
+    releaseBadge.hidden = false
   }
   readalongManifest = null
   readalongTimeline = []
@@ -1775,31 +1779,27 @@ async function setupReadalong(track, request) {
   $("dock-readalong").hidden = true
 
   try {
-    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
-    // Support multi-volume sub-directory audiobooks (e.g. Great Mental Models/Volume 1/...)
-    // Check current track directory first; if not found, fallback to parent directory
-    const candidates = [parent]
-    const grandParent = parent.slice(0, parent.lastIndexOf("/"))
-    if (grandParent && isWithinRoot(grandParent)) {
-      candidates.push(grandParent)
-    }
+    const candidates = manifestDirectories(track.path, ROOT)
+    const cachePrefix = `${endpoint}|${account()}|`
 
     let manifest = null
     let validParent = ""
 
     for (const p of candidates) {
       const manifestPath = `${p}/readalong/readalong.manifest.json`
-      let m = manifestMemoryCache.get(manifestPath)
+      let m = manifestMemoryCache.get(cachePrefix + manifestPath)
       if (!m) {
         const info = await api("fs/get", {
           path: manifestPath,
           password: directoryPassword,
         }).catch(() => null)
+        if (request !== playRequest) return
         if (info) {
           const manifestUrl = mediaUrl(endpoint, { path: manifestPath }, info.sign)
           m = await fetch(manifestUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
+          if (request !== playRequest) return
           if (m && m.schemaVersion === 1) {
-            manifestMemoryCache.set(manifestPath, m)
+            manifestMemoryCache.set(cachePrefix + manifestPath, m)
           }
         }
       }
@@ -1810,9 +1810,11 @@ async function setupReadalong(track, request) {
         readalongFrameReady = null
         if (releaseBadge) releaseBadge.hidden = true
 
-        // 纯听书如果不跟读，但目录下有 EPUB，播放界面依然显示 EPUB 按钮供浏览！
-        const listData = await api("fs/list", { path: p, password: directoryPassword, page: 1, per_page: 50 }).catch(() => null)
-        const epubItem = listData?.content?.find((item) => !item.is_dir && /\.epub$/i.test(item.name))
+        // Audio-only releases may still offer an EPUB on any listing page.
+        const epubItem = await findEpubInPages(p, (path, page) =>
+          api("fs/list", { path, password: directoryPassword, page, per_page: 200 }),
+          () => request === playRequest)
+        if (request !== playRequest) return
         if (epubItem) {
           $("dock-readalong").hidden = false
           const label = $("dock-readalong").querySelector("span")
@@ -1850,44 +1852,44 @@ async function setupReadalong(track, request) {
 
     // Relative paths distinguish identically named tracks in separate volumes.
     const relative = track.path.slice(validParent.length + 1)
-    const source = manifest.audioSources?.find((s) => s.id === relative || s.alistPath === track.path || s.id === track.name || s.name === track.name)
+    const source = matchAudioSource(manifest.audioSources, track, relative)
     // The manifest is sufficient to expose the EPUB button. Large books may
     // load their current track timeline shard asynchronously below.
     $("dock-readalong").hidden = !Boolean(manifest.alignedDocument || manifest.textRoot)
+    $("dock-readalong").onclick = openReadalong
+    const dockLabel = $("dock-readalong").querySelector("span")
+    if (dockLabel) dockLabel.textContent = "跟读"
+    $("dock-readalong").title = "EPUB 音文跟读"
 
     let timelinePath = `${assetBase}/${manifest.timeline || "timeline.json"}`
     if (manifest.timelineFormat === "per-audio-source-v1") {
       const indexPath = `${assetBase}/${manifest.timelineIndex || manifest.timeline || "timeline-index.json"}`
-      let index = timelineMemoryCache.get(indexPath)
+      let index = timelineMemoryCache.get(cachePrefix + indexPath)
       if (!index) {
         const indexInfo = await api("fs/get", { path: indexPath, password: directoryPassword }).catch(() => null)
         if (!indexInfo || request !== playRequest) return
         const indexUrl = mediaUrl(endpoint, { path: indexPath }, indexInfo.sign)
         index = await fetch(indexUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
-        if (index?.files) timelineMemoryCache.set(indexPath, index)
+        if (request !== playRequest) return
+        if (index?.files) timelineMemoryCache.set(cachePrefix + indexPath, index)
       }
       const shard = source && timelinePathForSource(manifest, index, source.id)
       if (!shard) return
       timelinePath = `${assetBase}/${shard}`
     }
 
-    let timeline = timelineMemoryCache.get(timelinePath)
+    let timeline = timelineMemoryCache.get(cachePrefix + timelinePath)
     if (!timeline) {
       const timelineInfo = await api("fs/get", { path: timelinePath, password: directoryPassword }).catch(() => null)
       if (!timelineInfo || request !== playRequest) return
       const timelineUrl = mediaUrl(endpoint, { path: timelinePath }, timelineInfo.sign)
       timeline = await fetch(timelineUrl, { cache: "no-store" }).then((r) => r.json()).catch(() => null)
-      if (Array.isArray(timeline)) timelineMemoryCache.set(timelinePath, timeline)
+      if (request !== playRequest) return
+      if (Array.isArray(timeline)) timelineMemoryCache.set(cachePrefix + timelinePath, timeline)
     }
     if (request !== playRequest || !Array.isArray(timeline)) return
 
-    let matched = source ? timeline.filter((s) => s.audioSourceId === source.id || s.audioSourceId === track.name) : []
-    if (!matched.length) {
-      matched = timeline.filter((s) => s.audioSourceId === track.name || s.audioSourceId === relative)
-    }
-    if (!matched.length && !timeline.some((s) => s.audioSourceId)) {
-      matched = timeline
-    }
+    const matched = segmentsForTrack(timeline, manifest.audioSources, source, track, relative)
 
     // Always sort filtered segments strictly by start time to guarantee binary search correctness
     readalongTimeline = matched.sort((a, b) => (Number(a.start) || 0) - (Number(b.start) || 0))
@@ -1907,7 +1909,7 @@ async function setupReadalong(track, request) {
       syncReadalong(true)
     }
   } catch {
-    $("dock-readalong").hidden = true
+    if (request === playRequest) $("dock-readalong").hidden = true
   }
 }
 
@@ -2689,6 +2691,8 @@ on("logout-btn", "click", logout)
 
 function logout() {
   for (const url of coverObjectUrls.values()) URL.revokeObjectURL(url)
+  manifestMemoryCache.clear()
+  timelineMemoryCache.clear()
   coverObjectUrls.clear()
   coverSignedCache.clear()
   saveProgress()

@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 
 from tools.readalong.authoritative_validator import audit_book_authoritative, safe_path
 from tools.readalong.atomic_io import atomic_json
+from tools.readalong.tree_swap import recover_tree_swap, replace_active_tree
 from tools.readalong.candidate_safety import source_files
 from tools.readalong.controlled_publisher import BookPublishLock, compute_dir_fingerprint, _switch
 from tools.readalong.acoustic_evaluator import sha256
@@ -243,6 +244,9 @@ def publish_practical(book_dir, candidate_dir, *, dry_run=False, material=None):
   with BookPublishLock(book) as lock:
     if not lock._acquired:
       return {'success': False, 'code': 'ERR_PUBLISH_LOCKED'}
+    if dry_run and (book/'.readalong-swap.json').exists():
+      raise ValueError('Interrupted publication requires recovery before dry run')
+    recover_tree_swap(book)
     ensure_book_cover_and_summary(book)
     source_state = source_snapshot(book)
     result = audit_practical(book, assets, material)
@@ -315,11 +319,10 @@ def publish_practical(book_dir, candidate_dir, *, dry_run=False, material=None):
         replaced.parent.mkdir(parents=True, exist_ok=True)
         if replaced.exists():
           raise ValueError('Replaced active payload already exists; refusing to overwrite it')
-        if active.exists():
-          os.replace(active, replaced)
-        os.replace(staged, active)
+        replace_active_tree(book, staged, replaced)
       except BaseException:
-        shutil.rmtree(staged, ignore_errors=True)
+        if not (book/'.readalong-swap.json').exists():
+          shutil.rmtree(staged, ignore_errors=True)
         raise
     return {'success': True, 'active_dir': str(active), 'revision_dir': str(revision),
       'receipt': str(revision/'release-receipt.json'), 'audit': result}
@@ -333,6 +336,7 @@ def rollback_practical(book_dir, revision_id):
   with BookPublishLock(book) as lock:
     if not lock._acquired:
       return {'success': False, 'code': 'ERR_PUBLISH_LOCKED'}
+    recover_tree_swap(book)
     revision = safe_path(book, '.readalong_revisions/'+revision_id)
     receipt = json.loads((revision/'release-receipt.json').read_text())
     current = json.loads((book/'readalong/readalong.manifest.json').read_text())
@@ -368,11 +372,7 @@ def rollback_practical(book_dir, revision_id):
       rejected_active = rollback_root/'rejected-active'
       if rejected_active.exists():
         raise ValueError('Rejected active payload already exists; refusing to overwrite it')
-      if active.is_symlink():
-        active.unlink()
-      elif active.exists():
-        os.replace(active, rejected_active)
-      os.replace(restore_stage, active)
+      replace_active_tree(book, restore_stage, rejected_active)
     return {'success': True, 'restoredPreviousEntry': True}
 
 

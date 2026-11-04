@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
+import * as loader from '../../../studio/audiobooks/readalong-loader.js'
 
 test('actual setupReadalong shows practical gaps without an out-of-scope badge variable', async () => {
   const source = fs.readFileSync(new URL('../../../studio/audiobooks/app.js', import.meta.url), 'utf8')
@@ -11,9 +12,12 @@ test('actual setupReadalong shows practical gaps without an out-of-scope badge v
   const manifest = { schemaVersion: 1, assetRevision: 'a'.repeat(32), timeline: 'timeline.json', textRoot: 'text/',
     audioSources: [{ id: 'a.mp3' }], practicalRelease: { decision: 'PUBLISH_WITH_GAPS' } }
   const context = vm.createContext({
+    ...loader, ROOT: '/750HD/有声书', account: () => 'test',
+    manifestMemoryCache: new loader.ReadalongCache(), timelineMemoryCache: new loader.ReadalongCache(),
+    openReadalong() {},
     invalidateReadalong() {},
     closeReadalong() { nodes.get('readalong').hidden = true },
-    $(id) { if (!nodes.has(id)) nodes.set(id, {}); return nodes.get(id) },
+    $(id) { if (!nodes.has(id)) nodes.set(id, { querySelector: () => ({}) }); return nodes.get(id) },
     api: async () => ({ sign: '' }), isWithinRoot: () => true,
     mediaUrl: (_, info) => info.path,
     fetch: async url => ({ json: async () => url.endsWith('readalong.manifest.json') ? manifest :

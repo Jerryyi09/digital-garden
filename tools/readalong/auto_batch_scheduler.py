@@ -124,7 +124,7 @@ def process_category(cat_name: str) -> dict:
       pub_ok = True
       print(f"  [SUCCESS] Tier 1/2/3 verification and NUC sync PASSED for {cat_name}!")
     else:
-      pub_msg = pub_res.stderr[-500:]
+      pub_msg = (pub_res.stdout + "\n" + pub_res.stderr)[-2500:]
       print(f"  [WARNING] Publication failed for {cat_name}: {pub_msg}")
   else:
     print(f"  [NOTICE] No publishable books in {cat_name} (all skipped or mismatched).")
@@ -132,7 +132,7 @@ def process_category(cat_name: str) -> dict:
   elapsed = time.perf_counter() - t0
   return {
     "category": cat_name,
-    "status": "COMPLETED",
+    "status": "PUBLICATION_FAILED" if publishable_count > 0 and not pub_ok else "COMPLETED",
     "elapsed_seconds": elapsed,
     "run_dir": str(latest_run),
     "publishable_count": publishable_count,

@@ -20,15 +20,37 @@ def dir_tree_manifest_hash(dir_path: Path):
   return h.hexdigest()
 
 
+def timeline_payload_hash(base, manifest):
+  """Hash the index and every referenced shard, with bounded read memory."""
+  base = Path(base)
+  timeline = base / (manifest.get("timelineIndex") or manifest.get("timeline") or "timeline.json")
+  def digest(path):
+    with path.open("rb") as stream:
+      hasher = hashlib.sha256()
+      for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+        hasher.update(chunk)
+      return hasher.hexdigest()
+  index_hash = digest(timeline)
+  if manifest.get("timelineFormat") != "per-audio-source-v1":
+    return index_hash
+  index = json.loads(timeline.read_text(encoding="utf-8"))
+  hasher = hashlib.sha256(index_hash.encode("ascii"))
+  for rel in sorted(set(index["files"].values())):
+    shard = (base / rel).resolve()
+    if not shard.is_relative_to(base.resolve()):
+      raise ValueError("Unsafe timeline shard path: " + rel)
+    hasher.update(json.dumps([rel, digest(shard)], ensure_ascii=False).encode("utf-8"))
+  return hasher.hexdigest()
+
+
 def published_tier2_hashes(book_dir: Path):
   manifest_path = book_dir / "readalong" / "readalong.manifest.json"
   manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
   revision = manifest.get("assetRevision")
   source_base = book_dir / ".readalong_revisions" / revision if revision else book_dir / "readalong"
   text_root = source_base / (manifest.get("textRoot") or "text/")
-  timeline_path = source_base / (manifest.get("timeline") or "timeline.json")
   return (dir_tree_manifest_hash(text_root), hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
-          hashlib.sha256(timeline_path.read_bytes()).hexdigest())
+          timeline_payload_hash(source_base, manifest))
 
 
 def tier2_book_payload(category, book_name, book_dir):

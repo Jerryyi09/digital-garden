@@ -146,7 +146,8 @@ function gitTimes() {
   return { times, dirty }
 }
 
-const history = gitTimes()
+// Load history only when a file has no authoritative date.
+let history
 
 // Recorded by scripts/publish-notes.mjs at publish time; authoritative on every builder.
 let publishDates = {}
@@ -163,6 +164,7 @@ async function updatedTime(file, frontmatter = {}) {
   )
   if (!Number.isNaN(declared)) return declared
 
+  history ??= gitTimes()
   if (!history.dirty.has(relative) && history.times.has(relative))
     return history.times.get(relative)
 

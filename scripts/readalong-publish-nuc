@@ -55,7 +55,7 @@ echo "  Batch dir:   $BATCH_DIR"
 echo "  Remote base: $TARGET_BASE"
 echo "=================================================="
 
-"$PYTHON" -c "
+"$PYTHON" - "$BATCH_DIR" "$TARGET_BASE" "$PYTHON" << 'EOF'
 import json, subprocess, sys
 from pathlib import Path
 from tools.readalong.nuc_syncer import sync_book_to_nuc
@@ -71,10 +71,10 @@ except RuntimeError as exc:
     print(f'ERROR: Another NUC publication process is currently running. {exc}', file=sys.stderr)
     sys.exit(1)
 
-run_dir = Path('$BATCH_DIR')
+run_dir = Path(sys.argv[1])
 inv = json.load(open(run_dir / 'inventory.json'))
-py = '$PYTHON'
-remote_target = '$TARGET_BASE'
+remote_target = sys.argv[2]
+py = sys.argv[3]
 remote_host, remote_path = remote_target.split(':', 1)
 
 candidates = {}
@@ -104,6 +104,7 @@ elif (run_dir / 'results.json').exists():
 print(f'Found {len(candidates)} candidate(s) ready for audit, publish & sync')
 
 synced_books_for_tier2 = []
+failed_books = []
 
 for uid, (b_dir_str, c_path) in sorted(candidates.items()):
     cat, name = uid.split('/', 1)
@@ -115,10 +116,12 @@ for uid, (b_dir_str, c_path) in sorted(candidates.items()):
     res = subprocess.run([py, '-m', 'tools.readalong.readalong_cli', 'audit-practical', str(b_dir), str(c_path)], capture_output=True, text=True)
     if res.returncode != 0:
         print(f'  [FAIL] Audit errored: {res.stderr}')
+        failed_books.append((uid, 'AUDIT_ERROR', [res.stderr.strip()]))
         continue
     ad = json.loads(res.stdout)
     if not ad.get('publishAllowed'):
-        print(f'  [SKIP] Candidate not publishable: decision={ad.get(\"decision\")}, errors={ad.get(\"hardErrors\")}')
+        print(f'  [SKIP] Candidate not publishable: decision={ad.get("decision")}, errors={ad.get("hardErrors")}')
+        failed_books.append((uid, 'NOT_PUBLISHABLE', ad.get('hardErrors', [])))
         continue
 
     # 2. 本地原子发布
@@ -126,27 +129,34 @@ for uid, (b_dir_str, c_path) in sorted(candidates.items()):
     pub_res = subprocess.run([py, '-m', 'tools.readalong.readalong_cli', 'publish-practical', str(b_dir), str(c_path)], capture_output=True, text=True)
     if pub_res.returncode != 0:
         print(f'  [FAIL] Local publish error: {pub_res.stderr}')
+        failed_books.append((uid, 'LOCAL_PUBLISH_ERROR', [pub_res.stderr.strip()]))
         continue
     pd = json.loads(pub_res.stdout)
     if not pd.get('success'):
         print(f'  [FAIL] Local publish failed: {pd}')
+        failed_books.append((uid, 'LOCAL_PUBLISH_FAILED', [str(pd)]))
         continue
-    print(f'  [OK] Local revision: {pd.get(\"revision\")}')
+    print(f'  [OK] Local revision: {pd.get("revision")}')
 
     # Tier 1 本地静态全面检验（秒级零网络：锚点、CSS、自然排序、分卷路径、粒度指标）
     print(f'[*] Tier 1: Local static verification...')
     t1_ok, t1_issues, t1_metrics = tier1_local_static_check(b_dir)
     if not t1_ok:
         print(f'  [TIER 1 FAILED] {uid}: {t1_issues}')
-        sys.exit(1)
-    print(f'  [TIER 1 OK] Segments={t1_metrics[\"segments_count\"]}, Median={t1_metrics[\"median_duration\"]}s, P95={t1_metrics[\"p95_duration\"]}s, Fallback={t1_metrics[\"fallback_ratio\"]:.1%}')
+        failed_books.append((uid, 'TIER_1_FAILED', t1_issues))
+        continue
+    print(f'  [TIER 1 OK] Segments={t1_metrics["segments_count"]}, Median={t1_metrics["median_duration"]}s, P95={t1_metrics["p95_duration"]}s, Fallback={t1_metrics["fallback_ratio"]:.1%}')
 
     # 3. SSH 安全同步至 NUC（单书精确集、--protect-args、--iconv、备份旧版）
     print(f'[3/3] Syncing to NUC via SSH...')
-    sync_result = sync_book_to_nuc(b_dir, cat, name, remote_host=NUC_TARGET, remote_base=remote_path)
-    print(f'  [OK] Synced files and version directory to {remote_target}/{uid}')
-
-    synced_books_for_tier2.append(tier2_book_payload(sync_result['category'], sync_result['book_name'], b_dir))
+    try:
+        sync_result = sync_book_to_nuc(b_dir, cat, name, remote_host=NUC_TARGET, remote_base=remote_path)
+        print(f'  [OK] Synced files and version directory to {remote_target}/{uid}')
+        synced_books_for_tier2.append(tier2_book_payload(sync_result['category'], sync_result['book_name'], b_dir))
+    except Exception as exc:
+        print(f'  [SYNC FAILED] {uid}: {exc}')
+        failed_books.append((uid, 'SYNC_FAILED', [str(exc)]))
+        continue
 
 if synced_books_for_tier2:
     # Tier 2: 单次 SSH 批量服务器文件级核验（秒级，单进程）
@@ -168,6 +178,15 @@ if synced_books_for_tier2:
     print(f'  [TIER 3 OK] Alist gateway verified functional on {sample_cat}/{sample_book}!')
 
 print('\n==================================================')
-print('NUC publication, sync and tiered verification completed.')
+print(f'NUC publication summary: {len(synced_books_for_tier2)} succeeded, {len(failed_books)} failed/skipped.')
+if failed_books:
+    print('Failed/Skipped details:')
+    for f_uid, f_stage, f_reasons in failed_books:
+        print(f'  - {f_uid} [{f_stage}]: {f_reasons}')
+if failed_books:
+    sys.exit(1)
+if not synced_books_for_tier2:
+    print('NO_CANDIDATES: No books were published.', file=sys.stderr)
+    sys.exit(2)
 print('==================================================')
-"
+EOF

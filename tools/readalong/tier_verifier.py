@@ -146,12 +146,16 @@ DEFAULT_REMOTE_TARGET = NUC_TARGET
 def tier2_remote_batch_check(remote_host: str = DEFAULT_REMOTE_TARGET, book_tuples: list[tuple] = None, remote_root: str = "/mnt/750/Music/有声书") -> tuple[bool, list[str]]:
   """Tier 2: Single SSH call batch filesystem audit of all modified books on NUC."""
   import base64
+  import inspect
+  import shlex
+  from tools.readalong.release_integrity import timeline_payload_hash
   payload_b64 = base64.b64encode(json.dumps(book_tuples).encode("utf-8")).decode("ascii")
-  script = f"""python3 -c '
+  script = f"""
 import json, sys, hashlib, re, base64
 from pathlib import Path
 
-root = Path("{remote_root}")
+{inspect.getsource(timeline_payload_hash)}
+root = Path({json.dumps(remote_root, ensure_ascii=False)})
 targets = json.loads(base64.b64decode("{payload_b64}").decode("utf-8"))
 errors = []
 
@@ -186,7 +190,11 @@ for target in targets:
         errors.append(f"TIMELINE_MISSING: {{cat}}/{{name}}")
         continue
     if local_timeline_hash:
-        remote_timeline_hash = hashlib.sha256(tl_path.read_bytes()).hexdigest()
+        try:
+            remote_timeline_hash = timeline_payload_hash(s_base, m)
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            errors.append(f"TIMELINE_PAYLOAD_INVALID: {{cat}}/{{name}}: {{exc}}")
+            continue
         if remote_timeline_hash != local_timeline_hash:
             errors.append(f"TIMELINE_HASH_MISMATCH: {{cat}}/{{name}} local={{local_timeline_hash[:8]}} rem={{remote_timeline_hash[:8]}}")
     tl_obj = json.loads(tl_path.read_text(encoding="utf-8"))
@@ -197,9 +205,8 @@ for target in targets:
             if not shard.is_file():
                 errors.append(f"TIMELINE_SHARD_MISSING: {{cat}}/{{name}}/{{rel}}")
                 continue
-            tl.extend(json.loads(shard.read_text(encoding="utf-8"))[:50])
-            if len(tl) >= 50:
-                break
+            if len(tl) < 50:
+                tl.extend(json.loads(shard.read_text(encoding="utf-8"))[:50 - len(tl)])
     else:
         tl = tl_obj
 
@@ -232,7 +239,8 @@ if errors:
     print("FAILED:" + ";".join(errors))
     sys.exit(1)
 print("TIER2_OK")
-' """
+"""
+  script = "python3 -c " + shlex.quote(script)
   host = canonical_nuc_target(remote_host)
   res = run_nuc(direct_ssh_command(host, bounded_remote(script, seconds=600, lock="tier2")), check=False, runner=subprocess.run, capture_output=True, text=True)
   out = res.stdout.strip()

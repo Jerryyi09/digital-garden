@@ -6,7 +6,7 @@ import { resolvePlaybackSegment, SYNC_STATE } from '../../../studio/audiobooks/r
 
 test('R2-05: Stale fetch response must not overwrite displayed iframe content', async () => {
   const src = fs.readFileSync(new URL('../../../studio/audiobooks/app.js', import.meta.url), 'utf8');
-  const implementation = src.slice(src.indexOf('function loadReadalongDoc('), src.indexOf('// Safe event listener helper'));
+  const implementation = src.slice(src.indexOf('function readalongFragmentForSegment('), src.indexOf('async function setupReadalong(')) + src.slice(src.indexOf('function loadReadalongDoc('), src.indexOf('// Safe event listener helper'));
 
   let shown = '';
   const doc = {
@@ -99,7 +99,7 @@ test('R2-05: Stale fetch response must not overwrite displayed iframe content', 
 
 test('R2-05: Non-active states (AFTER_END / BEFORE_START / UNMAPPED) must clear highlight', async () => {
   const src = fs.readFileSync(new URL('../../../studio/audiobooks/app.js', import.meta.url), 'utf8');
-  const implementation = src.slice(src.indexOf('function loadReadalongDoc('), src.indexOf('// Safe event listener helper'));
+  const implementation = src.slice(src.indexOf('function readalongFragmentForSegment('), src.indexOf('async function setupReadalong(')) + src.slice(src.indexOf('function loadReadalongDoc('), src.indexOf('// Safe event listener helper'));
 
   let removals = 0;
   const doc = {

@@ -80,28 +80,37 @@ function setupListing() {
   const empty = document.querySelector<HTMLElement>("[data-garden-empty]")
   let sort = "updated"
 
+  const folders = [...directory.querySelectorAll<HTMLDetailsElement>("[data-folder]")].map(folder => {
+    const list = folder.querySelector<HTMLElement>(".g-list")
+    const rows = list ? [...list.querySelectorAll<HTMLElement>("[data-garden-item]")] : []
+    const searchText = new Map(rows.map(row => [row, (row.dataset.search || "").toLocaleLowerCase()]))
+    return { folder, list, rows, searchText }
+  })
+  let appliedSort = ""
+
   const update = () => {
     const query = (search?.value || "").trim().toLocaleLowerCase()
     let visible = 0
-    for (const folder of directory.querySelectorAll<HTMLDetailsElement>("[data-folder]")) {
-      const list = folder.querySelector<HTMLElement>(".g-list")
+    for (const { folder, list, rows, searchText } of folders) {
       if (!list) continue
-      const rows = [...list.querySelectorAll<HTMLElement>("[data-garden-item]")]
-      rows.sort((a, b) =>
-        sort === "title"
-          ? (a.dataset.title || "").localeCompare(b.dataset.title || "", "zh-CN")
-          : Number(b.dataset.updated) - Number(a.dataset.updated),
-      )
+      if (appliedSort !== sort) {
+        rows.sort((a, b) =>
+          sort === "title"
+            ? (a.dataset.title || "").localeCompare(b.dataset.title || "", "zh-CN")
+            : Number(b.dataset.updated) - Number(a.dataset.updated),
+        )
+        list.append(...rows)
+      }
       let shown = 0
       for (const row of rows) {
-        list.append(row)
-        row.hidden = !(row.dataset.search || "").toLocaleLowerCase().includes(query)
+        row.hidden = !searchText.get(row)!.includes(query)
         if (!row.hidden) shown++
       }
       folder.hidden = shown === 0
       if (query && shown) folder.open = true
       visible += shown
     }
+    appliedSort = sort
     if (count) count.textContent = `${visible} 项`
     if (empty) empty.hidden = visible !== 0
   }
