@@ -7,7 +7,7 @@ import { timelinePathForSource } from "./timeline-loader.js"
 import { canSearch, normalizedSearchQuery, searchUrl } from "./search-client.js"
 import { renderGuideMath } from "./guide-math.js"
 
-import { ReadalongCache, manifestDirectories, matchAudioSource, segmentsForTrack, findEpubInPages } from "./readalong-loader.js"
+import { ReadalongCache, manifestDirectories, matchAudioSource, segmentsForTrack, findEpubInPages, findNextAcrossDirectories } from "./readalong-loader.js"
 
 const manifestMemoryCache = new ReadalongCache({ maxEntries: 32, ttl: 30000 })
 const timelineMemoryCache = new ReadalongCache({ weight: value => Array.isArray(value) ? value.length : 1, ttl: 30000 })
@@ -37,6 +37,7 @@ let lastSave = 0
 let playRequest = 0
 let browseRequest = 0
 let preparedNext = null
+let nextPreparation = null
 let db = null
 let directoryPassword = ""
 let syncStore = null
@@ -1254,23 +1255,30 @@ async function stream(track) {
 }
 
 async function prepareNext(request) {
+  const track = current
+  if (!track || request !== playRequest) return "cancelled"
   preparedNext = null
   if ($("btn-next")) $("btn-next").disabled = true
   try {
-    const parent = current.path.slice(0, current.path.lastIndexOf("/"))
-    const tracks = (parent === folder ? entries : (await list(parent)).items)
-      .filter((item) => !item.is_dir)
+    const parent = track.path.slice(0, track.path.lastIndexOf("/"))
+    const itemsFor = async path => path === folder ? entries : (await list(path)).items
+    const tracks = (await itemsFor(parent)).filter(item => !item.is_dir)
       .sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
-    const index = tracks.findIndex((item) => item.path === current?.path)
-    const next = index >= 0 ? tracks[index + 1] : null
-    if (!next) return
-    const url = await stream(next)
-    if (request === playRequest) {
-      preparedNext = { track: next, url, preparedAt: Date.now() }
-      if ($("btn-next")) $("btn-next").disabled = false
+    if (request !== playRequest) return "cancelled"
+    const index = tracks.findIndex(item => item.path === track.path)
+    let next = index >= 0 ? tracks[index + 1] : null
+    if (!next && index >= 0) {
+      next = await findNextAcrossDirectories(track, ROOT, itemsFor, () => request === playRequest)
     }
+    if (request !== playRequest) return "cancelled"
+    if (!next) return "end"
+    const url = await stream(next)
+    if (request !== playRequest) return "cancelled"
+    preparedNext = { track: next, url, preparedAt: Date.now() }
+    if ($("btn-next")) $("btn-next").disabled = false
+    return "ready"
   } catch {
-    /* Next chapter discovery failure shouldn't stop playback */
+    return request === playRequest ? "error" : "cancelled"
   }
 }
 
@@ -1376,7 +1384,7 @@ async function loadTrack(track, preparedUrl) {
   audio.load()
 
   playAudio()
-  prepareNext(request)
+  nextPreparation = prepareNext(request)
   setupReadalong(track, request)
   setupPdf(track, request)
   setupGuide(track, request)
@@ -1616,17 +1624,22 @@ audio.addEventListener("pause", () => {
   if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused"
 })
 
-audio.addEventListener("ended", () => {
+audio.addEventListener("ended", async () => {
   saveProgress(true)
   if (sleepTimerMode === "track") {
     clearSleepTimer()
     notice("定时关闭：已播放完当前章节")
     return
   }
+  const request = playRequest
+  let result = preparedNext ? "ready" : await nextPreparation
+  if (request !== playRequest) return
+  if (result === "error") result = await prepareNext(request)
+  if (request !== playRequest) return
   if (preparedNext) nextTrack()
   else {
     const endDesc = $("player-track-desc")
-    if (endDesc) endDesc.textContent = "全书已播完"
+    if (endDesc) endDesc.textContent = result === "end" ? "全书已播完" : "无法加载下一章节，请检查网络"
     render()
   }
 })

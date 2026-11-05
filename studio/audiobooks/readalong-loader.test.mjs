@@ -110,3 +110,65 @@ test("deep-volume setup loads only the exact source shard and restores the reade
   assert.equal(ctx.readalongTimeline.length, 1)
   assert.equal(ctx.$("dock-readalong").onclick, ctx.openReadalong)
 })
+
+test("cross-volume continuation sorts naturally and stays within the book", async () => {
+  const root = "/library"
+  const book = `${root}/category/book`
+  const file = path => ({ path: `${book}/${path}`, name: path.split("/").at(-1), is_dir: false })
+  const dir = path => ({ path: `${book}/${path}`, name: path.split("/").at(-1), is_dir: true })
+  const tree = { [book]: [dir("Volume 10"), dir("Volume 2"), dir("Volume 1")],
+    [`${book}/Volume 1`]: [file("Volume 1/01.mp3")],
+    [`${book}/Volume 2`]: [file("Volume 2/02.mp3"), file("Volume 2/01.mp3")],
+    [`${book}/Volume 10`]: [file("Volume 10/01.mp3")] }
+  const seen = []
+  const list = async path => { seen.push(path); return tree[path] || [] }
+  assert.equal((await loader.findNextAcrossDirectories(file("Volume 1/01.mp3"), root, list)).path, `${book}/Volume 2/01.mp3`)
+  assert.equal((await loader.findNextAcrossDirectories(file("Volume 2/02.mp3"), root, list)).path, `${book}/Volume 10/01.mp3`)
+  assert.equal(await loader.findNextAcrossDirectories(file("Volume 10/01.mp3"), root, list), null)
+  assert.ok(seen.every(path => path === book || path.startsWith(`${book}/`)))
+  assert.equal(loader.playbackBookRoot(`${root}/category/01.mp3`, root), null)
+})
+
+test("cross-directory discovery stops after cancellation and reports listing errors", async () => {
+  const track = { path: "/library/category/book/one/a.mp3" }
+  let active = true
+  let count = 0
+  const result = await loader.findNextAcrossDirectories(track, "/library", async () => { count++; active = false; return [] }, () => active)
+  assert.equal(result, null)
+  assert.equal(count, 1)
+  await assert.rejects(loader.findNextAcrossDirectories(track, "/library", async () => { throw new Error("offline") }), /offline/)
+})
+
+test("playback waits for pending preparation and ignores an old track after switching", async () => {
+  const app = fs.readFileSync(new URL("./app.js", import.meta.url), "utf8")
+  const ended = app.slice(app.indexOf('audio.addEventListener("ended",'), app.indexOf('audio.addEventListener("error",'))
+  const wait = deferred()
+  let handler, nextCalls = 0
+  const ctx = vm.createContext({ audio: { addEventListener: (_event, fn) => { handler = fn } }, saveProgress() {},
+    sleepTimerMode: "", playRequest: 1, preparedNext: null, nextPreparation: wait.promise,
+    nextTrack() { nextCalls++ }, render() {}, $: () => ({ textContent: "" }) })
+  vm.runInContext(ended, ctx)
+  const pending = handler()
+  ctx.playRequest = 2
+  ctx.preparedNext = { track: { path: "new" } }
+  wait.resolve("ready")
+  await pending
+  assert.equal(nextCalls, 0)
+})
+
+test("playback retries failed preloading and respects end-of-track sleep", async () => {
+  const app = fs.readFileSync(new URL("./app.js", import.meta.url), "utf8")
+  const ended = app.slice(app.indexOf('audio.addEventListener("ended",'), app.indexOf('audio.addEventListener("error",'))
+  let handler, retries = 0, nextCalls = 0
+  const ctx = vm.createContext({ audio: { addEventListener: (_event, fn) => { handler = fn } }, saveProgress() {},
+    sleepTimerMode: "", playRequest: 1, preparedNext: null, nextPreparation: Promise.resolve("error"),
+    async prepareNext() { retries++; ctx.preparedNext = {}; return "ready" },
+    nextTrack() { nextCalls++ }, clearSleepTimer() {}, notice() {}, render() {}, $: () => ({ textContent: "" }) })
+  vm.runInContext(ended, ctx)
+  await handler()
+  assert.equal(retries, 1)
+  assert.equal(nextCalls, 1)
+  ctx.sleepTimerMode = "track"
+  await handler()
+  assert.equal(nextCalls, 1)
+})
