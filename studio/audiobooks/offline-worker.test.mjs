@@ -6,7 +6,7 @@ import { OFFLINE_CACHE } from "./offline-store.js"
 const source = fs.readFileSync(new URL("./sw.js", import.meta.url), "utf8")
 function worker(cache) {
   const events = new Map()
-  const ctx = vm.createContext({ URL, Request, Response, Headers, Blob,
+  const ctx = vm.createContext({ URL, Request, Response, Headers, Blob, ReadableStream,
     self: { location: { origin: 'https://local.test' }, registration: { scope: 'https://local.test/studio/audiobooks/' },
       clients: { claim() {} }, addEventListener(name, fn) { const rows = events.get(name) || []; rows.push(fn); events.set(name, rows) } },
     caches: cache, fetch: async () => { throw new Error('offline') } })
@@ -37,4 +37,22 @@ test("worker serves local audio range without a network request", async () => {
   const response = await answer
   assert.equal(response.status, 206)
   assert.equal(await response.text(), 'cde')
+})
+test("worker serves a range of a chunked download, reading only the needed chunks", async () => {
+  const key = 'https://local.test/studio/audiobooks/offline-data/user/file/audio'
+  const size = 8 * 1024 * 1024 + 4
+  const entries = new Map([
+    [key, new Response(JSON.stringify({ size, chunkSize: 8 * 1024 * 1024, chunks: 2, type: 'audio/mpeg' }), { headers: { 'X-Garden-Chunks': '2' } })],
+    [`${key}?chunk=1`, new Response('wxyz')],
+  ])
+  const read = []
+  const events = worker({ open: async () => ({ match: async url => { read.push(url); return entries.get(url)?.clone() } }) })
+  let answer
+  const event = { request: new Request(key, { headers: { Range: `bytes=${size - 3}-` } }), respondWith(promise) { answer = promise } }
+  for (const handler of events.get('fetch')) handler(event)
+  const response = await answer
+  assert.equal(response.status, 206)
+  assert.equal(response.headers.get('Content-Type'), 'audio/mpeg')
+  assert.equal(await response.text(), 'xyz')
+  assert.deepEqual(read, [key, `${key}?chunk=1`])
 })

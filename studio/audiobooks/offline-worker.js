@@ -5,8 +5,6 @@ self.addEventListener("fetch", event => {
   if (url.origin !== self.location.origin || !url.pathname.startsWith("/studio/audiobooks/offline-data/")) return
   event.respondWith((async () => {
     const cache = await caches.open("garden-offline-library-v1")
-    const response = await cache.match(event.request.url)
-    if (!response) return new Response("本机文件已丢失，请重新下载", { status: 404 })
-    return globalThis.gardenOfflineRangeResponse(await response.blob(), event.request.headers.get("Range"), response.headers)
+    return globalThis.gardenOfflineFileResponse(cache, event.request.url, event.request.headers.get("Range"))
   })())
 })

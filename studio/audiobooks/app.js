@@ -3015,6 +3015,12 @@ function offlineBookStatus(path) {
   return offlineOwner === account() && offlineLibrary ? offlineLibrary.status(path) : { state: "none", done: 0, total: 0, bytes: 0 }
 }
 
+// Byte progress when sizes are known (a single-file book is one 300 MB file), else files.
+function offlineProgressText(status) {
+  if (status.totalBytes) return `${Math.min(99, Math.floor((status.bytes / status.totalBytes) * 100))}%`
+  return status.total ? `${status.done}/${status.total}` : "…"
+}
+
 function updateDownloadButton() {
   const button = $("download-book")
   if (!button) return
@@ -3025,8 +3031,8 @@ function updateDownloadButton() {
   const status = offlineBookStatus(path)
   const label = {
     none: "下载",
-    downloading: status.total ? `下载中 ${status.done}/${status.total}` : "准备下载…",
-    partial: `继续下载 ${status.done}/${status.total}`,
+    downloading: status.total ? `下载中 ${offlineProgressText(status)}` : "准备下载…",
+    partial: `继续下载 ${offlineProgressText(status)}`,
     complete: "✓ 已下载",
   }[status.state]
   $("download-book-label").textContent = label
@@ -3041,7 +3047,7 @@ function updateOfflineSummary() {
   const books = Object.values(library?.state.books || {})
   if (library?.downloading) {
     const status = library.status(library.downloading)
-    el.textContent = `下载中 ${status.done}/${status.total || "…"}`
+    el.textContent = `下载中 ${offlineProgressText(status)}`
   } else if (!books.length) {
     el.textContent = "未下载"
   } else {
@@ -3080,7 +3086,7 @@ function renderOfflineSheet() {
   $("offline-active").hidden = !downloading && !offlineMessage
   if (downloading) {
     const status = library.status(downloading)
-    $("offline-status").textContent = `正在下载《${downloading.split("/").pop()}》 ${status.done}/${status.total || "…"}`
+    $("offline-status").textContent = `正在下载《${downloading.split("/").pop()}》 ${offlineProgressText(status)} · ${formatOfflineBytes(status.bytes)}`
   } else {
     $("offline-status").textContent = offlineMessage
   }
@@ -3125,14 +3131,14 @@ function offlineBookRow(library, book) {
   const meta = document.createElement("small")
   meta.textContent = {
     complete: `已下载 · ${formatOfflineBytes(status.bytes)}`,
-    downloading: `下载中 ${status.done}/${status.total} · ${formatOfflineBytes(status.bytes)}`,
+    downloading: `下载中 ${offlineProgressText(status)} · ${formatOfflineBytes(status.bytes)} / ${formatOfflineBytes(status.totalBytes || 0)}`,
     partial: `未完成 ${status.done}/${status.total} · ${formatOfflineBytes(status.bytes)} / ${formatOfflineBytes(status.totalBytes || 0)}`,
   }[status.state] || ""
   info.append(title, meta)
   if (status.state !== "complete" && status.total) {
     const bar = document.createElement("progress")
-    bar.max = status.total
-    bar.value = status.done
+    bar.max = status.totalBytes || status.total
+    bar.value = status.totalBytes ? status.bytes : status.done
     info.append(bar)
   }
   row.append(info)
@@ -3198,8 +3204,8 @@ function exportRow(library, book, path) {
     prepare.onclick = attempt(async () => {
       prepare.disabled = true
       try {
-        const response = await library.cache.match(library.key(path))
-        if (!response) throw new Error("本机文件已丢失，请重新下载")
+        const response = await library.response(path)
+        if (!response.ok) throw new Error("本机文件已丢失，请重新下载")
         const file = new File([await response.blob()], path.split("/").pop(), { type: "audio/" + (path.endsWith(".mp3") ? "mpeg" : "mp4") })
         if (!navigator.canShare({ files: [file] })) throw new Error("系统不支持分享此文件，请使用下载链接")
         prepare.textContent = "分享 / 存储到文件"
@@ -3234,6 +3240,7 @@ async function runOfflineDownload(path) {
     offlineMessage = "下载完成，可离线播放和跟读"
     notice(`《${path.split("/").pop()}》已下载，可离线收听`)
   } catch (error) {
+    if (error.name !== "AbortError") console.error("[audiobooks offline] download failed", path, error, error.cause)
     offlineMessage = error.name === "AbortError" ? "已暂停，可点「继续」接着下载" : `下载暂停：${error.message}`
     notice(offlineMessage)
   } finally {

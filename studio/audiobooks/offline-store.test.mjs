@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { OfflineLibrary, rangeResponse, DEFAULT_LIMIT } from "./offline-store.js"
+import { OfflineLibrary, rangeResponse, DEFAULT_LIMIT, CHUNK_SIZE } from "./offline-store.js"
 
 class MemoryCache {
   data = new Map()
@@ -166,4 +166,96 @@ test("unsafe filenames and category-wide downloads are rejected", async () => {
   await assert.rejects(f.library.download('/root/category'), /书籍目录/)
   f.tree[f.book] = [{ name: '../other.mp3', size: 3 }]
   await assert.rejects(f.library.download(f.book), /无效路径/)
+})
+
+// ── Chunked storage (iPhone "Internal error" on a 288 MB single-file book) ─────────────
+const MB = 1024 * 1024
+function bigFixture(size, extra = {}) {
+  const book = "/root/category/single"
+  const data = new Uint8Array(size)
+  for (let i = 0; i < size; i++) data[i] = (i * 31 + 7) & 255
+  const file = `${book}/book.mp3`
+  const cache = new MemoryCache()
+  const options = { cache, origin: "https://local.test", owner: "alice", root: "/root", storage: {},
+    listRemote: async path => path === book ? [{ name: "book.mp3", size }] : [],
+    fetchFile: async () => new Response(new Blob([data]), { headers: { "Content-Type": "audio/mpeg" } }), ...extra }
+  return { book, file, data, cache, options, library: new OfflineLibrary(options) }
+}
+const bytesOf = async response => new Uint8Array(await response.arrayBuffer())
+
+test("a file larger than one chunk is stored as fixed-size chunks, never one huge entry", async () => {
+  const f = bigFixture(2 * CHUNK_SIZE + 123)
+  const put = f.cache.put.bind(f.cache)
+  // WebKit-like: a single cache entry above the chunk size fails with a generic error
+  f.cache.put = async (key, response) => {
+    const clone = response.clone()
+    if ((await clone.arrayBuffer()).byteLength > CHUNK_SIZE) throw new DOMException("Internal error", "UnknownError")
+    return put(key, response)
+  }
+  await f.library.download(f.book)
+  assert.equal(f.library.state.books[f.book].complete, true)
+  assert.deepEqual(f.library.findFile(f.file), { size: f.data.length, chunks: 3 })
+  assert.deepEqual(await bytesOf(await f.library.response(f.file)), f.data)
+})
+
+test("chunked ranges cross chunk boundaries exactly like the original bytes", async () => {
+  const f = bigFixture(CHUNK_SIZE + 5 * MB)
+  await f.library.download(f.book)
+  for (const [start, end] of [[0, 9], [CHUNK_SIZE - 3, CHUNK_SIZE + 2], [CHUNK_SIZE, CHUNK_SIZE], [f.data.length - 4, f.data.length - 1]]) {
+    const response = await f.library.response(f.file, `bytes=${start}-${end}`)
+    assert.equal(response.status, 206)
+    assert.equal(response.headers.get("Content-Range"), `bytes ${start}-${end}/${f.data.length}`)
+    assert.equal(Number(response.headers.get("Content-Length")), end - start + 1)
+    assert.deepEqual(await bytesOf(response), f.data.slice(start, end + 1))
+  }
+  const open = await f.library.response(f.file, "bytes=100-")
+  assert.equal(open.status, 206)
+  assert.equal((await bytesOf(open)).length, f.data.length - 100)
+  assert.equal((await f.library.response(f.file, `bytes=${f.data.length}-`)).status, 416)
+})
+
+test("a write failure mid-file removes that file's chunks and stays resumable", async () => {
+  const f = bigFixture(3 * CHUNK_SIZE)
+  const put = f.cache.put.bind(f.cache)
+  let fail = true
+  f.cache.put = async (key, response) => {
+    if (fail && key.endsWith("?chunk=1")) throw new DOMException("Internal error", "UnknownError")
+    return put(key, response)
+  }
+  await assert.rejects(f.library.download(f.book), error => error.name === "UnknownError" && /book\.mp3/.test(error.message))
+  assert.equal([...f.cache.data.keys()].filter(key => key.includes("/file/")).length, 0)
+  assert.equal(f.library.status(f.book).state, "partial")
+  fail = false
+  await f.library.download(f.book)
+  assert.deepEqual(await bytesOf(await f.library.response(f.file)), f.data)
+})
+
+test("progress counts bytes inside a large file, not only finished files", async () => {
+  const f = bigFixture(3 * CHUNK_SIZE)
+  const seen = []
+  f.library.onChange = () => { const s = f.library.status(f.book); if (s.state === "downloading") seen.push(s.bytes) }
+  await f.library.download(f.book)
+  assert.ok(seen.some(bytes => bytes > 0 && bytes < f.data.length), `in-flight bytes reported: ${seen}`)
+})
+
+test("missing chunks are detected, and delete removes every chunk", async () => {
+  const f = bigFixture(2 * CHUNK_SIZE + 1)
+  await f.library.download(f.book)
+  const keys = f.library.storedKeys(f.file)
+  assert.equal(keys.length, 4)
+  await f.cache.delete(keys[2])
+  assert.equal(await f.library.verify(), true)
+  assert.equal(f.library.status(f.book).state, "partial")
+  await f.library.download(f.book)
+  await f.library.remove(f.book)
+  assert.equal([...f.cache.data.keys()].filter(key => key.includes("/file/")).length, 0)
+})
+
+test("files downloaded before chunking (single raw entry) still play and export", async () => {
+  const f = fixture()
+  await f.library.download(f.book)
+  const path = `${f.book}/Volume 2/01.mp3`
+  assert.equal(f.library.findFile(path).chunks, undefined)
+  assert.equal(await (await f.library.response(path, "bytes=1-2")).text(), "ef")
+  assert.equal(await (await f.library.response(path)).text(), "def")
 })
