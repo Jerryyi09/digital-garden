@@ -1,6 +1,7 @@
+import { OfflineLibrary, OFFLINE_CACHE } from "./offline-store.js"
 import { UserSync } from "./user-sync.js"
 import { openSyncStore } from "./sync-store.js"
-import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl, showBookOverview, findGuideInPages } from "./config.js"
+import { ROOT, resolveEndpoint, isWithinRoot, trackId, mediaUrl as remoteMediaUrl, showBookOverview, findGuideInPages } from "./config.js"
 import { getBookSummary, getBookCover, getJacketColors, hasBookReadalong } from "./summaries.js"
 import { resolvePlaybackSegment, SYNC_STATE } from "./readalong-sync.js"
 import { timelinePathForSource } from "./timeline-loader.js"
@@ -8,6 +9,14 @@ import { canSearch, normalizedSearchQuery, searchUrl } from "./search-client.js"
 import { renderGuideMath } from "./guide-math.js"
 
 import { ReadalongCache, manifestDirectories, matchAudioSource, segmentsForTrack, findEpubInPages, findNextAcrossDirectories } from "./readalong-loader.js"
+
+let offlineLibrary = null
+let offlineOwner = ""
+let offlineBrowsing = false
+
+function mediaUrl(endpoint, track, sign) {
+  return offlineOwner === account() && offlineLibrary?.localUrl(track.path) || remoteMediaUrl(endpoint, track, sign)
+}
 
 const manifestMemoryCache = new ReadalongCache({ maxEntries: 32, ttl: 30000 })
 const timelineMemoryCache = new ReadalongCache({ weight: value => Array.isArray(value) ? value.length : 1, ttl: 30000 })
@@ -523,6 +532,19 @@ function saveProgress(completed = audio.ended) {
 }
 
 async function api(route, body = {}, token = auth?.token) {
+  if (offlineOwner === account() && offlineLibrary) {
+    if (route === "fs/get" && offlineLibrary.localUrl(body.path)) return { sign: "" }
+    if (route === "fs/list" && (offlineBrowsing || !navigator.onLine)) {
+      const result = offlineLibrary.listing(body.path)
+      if (result) return body.page > 1 ? { content: [], total: result.total } : result
+    }
+    if (offlineBrowsing && (route === "fs/get" || route === "fs/list")) throw new Error("本机没有此文件，请切换在线书库后下载")
+  }
+  if (!navigator.onLine) throw new Error("本机没有此文件，请联网后下载")
+  return remoteApi(route, body, token)
+}
+
+async function remoteApi(route, body = {}, token = auth?.token) {
   const headers = { "Content-Type": "application/json", "Client-Id": stableDevice }
   if (token) headers.Authorization = token
   if (auth?.deviceKey) headers["Device-Key"] = auth.deviceKey
@@ -1067,6 +1089,8 @@ function renderGlobalSearch(query) {
 }
 
 function render() {
+  const downloadButton = $("download-book")
+  if (downloadButton) downloadButton.hidden = folder.slice(ROOT.length + 1).split("/").length < 2
   breadcrumbs()
 
   // Display full book overview banner if inside a book folder
@@ -1250,6 +1274,8 @@ function updateProfileStats() {
 }
 
 async function stream(track) {
+  if (offlineOwner === account() && offlineLibrary?.localUrl(track.path)) return offlineLibrary.localUrl(track.path)
+  if (offlineBrowsing) throw new Error("此音轨尚未下载，请在在线书库下载后播放")
   const info = await api("fs/get", { path: track.path, password: directoryPassword })
   return mediaUrl(endpoint, track, info.sign)
 }
@@ -2670,6 +2696,9 @@ on("connection-form", "submit", async (event) => {
     const password = $("password").value
     if (!password && (!auth || auth.username !== username || auth.endpoint !== nextEndpoint))
       throw new Error("请输入 AList 密码。")
+    offlineLibrary?.pause()
+    offlineLibrary = null
+    offlineOwner = ""
     endpoint = nextEndpoint
     if (password) {
       const data = await api(
@@ -2686,6 +2715,7 @@ on("connection-form", "submit", async (event) => {
     write($("remember").checked ? localStorage : sessionStorage, AUTH, auth)
     $("password").value = ""
     $("settings")?.close()
+    await openOfflineLibrary()
     startUserSync()
     notice("登录成功，正在同步书库...")
     await browse(ROOT)
@@ -2703,6 +2733,12 @@ on("logout", "click", () => {
 on("logout-btn", "click", logout)
 
 function logout() {
+  offlineLibrary?.pause()
+  offlineLibrary = null
+  offlineOwner = ""
+  offlineBrowsing = false
+  $("offline-books")?.replaceChildren()
+  $("offline-space").textContent = "请登录后查看本机下载"
   for (const url of coverObjectUrls.values()) URL.revokeObjectURL(url)
   manifestMemoryCache.clear()
   timelineMemoryCache.clear()
@@ -2815,6 +2851,7 @@ on("import", "change", attempt(async () => {
 // Initialize App
 async function init() {
   setSpeed(prefs.speed || 1)
+  await openOfflineLibrary().catch(error => notice(error.message))
   try {
     await openDatabase()
     syncStore = await openSyncStore()
@@ -2867,7 +2904,7 @@ async function init() {
     $("list-status").textContent = "未连接家庭书库，请点击右上角设置登录"
     render()
     // Open settings dialog if not connected
-    const settingsDlg = $("settings")
+    const settingsDlg = Object.keys(offlineLibrary?.state.books || {}).length ? null : $("settings")
     if (settingsDlg && typeof settingsDlg.showModal === "function") {
       try {
         settingsDlg.showModal()
@@ -2892,4 +2929,114 @@ async function init() {
   }
 }
 
-init()
+queueMicrotask(init)
+
+
+let offlineRenderEpoch = 0
+function formatOfflineBytes(bytes) {
+  return bytes < 1024 ** 3 ? `${(bytes / 1024 ** 2).toFixed(1)} MB` : `${(bytes / 1024 ** 3).toFixed(2)} GB`
+}
+async function openOfflineLibrary() {
+  offlineLibrary?.pause()
+  const owner = account()
+  const library = new OfflineLibrary({ cache: await caches.open(OFFLINE_CACHE), origin: location.origin,
+    owner: `${ROOT}|${owner}`, root: ROOT, storage: navigator.storage,
+    listRemote: async (path, signal) => {
+      const rows = []
+      for (let page = 1; ; page++) {
+        signal.throwIfAborted()
+        const data = await remoteApi("fs/list", { path, password: directoryPassword, page, per_page: 200 })
+        rows.push(...(data.content || []))
+        if (!data.content?.length || (data.total != null && rows.length >= data.total)) return rows
+      }
+    },
+    fetchFile: async (path, signal) => {
+      const info = await remoteApi("fs/get", { path, password: directoryPassword })
+      return fetch(remoteMediaUrl(endpoint, { path }, info.sign), { signal, cache: "no-store" })
+    }, onChange: () => { if (offlineLibrary === library) renderOfflineLibrary() },
+  })
+  await library.open()
+  offlineOwner = owner
+  offlineLibrary = library
+  await renderOfflineLibrary()
+}
+async function renderOfflineLibrary() {
+  const epoch = ++offlineRenderEpoch
+  const library = offlineLibrary
+  const container = $("offline-books")
+  if (!library || !container) return
+  container.replaceChildren()
+  $("offline-limit").value = library.state.limit / 1024 ** 3
+  const estimate = await navigator.storage?.estimate?.().catch(() => null)
+  if (library !== offlineLibrary || epoch !== offlineRenderEpoch) return
+  container.replaceChildren()
+  $("offline-space").textContent = `已下载 ${formatOfflineBytes(library.used)} / 上限 ${formatOfflineBytes(library.state.limit)}` +
+    (estimate ? ` · 系统估计可用 ${formatOfflineBytes(Math.max(0, estimate.quota - estimate.usage))}` : "")
+  for (const book of Object.values(library.state.books)) {
+    const row = document.createElement("div")
+    row.className = "offline-book"
+    const title = document.createElement("strong")
+    title.textContent = `${book.path.split("/").pop()} · ${book.complete ? "已下载" : "未完成"}（${Object.keys(book.files).length}/${book.plan.length}）`
+    row.append(title)
+    const button = (label, action) => {
+      const node = document.createElement("button")
+      node.textContent = label
+      node.onclick = attempt(action)
+      row.append(node)
+    }
+    button("打开", async () => { offlineBrowsing = true; $("tab-library").click(); await browse(book.path) })
+    if (!book.complete) button("继续下载", () => runOfflineDownload(book.path))
+    button("删除本机副本", async () => {
+      if (current?.path.startsWith(book.path + "/")) throw new Error("请先切换到其他书籍再删除")
+      await library.remove(book.path)
+      manifestMemoryCache.clear(); timelineMemoryCache.clear()
+    })
+    const files = document.createElement("details")
+    const summary = document.createElement("summary")
+    summary.textContent = "导出音频到文件"
+    files.append(summary)
+    for (const path of Object.keys(book.files).filter(path => AUDIO.test(path))) {
+      const link = document.createElement("a")
+      link.href = library.localUrl(path)
+      link.download = path.split("/").pop()
+      link.textContent = path.slice(book.path.length + 1)
+      files.append(link)
+      if (navigator.canShare && navigator.share) {
+        const prepare = document.createElement("button")
+        prepare.textContent = "准备分享文件"
+        prepare.onclick = attempt(async () => {
+          prepare.disabled = true
+          try {
+            const response = await library.cache.match(library.key(path))
+            if (!response) throw new Error("本机文件已丢失，请重新下载")
+            const file = new File([await response.blob()], path.split("/").pop(), { type: "audio/" + (path.endsWith(".mp3") ? "mpeg" : "mp4") })
+            if (!navigator.canShare({ files: [file] })) throw new Error("系统不支持分享此文件，请使用下载链接")
+            prepare.textContent = "分享 / 存储到文件"
+            prepare.onclick = attempt(() => navigator.share({ files: [file] }))
+          } finally { prepare.disabled = false }
+        })
+        files.append(prepare)
+      }
+      files.append(document.createElement("br"))
+    }
+    row.append(files)
+    container.append(row)
+  }
+}
+async function runOfflineDownload(path) {
+  if (!offlineLibrary) await openOfflineLibrary()
+  if (!navigator.serviceWorker?.controller) throw new Error("请刷新播放器后再下载，以启用离线播放")
+  $("offline-status").textContent = "下载中，请保持播放器打开；请自行确认已连接 Wi‑Fi。"
+  try { await offlineLibrary.download(path); $("offline-status").textContent = "下载完成，可离线播放和跟读" }
+  catch (error) { $("offline-status").textContent = error.name === "AbortError" ? "已暂停，可继续下载" : `下载暂停：${error.message}` }
+}
+on("download-book", "click", attempt(() => {
+  const parts = folder.slice(ROOT.length + 1).split("/")
+  return runOfflineDownload(`${ROOT}/${parts[0]}/${parts[1]}`)
+}))
+on("offline-pause", "click", () => offlineLibrary?.pause())
+on("offline-limit-save", "click", attempt(async () => {
+  if (!offlineLibrary) await openOfflineLibrary()
+  await offlineLibrary.setLimit(Math.round(Number($("offline-limit").value) * 1024 ** 3))
+}))
+on("offline-online", "click", attempt(async () => { offlineBrowsing = false; $("tab-library").click(); await browse(ROOT) }))

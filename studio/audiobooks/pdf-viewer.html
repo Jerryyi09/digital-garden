@@ -103,7 +103,7 @@
       display: none !important;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="./vendor/pdf/pdf.min.js"></script>
 </head>
 <body>
   <div class="pdf-container">
@@ -136,7 +136,7 @@
 
   <script>
     if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf/pdf.worker.min.js';
     }
 
     const canvas = document.getElementById('pdf-canvas');
