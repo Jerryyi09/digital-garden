@@ -17,15 +17,34 @@ export class OfflineLibrary {
   valid(path, base = this.root) {
     return typeof path === "string" && path.startsWith(base + "/") && !path.slice(1).split("/").some(p => !p || p === "." || p === "..")
   }
+  // Reads only the index, so app start-up never waits on per-file checks.
   async open() {
     const saved = await this.cache.match(this.indexKey)
     if (saved) this.state = await saved.json()
+    return this
+  }
+  // Drops entries whose bytes the system has evicted. Run in the background after start-up;
+  // downloads and deletions repeat the same check under the lock before changing anything.
+  async verify() {
+    let changed = false
     for (const book of Object.values(this.state.books)) {
       for (const path of Object.keys(book.files)) {
-        if (!await this.cache.match(this.key(path))) { delete book.files[path]; book.complete = false }
+        if (!await this.cache.match(this.key(path))) { delete book.files[path]; book.complete = false; changed = true }
       }
     }
-    return this
+    if (changed && !this.busy) await this.save()
+    return changed
+  }
+  // Snapshot for the UI: complete / partial / downloading, with file and byte counts.
+  status(path) {
+    const book = this.state.books[path]
+    if (!book) return { state: this.downloading === path ? "downloading" : "none", done: 0, total: 0, bytes: 0 }
+    const done = Object.keys(book.files).length
+    const bytes = Object.values(book.files).reduce((n, file) => n + file.size, 0)
+    const total = book.plan?.length || 0
+    const totalBytes = (book.plan || []).reduce((n, file) => n + file.size, 0)
+    const state = this.downloading === path ? "downloading" : book.complete ? "complete" : "partial"
+    return { state, done, total, bytes, totalBytes }
   }
   async save() {
     await this.cache.put(this.indexKey, new Response(JSON.stringify(this.state), { headers: { "Content-Type": "application/json" } }))
@@ -93,6 +112,8 @@ export class OfflineLibrary {
     if (this.controller) throw new Error("已有下载进行中")
     if (!this.valid(path) || path.slice(this.root.length + 1).split("/").length !== 2) throw new Error("请在书籍目录开始下载")
     this.controller = new AbortController()
+    this.downloading = path
+    this.onChange()
     const signal = this.controller.signal
     let book = this.state.books[path]
     try {
@@ -163,6 +184,6 @@ export class OfflineLibrary {
       }
       book.complete = true
       await this.save()
-    } finally { this.controller = null; this.onChange() }
+    } finally { this.controller = null; this.downloading = null; this.onChange() }
   }
 }

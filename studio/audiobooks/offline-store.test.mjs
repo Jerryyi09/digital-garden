@@ -78,8 +78,29 @@ test("missing cache data is detected after restart", async () => {
   await f.library.download(f.book)
   await f.cache.delete(f.library.localUrl(`${f.book}/Volume 2/01.mp3`))
   const reopened = await new OfflineLibrary(f.options).open()
+  // open() only reads the index so start-up is never blocked by per-file checks
+  assert.equal(reopened.state.books[f.book].complete, true)
+  assert.equal(await reopened.verify(), true)
   assert.equal(reopened.state.books[f.book].complete, false)
   assert.equal(reopened.used, 3)
+  const again = await new OfflineLibrary(f.options).open()
+  assert.equal(again.state.books[f.book].complete, false, "verify() persists the corrected index")
+})
+
+test("status reports none, downloading, partial and complete for the UI", async () => {
+  const f = fixture()
+  assert.equal(f.library.status(f.book).state, "none")
+  const seen = []
+  f.library.onChange = () => seen.push(f.library.status(f.book).state)
+  const fetchFile = f.library.fetchFile
+  let fail = true
+  f.library.fetchFile = async path => { if (path.includes("Volume 1") && fail) throw new Error("offline"); return fetchFile(path) }
+  await assert.rejects(f.library.download(f.book), /offline/)
+  assert.ok(seen.includes("downloading"))
+  assert.deepEqual({ ...f.library.status(f.book) }, { state: "partial", done: 1, total: 2, bytes: 3, totalBytes: 6 })
+  fail = false
+  await f.library.download(f.book)
+  assert.equal(f.library.status(f.book).state, "complete")
 })
 
 test("pinned release download excludes historical revisions and stores the entry manifest", async () => {

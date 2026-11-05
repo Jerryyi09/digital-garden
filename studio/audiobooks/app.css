@@ -1761,9 +1761,109 @@ button:active { opacity: 0.7; }
   letter-spacing: -0.01em;
 }
 
-.offline-panel { padding: 16px; background: var(--bg-primary, #fff); border-radius: 16px; margin: 12px 0; }
-.offline-panel button, #download-book { padding: 10px; margin: 4px; border-radius: 8px; cursor: pointer; }
-.offline-panel input { width: 80px; padding: 8px; }
-.offline-book { border-top: 1px solid #ddd; padding: 12px 0; }
-.offline-book strong { display: block; }
-.offline-book a { display: inline-block; padding: 8px 0; }
+/* ── Offline downloads ───────────────────────────────────────────── */
+
+/* Book page: download control sits next to "书名 · N 项" */
+.list-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.list-meta-left .list-status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.meta-download {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 10px 0 8px;
+  border-radius: 14px;
+  background: var(--brand-blue-bg);
+  color: var(--brand-blue);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.meta-download-icon { width: 15px; height: 15px; }
+.meta-download[data-state="complete"] { background: var(--brand-green-bg); color: var(--brand-green); }
+.meta-download[data-state="complete"] .meta-download-icon { display: none; }
+.meta-download[data-state="downloading"] .meta-download-icon { animation: meta-download-pulse 1.2s ease-in-out infinite; }
+@keyframes meta-download-pulse { 50% { transform: translateY(2px); opacity: .55; } }
+
+/* 我的: chevron on navigable rows */
+.menu-chevron::after { content: "›"; margin-left: 6px; font-size: 18px; line-height: 1; color: var(--text-tint); vertical-align: -1px; }
+
+/* Downloads sheet */
+.offline-sheet {
+  max-width: 520px;
+  max-height: min(86vh, 760px);
+  padding: 0 18px calc(18px + var(--safe-bottom));
+  overflow-y: auto;
+  background: var(--bg-primary);
+}
+.offline-sheet::backdrop { background: rgba(0, 0, 0, .32); }
+.sheet-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 -18px 12px;
+  padding: 16px 18px 12px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--line-color);
+}
+.sheet-head h3 { margin: 0; font-size: 17px; }
+.sheet-done { color: var(--brand-blue); font-size: 15px; font-weight: 600; padding: 4px; }
+.sheet-section { margin: 20px 4px 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.menu-select { border: 0; background: transparent; color: var(--text-sub); font-size: 15px; text-align: right; }
+
+.offline-usage { padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--line-color); border-radius: 14px; }
+.usage-bar { height: 8px; overflow: hidden; border-radius: 4px; background: var(--bg-subtle); }
+.usage-bar span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--brand-blue); transition: width .3s ease; }
+.usage-text { margin: 8px 0 0; font-size: 12px; color: var(--text-muted); }
+
+.offline-active {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--brand-blue-bg);
+  color: var(--brand-blue);
+  font-size: 13px;
+}
+.offline-active button { flex: none; font-weight: 600; padding: 4px 2px; }
+
+.offline-list { background: var(--bg-card); border: 1px solid var(--line-color); border-radius: 14px; overflow: hidden; }
+.offline-empty { margin: 0; padding: 18px 16px; font-size: 13px; color: var(--text-muted); }
+.offline-book { padding: 12px 16px; border-bottom: 1px solid var(--line-color); }
+.offline-book:last-child { border-bottom: 0; }
+.ob-info { display: grid; gap: 3px; }
+.ob-info strong { font-size: 15px; font-weight: 600; line-height: 1.4; }
+.ob-info small { font-size: 12px; color: var(--text-muted); }
+.offline-book[data-state="complete"] .ob-info small { color: var(--brand-green); }
+.ob-info progress { width: 100%; height: 4px; margin-top: 4px; appearance: none; border: 0; border-radius: 2px; background: var(--bg-subtle); overflow: hidden; }
+.ob-info progress::-webkit-progress-bar { background: var(--bg-subtle); }
+.ob-info progress::-webkit-progress-value { background: var(--brand-blue); }
+.ob-info progress::-moz-progress-bar { background: var(--brand-blue); }
+.ob-actions { display: flex; gap: 8px; margin-top: 10px; }
+.ob-actions button { min-height: 32px; padding: 0 14px; border-radius: 16px; background: var(--bg-subtle); color: var(--text-main); font-size: 13px; font-weight: 500; }
+.ob-actions button.danger { margin-left: auto; color: #cf1322; background: #fff1f0; }
+.ob-export { margin-top: 8px; font-size: 13px; }
+.ob-export summary { color: var(--text-sub); cursor: pointer; padding: 4px 0; }
+.ob-export-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-top: 1px dashed var(--line-color); }
+.ob-export-row a { color: var(--brand-blue); overflow-wrap: anywhere; }
+.ob-export-row button { flex: none; color: var(--brand-blue); font-size: 12px; }
+
+.offline-help { margin-top: 16px; font-size: 13px; color: var(--text-sub); }
+.offline-help summary { padding: 4px; color: var(--text-muted); cursor: pointer; }
+.offline-help ul { margin: 6px 0 0; padding-left: 20px; line-height: 1.7; }
