@@ -9,6 +9,18 @@
 globalThis.gardenOfflineChunkSize = 8 * 1024 * 1024
 globalThis.gardenOfflineChunkKey = (key, index) => `${key}?chunk=${index}`
 
+// Books downloaded after 2026-11-06 live in their own cache, so deleting a book is one
+// caches.delete() instead of many entry deletions, and a damaged entry stays inside one
+// book. Their keys are `<prefix>book/<book>/<file>`; the cache name is derived from the key,
+// so the Service Worker finds it without reading the index. Older `<prefix>file/` keys live
+// in the shared garden-offline-library-v1 cache.
+globalThis.gardenOfflineSharedCache = "garden-offline-library-v1"
+globalThis.gardenOfflineBookCachePrefix = "garden-offline-book:"
+globalThis.gardenOfflineCacheName = key => {
+  const match = /^(.*\/offline-data\/[^/]+\/book\/[^/?]+)\//.exec(key)
+  return match ? globalThis.gardenOfflineBookCachePrefix + match[1] : globalThis.gardenOfflineSharedCache
+}
+
 function parseRange(range, size) {
   if (!range) return { start: 0, end: size - 1, partial: false }
   const match = /^bytes=(\d*)-(\d*)$/.exec(range)

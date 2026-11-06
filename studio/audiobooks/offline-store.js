@@ -1,33 +1,45 @@
-export const OFFLINE_CACHE = "garden-offline-library-v1"
+import "./offline-range.js"
+export const OFFLINE_CACHE = globalThis.gardenOfflineSharedCache
+export const BOOK_CACHE_PREFIX = globalThis.gardenOfflineBookCachePrefix
 export const DEFAULT_LIMIT = 5 * 1024 ** 3
 export const OFFLINE_PREFIX = "/studio/audiobooks/offline-data/"
-
-import "./offline-range.js"
 export const rangeResponse = globalThis.gardenOfflineRangeResponse
 export const fileResponse = globalThis.gardenOfflineFileResponse
 export const CHUNK_SIZE = globalThis.gardenOfflineChunkSize
 const chunkKey = globalThis.gardenOfflineChunkKey
 
 export class OfflineLibrary {
-  constructor({ cache, origin, owner, root, fetchFile, listRemote, storage = {}, onChange = () => {} }) {
-    Object.assign(this, { cache, origin, owner, root, fetchFile, listRemote, storage, onChange })
+  // `cache` is the shared cache (index + books stored before per-book caches);
+  // `caches` is the CacheStorage used for per-book caches.
+  constructor({ cache, caches, origin, owner, root, fetchFile, listRemote, storage = {}, onChange = () => {} }) {
+    Object.assign(this, { cache, caches, origin, owner, root, fetchFile, listRemote, storage, onChange })
     this.prefix = `${origin}${OFFLINE_PREFIX}${encodeURIComponent(owner)}/`
     this.indexKey = this.prefix + "index"
     this.state = { limit: DEFAULT_LIMIT, books: {} }
     this.controller = null
   }
-  key(path) { return this.prefix + "file/" + encodeURIComponent(path) }
+  bookOf(path) { return Object.values(this.state.books).find(book => path === book.path || path.startsWith(book.path + "/")) }
+  bookCacheName(bookPath) { return BOOK_CACHE_PREFIX + this.prefix + "book/" + encodeURIComponent(bookPath) }
+  cacheFor(book) { return book?.store === "book" ? this.caches.open(this.bookCacheName(book.path)) : this.cache }
+  key(path, book = this.bookOf(path)) {
+    if (book?.store === "book") return this.prefix + "book/" + encodeURIComponent(book.path) + "/" + encodeURIComponent(path.slice(book.path.length + 1))
+    return this.prefix + "file/" + encodeURIComponent(path)
+  }
   // Every cache entry backing one stored file (head + chunks for chunked files).
-  storedKeys(path, file = this.findFile(path)) {
-    const key = this.key(path)
+  storedKeys(path, file = this.findFile(path), book = this.bookOf(path)) {
+    const key = this.key(path, book)
     return [key, ...Array.from({ length: file?.chunks || 0 }, (_, index) => chunkKey(key, index))]
   }
-  async hasStored(path, file) {
-    for (const key of this.storedKeys(path, file)) if (!await this.cache.match(key)) return false
+  async hasStored(path, file, book = this.bookOf(path), cache) {
+    cache ||= await this.cacheFor(book)
+    for (const key of this.storedKeys(path, file, book)) if (!await cache.match(key)) return false
     return true
   }
   // Same response the Service Worker serves, for in-page reads (export, tests).
-  response(path, range = null) { return fileResponse(this.cache, this.key(path), range) }
+  async response(path, range = null) {
+    const book = this.bookOf(path)
+    return fileResponse(await this.cacheFor(book), this.key(path, book), range)
+  }
   valid(path, base = this.root) {
     return typeof path === "string" && path.startsWith(base + "/") && !path.slice(1).split("/").some(p => !p || p === "." || p === "..")
   }
@@ -42,8 +54,13 @@ export class OfflineLibrary {
   async verify() {
     let changed = false
     for (const book of Object.values(this.state.books)) {
-      for (const [path, file] of Object.entries(book.files)) {
-        if (!await this.hasStored(path, file)) { delete book.files[path]; book.complete = false; changed = true }
+      try {
+        const cache = await this.cacheFor(book)
+        for (const [path, file] of Object.entries(book.files)) {
+          if (!await this.hasStored(path, file, book, cache)) { delete book.files[path]; book.complete = false; changed = true }
+        }
+      } catch (error) {
+        console.warn("[offline] verify skipped a damaged book cache", book.path, error) // the book stays listed; delete/clear-all still work
       }
     }
     if (changed && !this.busy) await this.save()
@@ -69,19 +86,11 @@ export class OfflineLibrary {
   async exclusive(action) {
     if (this.busy) throw new Error("已有下载或存储操作进行中")
     this.busy = true
+    // Only re-reads the index: per-book checks happen in the operation that needs them, so
+    // one damaged entry can no longer make every download or deletion fail.
     const run = async () => {
       const saved = await this.cache.match(this.indexKey)
       if (saved) this.state = await saved.json()
-      for (const book of Object.values(this.state.books)) {
-        for (const [path, file] of Object.entries(book.files)) {
-          if (!await this.hasStored(path, file)) { delete book.files[path]; book.complete = false }
-        }
-      }
-      // Only the lock holder may clean interrupted, uncommitted downloads (including chunks).
-      const retained = new Set(Object.values(this.state.books).flatMap(book => Object.entries(book.files).flatMap(([path, file]) => this.storedKeys(path, file))))
-      for (const key of await this.cache.keys()) {
-        if (key.url.startsWith(this.prefix + "file/") && !retained.has(key.url)) await this.cache.delete(key)
-      }
       return action()
     }
     try {
@@ -94,6 +103,7 @@ export class OfflineLibrary {
   }
   setLimit(bytes) { return this.exclusive(() => this._setLimit(bytes)) }
   remove(path) { return this.exclusive(() => this._remove(path)) }
+  clearAll() { return this.exclusive(() => this._clearAll()) }
   download(path) { return this.exclusive(() => this._download(path)) }
   async _setLimit(bytes) {
     if (!Number.isSafeInteger(bytes) || bytes <= 0 || bytes < this.used) throw new Error("上限不能小于已下载大小")
@@ -115,12 +125,34 @@ export class OfflineLibrary {
     return children.size ? { content: [...children.values()], total: children.size } : null
   }
   pause() { this.controller?.abort() }
+  // Returns the number of entries that could not be released (older shared-cache books only).
   async _remove(path) {
     if (this.controller) throw new Error("请先暂停下载")
     const book = this.state.books[path]
-    if (!book) return
-    for (const [file, meta] of Object.entries(book.files)) for (const key of this.storedKeys(file, meta)) await this.cache.delete(key)
+    if (!book) return 0
+    let stuck = 0
+    if (book.store === "book") {
+      await this.caches.delete(this.bookCacheName(book.path))
+    } else {
+      for (const [file, meta] of Object.entries(book.files)) {
+        for (const key of this.storedKeys(file, meta, book)) {
+          try { await this.cache.delete(key) } catch (error) { stuck++; console.warn("[offline] could not release", key, error) }
+        }
+      }
+    }
     delete this.state.books[path]
+    await this.save()
+    return stuck
+  }
+  // Recovery: drops every offline download of this player on this device (all accounts),
+  // including entries the system can no longer read or delete one by one.
+  async _clearAll() {
+    if (this.controller) throw new Error("请先暂停下载")
+    for (const name of await this.caches.keys()) {
+      if (name === OFFLINE_CACHE || name.startsWith(BOOK_CACHE_PREFIX)) await this.caches.delete(name)
+    }
+    this.cache = await this.caches.open(OFFLINE_CACHE)
+    this.state = { limit: this.state.limit, books: {} }
     await this.save()
   }
   async _download(path) {
@@ -133,8 +165,9 @@ export class OfflineLibrary {
     let book = this.state.books[path]
     try {
       await this.storage.persist?.()
+      if (book && !book.store && !Object.keys(book.files).length) book.store = "book" // nothing stored yet: move to its own cache
       if (!book || !book.plan) {
-        book = { path, dirs: {}, files: {}, plan: [], complete: false }
+        book = { path, dirs: {}, files: {}, plan: [], complete: false, store: "book" }
         const readalongRoots = []
         const scan = async directory => {
           signal.throwIfAborted()
@@ -170,13 +203,22 @@ export class OfflineLibrary {
       const remaining = book.plan.filter(file => !book.files[file.path]).reduce((sum, file) => sum + file.size, 0)
       const estimate = await this.storage.estimate?.()
       if (this.used + remaining > this.state.limit || (estimate?.quota != null && remaining > estimate.quota - estimate.usage)) throw new Error("空间不足，请调整上限或删除已下载书籍")
+      const cache = await this.cacheFor(book)
+      for (const [file, meta] of Object.entries(book.files)) {
+        if (!await this.hasStored(file, meta, book, cache)) { delete book.files[file]; book.complete = false }
+      }
+      if (book.store === "book") {
+        // Drop leftovers of an interrupted run in this book's own cache only.
+        const retained = new Set(Object.entries(book.files).flatMap(([file, meta]) => this.storedKeys(file, meta, book)))
+        for (const request of await cache.keys()) if (!retained.has(request.url)) await cache.delete(request).catch(() => {})
+      }
       for (const file of book.plan) {
         signal.throwIfAborted()
-        if (book.files[file.path] && await this.hasStored(file.path, book.files[file.path])) continue
+        if (book.files[file.path]) continue
         const response = file.json ? new Response(JSON.stringify(file.json), { headers: { "Content-Type": "application/json" } }) : await this.fetchFile(file.path, signal)
         if (response.status !== 200 || response.type === "opaque" || !response.body) throw new Error(`文件下载失败：${file.path.split("/").pop()}`)
         delete book.files[file.path]
-        book.files[file.path] = await this._store(book, file, response, signal)
+        book.files[file.path] = await this._store(book, file, response, signal, cache)
         await this.save()
       }
       book.complete = true
@@ -187,8 +229,8 @@ export class OfflineLibrary {
   // Streams one file into the cache: one raw entry if it fits in a chunk, otherwise
   // fixed-size chunks plus a head. Nothing is registered until every entry is written;
   // on failure all entries written for this file are removed.
-  async _store(book, file, response, signal) {
-    const key = this.key(file.path)
+  async _store(book, file, response, signal, cache) {
+    const key = this.key(file.path, book)
     const name = file.path.split("/").pop()
     const type = response.headers.get("Content-Type") || "application/octet-stream"
     const used = this.used
@@ -201,7 +243,7 @@ export class OfflineLibrary {
     let chunks = 0
     const put = async (entryKey, body, headers) => {
       try {
-        await this.cache.put(entryKey, new Response(body, { headers }))
+        await cache.put(entryKey, new Response(body, { headers }))
         written.push(entryKey)
       } catch (error) {
         const wrapped = new Error(`写入本机失败：${name}（${error.name}: ${error.message}）`)
@@ -246,7 +288,7 @@ export class OfflineLibrary {
       return chunks ? { size, chunks } : { size }
     } catch (error) {
       reader.cancel().catch(() => {})
-      for (const entryKey of written) await this.cache.delete(entryKey)
+      for (const entryKey of written) await cache.delete(entryKey).catch(() => {})
       throw error
     } finally {
       this.inflight = null

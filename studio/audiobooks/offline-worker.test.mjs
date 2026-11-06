@@ -56,3 +56,13 @@ test("worker serves a range of a chunked download, reading only the needed chunk
   assert.equal(await response.text(), 'xyz')
   assert.deepEqual(read, [key, `${key}?chunk=1`])
 })
+test("worker reads a per-book download from that book's own cache", async () => {
+  const key = 'https://local.test/studio/audiobooks/offline-data/alice/book/%2Froot%2Fcat%2Fb/01.mp3'
+  const opened = []
+  const events = worker({ open: async name => { opened.push(name); return { match: async url => url === key ? new Response('abcdef') : undefined } } })
+  let answer
+  const event = { request: new Request(key, { headers: { Range: 'bytes=0-1' } }), respondWith(promise) { answer = promise } }
+  for (const handler of events.get('fetch')) handler(event)
+  assert.equal(await (await answer).text(), 'ab')
+  assert.deepEqual(opened, ['garden-offline-book:https://local.test/studio/audiobooks/offline-data/alice/book/%2Froot%2Fcat%2Fb'])
+})

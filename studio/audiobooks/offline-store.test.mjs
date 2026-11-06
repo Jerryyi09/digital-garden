@@ -1,13 +1,27 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { OfflineLibrary, rangeResponse, DEFAULT_LIMIT, CHUNK_SIZE } from "./offline-store.js"
+import { OfflineLibrary, rangeResponse, DEFAULT_LIMIT, CHUNK_SIZE, OFFLINE_CACHE } from "./offline-store.js"
 
 class MemoryCache {
   data = new Map()
-  async match(key) { return this.data.get(typeof key === 'string' ? key : key.url)?.clone() }
-  async put(key, value) { const bytes = await value.arrayBuffer(); this.data.set(key, new Response(bytes, { headers: value.headers })) }
-  async delete(key) { return this.data.delete(typeof key === 'string' ? key : key.url) }
+  constructor(storage) { this.storage = storage }
+  broken = new Set() // entries the system can no longer read or delete (WebKit "Internal error")
+  check(key) { if (this.broken.has(typeof key === 'string' ? key : key.url)) throw new DOMException("Internal error", "UnknownError") }
+  async match(key) { this.check(key); return this.data.get(typeof key === 'string' ? key : key.url)?.clone() }
+  async put(key, value) { await this.storage?.putHook?.(key, value.clone()); const bytes = await value.arrayBuffer(); this.data.set(key, new Response(bytes, { headers: value.headers })) }
+  async delete(key) { this.check(key); return this.data.delete(typeof key === 'string' ? key : key.url) }
   async keys() { return [...this.data.keys()].map(url => ({ url })) }
+}
+// CacheStorage stand-in: named caches, plus helpers that look across all of them.
+class MemoryStorage {
+  named = new Map()
+  async open(name) { if (!this.named.has(name)) this.named.set(name, new MemoryCache(this)); return this.named.get(name) }
+  async delete(name) { return this.named.delete(name) }
+  async keys() { return [...this.named.keys()] }
+  openSync(name) { if (!this.named.has(name)) this.named.set(name, new MemoryCache(this)); return this.named.get(name) }
+  async match(key) { for (const cache of this.named.values()) { const hit = await cache.match(key); if (hit) return hit } }
+  async deleteEntry(key) { for (const cache of this.named.values()) await cache.delete(key) }
+  entryKeys() { return [...this.named.values()].flatMap(cache => [...cache.data.keys()]).filter(key => !key.endsWith("/index")) }
 }
 function fixture(extra = {}) {
   const book = "/root/category/book"
@@ -15,11 +29,12 @@ function fixture(extra = {}) {
   const tree = { [book]: [{ name: "Volume 2", is_dir: true }, { name: "Volume 1", is_dir: true }],
     [`${book}/Volume 1`]: [{ name: "01.mp3", size: 3 }], [`${book}/Volume 2`]: [{ name: "01.mp3", size: 3 }] }
   let requests = []
-  const cache = new MemoryCache()
-  const options = { cache, origin: "https://local.test", owner: "alice", root: "/root", storage: {},
+  const caches = new MemoryStorage()
+  const cache = caches.openSync(OFFLINE_CACHE)
+  const options = { cache, caches, origin: "https://local.test", owner: "alice", root: "/root", storage: {},
     listRemote: async path => tree[path] || [], fetchFile: async path => { requests.push(path); return new Response(bytes.get(path)) }, ...extra }
   const library = new OfflineLibrary(options)
-  return { book, bytes, tree, cache, options, library, requests }
+  return { book, bytes, tree, cache, caches, options, library, requests }
 }
 
 test("manual whole-book download persists volume listings and reopens without network", async () => {
@@ -31,7 +46,7 @@ test("manual whole-book download persists volume listings and reopens without ne
   assert.equal(f.library.state.books[f.book].complete, true)
   const reopened = await new OfflineLibrary({ ...f.options, fetchFile: () => { throw new Error("offline") } }).open()
   assert.equal(reopened.listing(f.book).content.length, 2)
-  const response = await f.cache.match(reopened.localUrl(`${f.book}/Volume 2/01.mp3`))
+  const response = await f.caches.match(reopened.localUrl(`${f.book}/Volume 2/01.mp3`))
   assert.equal(await response.text(), "def")
   const other = await new OfflineLibrary({ ...f.options, owner: "bob" }).open()
   assert.equal(other.localUrl(`${f.book}/Volume 2/01.mp3`), null)
@@ -76,7 +91,7 @@ test("interrupted download resumes completed files instead of fetching them twic
 test("missing cache data is detected after restart", async () => {
   const f = fixture()
   await f.library.download(f.book)
-  await f.cache.delete(f.library.localUrl(`${f.book}/Volume 2/01.mp3`))
+  await f.caches.deleteEntry(f.library.localUrl(`${f.book}/Volume 2/01.mp3`))
   const reopened = await new OfflineLibrary(f.options).open()
   // open() only reads the index so start-up is never blocked by per-file checks
   assert.equal(reopened.state.books[f.book].complete, true)
@@ -112,7 +127,7 @@ test("pinned release download excludes historical revisions and stores the entry
   f.bytes.set(`${base}/timeline.json`, "[]")
   await f.library.download(f.book)
   assert.ok(f.library.localUrl(`${base}/timeline.json`))
-  assert.equal((await (await f.cache.match(f.library.localUrl(`${f.book}/readalong/readalong.manifest.json`))).json()).assetRevision, "a".repeat(32))
+  assert.equal((await (await f.caches.match(f.library.localUrl(`${f.book}/readalong/readalong.manifest.json`))).json()).assetRevision, "a".repeat(32))
 })
 
 for (const [range, status, text] of [[null, 200, "abcdef"], ["bytes=1-3", 206, "bcd"], ["bytes=3-", 206, "def"], ["bytes=-2", 206, "ef"], ["bytes=99-", 416, ""], ["bytes=3-1", 416, ""], ["bytes=0-1,3-4", 416, ""]]) {
@@ -125,15 +140,11 @@ for (const [range, status, text] of [[null, 200, "abcdef"], ["bytes=1-3", 206, "
 
 test("quota write failure leaves no partial file and remains resumable", async () => {
   const f = fixture()
-  const put = f.cache.put.bind(f.cache)
-  f.cache.put = async (key, response) => {
-    if (key.includes('/file/')) throw new DOMException('full', 'QuotaExceededError')
-    return put(key, response)
-  }
+  f.caches.putHook = async key => { if (key.includes('/book/')) throw new DOMException('full', 'QuotaExceededError') }
   await assert.rejects(f.library.download(f.book), { name: 'QuotaExceededError' })
   assert.equal(f.library.used, 0)
   assert.equal(f.library.controller, null)
-  f.cache.put = put
+  f.caches.putHook = null
   await f.library.download(f.book)
   assert.equal(f.library.state.books[f.book].complete, true)
 })
@@ -158,7 +169,7 @@ test("delete removes only the selected account's downloaded bytes", async () => 
   await other.download(f.book)
   await f.library.remove(f.book)
   assert.equal(f.library.used, 0)
-  assert.ok(await f.cache.match(other.localUrl(`${f.book}/Volume 1/01.mp3`)))
+  assert.ok(await f.caches.match(other.localUrl(`${f.book}/Volume 1/01.mp3`)))
 })
 
 test("unsafe filenames and category-wide downloads are rejected", async () => {
@@ -175,22 +186,20 @@ function bigFixture(size, extra = {}) {
   const data = new Uint8Array(size)
   for (let i = 0; i < size; i++) data[i] = (i * 31 + 7) & 255
   const file = `${book}/book.mp3`
-  const cache = new MemoryCache()
-  const options = { cache, origin: "https://local.test", owner: "alice", root: "/root", storage: {},
+  const caches = new MemoryStorage()
+  const cache = caches.openSync(OFFLINE_CACHE)
+  const options = { cache, caches, origin: "https://local.test", owner: "alice", root: "/root", storage: {},
     listRemote: async path => path === book ? [{ name: "book.mp3", size }] : [],
     fetchFile: async () => new Response(new Blob([data]), { headers: { "Content-Type": "audio/mpeg" } }), ...extra }
-  return { book, file, data, cache, options, library: new OfflineLibrary(options) }
+  return { book, file, data, cache, caches, options, library: new OfflineLibrary(options) }
 }
 const bytesOf = async response => new Uint8Array(await response.arrayBuffer())
 
 test("a file larger than one chunk is stored as fixed-size chunks, never one huge entry", async () => {
   const f = bigFixture(2 * CHUNK_SIZE + 123)
-  const put = f.cache.put.bind(f.cache)
   // WebKit-like: a single cache entry above the chunk size fails with a generic error
-  f.cache.put = async (key, response) => {
-    const clone = response.clone()
-    if ((await clone.arrayBuffer()).byteLength > CHUNK_SIZE) throw new DOMException("Internal error", "UnknownError")
-    return put(key, response)
+  f.caches.putHook = async (key, response) => {
+    if ((await response.arrayBuffer()).byteLength > CHUNK_SIZE) throw new DOMException("Internal error", "UnknownError")
   }
   await f.library.download(f.book)
   assert.equal(f.library.state.books[f.book].complete, true)
@@ -216,14 +225,10 @@ test("chunked ranges cross chunk boundaries exactly like the original bytes", as
 
 test("a write failure mid-file removes that file's chunks and stays resumable", async () => {
   const f = bigFixture(3 * CHUNK_SIZE)
-  const put = f.cache.put.bind(f.cache)
   let fail = true
-  f.cache.put = async (key, response) => {
-    if (fail && key.endsWith("?chunk=1")) throw new DOMException("Internal error", "UnknownError")
-    return put(key, response)
-  }
+  f.caches.putHook = async key => { if (fail && key.endsWith("?chunk=1")) throw new DOMException("Internal error", "UnknownError") }
   await assert.rejects(f.library.download(f.book), error => error.name === "UnknownError" && /book\.mp3/.test(error.message))
-  assert.equal([...f.cache.data.keys()].filter(key => key.includes("/file/")).length, 0)
+  assert.equal(f.caches.entryKeys().length, 0)
   assert.equal(f.library.status(f.book).state, "partial")
   fail = false
   await f.library.download(f.book)
@@ -243,12 +248,12 @@ test("missing chunks are detected, and delete removes every chunk", async () => 
   await f.library.download(f.book)
   const keys = f.library.storedKeys(f.file)
   assert.equal(keys.length, 4)
-  await f.cache.delete(keys[2])
+  await f.caches.deleteEntry(keys[2])
   assert.equal(await f.library.verify(), true)
   assert.equal(f.library.status(f.book).state, "partial")
   await f.library.download(f.book)
   await f.library.remove(f.book)
-  assert.equal([...f.cache.data.keys()].filter(key => key.includes("/file/")).length, 0)
+  assert.equal(f.caches.entryKeys().length, 0)
 })
 
 test("files downloaded before chunking (single raw entry) still play and export", async () => {
@@ -258,4 +263,79 @@ test("files downloaded before chunking (single raw entry) still play and export"
   assert.equal(f.library.findFile(path).chunks, undefined)
   assert.equal(await (await f.library.response(path, "bytes=1-2")).text(), "ef")
   assert.equal(await (await f.library.response(path)).text(), "def")
+})
+
+// ── Deleting with a damaged shared cache (iPhone "Internal error" on delete, 11-06) ─────
+// Builds the state an iPhone is left in: an older book in the shared cache, an empty record
+// for the book whose 288 MB write failed, and that failed write's damaged orphan entry.
+async function legacyFixture() {
+  const f = fixture()
+  const legacy = f.book
+  const failed = "/root/category/failed"
+  const key = path => f.library.prefix + "file/" + encodeURIComponent(path)
+  for (const [path, body] of f.bytes) await f.cache.put(key(path), new Response(body))
+  const orphan = key(`${failed}/big.mp3`)
+  await f.cache.put(orphan, new Response("x"))
+  f.cache.broken.add(orphan)
+  f.library.state.books[legacy] = { path: legacy, complete: true, dirs: {}, plan: [...f.bytes.keys()].map(path => ({ path, size: 3 })),
+    files: Object.fromEntries([...f.bytes.keys()].map(path => [path, { size: 3 }])) }
+  f.library.state.books[failed] = { path: failed, complete: false, dirs: {}, plan: [{ path: `${failed}/big.mp3`, size: 4 }], files: {} }
+  await f.library.save()
+  f.tree[failed] = [{ name: "big.mp3", size: 4 }]
+  f.bytes.set(`${failed}/big.mp3`, "abcd")
+  return { ...f, legacy, failed, orphan }
+}
+
+test("books stored before per-book caches still play from the shared cache", async () => {
+  const f = await legacyFixture()
+  const path = `${f.legacy}/Volume 2/01.mp3`
+  assert.match(f.library.localUrl(path), /\/file\//)
+  assert.equal(await (await f.library.response(path, "bytes=1-2")).text(), "ef")
+})
+
+test("a damaged entry in the shared cache no longer breaks delete or download", async () => {
+  const f = await legacyFixture()
+  assert.equal(await f.library.remove(f.legacy), 0)
+  assert.equal(f.library.state.books[f.legacy], undefined)
+  assert.equal(await f.library.verify(), false)
+  // the record left by the failed download moves to its own cache and completes
+  await f.library.download(f.failed)
+  assert.equal(f.library.state.books[f.failed].store, "book")
+  assert.match(f.library.localUrl(`${f.failed}/big.mp3`), /\/book\//)
+  assert.equal(await (await f.library.response(`${f.failed}/big.mp3`)).text(), "abcd")
+  const reopened = await new OfflineLibrary(f.options).open()
+  assert.equal(reopened.state.books[f.failed].complete, true)
+})
+
+test("an older-book entry that cannot be deleted is reported, not fatal", async () => {
+  const f = await legacyFixture()
+  f.cache.broken.add(f.library.key(`${f.legacy}/Volume 1/01.mp3`))
+  assert.equal(await f.library.remove(f.legacy), 1)
+  assert.equal(f.library.state.books[f.legacy], undefined)
+})
+
+test("deleting a book drops its whole cache and leaves other books intact", async () => {
+  const f = fixture()
+  const other = "/root/category/other"
+  f.tree[other] = [{ name: "a.mp3", size: 3 }]
+  f.bytes.set(`${other}/a.mp3`, "xyz")
+  await f.library.download(f.book)
+  await f.library.download(other)
+  const names = await f.caches.keys()
+  assert.equal(names.filter(name => name.startsWith("garden-offline-book:")).length, 2)
+  await f.library.remove(f.book)
+  assert.deepEqual((await f.caches.keys()).filter(name => name.startsWith("garden-offline-book:")), [f.library.bookCacheName(other)])
+  assert.equal(await (await f.library.response(`${other}/a.mp3`)).text(), "xyz")
+})
+
+test("clear all resets a damaged library and downloads work again", async () => {
+  const f = await legacyFixture()
+  await f.library.download(f.failed)
+  await f.library.clearAll()
+  assert.deepEqual(await f.caches.keys(), [OFFLINE_CACHE])
+  assert.deepEqual(f.library.state.books, {})
+  assert.equal(f.library.state.limit, DEFAULT_LIMIT)
+  await f.library.download(f.book)
+  assert.equal(f.library.status(f.book).state, "complete")
+  assert.deepEqual(Object.keys((await new OfflineLibrary({ ...f.options, cache: await f.caches.open(OFFLINE_CACHE) }).open()).state.books), [f.book])
 })

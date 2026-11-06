@@ -13,7 +13,7 @@
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icon-180.png">
     <link rel="stylesheet" href="./app.css?v=36">
-    <script type="module" src="./app.js?v=54"></script>
+    <script type="module" src="./app.js?v=55"></script>
   </head>
   <body>
     <!-- App Root Viewport -->
@@ -508,6 +508,8 @@
           </label>
         </div>
 
+        <button id="offline-clear-all" type="button" class="offline-clear-all">清除全部离线下载</button>
+
         <details class="offline-help">
           <summary>使用说明</summary>
           <ul>
@@ -516,6 +518,7 @@
             <li>已下载的书优先用本机文件播放和跟读，断网也能听；手机请从主屏幕图标打开。</li>
             <li>上限只约束本播放器，不代表系统为它预留空间；系统空间紧张时仍可能清理。</li>
             <li>导出到“文件”会另存一份，额外占用空间。服务器更新书籍后，删除本机副本再下载即可获得新版本。</li>
+            <li>如果删除或下载反复报错，可用「清除全部离线下载」重置本机下载库，再重新下载需要的书。</li>
           </ul>
         </details>
       </dialog>

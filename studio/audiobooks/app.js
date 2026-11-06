@@ -2976,7 +2976,7 @@ function formatOfflineBytes(bytes) {
 async function openOfflineLibrary() {
   offlineLibrary?.pause()
   const owner = account()
-  const library = new OfflineLibrary({ cache: await caches.open(OFFLINE_CACHE), origin: location.origin,
+  const library = new OfflineLibrary({ cache: await caches.open(OFFLINE_CACHE), caches, origin: location.origin,
     owner: `${ROOT}|${owner}`, root: ROOT, storage: navigator.storage,
     listRemote: async (path, signal) => {
       const rows = []
@@ -3165,8 +3165,11 @@ function offlineBookRow(library, book) {
   else button("删除", async () => {
     if (current?.path.startsWith(book.path + "/")) throw new Error("正在播放这本书，请先切换到其他书籍再删除")
     if (!confirm(`删除《${book.path.split("/").pop()}》的本机副本（${formatOfflineBytes(status.bytes)}）？\n在线书库中的原书不受影响。`)) return
-    await library.remove(book.path)
+    const stuck = await library.remove(book.path)
     manifestMemoryCache.clear(); timelineMemoryCache.clear()
+    notice(stuck
+      ? `已删除《${book.path.split("/").pop()}》，但有 ${stuck} 个本机文件系统未能释放；空间不足时可在「离线下载」底部选「清除全部离线下载」。`
+      : `已删除《${book.path.split("/").pop()}》的本机副本`)
     await refreshOfflineEstimate()
   }, "danger")
   row.append(actions)
@@ -3266,6 +3269,17 @@ on("offline-limit", "change", attempt(async () => {
     await offlineLibrary.setLimit(Number($("offline-limit").value))
     notice("下载上限已更新")
   } finally { refreshOfflineUi() }
+}))
+on("offline-clear-all", "click", attempt(async () => {
+  if (!offlineLibrary) await openOfflineLibrary()
+  if (current && offlineLibrary.findFile(current.path)) throw new Error("正在播放已下载的书，请先切换到在线书库的书再清除")
+  if (!confirm("清除本设备上播放器的全部离线下载？\n已下载的书都需要重新下载；在线书库和收听记录不受影响。")) return
+  await offlineLibrary.clearAll()
+  manifestMemoryCache.clear(); timelineMemoryCache.clear()
+  offlineBrowsing = false
+  notice("已清除全部离线下载")
+  await refreshOfflineEstimate()
+  refreshOfflineUi()
 }))
 on("offline-online", "click", attempt(async () => {
   offlineBrowsing = false
