@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>八上期中作文练笔</title>
+  <!-- KaTeX for math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.08);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.12);
+        --bg-warm: rgba(251, 146, 60, 0.12);
+        --bg-danger: rgba(248, 113, 113, 0.12);
+        --bg-success: rgba(74, 222, 128, 0.12);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 740px; margin: 0 auto; }
+    p, li { text-align: justify; margin-bottom: 0.55em; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    /* 顶部 Hero 卡片 */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3.5px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--text-main);
+    }
+    .hero-quote p { margin-bottom: 0.4em; }
+    .hero-quote p:last-child { margin-bottom: 0; }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 1.1fr 1.2fr 1fr 0.8fr;
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 3px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .t-btn:hover { opacity: 0.85; }
+    .t-btn.btn-back { background: var(--bg-accent); color: var(--primary); font-weight: 700; }
+    .t-btn.btn-open { background: var(--bg-subtle); color: var(--text-main); }
+    .t-btn.btn-close { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* PWA 全屏模式右下角浮动返回按钮 */
+    .fab-back {
+      position: fixed;
+      right: 14px;
+      bottom: 22px;
+      z-index: 99;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      cursor: pointer;
+      opacity: 0.9;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.18s, opacity 0.18s;
+    }
+    .fab-back:hover, .fab-back:active {
+      transform: scale(1.08);
+      opacity: 1;
+      background: var(--bg-accent);
+    }
+    .fab-back svg { width: 20px; height: 20px; }
+
+    /* 公式排版防溢出 */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .part-divider {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin: 20px 2px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目 */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.18s ease;
+    }
+    details.guide-section[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+      background: var(--bg-card);
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .color-navy { background: var(--bg-accent); color: var(--primary); }
+    .color-amber { background: var(--bg-warm); color: var(--secondary); }
+    .color-bamboo { background: var(--bg-success); color: var(--success); }
+    .color-purple { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+    .color-rose { background: var(--bg-danger); color: var(--danger); }
+    .color-cyan { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+
+    .sec-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--text-main); }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; font-weight: 600; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+
+    .section-content {
+      padding: 10px 12px 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 14px 18px 22px; }
+    }
+
+    /* 内部小标题与区块 */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; }
+
+    /* 纯色块 */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 12px;
+      border-radius: 6px;
+      margin: 9px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 标签 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 表格移动端自适应 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 10px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    ul, ol { padding-left: 19px; margin: 6px 0 10px; }
+    li { font-size: 14.8px; margin-bottom: 5px; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      background: var(--bg-subtle);
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      color: var(--primary);
+    }
+    pre {
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+    }
+    pre code { background: none; padding: 0; color: var(--text-main); }
+
+    footer {
+      text-align: center;
+      padding: 28px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      
+      <h1>八上期中作文练笔</h1>
+      <div class="hero-sub">Rosemary Garden 精读导读</div>
+      
+    </header>
+
+    <!-- 置顶工具栏 -->
+    <nav class="toolbar">
+      <button class="t-btn btn-back" onclick="navigateBack()">← 作品廊</button>
+      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 全部展开 (38)</button>
+      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 全部收起</button>
+      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 顶部</button>
+    </nav>
+
+    <!-- 手风琴内容区块 -->
+    <main>
+      
+      <details class="guide-section" id="sec-01" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">01</span>
+            <span class="sec-title">古诗扩写：黄鹤楼</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>仙人早已骑着黄鹤飞去，而这里只留下了黄鹤楼。黄鹤楼屹立不倒，依旧见证着滚滚长江流水。金黄的飞檐微微扬起，宛如一只振翅欲飞的黄鹤，等待仙鹤归来。但水天相接之处再也没有出现仙鹤，它似乎已经飞去了天界，不会再次降临凡间。而黄鹤楼旁，那天边的白云历经千载仍然不散，却只能无依无靠地飘荡，徒然等待着永不归来的神鸟。登上黄鹤楼，视线能够越过云雾，落在长江的对岸。天气格外的好，阳光让江水泛起点点金光，让对岸的原野显得清晰无比。每一棵树木的叶子都沐浴在阳光下，暖风吹过，金黄的碎光便闪动起来，整片树林成了金色的海洋。而波涛中的鹦鹉洲则是一片翠绿。小小的岛屿上，花草树木竞相生长，争着将枝叶伸向太阳，有些树木甚至勇敢地探向江水。茂密的树冠中，时而闪现一两个灵动的身影，伴随着欢快婉转的鸣唱。不知不觉间，天色渐暗，黄昏将至，江面上悄然升起一层雾气，薄纱一般久久不散。它遮住了对岸的树木，也遮住了更远的天际，不禁勾起了游子的愁绪，通往故乡的路，究竟在何方？</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-02" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">02</span>
+            <span class="sec-title">古诗扩写：野望</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>夕阳渐渐坠入群山，为云朵镶上金边。天空披上了彩色的缎，色彩交相辉映。我站在东皋村远眺着这绚丽的天空，心中却有些失落。我徘徊着，感觉无归依之处，也无可依靠的人。抬眼望去，是一片灿烂的秋景，山林中，每一棵树都被染上一抹秋天的色彩，鹅黄、浅橙、金色，山峦仿佛被水彩晕染过。其中有一棵鲜红的枫树，枝可宛如一团烈火，秋风拂过，火星点点飘落。当落日的余晖笼罩了连绵的山峦，又是另一幅美妙的图画。夕阳蜂蜜似的光晕浸没了一座又一座山峰，一直绵延至天际，与晚霞相接。当夕阳沉入地平线，群山便一点点被黑夜所笼罩，一片寂静。这时，牧牛人才结束一天的放牧，赶着一小群牛回家，传来“哞哞”的叫唤；猎人骑着骏马，手中提着一天的收获准备将它们烤成晚餐，马蹄轻快地扬起细沙。我看着他们消失在蜿蜒的小径尽头，却发现自己一个都不认识，于是我只能放声歌唱，怀念那伯夷、叔齐在首阳山采薇的事迹，也感叹着，自己的出路究竟通向何方。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-03">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">03</span>
+            <span class="sec-title">古文扩写：记承天寺夜游</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>元丰六年十月十二日的夜晚，我闲得无事，便解开衣物，想要酣睡一宿。这式，一缕银白的幽光悄悄透过窗户，映在地板上，好似结了一层薄霜。抬头望去，一轮玉盘嵌在深蓝的天际上，周围还零星有几颗若隐若现的星星，这月色怎不令人神往？于是我便愉悦地系上衣服，准备出门赏月。转念一想，如此美的月夜若无人一同欣赏就少了几分乐趣。想到这里，我就前往承天寺寻找好友张怀民。怀民似乎也被皎洁的月色所迷住，久久未眠，我们便一同在寺院中庭漫步。四周的景物仿佛被蒙上一层轻纱，染上一片宁静与朦胧，连虫鸣似乎都停止了。明月将如水的月光洒在中庭，正如一潭清澈见底的池水，波光粼粼，空明澄澈。水中藻、荇交错，一阵清风吹拂庭院，水草便摇曳起柔软的叶片。清风也送来了松香，这些“水草”大概是月亮投下的松柏的影子吧。我们踏着这一潭清水，感受草木的芬芳，简直是无以惬意的意境。正值满月，却无其他人欣赏。哪里没有月？哪里没有松柏？处处月明，但人们却皆在忙碌，无暇观赏，只有我们二人能悠然自得，漫步在月夜中。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-04">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">04</span>
+            <span class="sec-title">古文扩写：答谢中书书</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>神州大地上，有水墨画般的名山大川，更有用笔墨绘画的人。这青山绿水，从古至今，都是文人墨客津津乐道的。你看，那拔地而起的高峰宛如出鞘的利剑，直插云霄，山顶若隐若现；山脚下的小溪又如一条玻璃带，阳光照在清波上，让河底每一粒金沙都清晰可见；岸边的石壁仿佛披上了彩霞，色彩重重叠叠，交相辉映。沿着岩壁向上，一片随山峦起伏的绿映入眼帘。常年青绿的树林繁茂无比，在树下只洒下碎光；四季挺拔的翠竹，叶片上还挂着晶莹的露珠。在这里，每当晨雾渐渐散去，猿猴和飞鸟争相啼叫，欢快婉转的鸣唱中夹杂几声长啸；当火红的夕阳缓缓落下西边的群山，原本潜游的鱼竞相跃出水面，随着“哗啦”声，一抹银光在波涛中转瞬即逝，溅起一层水雾。这山中美妙而灵动的意境，真是称得上人间仙境。自从康乐公谢灵运以来，从来没能有欣赏这种意境的人了。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-05">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">05</span>
+            <span class="sec-title">古文扩写：三峡</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>绵延七百里的三峡，就像长江在群山中劈出的裂痕，两岸的山峦连绵不绝，与天际线相接，从中找不出一丝裂缝，更没有中断的地方。这里，一座座山峰拔地而起，宛如一把把出鞘的利剑，直指蓝天；一个个山崖挺立着，它们如屏障一般，遮天蔽日，将天空变为一条细线。如果不是正午，炽热的阳光根本无法照进这险峻的峡谷；若非正是子夜，皎洁的月亮也不能漏进半分银光。其余的时间，三峡都沉浸在一片宁静和幽深中。</p>
+<p>每当夏日降临，澎湃的水声便会撕破宁静。这时，汹涌湍急的水流漫上山陵，拍打在崖壁上，激起千层白浪，又跌回峡谷。原本的航道被激流截断，无论是顺流还是逆流的船只都在凶猛的水势面前望而却步。只有那些承担加急使命的船只，才敢于在急流中劈波斩浪。它清晨才与雾气缭绕的白帝城辞别，借着水流像离弦之箭一般掠过万重青山，不过傍晚时分便到了千里之外的江陵。哪怕骑着飞奔的骏马，踏风而行，也比不上这奔腾的水快。</p>
+<p>每逢冬春之时，三峡便褪去了夏日的汹涌澎湃，染上了几分灵动和生机。此时的江面之上，雪白的急流如同奔腾的群马，卷出千堆碎雪，激起片片水雾。而那回旋的绿潭却清澈见底，宛如一块无瑕的翡翠，清波将两岸高耸的山峦与轻盈的流云映在潭中。仰望直插云霄的山峰，奇松怪柏扎根在岩缝中，像永不倒下的守卫一般历经风雨却仍在生长。山间点缀着悬泉瀑布，它们像一条条银河从天上跌落，飞似地冲入潭中。这条条银河隐敝在水清树茂、山高草盛的峡谷里，真是一番静谧与灵动交织的趣味。</p>
+<p>当时间转到下霜，刚刚放晴的早晨，三峡却漫起一层肃杀的寒意。林木在寒风中瑟瑟发抖，林间的小溪仿佛失去了清脆的哗哗声，四周一片苍茫寂静。忽然，几声高亢而凄厉的猿啼划破了沉寂，一声接着一声，在空旷的山谷中回荡，久久不散。这声音悲凉婉转，如泣如诉，仿佛带着江水般无尽的悲哀与凄凉。它们唤起了无数人的悲思，正如古老渔歌中所唱的那样“巴东三峡巫峡长，猿鸣三声泪沾裳。”这悲凉的景象和凄厉的猿啼，为三峡这幅雄浑壮丽的画卷中，添上一抹深沉而厚重的色彩。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-06">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">06</span>
+            <span class="sec-title">我渴望被看见</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>夜幕悄悄降临，四周寂静无人，我的房间依旧开着一盏台灯。这是我练琴的最后十分钟，只有月亮陪伴，月光洒在合唱节伴奏的乐谱上，也洒在黑白琴键上，显得无比孤独。我把搭在琴上的手放下，忽然感到一阵失落。这里没人知道我在努力，也没有人会问。</p>
+<p>“伴奏本来就是配角，不重要的。”我安慰自己，重新翻开谱子。夜渐渐深了，弹着弹着我恍惚间看见音符一同唱出旋律。小节要求同时弹两个和弦，少一个音都显得单薄，多一个音又显得沉重；快速跳跃的和弦，哪怕弹错一个看似无关紧要的音，顿时失去了灵韵；高潮部分低音雄浑，高音轻盈，所有音符齐心协力将乐曲推向辉煌。那天合上乐谱时，我想，原来每一个音都值得被演奏出来，被听到。</p>
+<p>合唱节伴随着兴奋拉开序幕。候场区中，同学们一遍遍默唱着那段旋律，我的手心沁出了汗珠。上台后，我坐在角落中的一架电钢琴边，虽不被聚光灯照到，但从同学们的目光中，我看到了鼓励和期待。随着音乐的流淌，我那些失落被吹散，因为，每一个音符都托起了同学们的歌唱；每一个歌声都托起了我的音符，缺少一个，整支乐曲便会失去许多。所有的和声，都值得被听到。最后一个音符落下，灯光渐渐暗下来，但同学们的眼睛更亮了。我看着他们，并知道，他们一定看见了我。原来，不是站在聚光灯下就能被看见，而是让光透过自己，点亮更多的人。</p>
+<p>老师批语：被看见，被光亮给予更多温暖、信心与力量。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-07">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">07</span>
+            <span class="sec-title">我看见了那份尊重</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>我关于老师们的师恩，最不能忘记的，大概就是那份温暖与尊重。</p>
+<p>那是一个傍晚，家长会的热闹仿佛还留在耳边，学生活动区只剩笔尖与纸摩擦的“沙沙”声。走廊尽头传来渐近的脚步声，是老师与小陈的妈妈。我握笔的手一顿——小陈最近学习状态下清，几次小测都不理想。两人在桌前坐下，老师缓缓开口：“不知您最近是否关注过孩子的学习？他最近几次小测状态有些波动。”老师轻轻敲着桌面，微笑着安慰焦虑的家长，“不过只要能把作业写得认真，孩子很快就能适应。”我心里一震，原来批评竟能如此温和。</p>
+<p>送走家长，老师轻轻推开教室门，暖黄的灯光瞬间泄入走廊，也照亮了小陈低垂的头和攥紧作业本的手。透过掩上的门，我隐约听见老师的话：“小陈，你的听讲状态真的很投入！这是十分难得之处。只要你再将听讲的成果巩固在作业中，那么你一定会更上一层楼……”我看不清老师的脸，却看到小陈的手渐渐松开，作业本被重新抚平。半晌，老师和小陈并肩走出教室。我合上作业本，却发现一个字都没写。小学时，我也曾有一次当众被批评，同学们哄笑，当时我多么渴望能被平等尊重！此刻，我望着空教室中暖光下的作业本，感觉它仿佛是老师为同学留下的尊严。她把批评留在走廊中，却让光亮能在同学抬头时，就被看见。</p>
+<p>春风化雨，润物无声。老师激励同学，从不是将一句批评当面喊出，而是用肯定，无声地指出不足，用宽容，无声地铺出进步的道路。有些话，还未说出，却已经温暖了人心。</p>
+<p>老师批语：温暖，柔软的教育，润人心。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-08">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">08</span>
+            <span class="sec-title">DEEPSEEK</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>下面按你给出的篇目逐篇点评。整体上，你的语言感受力很好，尤其擅长写景、铺陈色彩与光影，古诗文扩写有明显优势；但生活记叙文存在“立意好、细节散、点题弱、结构不够紧”的问题。下面我按“核心问题—改进方案—可借鉴亮点”来梳理，最后做共性总结。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-09">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">09</span>
+            <span class="sec-title">一、古诗文扩写板块</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">1.《黄鹤楼》扩写</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>扩写与原诗关系不够紧</strong>：开头写仙人骑鹤、黄鹤楼、白云，尚能对应原诗；但中后段大量写“阳光、江水、原野、树林、鹦鹉洲、花草、鸟鸣”，已经偏向一般写景，冲淡了《黄鹤楼》原诗“吊古伤今、乡愁渺远”的核心情绪。</li>
+<li><strong>情绪转折太突然</strong>：前面是大段明媚、生机、金色海洋，最后一句“天色渐暗……勾起游子愁绪”像硬拐弯，缺少从“乐景”到“哀情”的过渡。</li>
+<li><strong>“黄鹤”意象重复但未深化</strong>：黄鹤飞去、等待仙鹤归来、飞向天界，写得较多，但没有把“黄鹤不归”与“时光不返、人事全非、乡关何处”联系起来。</li>
+<li><strong>语言有堆砌感</strong>：如“金黄的碎光”“金色的海洋”“翠绿”“竞相生长”等，画面漂亮，但部分句子偏熟，缺少独特观察。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>压缩中间明丽写景，强化原诗情感线</strong>：<br>建议结构改为：<br>① 黄鹤已去，楼空江流——② 白云千载，空自悠悠——③ 登楼所见，乐景反衬——④ 日暮乡关，愁绪收束。<br>这样“晴川历历汉阳树，芳草萋萋鹦鹉洲”只作为中间一层，不要占太大篇幅。</li>
+<li><strong>把“乐景”写成“反衬”</strong>：<br>例如不要只写“阳光让江水泛金”，而要写“江水流得那样急，却带不走楼上的空寂”。<br>不要只写“树林成了金色海洋”，而要写“越明亮，越显得黄鹤一去不返”。</li>
+<li><strong>结尾要回到“乡关何处”</strong>：<br>可以写：“烟波江上，暮色四合，我忽然明白，黄鹤不归，白云千载，而我的归路，也在这苍茫中模糊了。”</li>
+<li><strong>减少形容词堆叠，增加动词与心理</strong>：<br>如“金光”“翠绿”“金色海洋”可保留一处，其余换成“光在叶背跳跃”“洲上草色漫过来，像要把人淹没”。</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>有画面感，能抓住“黄鹤楼—长江—白云—鹦鹉洲”等意象。</li>
+<li>语言有文采，尤其“金黄的飞檐微微扬起，宛如一只振翅欲飞的黄鹤”这一句有想象力。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+扩写不是改写，也不是借题写景。评分老师最看重：<strong>是否忠于原诗、是否合理扩展、是否保留原诗情感基调</strong>。这一篇目前属于“语言较好，但中心偏移”。</p>
+<hr>
+<div class="sub-heading">2.《野望》扩写</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>写景层次较清楚，但“东皋薄暮望，徙倚欲何依”的孤独感不够贯穿</strong>。<br>中间写秋景、枫树、落日、牧牛人、猎人，画面丰富，但“我”的失落、徘徊、无依，只在开头和结尾出现，中间被景物淹没。</li>
+<li><strong>结尾引用伯夷、叔齐，理解较浅</strong>。<br>“怀念那伯夷、叔齐在首阳山采薇的事迹”只是贴标签，没有写出“他们为何值得怀念”“我和他们有什么共鸣”。</li>
+<li><strong>部分表达不准确</strong>：<br>“枝可宛如一团烈火”应为“枝柯”；“猎人骑着骏马，手中提着一天的收获准备将它们烤成晚餐”过于具体，冲淡了原诗淡淡的惆怅。</li>
+<li><strong>景物顺序有些杂</strong>：<br>夕阳、云朵、天空、秋景、枫树、落日余晖、夕阳沉入地平线，时间线有重复。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>用“望”统摄全文</strong>：<br>远望—近望—俯望—回望。每一层都扣“徙倚欲何依”。</li>
+<li><strong>中间写景要带出“无依”</strong>：<br>如：“牧人赶牛归家，猎人提猎物归家，他们都有归处；只有我，站在东皋，不知归向何方。”</li>
+<li><strong>结尾不要只提伯夷叔齐，要写出选择</strong>：<br>可改为：“他们采薇而食，不是没有出路，而是不肯走向自己不认同的路。而我呢？我的路又在哪？”</li>
+<li><strong>精简落日描写</strong>：<br>保留“夕阳—群山—晚霞—牧归—猎归—无相识—长歌怀采薇”这条线即可。</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>秋景描写有色彩感，“鹅黄、浅橙、金色”“鲜红的枫树像一团烈火”较好。</li>
+<li>能注意到“牧牛人”“猎人”这些人物活动，有生活气息。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+这首诗扩写要抓住“薄暮”“徙倚”“无依”“秋色”“牧猎归”“怀采薇”。目前景够，情不够，结尾点题弱。</p>
+<hr>
+<div class="sub-heading">3.《记承天寺夜游》扩写</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>整体较完整，但“闲人”二字没有真正展开</strong>。<br>原文核心是“何夜无月？何处无竹柏？但少闲人如吾两人者耳。”你写到了“人们皆在忙碌，无暇观赏，只有我们二人能悠然自得”，但还可以更深入：被贬的苏轼，为何还能“闲”？这种“闲”是自嘲、自我排遣，也是精神超越。</li>
+<li><strong>语言有现代腔和重复</strong>：<br>“这式”应为“这时”；“简直是无以惬意的意境”表达别扭；“我们踏着这一潭清水”中“踏着清水”与“影子”逻辑可再顺。</li>
+<li><strong>比喻较密但部分不够统一</strong>：<br>月光—池水—藻荇—松柏影子，这是原文妙处。你加“清风送松香”“水草摇曳”，可以，但要注意不要破坏“积水空明”的静谧。</li>
+<li><strong>结尾议论稍浅</strong>：<br>“只有我们二人能悠然自得”偏表面，没有写出“闲人”的复杂意味。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>结构按原文走</strong>：<br>解衣欲睡—月色入户—欣然起行—念无与为乐—寻张怀民—怀民亦未寝—步于中庭—庭下积水空明—盖竹柏影也—何夜无月—但少闲人。</li>
+<li><strong>重点扩写“闲人”</strong>：<br>可写：“所谓闲人，并非无事可做，而是被贬之后，仍能在一庭月色中安放自己。世人忙，我们闲；世人睡，我们醒。”</li>
+<li><strong>减少多余修饰</strong>：<br>如“周围还零星有几颗若隐若现的星星”可保留，但不必太多。</li>
+<li><strong>结尾要升华但不空</strong>：<br>可写：“月常有，竹柏常有，难的是一颗不被境遇压垮的心。今夜，我与怀民都是闲人，也都是被月光照亮的幸者。”</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>对原文脉络把握较好。</li>
+<li>“明月将如水的月光洒在中庭，正如一潭清澈见底的池水”能还原原文意境。</li>
+<li>有“月光—积水—藻荇—竹柏影”的比喻意识。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+这篇属于中等偏上。只要把“闲人”内涵写透，删去现代腔，就能升格。</p>
+<hr>
+<div class="sub-heading">4.《答谢中书书》扩写</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>写景很密，但层次不够清楚</strong>。<br>高峰、小溪、石壁、树林、翠竹、晨雾、猿鸟、夕阳、游鱼，几乎把原文意象都铺开了，但缺少“总—分—总”或“仰视—俯视—平视—晨昏”的顺序。</li>
+<li><strong>“自康乐公谢灵运以来，从来没能有欣赏这种意境的人了”理解有偏差</strong>。<br>原文“自康乐以来，未复有能与其奇者”是作者自许，也暗含对世人不能领略山水的感慨。你写“从来没能有欣赏这种意境的人了”，语气太绝对，且没写出陶弘景的自豪与孤独。</li>
+<li><strong>部分描写偏现代</strong>：<br>“玻璃带”“人间仙境”“水墨画般的名山大川”可以，但“人间仙境”略俗。</li>
+<li><strong>缺少“书”的意味</strong>：<br>这是书信，扩写时最好保留“我与您说说这山水”的倾诉感。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>开头加书信感</strong>：<br>“谢中书，若你问我江南山水何如，我便答你：高峰入云，清流见底……”</li>
+<li><strong>按原文层次扩写</strong>：<br>① 高峰—清流—石壁—林竹（静景）<br>② 晨雾—猿鸟—夕日—沉鳞（动景）<br>③ 总赞—自康乐以来无人能赏（抒情议论）</li>
+<li><strong>结尾要写出“我”的自得与遗憾</strong>：<br>“谢公之后，还有谁能与我同赏？我写给你，既是分享，也是邀约。”</li>
+<li><strong>删减重复形容词</strong>：<br>如“欢快婉转的鸣唱”在《黄鹤楼》《三峡》中反复出现，要换表达。</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>意象覆盖全，能体现原文“山川之美”。</li>
+<li>“山脚下的小溪又如一条玻璃带”有画面感。</li>
+<li>动静结合意识较强。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+扩写要“忠于原文顺序与情感”，不要只追求辞藻。这篇建议重点练“层次”和“书信语气”。</p>
+<hr>
+<div class="sub-heading">5.《三峡》扩写</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>语言最铺张，但最需要瘦身</strong>。<br>这篇写得很长，画面多，但很多地方是“同义反复”：山峰像利剑、山崖如屏障、急流、绿潭、悬泉瀑布、猿啼，原文都有，但你加了大量形容，导致节奏慢。</li>
+<li><strong>四时结构清楚，但每段重点不够突出</strong>：<br>夏—水急；春冬—清幽；秋—凄寒。你基本写到了，但夏段“有时朝发白帝”的夸张感、春冬“素湍绿潭，回清倒影”的清澈感、秋“猿鸣三声泪沾裳”的悲凉感，还可以更集中。</li>
+<li><strong>部分表达不准确</strong>：<br>“隐敝”应为“隐蔽”；“雪白的急流如同奔腾的群马，卷出千堆碎雪”与“回旋的绿潭”对照好，但“群马”与“碎雪”混在一起，比喻略乱。</li>
+<li><strong>结尾渔歌引用好，但前面猿啼描写过长</strong>。<br>猿啼是秋景高潮，应集中发力。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>按“山—夏水—春冬—秋”四层写</strong>：<br>山：连绵、遮天蔽日。<br>夏：水急、断航、朝发白帝暮到江陵。<br>春冬：素湍、绿潭、倒影、悬泉瀑布。<br>秋：林寒、涧肃、猿啼、渔歌。</li>
+<li><strong>每层只保留一个核心画面</strong>：<br>如夏只写“白浪—断航—疾舟”；春冬只写“素湍—绿潭—倒影—瀑布”；秋只写“寒林—猿啼—泪沾裳”。</li>
+<li><strong>结尾要收束</strong>：<br>“三峡之美，不止雄奇，更有悲凉。它让人惊叹，也让人落泪。”</li>
+<li><strong>减少“像利剑”“像屏障”“像银河”等常见比喻</strong>，换一个更新颖的，如“山把天挤成一条缝”。</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>能完整覆盖原文内容。</li>
+<li>夏水、春冬、秋景三段意识清楚。</li>
+<li>渔歌引用自然。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+这篇属于“内容全但不够精”。考场作文最忌堆砌。建议练习“一段一景一情”。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-10">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">10</span>
+            <span class="sec-title">二、生活记叙文板块</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">6.《我渴望被看见》</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>立意很好，但“被看见”的过程不够具体</strong>。<br>开头练琴、月亮、伴奏谱，营造孤独感，很好。但中间“音符齐心协力将乐曲推向辉煌”是联想，不是事件。读者看不到“我”如何被看见。</li>
+<li><strong>叙事线索弱</strong>：<br>练琴—合唱节—上台—最后音符落下—同学们眼睛亮了。事情有，但缺少关键细节：谁看了你？怎么看的？你当时什么反应？</li>
+<li><strong>点题句较空</strong>：<br>“原来，不是站在聚光灯下就能被看见，而是让光透过自己，点亮更多的人。”这句很好，但前面没有足够铺垫“光透过自己”的具体过程。</li>
+<li><strong>老师批语“被看见，被光亮给予更多温暖、信心与力量”</strong>，说明主题可再往“被看见后获得力量”深化。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>增加一个“被看见”的关键瞬间</strong>：<br>例如：合唱结束后，指挥同学回头对你笑了一下；或老师朝你点头；或同学说“伴奏今天真稳”。<br>这个瞬间要写慢：动作、眼神、声音、你的心理。</li>
+<li><strong>把“练琴”与“合唱”形成对照</strong>：<br>练琴时无人看见；合唱时你的音符托起大家，大家的目光也托起你。<br>可写：“我以前以为伴奏在角落，没人会注意。可当我的第一个和弦落下，前排同学轻轻跟着点头，我忽然知道，他们听见了。”</li>
+<li><strong>结尾不要只讲道理，要回到画面</strong>：<br>“灯暗了，同学们的眼睛却亮着。那一刻，我知道，我不是角落里的伴奏，我是被看见的一束光。”</li>
+<li><strong>删减抽象议论</strong>：<br>“每一个音符都值得被演奏出来，被听到”可以保留，但后面要马上接事件。</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>立意切合初二成长类作文。</li>
+<li>“不是站在聚光灯下就能被看见，而是让光透过自己，点亮更多的人”是金句。</li>
+<li>月亮、琴键、乐谱、候场、手心汗珠等细节有氛围。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+记叙文要“以事带情，以细节显立意”。这篇目前是“立意好，事件弱”。改进重点是：<strong>写一个让‘我’真正感到被看见的瞬间</strong>。</p>
+<hr>
+<div class="sub-heading">7.《我看见了那份尊重》</div>
+<p><strong>核心问题：</strong></p>
+<ol>
+<li><strong>选材很好，但叙事视角有点绕</strong>。<br>“我”在教室外写作业，听到老师和小陈妈妈、小陈的对话。这个设计可以，但“我”为什么能听到？要交代自然。</li>
+<li><strong>老师形象很温暖，但“我看见了尊重”中的“我”感受不够</strong>。<br>你写小学时自己当众被批评，这是关键对比，但只一句带过。应该展开：当时多难堪？现在看到老师这样对待小陈，你内心怎样震动？</li>
+<li><strong>部分句子表达不清</strong>：<br>“小陈最近学习状态下清”应为“不佳”；“暖黄的灯光瞬间泄入走廊”中“泄”可换“泻”；“感觉它仿佛是老师为同学留下的尊严”略绕。</li>
+<li><strong>结尾议论好，但偏多</strong>。<br>“春风化雨，润物无声”很熟，可保留，但前面事件已足够，结尾应更简洁。</li>
+</ol>
+<p><strong>改进方案：</strong></p>
+<ul>
+<li><strong>结构改为</strong>：<br>① 傍晚，我听到老师与小陈妈妈谈话。<br>② 老师温和批评，安慰家长。<br>③ 老师单独与小陈谈话，肯定中指出不足。<br>④ 我回忆起自己曾被当众批评的难堪。<br>⑤ 我明白了：尊重是把批评留在走廊，把尊严留给学生。</li>
+<li><strong>重点写“我”的心理对比</strong>：<br>“小学时，老师一句批评，全班哄笑，我恨不得钻进地缝。现在，老师把批评放在走廊，把光留在教室。那一刻，我看见了尊重。”</li>
+<li><strong>减少旁枝</strong>：<br>“我合上作业本，却发现一个字都没写”这个细节很好，保留。它说明“我”被触动了。</li>
+<li><strong>结尾短而有力</strong>：<br>“有些话还未说出，却已温暖人心。那天，我看见了尊重，也看见了教育最柔软的模样。”</li>
+</ul>
+<p><strong>亮点：</strong></p>
+<ul>
+<li>选材真实，老师形象温暖。</li>
+<li>“她把批评留在走廊中，却让光亮能在同学抬头时，就被看见”这句很好。</li>
+<li>有自我对照，有反思。</li>
+</ul>
+<p><strong>初二评分提醒：</strong>
+这篇是两篇记叙文中更成熟的一篇。主要问题是“我”的内心戏不够，导致“我看见了”的“看见”偏旁观。把“我”的回忆与震动写足，就能升格。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-11">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">11</span>
+            <span class="sec-title">三、整体共性优缺点</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">优点</div>
+<ol>
+<li><strong>语言感受力强</strong>：色彩、光影、声音、动静结合，你都有意识。</li>
+<li><strong>古诗文理解基础较好</strong>：能抓住主要意象和大致情感。</li>
+<li><strong>有立意意识</strong>：尤其是两篇记叙文，知道要写“被看见”“尊重”这样的成长主题。</li>
+<li><strong>会引用、会点题</strong>：如“巴东三峡巫峡长”“春风化雨，润物无声”。</li>
+</ol>
+<div class="sub-heading">缺点</div>
+<ol>
+<li><strong>扩写容易堆砌辞藻，偏离原诗情感</strong>。<br>最典型的是《黄鹤楼》《三峡》：画面多，但中心不集中。</li>
+<li><strong>记叙文事件弱，心理描写不够</strong>。<br>《我渴望被看见》缺少“被看见”的关键瞬间；《我看见了那份尊重》缺少“我”的震动。</li>
+<li><strong>点题句常靠结尾硬拔</strong>。<br>前面铺垫不足，结尾突然升华，容易空。</li>
+<li><strong>语言有重复和现代腔</strong>。<br>如“欢快婉转的鸣唱”“金色海洋”“人间仙境”反复出现。</li>
+<li><strong>结构层次有时乱</strong>。<br>时间线、空间线、情感线要更清楚。</li>
+</ol>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-12">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">12</span>
+            <span class="sec-title">四、提升重点与可执行训练</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">1. 扩写训练：一诗一情，一句一景</div>
+<p>每篇扩写先列三行：</p>
+<ul>
+<li>原诗核心情感：______</li>
+<li>必须保留的意象：______</li>
+<li>我的扩写顺序：______</li>
+</ul>
+<p>例如《黄鹤楼》：</p>
+<ul>
+<li>情感：吊古伤今、乡愁。</li>
+<li>意象：黄鹤、楼、长江、白云、晴川、汉阳树、鹦鹉洲、日暮、烟波。</li>
+<li>顺序：楼空—鹤去—云悠—登望—日暮—愁生。</li>
+</ul>
+<div class="sub-heading">2. 记叙文训练：一个瞬间，三次点题</div>
+<ul>
+<li>一个瞬间：最打动你的那个动作、眼神、声音。</li>
+<li>三次点题：开头点、中间点、结尾点。</li>
+<li>心理变化：之前—那时—之后。</li>
+</ul>
+<p>例如《我渴望被看见》：</p>
+<ul>
+<li>瞬间：合唱结束后，指挥回头对你笑。</li>
+<li>心理：失落—紧张—被听见—被看见。</li>
+<li>点题：开头“没人知道我在努力”；中间“他们听见了我的和弦”；结尾“我被看见了”。</li>
+</ul>
+<div class="sub-heading">3. 语言训练：删形容词，加动词</div>
+<p>把“金色的海洋”改为“光在叶背上跳”。<br>把“欢快婉转的鸣唱”改为“鸟声从树冠里漏下来”。<br>把“天气格外的好”改为“阳光把江面敲成碎金”。</p>
+<div class="sub-heading">4. 结构训练：一段一景一情</div>
+<p>每段问自己：</p>
+<ul>
+<li>这段写什么景？</li>
+<li>这个景带出什么情？</li>
+<li>和中心有什么关系？</li>
+</ul>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-13">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">13</span>
+            <span class="sec-title">五、总评</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>你的作文底子不错，尤其古诗文扩写有文采，生活记叙文有真情。但初二作文评分不只看出彩句子，更看：<strong>中心是否集中、结构是否清楚、细节是否支撑立意、点题是否自然</strong>。</p>
+<p>如果用一个词概括你当前最需要提升的，就是：<strong>收束</strong>。<br>扩写要收束到原诗情感；记叙文要收束到一个核心瞬间；语言要收束到精准表达，而不是一味铺陈。</p>
+<p>只要把“堆砌”变成“聚焦”，把“旁白”变成“细节”，把“结尾升华”变成“前文铺垫”，你的作文会从“有文采”提升到“有感染力、有思想、有结构”。</p>
+<hr>
+<p>已收到全部 7 篇习作。下面按两大板块逐篇点评，每篇按「总体定位 → 核心问题（引用原文原句）→ 可直接落地的改法（含示范句）」展开，最后做共性总结与训练清单。对标口径：部编版八年级写作要求 + 中考作文评分维度（内容、结构、语言、书写）。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-14">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">14</span>
+            <span class="sec-title">KIMI 点评</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          
+        </div>
+      </details>
+      <details class="guide-section" id="sec-15">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">15</span>
+            <span class="sec-title">一、古诗文扩写板块（5 篇）</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">1.《黄鹤楼》扩写</div>
+<p><strong>总体定位</strong>：内容忠于原诗、意象完整，语言有文采，属于&quot;二类上&quot;。主要失分点不在语言，而在<strong>情感比例失调</strong>——中段明丽写景过长，冲淡了&quot;吊古伤今&quot;的基调，结尾愁绪像硬拐弯。</p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>详略失当，重心偏移。</strong> 首四句&quot;鹤去楼空、白云徒待&quot;紧扣原诗且不错，但从&quot;天气格外的好&quot;开始，近半篇幅写阳光、金江、金林、绿岛、鸟鸣——纯乐景铺陈。原诗&quot;晴川历历、芳草萋萋&quot;只是中间一层，作用是为&quot;日暮乡关&quot;作反衬，不该反客为主。</li>
+<li><strong>乐景没有为哀情服务。</strong> 全段写景都是&quot;客观好看&quot;，没有一个字让美景反过来衬出&quot;空&quot;。原诗眼在&quot;白云千载<strong>空</strong>悠悠&quot;的&quot;空&quot;字——空=徒然、无着落。你只写了&quot;无依无靠地飘荡，徒然等待&quot;一句，全篇的文眼就出现了一次。</li>
+<li><strong>结尾转折无根。</strong> &quot;不知不觉间，天色渐暗&quot;恰恰说明前文沉醉于美景，愁绪来得毫无铺垫。&quot;勾起游子愁绪&quot;是&quot;告诉读者我愁了&quot;，不是让读者看到愁如何生。</li>
+<li><strong>套话与口语。</strong> &quot;天气格外的好&quot;是小学生口吻；&quot;金色的海洋&quot;&quot;欢快婉转的鸣唱&quot;是熟滥表达（&quot;欢快婉转的鸣唱&quot;在你的《答谢中书书》里又出现了一次）。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>重排比例</strong>：鹤去楼空＋白云空悠（约 35%）→ 晴川、鹦鹉洲（约 25%）→ 日暮烟波乡关（约 40%）。</li>
+<li><strong>把乐景改成反衬</strong>，示范：<ul>
+<li>原句：&quot;天气格外的好，阳光让江水泛起点点金光&quot; → &quot;江面碎金乱跳，流得那样急，却带不走楼头这一片空寂。&quot;</li>
+<li>原句：&quot;整片树林成了金色的海洋&quot; → &quot;对岸越明亮，越显得楼上空空——黄鹤一去，原来连晴天都在反衬人。&quot;</li>
+</ul>
+</li>
+<li><strong>结尾补出&quot;愁从何来&quot;</strong>，示范：&quot;烟波合拢的暮色里我忽然明白：鹤千年不归，云千年徒自飘荡，而我望向的乡关，也在这苍茫里越走越远。&quot;——让愁从&quot;鹤不归、云空悠&quot;自然长出来，而不是&quot;天色渐暗所以愁&quot;。</li>
+<li><strong>保留的好句</strong>：&quot;金黄的飞檐微微扬起，宛如一只振翅欲飞的黄鹤&quot;——建筑与鹤互喻，全篇最好的一句，保留。</li>
+</ul>
+<p><strong>升格关键</strong>：抓一个&quot;空&quot;字贯穿全文，此篇可上一类。</p>
+<hr>
+<div class="sub-heading">2.《野望》扩写</div>
+<p><strong>总体定位</strong>：秋景有色彩感，&quot;蜂蜜似的光晕&quot;是亮点，但整体仍是&quot;景多情少&quot;，且结构上有明显的冗余。</p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>时间线重复。</strong> &quot;夕阳渐渐坠入群山&quot;（开头）→&quot;当落日的余晖笼罩了连绵的山峦&quot;→&quot;当夕阳沉入地平线&quot;——同一次落日写了三遍，全文近三分之一在反复描写同一个太阳。这是结构问题，考场直接扣结构分。</li>
+<li><strong>&quot;欲何依&quot;被景物淹没。</strong> &quot;我&quot;的失落只在开头（&quot;心中却有些失落&quot;）和结尾出现，中间大段写景是&quot;站在景外看&quot;。原诗的力量恰恰在：日有所归、云有所归、牛有所归、人有所归——<strong>万物皆有依，独我无所依</strong>。</li>
+<li><strong>牧人猎人写俗了。</strong> &quot;手中提着一天的收获准备将它们烤成晚餐&quot;——过于具体、琐碎，消解了诗意。牧归、猎归在原诗里不是风土人情，是反衬&quot;我&quot;无归处的道具。</li>
+<li><strong>用典贴标签。</strong> &quot;怀念那伯夷、叔齐在首阳山采薇的事迹&quot;只是翻译了&quot;长歌怀采薇&quot;，没写出&quot;我&quot;与古人的关系——他们采薇是有所守、有所不为；&quot;我&quot;的歌怀，是问自己的出路。另有一处错别字：<strong>&quot;枝可&quot;应为&quot;枝柯&quot;</strong>。</li>
+<li><strong>&quot;夕阳蜂蜜似的光晕浸没了一座又一座山峰&quot;——这是全篇最好的句子</strong>，&quot;浸没&quot;一词写出光如液体漫过山峦，保留并以此为语言标准。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>结构建议</strong>（用&quot;归&quot;字作暗线）：日归山 → 云归霞 → 牛归栏、人归家 → 我独徘徊无所归 → 长歌怀采薇。</li>
+<li><strong>牧猎段改写示范</strong>：&quot;牧牛人吆喝着牛群归栏，猎人提了一天的收获打马回家——他们都有去处。曲终人散的小径尽头，只剩我一个人立在东皋，不知该走向哪里。&quot;</li>
+<li><strong>结尾用典深化示范</strong>：&quot;伯夷叔齐采薇首阳，宁可不食周粟也不肯屈志。他们至少知道自己不做什么，而我呢？我的出路究竟通向何方？&quot;——用典写出&quot;我&quot;与古人的对话，而不是纪念古人的事迹。</li>
+<li><strong>删重</strong>：开头保留一次落日即可，&quot;余晖段&quot;与&quot;沉入地平线段&quot;合并。</li>
+</ul>
+<hr>
+<div class="sub-heading">3.《记承天寺夜游》扩写</div>
+<p><strong>总体定位</strong>：五篇扩写里对原文脉络把握最好的一篇，属&quot;二类上&quot;。但**&quot;闲人&quot;二字没有展开**——而它是全文题眼，也是阅卷老师最先找的得分点。</p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>&quot;闲人&quot;停在表面。</strong> 你写&quot;人们皆在忙碌，无暇观赏，只有我们二人能悠然自得&quot;——把&quot;闲&quot;理解成了&quot;有空、没睡、别人睡了我们在玩&quot;。苏轼的&quot;闲&quot;至少有三层：① 有空未寝；② <strong>贬谪闲置、朝廷不用</strong>（自嘲）；③ 在逆境中仍能自得其乐、与知音共赏的旷达。一层都没到，结尾议论自然立不住。</li>
+<li><strong>逻辑硬伤</strong>：&quot;我们踏着这一潭清水&quot;——月光如积水，人在庭中地上，如何&quot;踏着清水&quot;？这类句子阅卷老师会判定为&quot;表达不合理&quot;。</li>
+<li><strong>病句与错别字</strong>：&quot;这式&quot;应为&quot;这时&quot;；&quot;简直是无以惬意的意境&quot;是生硬造词，应为&quot;惬意得难以言说&quot;。</li>
+<li><strong>详略倒挂</strong>：欲睡—起行—寻怀民铺垫偏长；&quot;庭下如积水空明&quot;（全文最美的画面）和&quot;闲人&quot;议论偏短。重心应压在后半。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>比例调整</strong>：入睡起行（约 25%）→ 庭中月色（约 45%）→ 闲人感慨（约 30%）。</li>
+<li><strong>&quot;踏着清水&quot;改法</strong>：&quot;我们的身影落在&#39;池水&#39;里，随月波轻轻晃动，倒像是走在水面上了。&quot;</li>
+<li><strong>&quot;闲人&quot;三层递进示范</strong>（可直接化用）：&quot;哪里没有月亮？哪里没有竹柏？只是世人或为功名所累，或为困顿所缚，少有能停下脚步的心。我与怀民被贬黄州，政事皆空，是名副其实的&#39;闲人&#39;——可这&#39;闲&#39;里，未尝不是一种自在。&quot;</li>
+<li><strong>&quot;无以惬意&quot;改法</strong>：&quot;只觉满心惬意，难以言说。&quot;</li>
+</ul>
+<p><strong>升格关键</strong>：把&quot;闲人&quot;写透一层（哪怕只写到&quot;自嘲&quot;），再删净病句，此篇可冲一类。</p>
+<hr>
+<div class="sub-heading">4.《答谢中书书》扩写</div>
+<p><strong>总体定位</strong>：意象覆盖最全的一篇，动静结合意识好。两个问题：<strong>文体感缺失</strong>、<strong>结尾理解有偏差</strong>。</p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>丢了&quot;书信体&quot;。</strong> 《答谢中书书》是一封写给谢中书的书信，原文&quot;山川之美，古来共谈&quot;就是对朋友说的。你的扩写开头是&quot;神州大地上，有水墨画般的名山大川，更有用笔墨绘画的人&quot;——空泛议论，与谢中书毫无关系。没有倾诉对象，就退化成普通写景文，文体分丢失。</li>
+<li><strong>结尾理解偏差。</strong> 原句&quot;自康乐以来，未复有能与其奇者&quot;是<strong>自许＋惋惜</strong>：谢灵运之后没人懂这山水，而我懂，所以我写给你。你写成&quot;从来没能有欣赏这种意境的人了&quot;——语气绝对化，且&quot;我&quot;的自得与&quot;邀君共赏&quot;的意味全丢了。</li>
+<li><strong>套话复现</strong>：&quot;欢快婉转的鸣唱&quot;（第二篇作业出现）；&quot;人间仙境&quot;是俗套收尾。</li>
+<li><strong>&quot;山脚下的小溪又如一条玻璃带&quot;是好句</strong>，有质感，保留。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>加书信框架</strong>，示范：<ul>
+<li>开头：&quot;谢中书台鉴：你问我江南山水何如，我说——高峰入云，清流见底，容我为你一一道来。&quot;</li>
+<li>结尾：&quot;谢公之后再无能赏此奇者。今夜写下这些，一半是自许，一半是邀你——他日同游，方知我所言不虚。&quot;</li>
+</ul>
+</li>
+<li><strong>层次按原文走</strong>：① 高峰—清流—石壁—林竹（静景铺陈）；② 晓雾—猿鸟—夕日—沉鳞（早晚动景）；③ 自许与邀约（抒情）。段内不要再杂糅。</li>
+<li><strong>&quot;人间仙境&quot;替换</strong>：&quot;这大概就是谢公当年眼中的&#39;奇&#39;吧。&quot;</li>
+</ul>
+<hr>
+<div class="sub-heading">5.《三峡》扩写</div>
+<p><strong>总体定位</strong>：四段结构（山—夏水—春冬—秋）完整、原文要点全覆盖，是五篇里信息最完整的一篇。但它的病也最有代表性：<strong>把&quot;扩写&quot;理解成了&quot;堆比喻&quot;</strong>。</p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>比喻过密，意象打架。</strong> 几乎句句是比喻，读得让人喘不过气。典型如&quot;雪白的急流如同奔腾的群马，卷出千堆碎雪&quot;——&quot;群马&quot;和&quot;碎雪&quot;两个喻体并置（&quot;千堆雪&quot;还是苏轼的句子），互相干扰。又如&quot;利剑&quot;的比喻——《答谢中书书》里&quot;出鞘的利剑&quot;刚用过，同一本作业里复用，说明缺少自查。</li>
+<li><strong>语言气质与原文不符。</strong> 《三峡》原文是骈散结合、<strong>以少总多的峻洁之笔</strong>。你的扩写却句句浓妆：&quot;银河&quot;&quot;屏障&quot;&quot;守卫&quot;&quot;翡翠&quot;层层加码，偏离了郦道元&quot;素以为绚&quot;的调子。扩写的第一原则是<strong>贴着原文的气质走</strong>：《三峡》宜简，承天寺宜空。</li>
+<li><strong>字词硬伤</strong>：&quot;隐敝&quot;应为&quot;隐蔽&quot;；&quot;它清晨<strong>才</strong>与雾气缭绕的白帝城辞别……不过傍晚时分便到了江陵&quot;——&quot;才&quot;字误用，&quot;朝发白帝，暮到江陵&quot;要写<strong>快</strong>，应用&quot;刚……便/即&quot;：一个&quot;才&quot;字，速度感全毁。</li>
+<li><strong>发挥过头</strong>：&quot;像永不倒下的守卫一般历经风雨却仍在生长&quot;——加油式发挥，偏离原文。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>一段只留一个核心画面</strong>：山＝高峻（利剑、屏障二选一）；夏水＝迅疾（白帝—江陵的时空压缩，配&quot;虽乘奔御风，不以疾也&quot;）；春冬＝清（素湍绿潭，回清倒影）；秋＝凄（猿啼三声，泪沾裳）。</li>
+<li><strong>减比喻示范</strong>：&quot;雪白的急流如同奔腾的群马，卷出千堆碎雪，激起片片水雾&quot;→&quot;素湍翻着白浪，绿潭映着山影，一急一清，相映成趣。&quot;</li>
+<li><strong>&quot;才&quot;字修改</strong>：&quot;清晨刚辞白帝，借着水势如离弦之箭掠过万重青山，傍晚便到了千里外的江陵。&quot;</li>
+<li><strong>夏段补一处忠于原文的细节</strong>：&quot;沿溯阻绝&quot;你写到了（&quot;航道被激流截断&quot;），很好，保留。</li>
+</ul>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-16">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">16</span>
+            <span class="sec-title">二、生活记叙文板块（2 篇）</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">6.《我渴望被看见》</div>
+<p><strong>总体定位</strong>：立意好、金句好、氛围细节好，是两篇记叙文中&quot;想法大于呈现&quot;的典型。主要问题一句话：<strong>在最该写实的地方，你用了概括。</strong></p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>&quot;被看见&quot;的关键瞬间缺席。</strong> 全文高潮应该是&quot;我如何被看见&quot;，但你的处理是：&quot;最后一个音符落下，灯光渐渐暗下来，但同学们的眼睛更亮了。我看着他们，并知道，他们一定看见了我。&quot;——&quot;眼睛更亮了&quot;是全景扫描，&quot;他们一定看见了我&quot;是<strong>推断</strong>而不是呈现。读者想看到的是：谁？做了什么？哪个眼神、哪句话、哪个动作让你确定自己被看见了？这个瞬间缺席，全文就没有支点。</li>
+<li><strong>&quot;渴望&quot;到&quot;点亮他人&quot;之间断了一环。</strong> 你的结尾金句是&quot;不是站在聚光灯下就能被看见，而是让光透过自己，点亮更多的人&quot;。但请注意逻辑：你是<strong>先被看见、先被照亮</strong>，才谈得上去点亮别人。题目叫&quot;我渴望被看见&quot;，中间却从&quot;没人看见我&quot;直接跳到&quot;点亮更多人&quot;——恰好是老师批语指出的缺口：&quot;被看见，<strong>被光亮给予</strong>更多温暖、信心与力量&quot;。</li>
+<li><strong>&quot;恍惚间看见音符一同唱出旋律&quot;一段美而空。</strong> 整段是练琴时的内心想象，不推动事件，却占了不少篇幅。记叙文的规则：每一段都要回答&quot;删了它，中心受不受伤&quot;。</li>
+<li><strong>一处搭配不当</strong>：&quot;每一个歌声都托起了我的音符&quot;——&quot;歌声&quot;不能这样用，应为&quot;每一段歌声都托起了我的音符&quot;。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>补一个&quot;被看见瞬间&quot;</strong>，三个可选素材，挑一个写慢：<ul>
+<li>指挥同学回头，朝你点了一下头；</li>
+<li>老师站在侧幕，朝角落里的你竖了竖拇指；</li>
+<li>散场后一个同学说：&quot;今天伴奏特别稳，我都敢放开唱了。&quot;</li>
+</ul>
+</li>
+<li><strong>怎么写慢</strong>（动作分解示范）：&quot;最后一个和弦落下，我抬手收住余音。前排的指挥转过身——就半秒——朝我用力点了一下头，眼睛亮晶晶的。我的手还悬在琴键上方，心却&#39;咚&#39;地一声落了地：他们听见了。&quot;</li>
+<li><strong>结构重排</strong>：开头渴望（练琴孤独，保留，很好）→ 关键瞬间（详写 200 字左右）→ 懂得（先被照亮，再照亮别人；金句保留作结）。</li>
+<li><strong>删减</strong>：&quot;音符想象&quot;段压缩成两三句，省下的篇幅全给关键瞬间。</li>
+</ul>
+<hr>
+<div class="sub-heading">7.《我看见了那份尊重》</div>
+<p><strong>总体定位</strong>：两篇文章中更成熟的一篇——选材真、立意正、细节有功力（&quot;小陈的手渐渐松开，作业本被重新抚平&quot;&quot;我合上作业本，却发现一个字都没写&quot;都是通过物件写心理，非常高明）。主要问题：<strong>&quot;我&quot;在场却像不在场，视角交代不足，开头有病句。</strong></p>
+<p><strong>核心问题</strong></p>
+<ol>
+<li><strong>&quot;我&quot;的震动写薄了。</strong> 题目是&quot;我看见了那份尊重&quot;，分量应该在&quot;我&quot;：小学时曾被当众批评、同学哄笑——这个对照是你的独家素材，却只有&quot;同学们哄笑，当时我多么渴望能被平等尊重&quot;一句带过。应该展开：当时多难堪？今天看到老师把批评留在走廊、把光留在教室，内心怎样震动？过去的伤疤被今天这一幕怎样抚慰？写足这层，&quot;我看见了&quot;才立得住。目前文章主体是&quot;老师和小陈&quot;，&quot;我&quot;更像一个旁观者。</li>
+<li><strong>视角逻辑需要交代。</strong> &quot;我&quot;先听见走廊里老师与家长的谈话，又&quot;透过掩上的门&quot;听见老师与小陈的谈话——两次都在&quot;偷听&quot;，但你没交代&quot;我&quot;坐在哪里、为什么听得到。记叙文&quot;真实可信&quot;是内容分维度，阅卷老师会敏感。一句交代即可：&quot;我就坐在教室外的桌边写作业，离那扇门不过几步。&quot;</li>
+<li><strong>开头是病句</strong>：&quot;我关于老师们的师恩，最不能忘记的，大概就是那份温暖与尊重。&quot;——&quot;关于……的师恩&quot;杂糅，&quot;大概就是&quot;含糊。且全文写的是&quot;老师待学生的方式&quot;，&quot;师恩&quot;一词偏大——这份尊重不是施予&quot;我&quot;的恩，而是&quot;我&quot;目睹的一种教育。</li>
+<li><strong>字词</strong>：&quot;学习状态下清&quot;应为&quot;不佳&quot;；&quot;灯光瞬间泄入&quot;应为&quot;泻入&quot;（&quot;一泻而入&quot;，&quot;泄&quot;是漏出）。</li>
+<li><strong>结尾议论偏长。</strong> &quot;春风化雨，润物无声&quot;段意思对但说满了。前文事件已足够，议论应短而有力。</li>
+</ol>
+<p><strong>落地改进</strong></p>
+<ul>
+<li><strong>开头改写示范</strong>（二选一）：<ul>
+<li>&quot;有些尊重，不在表扬里，而在批评的方式里。那个傍晚，我亲眼看见了它。&quot;</li>
+<li>&quot;教育最柔软的模样是什么样子？那个傍晚，我在一条走廊里找到了答案。&quot;</li>
+</ul>
+</li>
+<li><strong>展开&quot;小学记忆&quot;</strong>（对照示范，约 100—150 字）：&quot;三年级时，我因为错题被老师在讲台上点名，全班哄笑起来。我盯着鞋尖，恨不得把&#39;难堪&#39;两个字咽进肚子里。从那以后我以为，批评和羞辱是同一件事。&quot;——然后接&quot;直到这个傍晚……&quot;，对照感立刻出来。</li>
+<li><strong>把&quot;我&quot;织进偷听过程</strong>：&quot;我握笔的手停在半空&quot;&quot;我屏住呼吸&quot;&quot;笔尖在纸上洇出一个墨点&quot;——用&quot;我&quot;的反应给对话配乐。</li>
+<li><strong>结尾压缩示范</strong>：&quot;有些话没有说出口，却已经温暖了人心。那天我看见的，是尊重，也是教育最柔软的模样。&quot;</li>
+<li><strong>保留金句</strong>：&quot;她把批评留在走廊中，却让光亮能在同学抬头时，就被看见。&quot;——这句可直接当结尾前的过渡。</li>
+</ul>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-17">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">17</span>
+            <span class="sec-title">三、整体共性与提升重点</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>共性优点</strong></p>
+<ol>
+<li>语言感受力强：色彩、光影、声音的描写有天赋（&quot;蜂蜜似的光晕&quot;&quot;飞檐如振翅的黄鹤&quot;）。</li>
+<li>扩写能忠于原文框架，要点覆盖完整，不遗漏关键句意。</li>
+<li>记叙文立意正、有真情，懂得用物件写心理（作业本、汗珠、琴谱）。</li>
+<li>有点题意识和金句意识。</li>
+</ol>
+<p><strong>共性短板（按失分严重程度排序）</strong></p>
+<ol>
+<li><strong>扩写&quot;以堆砌代聚焦&quot;</strong>：用加形容词、加比喻代替贴着原文情感走；中段写景偏航、详略失当（《黄鹤楼》《三峡》最典型）。</li>
+<li><strong>记叙文&quot;关键瞬间缺席&quot;</strong>：在最该写实的地方用概括和议论（《被看见》），或&quot;我&quot;的心理线断裂、旁观多体验少（《尊重》）。</li>
+<li><strong>结构松散</strong>：时间线重复（《野望》两次落日）、视角未交代（《尊重》）、段内杂糅（《答谢中书书》）。</li>
+<li><strong>结尾硬升华</strong>：金句本身好，但前文铺垫不足，导致&quot;拔得高、立不稳&quot;。</li>
+<li><strong>语言基本功</strong>：套话复现（&quot;欢快婉转的鸣唱&quot;×2、&quot;金色海洋&quot;&quot;人间仙境&quot;、&quot;利剑&quot;×2）；本册作业已见错别字 5 处（枝可→枝柯、这式→这时、隐敝→隐蔽、下清→不佳、无以惬意[病句]）＋ 用词硬伤（才/泻/踏着清水/每一个歌声）。</li>
+</ol>
+<p><strong>可执行训练清单</strong></p>
+<ol>
+<li><strong>扩写三问</strong>（动笔前写 3 行提纲）：原诗核心情感是什么？必须保留哪几个意象？我的详略比例怎么分？——每篇先过这三问再写。</li>
+<li><strong>&quot;关键瞬间慢镜头&quot;</strong>：每篇记叙文选定 1 个瞬间，拆成 4 笔：对方的动作、神态、声音、我的反应。删掉&quot;我感动了&quot;，换成&quot;我的手停在半空&quot;。</li>
+<li><strong>一段一画面一作用</strong>：每段写完自问——删掉它，中心受不受伤？不受就删。</li>
+<li><strong>建立&quot;禁用套话表&quot;</strong>：把本册出现过的熟滥表达列进去（金色海洋、人间仙境、欢快婉转……），每篇至少替换 3 处，替换方向＝动词＋具体物（&quot;光在叶背上跳&quot;代替&quot;金色的海洋&quot;）。</li>
+<li><strong>错字本</strong>：把本册 5 处错字病句收录，下次写完先查本。</li>
+<li><strong>润色流程固定化</strong>：写完→朗读一遍→删 10%→查错字→检查题目关键词在开头、事件中、结尾各出现一次，且中间那次必须在&quot;事&quot;里不在&quot;理&quot;里。</li>
+</ol>
+<p><strong>一句话总评</strong>：你的底子是&quot;有文采&quot;，下一步要练的是&quot;收束&quot;——扩写收束到原诗情感，记叙文收束到一个关键瞬间，语言收束到精准。把堆砌变聚焦、把旁白变细节、把结尾升华变前文铺垫，就能从&quot;二类上&quot;稳定进入&quot;一类&quot;。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-18">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">18</span>
+            <span class="sec-title">豆包评点：</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>初二作文随笔详细评点（问题+具体改进方案）</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-19">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">19</span>
+            <span class="sec-title">整体总评</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>本次作文包含五篇古诗文扩写、两篇生活记叙文，整体文笔细腻、修辞丰富、画面感强，具备初二学生优秀的文字功底，擅长景物描摹和氛围渲染。核心优势：语言优美、用词精致、擅长比喻拟人、细节描写到位。核心共性问题：<strong>扩写类脱离原作情感主旨、详略失衡、冗余堆砌；记叙类铺垫过多、细节碎片化、主旨升华生硬、情节节奏拖沓</strong>。下文逐篇精准点评，配套具体可落地的修改方案。</p>
+
+        </div>
+      </details>
+      <div class="part-divider" id="part-2">
+        <span>第一部分：古诗文/古文扩写作文评点</span>
+      </div><div class="part-preamble item-block"></div>
+      <details class="guide-section" id="sec-20">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">20</span>
+            <span class="sec-title">一、《古诗扩写：黄鹤楼》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>画面层次清晰，由楼及云、由昼及暮、由景生情，写景顺序由近及远、由静到动，逻辑通顺。2. 修辞运用娴熟，将飞檐比作黄鹤、雾气比作薄纱，意象贴合诗文，氛围感拉满。3. 结尾紧扣游子乡愁，贴合原作怀古思乡的核心情感，立意准确。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>内容冗余，虚构过度</strong>：原作侧重怀古沧桑、世事苍茫的感慨，文中大量堆砌“树林金光、鹦鹉洲花草飞鸟”等细节，属于无依据扩写，冲淡原作苍凉悠远的基调。2. <strong>情感单薄，表层写景</strong>：全程侧重景物描摹，缺少对“昔人已乘黄鹤去，此地空余黄鹤楼”的岁月沧桑、物是人非的感悟，只停留在思乡表层。3. <strong>语句重复拖沓</strong>：多次重复“等待仙鹤归来”，语义冗余，行文不够凝练。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>删减无效写景</strong>：大幅精简鹦鹉洲花草、飞鸟、林间碎光等脱离原作核心的细节，保留楼、江、云、雾四大核心意象，贴合原诗场景。2. <strong>深化怀古情感</strong>：在写景中融入抒情，新增对岁月变迁、世事无常的感慨，衔接“千载白云空悠悠”的苍茫感，让乡愁有铺垫、不突兀。3. <strong>精简语句</strong>：删除重复的等待、期盼类表述，长短句结合，弱化堆砌感，让文风贴合古诗的悠远空灵。</li>
+</ol>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-21">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">21</span>
+            <span class="sec-title">二、《古诗扩写：野望》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>色彩描写极具层次感，落日、群山、秋林、晚霞的色彩渲染细腻，画面鲜活。2. 动静结合到位，静写秋山秋色，动写牧人、猎人晚归，场景生动立体。3. 精准贴合原作，结尾紧扣伯夷、叔齐的典故，呼应诗人孤寂、怀才不遇的心境。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>详略严重失衡</strong>：前三分之二篇幅极致铺陈写景，结尾情感和主旨一笔带过，头重脚轻，冲淡诗歌“隐逸孤寂、惆怅迷茫”的核心。2. <strong>部分描写失真、刻意炫技</strong>：“夕阳蜂蜜似的光晕”“火星点点飘落”等比喻违和，不符合秋日萧瑟、清冷的基调。3. <strong>心理描写碎片化</strong>：开篇一句“心中失落”后全程写景，没有穿插心境变化，景物与情感脱节，情景交融不足。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>调整详略比例</strong>：精简冗余的秋色、晚霞描写，压缩写景篇幅，增加个人心境刻画，让景为情服务。2. <strong>修正违和修辞</strong>：替换温暖、明艳的比喻，改用清冷、萧瑟的意象，贴合秋日荒野、日暮寂寥的氛围。3. <strong>全程情景交融</strong>：在远眺、观秋景、望归人三个场景中，穿插孤独、无依、前路迷茫的心理，避免景情割裂。</li>
+</ol>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-22">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">22</span>
+            <span class="sec-title">三、《古文扩写：记承天寺夜游》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>开篇场景代入感极强，月色、夜景描写细腻，精准还原月夜清幽静谧的氛围。2. 完美复刻原文核心画面，“庭下如积水空明，水中藻荇交横”的扩写生动传神，贴合古文原意。3. 结尾感悟贴合苏轼心境，读懂了闲人二字的淡然与豁达，立意深刻。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>细节虚构不合理</strong>：原文无星星、松香等元素，多余虚构细节破坏原文极简、清幽的月夜意境，显得刻意堆砌。2. <strong>行文节奏平缓无起伏</strong>：从赏月、寻友、漫步、感悟全程平铺直叙，缺少情绪的细微变化，感染力不足。3. <strong>结尾升华稍显空洞</strong>：单纯议论感慨，没有结合苏轼被贬的背景，“悠然自得”的心境诠释不够透彻。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>删减无效虚构细节</strong>：去掉星星、松香、虫鸣停止等无依据内容，保留月色、庭中树影、积水空明的核心极简场景，贴合古文质朴的文风。2. <strong>增加情绪层次</strong>：开篇无事可眠的孤寂、见月的欣喜、寻友的契合、望月的释然，层层递进，让情绪更饱满。3. <strong>贴合背景升华主旨</strong>：简单融入被贬闲居的处境，突出“闲人”并非无聊，而是身处逆境、安然自适的豁达，让结尾感悟更落地。</li>
+</ol>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-23">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">23</span>
+            <span class="sec-title">四、《古文扩写：答谢中书书》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>开篇点题，精准把握山水如画、自古受人推崇的核心基调。2. 景物描写动静结合、视听结合，晨雾、猿鸟、夕阳、游鱼的场景灵动鲜活，贴合原文意境。3. 语言清雅，贴合山水小品文的文风，辞藻优美不浮夸。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>开篇立意偏差</strong>：首句“更有用笔墨绘画的人”偏离原文，原文核心是赞美山川之美，而非赞美文人作画，开篇立意失误。2. <strong>部分描写夸张失真</strong>：“高峰如利剑、小溪如玻璃带”比喻生硬，破坏山水温婉清幽的质感，风格违和。3. <strong>结尾仓促平淡</strong>：对“自康乐以来，未复有能与其奇者”的感悟太浅，没有写出对山川绝美、世人难赏的赞叹与自得之情。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>修正开篇立意</strong>：删除错误表述，改为“山川之美，古来共谈。神州大地的青山绿水，藏着世间最纯粹的诗意，是千古不变的人间盛景”，贴合原文主旨。2. <strong>优化比喻修辞</strong>：替换生硬凌厉的比喻，改用温婉贴合山水的意象，凸显山川清幽秀丽的特质。3. <strong>深化结尾主旨</strong>：结合谢灵运的典故，抒发自己能读懂、欣赏山川奇景的自得心境，升华山水共情的内核。</li>
+</ol>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-24">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">24</span>
+            <span class="sec-title">五、《古文扩写：三峡》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>全文结构完整，严格按照四季时序（夏、冬春、秋）行文，完全贴合原文结构，逻辑严谨。2. 场景对比鲜明，夏日汹涌、冬春灵动、秋日萧瑟，不同季节的三峡特点精准拿捏。3. 描写功底扎实，动静、远近、视听结合，猿啼、渔歌的结尾氛围感拉满，是五篇扩写中完成度最高的一篇。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>部分语句重复堆砌</strong>：多次用“利剑”比喻山峰，修辞重复；部分写景语句修饰过度，略显冗余。2. <strong>情感融入不足</strong>：全程极致写景，缺少作者对三峡雄奇、灵动、苍凉之美的赞叹，纯景物描写居多，缺少人文情怀。3. <strong>个别用词不当</strong>：“撕破宁静”“肃杀的寒意”用词过重，违背原文自然清幽、雄浑的基调，略显刻意悲壮。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>精简重复修辞和语句</strong>：替换重复的比喻，删减过度修饰的语句，让文风雄浑凝练，贴合《三峡》大气质朴的风格。2. <strong>穿插抒情议论</strong>：在每个季节写景结束后，小幅融入赞叹之情，凸显三峡兼具壮美与柔美、苍凉与灵动的独特魅力。3. <strong>优化用词</strong>：替换过重、刻意的词语，用贴合自然山水的词汇，还原原文浑然天成的意境。</li>
+</ol>
+
+        </div>
+      </details>
+      <div class="part-divider" id="part-3">
+        <span>第二部分：原创记叙文评点</span>
+      </div><div class="part-preamble item-block"></div>
+      <details class="guide-section" id="sec-25">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">25</span>
+            <span class="sec-title">一、《我渴望被看见》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>选材新颖真实，以合唱节钢琴伴奏的小众视角，诠释“被看见”的意义，贴合学生生活，立意温暖独特。2. 细节描写细腻，练琴的孤独、和弦的细节、手心出汗的神态，真实生动，代入感极强。3. 主旨升华高级，跳出“站在舞台中央才是光芒”的固有认知，读懂“默默托举、双向成就”的价值，立意深刻。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>开篇铺垫过长、情绪拖沓</strong>：开头孤独失落的铺垫篇幅过多，迟迟不进入核心事件，节奏缓慢。2. <strong>中间感悟略显抽象</strong>：通过音符感悟价值的段落偏理论化，缺少具体的练琴细节支撑，略显空洞。3. <strong>情节起伏不足</strong>：全文无波折，从失落、顿悟、绽放全程顺叙，缺少反差和冲突，感染力略有欠缺。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>精简开篇铺垫</strong>：压缩开头孤独抒情的篇幅，快速切入“深夜练琴、无人知晓、自我怀疑”的核心场景，开门见山点题。2. <strong>细化细节支撑感悟</strong>：增加具体的练琴挫折（反复纠错、枯燥重复、自我否定），让“每一个音符都值得被看见”的感悟有依据、不空洞。3. <strong>增加情节反差</strong>：可加入赛前自我怀疑、担心被忽略的心理，赛后被认可的温暖形成对比，强化主旨，让情感更饱满。</li>
+</ol>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-26">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">26</span>
+            <span class="sec-title">二、《我看见了那份尊重》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="sub-heading">✅ 优点</div>
+<ol>
+<li>选材温暖细腻，以老师私下沟通、温柔纠错的小事，诠释教育的尊重与温柔，视角独特、素材鲜活。2. 对比手法运用精妙，自己童年被当众批评的经历与老师温柔的教育方式形成对比，突出主题。3. 结尾升华贴切，紧扣“春风化雨、润物无声”，主旨清晰，情感真挚动人。</li>
+</ol>
+<div class="sub-heading">❌ 核心问题</div>
+<ol>
+<li><strong>视角铺垫不足</strong>：开篇直接切入场景，没有交代自己观察的缘由，“我”的旁观者身份略显突兀。2. <strong>细节描写不够聚焦</strong>：对老师的神态、语气、动作描写偏少，更多是侧面叙述，温柔尊重的氛围感不够浓烈。3. <strong>过渡稍显生硬</strong>：从观察老师谈心，到回忆自己童年经历的过渡不够自然，衔接略显突兀。</li>
+</ol>
+<div class="sub-heading">💡 具体改进方案</div>
+<ol>
+<li><strong>补充身份铺垫</strong>：开篇简单交代场景背景（家长会后留校整理作业、偶然目睹全程），让旁观者视角更合理。2.<strong>细化人物细节</strong>：增加老师柔声安抚、俯身沟通、眼神温和、耐心鼓励的动作神态细节，具象化“尊重与温柔”。3. <strong>优化段落过渡</strong>：在目睹老师温柔教育后，增加一句心理衔接，自然引出自己年少被当众批评的过往，让今昔对比更流畅自然。</li>
+</ol>
+
+        </div>
+      </details>
+      <div class="part-divider" id="part-4">
+        <span>第三部分：整体共性提升方案（适配初二考场作文）</span>
+      </div><div class="part-preamble item-block"></div>
+      <details class="guide-section" id="sec-27">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">27</span>
+            <span class="sec-title">1. 扩写类作文核心提升重点</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>坚守<strong>忠于原作、景情相融、详略得当</strong>三大原则：不随意堆砌无关景物、不虚构脱离主旨的细节；所有写景服务于原作情感，杜绝景情割裂；优先保留诗文核心意象，精简冗余修饰，避免喧宾夺主。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-28">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">28</span>
+            <span class="sec-title">2. 记叙类作文核心提升重点</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>强化<strong>细节落地、情节起伏、自然升华</strong>：用动作、神态、心理细节替代空洞抒情；适当增加小波折、小反差提升文章层次感；结尾升华贴合事件本身，不强行拔高、不空洞喊口号。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-29">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">29</span>
+            <span class="sec-title">3. 通用提分技巧</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>优化句式搭配，长短句结合，避免语句拖沓重复；精准把控文风，古诗文扩写贴合古典雅致基调，记叙文贴合细腻真挚的风格；杜绝过度炫技，修辞、写景、抒情以贴合主旨为核心，简洁凝练、真情至上。</p>
+<p>————————</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-30">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">30</span>
+            <span class="sec-title">Gemini</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这是一组质量相当高的初一升初二习作。整体来看，你的文字具有极强的画面感和色彩捕捉能力，对光影的渲染甚至达到了电影级的视觉精度，如同精心制作的动画短片般生动。同时，你具备细腻的共情力，能敏锐捕捉生活中的情绪微光。</p>
+<p>初二阶段的作文评分标准，将在初一“文从字顺、生动具体”的基础上，大幅提升对**“立意深刻（意境）、选材视角、语言纯度”**的要求。以下为你逐篇进行细致把脉，并提供可落地的升级方案。</p>
+<div class="sub-heading">第一部分：古诗文扩写板块点评</div>
+<p><strong>共性优点：</strong> 景物描写极为出彩，善用色彩交响与光影推移，文字充满了灵动的视觉美感。 <strong>共性问题：</strong> 现代词汇与童话色彩偶尔会破坏古典文学的“厚重感”与“清冷感”；景物与诗人内心情感的过渡（即“情景交融”）略显生硬。</p>
+<h4>1.《黄鹤楼》</h4>
+<ul>
+<li><p><strong>核心问题：意象风格与原诗基调不符。</strong> 崔颢的《黄鹤楼》是苍凉、旷达而又充满身世漂泊之感的。你笔下“有些树木甚至勇敢地探向江水”以及“欢快婉转的鸣唱”，带有一种活泼可爱的现代童话感，削弱了原诗中“千载空悠悠”的宇宙苍茫感。</p>
+</li>
+<li><p><strong>改进方案：</strong> 调整画面色调，将“暖风、金黄的碎光、欢快的鸣唱”改为更显清冷、辽阔的意象。例如，描写江面的浩渺与芦苇在风中的摇曳。结尾处的“不禁勾起了游子的愁绪”略显突兀，可以通过描写江面逐渐吞没视线的暮霭，让愁绪随着视线的受阻自然升腾而起。</p>
+</li>
+</ul>
+<h4>2.《野望》</h4>
+<ul>
+<li><p><strong>核心问题：比喻的“现代感”破坏了古典意境。</strong> 王绩此诗写于秋日傍晚，充满孤独彷徨。“夕阳蜂蜜似的光晕”这个比喻太甜美、太现代了，与全诗萧瑟、无所归依的氛围相悖。结尾引出“伯夷、叔齐”的过渡过于直接（“于是我只能放声歌唱……”）。</p>
+</li>
+<li><p><strong>改进方案：</strong> 提炼冷色调。将“蜂蜜似的光”改为“如残血般的余晖”或“泛着冷金色的夕阳”。在过渡时，增加动作和心理的铺垫：看着牧童与猎人满载而归，喧闹是他们的，自己孑然一身站在冷风中，手抚树干，怅然若失，这时再自然吟咏出采薇的典故，以此自况。</p>
+</li>
+</ul>
+<h4>3.《记承天寺夜游》</h4>
+<ul>
+<li><p><strong>核心问题：对“闲人”的理解停留在表层。</strong> 苏轼的“闲”不是“闲得无事想要酣睡”，而是在政治贬谪中被迫清闲，从而产生的豁达与无奈交织的复杂情感。“简直是无以惬意的意境”这句抒情过于直白，破坏了前文营造的如水月色。</p>
+</li>
+<li><p><strong>改进方案：</strong> 开头应写出夜半惊醒或是辗转难眠，见月色入户，心中烦闷顿消的豁然开朗。庭院漫步时，不需要直接喊出“惬意”，只需描写两人踏着月色，不发一语，却心灵相通的默契。结尾扣题，强调虽然世人皆忙于功名利禄，唯有我们这两个被世俗边缘化的“闲人”，才能拥有这片绝美的空明。</p>
+</li>
+</ul>
+<h4>4.《答谢中书书》</h4>
+<ul>
+<li><p><strong>核心问题：词汇出戏，缺乏骈文的对称美。</strong> 陶弘景的原作是骈散结合的，“小溪又如一条玻璃带”中“玻璃”一词极其出戏，打破了读者好不容易建立起来的古典想象。</p>
+</li>
+<li><p><strong>改进方案：</strong> 替换现代意象，将“玻璃带”改为“白练”或“无瑕的玉带”。此外，原作“晓雾将歇，猿鸟乱鸣；夕日欲颓，沉鳞竞跃”极具对仗的音韵美，你在扩写时也可以尝试使用句式对称的短句，比如“晨曦初破，薄雾如纱……暮色四合，夕阳如血……”来增强文章的节奏感。</p>
+</li>
+</ul>
+<h4>5.《三峡》</h4>
+<ul>
+<li><p><strong>总体评价：这是五篇扩写中最好的一篇。</strong> 结构严谨，四季的特点抓得极其准确，动静结合得当。</p>
+</li>
+<li><p><strong>细微优化：</strong> 在写秋季的猿啼时，声音的描写已经很到位，若能进一步渲染声音在峡谷中产生回音的空间感（“一声接着一声，在空旷的山谷中回荡”这句很好，可再加一句描写江面寒风与猿啼交织的冷彻骨髓），会更加震撼。</p>
+</li>
+</ul>
+<div class="sub-heading">第二部分：生活记叙文板块点评</div>
+<p><strong>共性优点：</strong> 选材贴近生活，细节捕捉非常细腻，能写出内心细微的波折。 <strong>共性问题：</strong> 叙事的“在场感”和“动作性”不足。主角大多在“想”或者“看”，缺少推动情节发展的实质性“动作”，导致文章张力偏弱。</p>
+<h4>1.《我渴望被看见》</h4>
+<ul>
+<li><p><strong>核心问题：转折主要靠心理活动，缺乏舞台上的具体动作支撑。</strong> 从孤独练琴到舞台上被认可，中间的心态转变很好，但在舞台上的高潮部分有些虚。</p>
+</li>
+<li><p><strong>改进方案：</strong> 增加真实的肌肉记忆与触觉细节。在描写练琴或演出时，具体写写手指在黑白琴键上跨越、调整复杂指法时的触感。即便是一首结构简单的曲子，通过左手沉稳的和弦与右手轻灵的旋律交织，也能烘托出宏大的气势。写出你在舞台上如何通过指尖的力度去配合合唱的呼吸（比如：合唱渐弱时，我轻触琴键，生怕惊扰了这纯净的和声；高潮处，我将全身的力量倾注于指尖，和弦如浪潮般托起所有的歌声）。用具体的弹奏动作去具象化“每一个音符都托起了同学们的歌唱”。</p>
+</li>
+</ul>
+<h4>2.《我看见了那份尊重》</h4>
+<ul>
+<li><p><strong>核心问题：叙述视角过于边缘化。</strong> “我”全程是一个站在暗处的偷听者和旁观者，虽然写出了老师的温柔，但“我”自身的参与度极低，这让文章看起来像是在写别人的故事，缺乏初中记叙文要求的“深刻的自我体悟”。</p>
+</li>
+<li><p><strong>改进方案：</strong> 加深“我”与事件的羁绊。第一种改法：在偷听的过程中，穿插“我”曾经因为做错事而极度害怕被当众批评的心理煎熬，形成强烈的内心对比；第二种改法：让“我”手中也拿着一本成绩不理想的作业本准备去办公室挨批，在走廊目睹了这一幕后，内心的恐惧被老师的暖光融化。这样能让“我”从旁观者变成情感的亲历者。</p>
+</li>
+</ul>
+<div class="sub-heading">总结：初二作文能力进阶的三大重点</div>
+<ol>
+<li><p><strong>语言的“纯化”与“克制”</strong> 你拥有很强的词汇调动能力，但好文章往往懂得分寸。写古文扩写时，必须屏蔽现代生活中的词汇（如玻璃、水彩），使用古典意象（如琉璃、丹青）。同时，留出“空白”，不要把所有的美都用形容词塞满，多用动词和名词来白描。</p>
+</li>
+<li><p><strong>化“旁观”为“亲历”</strong> 在写生活记叙文时，尽量避免“我听见别人说话”、“我看见别人做事”这种弱关联结构。把“我”推到矛盾的中心去，写“我”的动作、挣扎与改变。</p>
+</li>
+<li><p><strong>深化“景”与“情”的暗合</strong> 你现在的景物像是一幅幅高精度的唯美插画，但初二要求“一切景语皆情语”。在提笔描写夕阳或树木之前，先问自己：我现在是高兴还是失落？如果是失落，那么阳光刺眼就是一种打扰，树木的阴影就显得格外压抑。让景物成为你情绪的外化，而非单纯的风景展示。</p>
+</li>
+</ol>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-31">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">31</span>
+            <span class="sec-title">ChatGPT</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>整体看，这组习作基础相当好。古诗文扩写板块最大的优点是：语言有画面感，能抓住原文意境，不是简单翻译；生活记叙文板块最大的优点是：有真实情感，有主题意识，结尾能上升到一定的精神层面。</p>
+<p>但问题也比较集中：古诗文扩写有时“美化过度”，容易脱离原诗文的情绪节奏；生活记叙文则有时“抒情先行”，事件冲突还不够扎实，细节证据还可以更具体。下面逐篇评。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-32">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">32</span>
+            <span class="sec-title">一、古诗扩写：《黄鹤楼》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这篇整体完成度较高，基本抓住了《黄鹤楼》的核心情绪：由仙人传说起笔，写楼、云、晴川、芳草、暮霭，最后落到乡愁。结构顺序也基本符合原诗：“昔人已乘黄鹤去”到“日暮乡关何处是”，没有明显漏句。</p>
+<p>最突出的优点是画面推进清楚。开头写“仙人早已骑着黄鹤飞去”，能把传说感打开；中段写晴川、树木、鹦鹉洲，色彩明亮；结尾写黄昏、雾气、乡愁，能从景物自然过渡到情感。尤其“通往故乡的路，究竟在何方？”这一句较好地对应了“乡关何处是”，有余味。</p>
+<p>核心问题在于：前半部分“仙鹤归来”“神鸟等待”等想象略多，容易把原诗的“空余黄鹤楼”“白云千载空悠悠”写成童话式叙事。崔颢原诗的重点不是“白云等待神鸟”，而是“人去楼空、岁月悠悠、天地辽阔、人生漂泊”。这里的“徒然等待着永不归来的神鸟”情绪有点直白，也把“空悠悠”的空旷感缩小成了具体故事。</p>
+<p>第二个问题是中段景物略显“过满”。“每一棵树木的叶子都沐浴在阳光下”“整片树林成了金色的海洋”“花草树木竞相生长”“欢快婉转的鸣唱”，语言很美，但《黄鹤楼》的晴川、芳草其实是清晰开阔，不宜写得过于热闹。因为它后面要转入“日暮乡关”，如果中间太繁盛欢快，情绪转折会略显突然。</p>
+<p>修改方向：保留画面层次，但压低童话化和热闹化表达。重点突出“空”“远”“久”“望而不得”。例如白云部分可以从“等待神鸟”改为“千年流转，唯有白云仍在楼头悠悠飘荡，像把无数登楼人的怅惘都留在天际”。晴川部分不必写每片叶子，可以写“汉阳城外的树木在阳光下历历可辨，远得像画，却又清楚得令人心惊”。这样更贴近原诗的辽远感。</p>
+<p>评分角度看，这篇可以达到初二上等水平。若按常见满分 50 分作文标准，语言与结构较强，但情感深度和原诗气质还可提升，大致可在 43—46 分区间。提升重点是：少一点“编故事”，多一点“由景生情”的苍茫感。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-33">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">33</span>
+            <span class="sec-title">二、古诗扩写：《野望》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这篇的优点是色彩丰富，秋景写得比较鲜明，能抓住“树树皆秋色，山山唯落晖”的视觉特点。文章也能写出作者“无归依”的心理状态，最后联系伯夷、叔齐，说明学生理解了原诗尾联“相顾无相识，长歌怀采薇”的含义。</p>
+<p>但这篇的核心问题比《黄鹤楼》明显：语言风格偏华丽，和《野望》原诗的“苍凉、孤寂、质朴”不完全吻合。王绩这首诗不是单纯写“绚丽秋景”，而是写人在暮色秋野中产生的孤独感、无所依归感。原诗中的秋色、落晖、牧人、猎马，都不是热闹画面，而是“别人各有归处，唯我无所归”的反衬。</p>
+<p>文中“天空披上了彩色的缎”“夕阳蜂蜜似的光晕”“一幅美妙的图画”等表达偏柔美浪漫，削弱了原诗的荒寒感。“猎人骑着骏马，手中提着一天的收获准备将它们烤成晚餐”这一句想象过实，甚至有些生活化、现代化，把原诗“猎马带禽归”的凝练感写散了。“我看着他们消失在蜿蜒的小径尽头，却发现自己一个都不认识”这一句很好，是全篇最贴近诗意的地方，应该强化。</p>
+<p>此外，有两个细节需要修改：“东皋村”不太准确，原诗“东皋薄暮望”中的“东皋”不是一定指“东皋村”，更像是东边水边高地、田野一带；“枝可宛如一团烈火”应为“枝叶宛如一团烈火”。</p>
+<p>修改方向：减少明艳词，增加暮色、秋气、归人与孤身之间的对照。可以把色彩从“绚丽”调成“苍黄、黯淡、萧瑟”。比如“夕阳渐渐坠入群山，为云朵镶上金边”可以改为“薄暮时分，东皋一带被斜阳笼住，远处山色渐暗，秋意从树梢一层层沉下来”。牧人和猎人部分应突出“他们有归处”：牧人赶牛归村，猎人带禽归家，马蹄声渐远，而“我”只能站在原地，四顾无亲。</p>
+<p>这篇如果只看语言，分数不低；但如果按扩写要求看“是否准确还原原诗意境”，会被扣一些。大致可在 40—43 分。提升重点是：不要把“秋野孤怀”写成“秋景游记”，要让每一处景物都服务于“无所归依”。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-34">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">34</span>
+            <span class="sec-title">三、古文扩写：《记承天寺夜游》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这篇整体很有灵气，语言干净，意境也较好。尤其“月光洒在中庭，正如一潭清澈见底的池水，波光粼粼，空明澄澈”能抓住原文“庭下如积水空明”的美感。后面写“水中藻、荇交错”再点出“松柏影”，也符合原文从错觉到发现的审美过程。</p>
+<p>这篇最好的地方，是基本把握了苏轼的闲适感。开头“闲得无事”“月色怎不令人神往”“准备出门赏月”，能写出被月色打动的过程。结尾“处处月明，但人们却皆在忙碌，无暇观赏，只有我们二人能悠然自得”也能对应“但少闲人如吾两人者耳”。</p>
+<p>但问题也在结尾：对“闲人”的理解还可以更深。苏轼这里的“闲人”不是单纯“有空赏月的人”，更有被贬之后的失意、自嘲、旷达与精神自由。文章现在写成“别人忙，我们悠闲”，略浅了一点。初二学生能写到这个程度已经很好，但要冲高分，需要写出“被现实闲置的人，却拥有看见美的心”。</p>
+<p>另外，文中有几个表达需要修正：“这式”应为“这时”；“无以惬意的意境”不通顺，可改为“无比惬意的境界”或“难以言说的惬意”。“正值满月”不一定准确，原文只说“月色入户”，不宜擅自写成满月。还有“连虫鸣似乎都停止了”可以保留，但要注意不要把寺院写得过于静止，原文的妙处是空明灵动，不是死寂。</p>
+<p>修改方向：结尾增加一层复杂情感。不要只说“我们有闲情”，可以写成：“也许世人都在奔走，也许我们不过是被世事暂时搁在一旁的人，可正因如此，才没有错过这一庭月色。”这样更接近苏轼的旷达与自嘲。中间景物描写可稍微收束，不必加太多“草木芬芳”，因为原文重点是视觉上的月色空明，而不是嗅觉描写。</p>
+<p>这篇可评为 44—47 分。它的语言、结构、意境都较好，若能把“闲人”的精神内涵写深，就是这组古文扩写里最容易冲高分的一篇。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-35">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">35</span>
+            <span class="sec-title">四、古文扩写：《答谢中书书》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这篇语言流畅，画面感强，对原文“山川之美，古来共谈”的整体框架把握比较准确。文章按高峰、清流、石壁、青林翠竹、晓雾、夕日、猿鸟、沉鳞的顺序展开，基本对应原文，层次完整。</p>
+<p>优点是动静结合意识不错。前半部分写山、水、石壁、树林、翠竹，是静景；后半部分写晨雾散去、猿鸟啼叫、夕阳落山、鱼儿跃出，是动景。这个结构很符合原文“晓雾将歇，猿鸟乱鸣；夕日欲颓，沉鳞竞跃”的节奏。语言上，“一抹银光在波涛中转瞬即逝”比较生动。</p>
+<p>主要问题是：个别比喻重复，且有些语句过满。比如“拔地而起的高峰宛如出鞘的利剑”在《三峡》中也使用了，若多篇放在一起看，会显得词库重复。又如“山脚下的小溪又如一条玻璃带”“河底每一粒金沙都清晰可见”，虽然好看，但“清流见底”的美更偏清澈幽静，不一定需要“金沙”这种装饰性细节。</p>
+<p>更关键的是最后一句：“自从康乐公谢灵运以来，从来没能有欣赏这种意境的人了。”这句话理解上略有偏差。原文“未复有能与其奇者”不是说“从来没有欣赏这种意境的人”，而是说“再没有能真正参与、领会这种奇丽山水之美的人”。这里有作者的自得与知音意识，不是简单感叹没人欣赏。</p>
+<p>修改方向：第一，压缩装饰性比喻，突出山水本身的清峻、明丽、灵动。第二，结尾要写出“我也能领会此中奇美”的知音感。比如可改成：“自谢灵运之后，能真正走进这山水奇境、与它心意相通的人，恐怕已经很少了。而我今日写给你，正是想与你共赏这份人间清绝。”这样更贴合“答谢中书书”作为书信的交流意味。</p>
+<p>这篇大约在 42—45 分。它的基础很好，但要避免“景物堆砌式美文”，重点提升原文最后一句的思想味和书信感。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-36">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">36</span>
+            <span class="sec-title">五、古文扩写：《三峡》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这是古诗文扩写板块中篇幅最完整、结构最清楚的一篇。它基本按原文四层展开：总写山势，夏水迅疾，春冬清荣峻茂，晴初霜旦猿鸣凄异。段落层次非常清楚，也能抓住三峡不同季节的不同特点。</p>
+<p>优点非常明显。第一，结构完整，不漏原文重点。第二，气势较足，尤其夏水一段“清晨才与雾气缭绕的白帝城辞别……傍晚时分便到了千里之外的江陵”，很好地扩写了“朝发白帝，暮到江陵”。第三，冬春一段能写出“素湍绿潭，回清倒影”的视觉层次。第四，最后猿啼一段情绪到位，有悲凉感。</p>
+<p>核心问题有三个。</p>
+<p>第一个问题是语言有些“用力过猛”。比如“一把把出鞘的利剑”“撕破宁静”“离弦之箭”“踏风而行”“银河从天上跌落”等，单看都可以，但连续出现会显得有些套路化。郦道元《三峡》的语言特点是凝练、峻洁、准确，不是铺张华丽。扩写可以生动，但不能把原文的冷峻气质变成夸饰散文。</p>
+<p>第二个问题是个别词义不够准确。“每当夏日降临”不如“到了夏季，江水上涨”准确，因为原文重点是“夏水襄陵”，即夏天水涨漫上山陵。“当时间转到下霜”表达不自然，应改为“到了秋日初晴或霜降的清晨”。“隐敝”应为“隐蔽”。“山高草盛”原文是“清荣峻茂”，重点是水清、树荣、山高、草盛，顺序和对象最好更准确。</p>
+<p>第三个问题是情绪转换可以更分明。第一段山势雄奇压迫，第二段夏水迅疾惊险，第三段春冬清丽秀美，第四段秋景凄清悲凉。现在每段都写得比较满，但四种审美差异还可以更鲜明。尤其第三段的“急流如群马”“银河跌落”仍然很激烈，可能削弱春冬“清荣峻茂”的清幽之美。</p>
+<p>修改方向：把每段设定一个主色调。山段写“险峻幽深”，夏段写“迅疾奔放”，春冬段写“清澈明净”，秋段写“凄清悲凉”。每段只保留一两个最有力的比喻，不要连续叠加。可以把“银河从天上跌落”改得更轻一些，如“悬泉瀑布从绝壁间垂落，水声在山谷中回旋”。这样更符合“良多趣味”的雅致。</p>
+<p>这篇大约在 44—47 分。若能减少套路化比喻、提高词义准确度，它会很稳地进入高分档。</p>
+<hr>
+
+        </div>
+      </details>
+      <div class="part-divider" id="part-5">
+        <span>二、生活记叙文</span>
+      </div><div class="part-preamble item-block"></div>
+      <details class="guide-section" id="sec-37">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">37</span>
+            <span class="sec-title">六、《我渴望被看见》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这篇是两篇生活记叙文中立意更成熟的一篇。它没有把“被看见”简单写成“我得到了表扬”，而是写成“我作为伴奏者，在成就集体中确认自己的价值”。这个立意很好，符合初二作文中“有真情实感、有成长体验、有思想提升”的高分要求。</p>
+<p>文章最突出的优点是“物象统一”。钢琴、乐谱、音符、和声、聚光灯、光，这些意象贯穿全文，最后落到“不是站在聚光灯下就能被看见，而是让光透过自己，点亮更多的人”。这个结尾有文学感，也有思辨性。比单纯写“老师和同学看见了我的努力”高级很多。</p>
+<p>第二个优点是心理变化清楚。开头是孤独失落：“没人知道我在努力”；中间通过练琴发现“每一个音都值得被演奏出来”；上台后意识到“我的伴奏托起了大家的歌唱”；最后完成价值转化。这个成长链条完整。</p>
+<p>但它的问题也很关键：事件冲突还不够具体。文章说“我渴望被看见”，但读者还没有充分看到“为什么我强烈渴望”。比如有没有人忽视过伴奏？有没有同学只关注主唱？有没有老师安排时一句“你就在旁边弹一下”？如果没有一个具体刺痛点，开头的孤独会显得偏抽象。高分记叙文需要“具体事件中的具体委屈”，而不仅是漂亮的情绪。</p>
+<p>第二个问题是中段“音符一同唱出旋律”的领悟略偏理性化。它很好，但还可以和真实动作结合。比如某个地方总是弹错、某个和弦练了很多遍、某次彩排因为伴奏不稳导致合唱散掉，后来终于撑住节奏。这样“每一个音都重要”的道理就不是想出来的，而是从经历中长出来的。</p>
+<p>第三个问题是结尾稍微有一点“金句感”。“让光透过自己，点亮更多的人”很好，但如果前文没有足够事件支撑，容易显得拔高。好在本文前文已有和声、伴奏、集体的铺垫，所以问题不严重。</p>
+<p>修改方案：增加一个“被忽视的具体瞬间”和一个“伴奏发挥关键作用的具体瞬间”。比如开头可以补一处：“排练结束时，大家讨论领唱、站位和服装，却没有人提到伴奏。我抱着谱子站在旁边，像一段被略过的前奏。”中间可以补一处：“有一次我低音慢了半拍，前排同学的声音立刻乱了一下，我才明白，角落里的琴声其实牵着整支队伍的呼吸。”这样主题会更有证据。</p>
+<p>这篇按初二考场作文标准，大约可在 45—48 分。它已经具备高分作文的立意和语言，只需要再补足事件冲突与关键细节，就会更有力量。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-38">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">38</span>
+            <span class="sec-title">七、《我看见了那份尊重》</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这篇的主题很明确，写的是“我看见老师用温和而尊重的方式教育学生”。它的优点是情感柔和，叙述角度独特：不是直接写老师怎样对“我”好，而是通过旁观小陈被教育的过程，看到老师对学生尊严的保护。这种写法比普通“师恩作文”更有新意。</p>
+<p>文章最好的部分是第三段。老师和小陈谈话，小陈“低垂的头”“攥紧作业本的手”“手渐渐松开，作业本被重新抚平”，这些动作细节很有效。它们没有直接说“小陈被安慰了”，而是通过手部变化写出了心理变化。这是很成熟的记叙手法。</p>
+<p>第二个亮点是“我”的个人经历插入得比较自然。“小学时，我也曾有一次当众被批评……”这一笔让文章不只是旁观，而是把“看见尊重”变成了“我理解尊重”。这能让主题更有情感来源。</p>
+<p>但这篇的核心问题是：叙事焦点略有分散。标题是“我看见了那份尊重”，但开头说“我关于老师们的师恩”，范围一下子变大了。后文实际上只写一位老师、一件事，所以开头最好不要泛泛写“老师们的师恩”，而应直接进入那个傍晚。比如可以改成：“直到那个傍晚，我才真正明白，教育里的尊重，原来可以这样安静地发生。”</p>
+<p>第二个问题是部分表达略显概念化。比如“春风化雨，润物无声”“温暖了人心”都是常见句，虽然准确，但不够独特。相比之下，“作业本被重新抚平”“把批评留在走廊中”更好。建议结尾少用套语，多回到本文独有的“灯光、走廊、作业本、低头又抬头”这些意象。</p>
+<p>第三个问题是事件矛盾还可以再增强。小陈到底哪里出了问题？老师如果当众批评会造成什么？家长焦虑到什么程度？小陈是否以为自己会被责备？这些如果稍微交代清楚，老师的“尊重”就更可贵。现在老师的教育方式很温柔，但冲突压力还不够强。</p>
+<p>修改方案：开头直接切入场景，减少总起式抒情；中间加强家长焦虑、小陈紧张与老师温和之间的对比；结尾用具体画面收束。比如最后可以不是“春风化雨，润物无声”，而是：“那本被重新抚平的作业本，安静地躺在灯光里。我忽然明白，真正的批评不是让一个人低下头，而是给他重新抬头的勇气。”这样的结尾更贴合全文，也更有原创性。</p>
+<p>这篇大约可在 44—47 分。它的细节和主题都很好，主要提升空间在于开头更聚焦、结尾少套话、冲突更具体。</p>
+<hr>
+
+        </div>
+      </details>
+      <div class="part-divider" id="part-6">
+        <span>三、两大板块的共性优点</span>
+      </div><div class="part-preamble item-block"><p>古诗文扩写方面，学生已经不满足于“逐句翻译”，而是能把原文变成连续画面，这是很重要的能力。多数文章能做到景物顺序清楚，原文要点基本不漏，语言有文采，有比喻，有色彩，有动态描写。这说明学生具备较好的语言表达基础和审美感受力。</p>
+<p>生活记叙文方面，学生的主题意识很强。两篇都不是流水账，而是能围绕一个精神关键词展开：“被看见”“尊重”。而且两篇都能通过生活中的小场景写成长体验，不是空谈大道理。尤其《我渴望被看见》的“伴奏”视角，《我看见了那份尊重》的“旁观教育”视角，都有较好的选材意识。</p>
+<p>更重要的是，这位学生已经有“意象经营”的意识。古诗文里反复用云、水、光、山、树、猿鸣等意象；记叙文里使用月光、台灯、琴键、乐谱、作业本、暖光等意象。这是冲高分作文的重要基础。</p>
+<hr>
+</div>
+      <div class="part-divider" id="part-7">
+        <span>四、共性核心问题</span>
+      </div><div class="part-preamble item-block"><p>第一个共性问题是“语言美”有时超过了“原文准”。古诗文扩写不是自由写景，更不是把原文改写成华丽散文。它的评分重点通常包括：是否忠于原文内容，是否把握原文情感，是否合理想象，是否语言流畅。现在的问题不是不会写，而是有些地方写得太满、太艳、太现代，导致原文的空旷、孤独、清峻、闲适被削弱。</p>
+<p>第二个共性问题是比喻库有重复。比如“出鞘的利剑”“银河跌落”“金色海洋”“轻纱”“玉盘”等都属于常见美文表达。它们并非不能用，但如果多篇连续出现，会让老师感觉语言有模板感。高分作文不是比喻越多越好，而是比喻越准确越好。</p>
+<p>第三个共性问题是生活作文的“具体冲突”还不够强。两篇记叙文都有好主题，但事件还可以更扎实。初二作文要想得高分，不能只写“我感到孤独”“我看见尊重”，还要让读者看到：哪一个动作、哪一句话、哪一个瞬间让“我”真正被刺痛或被照亮。情感要有证据。</p>
+<p>第四个共性问题是结尾有时略偏概念化。比如“春风化雨，润物无声”“温暖了人心”“点亮更多的人”都不错，但要警惕变成作文式拔高。最好的结尾往往不是喊出主题，而是让一个画面自然承载主题。</p>
+<hr>
+</div>
+      <div class="part-divider" id="part-8">
+        <span>五、最值得优先训练的三项能力</span>
+      </div><div class="part-preamble item-block"><p>第一项是“意境校准”。每次扩写古诗文前，先给原文定一个情绪关键词。《黄鹤楼》是空茫乡愁，《野望》是秋暮孤怀，《记承天寺夜游》是闲适中有旷达，《答谢中书书》是清丽中的知音自得，《三峡》是雄奇、迅疾、清幽、凄异的分层变化。写作时所有景物都要服从这个关键词，不能只追求好看。</p>
+<p>第二项是“细节证据化”。生活记叙文要训练一个原则：每一个主题词都必须有动作证据。“被看见”不能只靠说，要靠目光、掌声、排练失误、同学等待、老师点头来证明；“尊重”不能只靠议论，要靠压低的声音、掩上的门、松开的手、被抚平的作业本来证明。</p>
+<p>第三项是“语言减法”。这位学生不是语言贫乏，而是语言较满。下一阶段要学会删掉泛美句、套话句、重复比喻句，留下最准确的句子。尤其古文扩写中，每段最好只设置一个核心比喻，其余用准确描写支撑。</p>
+<hr>
+</div>
+      <div class="part-divider" id="part-9">
+        <span>六、可直接落地的训练方案</span>
+      </div><div class="part-preamble item-block"><p>以后写古诗文扩写，可以固定使用四步法。第一步，标出原文顺序，确保不漏内容。第二步，为全文确定一个情绪词。第三步，每一句原文只扩写一个主要画面，不额外添加过多故事。第四步，结尾必须回到原文情感，不要强行现代化感悟。</p>
+<p>比如《野望》的训练目标不是“把秋天写美”，而是“用秋天写孤独”。牧人归家、猎马归来，都要服务于“别人有归处，我无归处”。这样文章才不会偏题。</p>
+<p>生活记叙文可以固定使用“五点成文法”：一个刺痛点，一个转折点，一个关键动作，一个内心变化，一个画面式结尾。以《我渴望被看见》为例，刺痛点可以是“大家只讨论合唱队员，没有人提伴奏”；转折点可以是“发现一个和弦错了，整段合唱都会散”；关键动作可以是“上台前同学回头看我，等我给出第一个音”；内心变化是“我从配角感变成支撑感”；结尾画面可以是“最后一个音落下，我看见他们回头看向角落里的琴”。</p>
+<p>以《我看见了那份尊重》为例，刺痛点是“我曾经被当众批评”；转折点是“老师没有当众指出小陈的问题”；关键动作是“小陈攥紧的手松开”；内心变化是“我明白尊重不是不批评，而是保护一个人改正的勇气”；结尾画面是“暖光下被抚平的作业本”。</p>
+<hr>
+</div>
+      <div class="part-divider" id="part-10">
+        <span>七、总评</span>
+      </div><div class="part-preamble item-block"><p>这组作文已经明显超过普通初二学生的平均表达水平。优势不是简单的“词语优美”，而是有审美意识、有结构意识、有主题意识。最可贵的是，学生已经能把景物、物象和情感联系起来，这说明作文潜力很高。</p>
+<p>下一阶段不要再单纯追求“更华丽”，而要追求“更准确、更克制、更有证据”。古诗文扩写要从“把句子写美”升级到“把原文精神写准”；生活记叙文要从“把感受写出来”升级到“让事件自己证明感受”。</p>
+<p>如果按目前水平判断，古诗文扩写整体处于 42—46 分区间，生活记叙文处于 44—48 分区间。真正拉开高分差距的关键，不是词汇量，而是：原文气质是否精准，事件冲突是否具体，结尾是否自然有余味。</p>
+</div>
+    </main>
+
+    <!-- PWA / 移动端悬浮快捷返回按钮 -->
+    <button class="fab-back" onclick="navigateBack()" aria-label="返回作品廊" title="返回作品廊">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <footer>
+      <p>Rosemary Garden · <a href="/gallery/">返回作品廊</a> · <a href="/library/">返回图书馆</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+
+    function navigateBack() {
+      if (window.history.length > 1 && document.referrer && !document.referrer.includes(location.pathname)) {
+        window.history.back();
+      } else {
+        window.location.href = '/gallery/';
+      }
+    }
+
+    // Initialize KaTeX formulas
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\(", right: "\)", display: false},
+            {left: "\[", right: "\]", display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+</body>
+</html>
