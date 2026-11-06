@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>三篇山水小品文</title>
+  <!-- KaTeX for math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <style>
     :root {
       --bg-page: #fbf9f4;
@@ -106,7 +110,7 @@
       top: 6px;
       z-index: 30;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1.1fr 1.2fr 1fr 0.8fr;
       gap: 5px;
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -121,7 +125,7 @@
       color: var(--text-main);
       font-size: 12px;
       font-weight: 600;
-      padding: 7px 4px;
+      padding: 7px 3px;
       border-radius: 5px;
       cursor: pointer;
       white-space: nowrap;
@@ -129,8 +133,47 @@
       transition: background 0.15s, opacity 0.15s;
     }
     .t-btn:hover { opacity: 0.85; }
-    .t-btn.btn-open { background: var(--bg-accent); color: var(--primary); }
-    .t-btn.btn-close { background: var(--bg-warm); color: var(--secondary); }
+    .t-btn.btn-back { background: var(--bg-accent); color: var(--primary); font-weight: 700; }
+    .t-btn.btn-open { background: var(--bg-subtle); color: var(--text-main); }
+    .t-btn.btn-close { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* PWA 全屏模式右下角浮动返回按钮 */
+    .fab-back {
+      position: fixed;
+      right: 14px;
+      bottom: 22px;
+      z-index: 99;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      cursor: pointer;
+      opacity: 0.9;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.18s, opacity 0.18s;
+    }
+    .fab-back:hover, .fab-back:active {
+      transform: scale(1.08);
+      opacity: 1;
+      background: var(--bg-accent);
+    }
+    .fab-back svg { width: 20px; height: 20px; }
+
+    /* 公式排版防溢出 */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
 
     .part-divider {
       font-size: 13px;
@@ -306,9 +349,10 @@
 
     <!-- 置顶工具栏 -->
     <nav class="toolbar">
-      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 展开全部 (9)</button>
-      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 收起全部</button>
-      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 回到顶部</button>
+      <button class="t-btn btn-back" onclick="navigateBack()">← 作品廊</button>
+      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 全部展开 (9)</button>
+      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 全部收起</button>
+      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 顶部</button>
     </nav>
 
     <!-- 手风琴内容区块 -->
@@ -1047,6 +1091,13 @@
       </details>
     </main>
 
+    <!-- PWA / 移动端悬浮快捷返回按钮 -->
+    <button class="fab-back" onclick="navigateBack()" aria-label="返回作品廊" title="返回作品廊">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
     <footer>
       <p>Rosemary Garden · <a href="/gallery/">返回作品廊</a> · <a href="/library/">返回图书馆</a></p>
     </footer>
@@ -1056,6 +1107,29 @@
     function toggleAllSections(openState) {
       document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
     }
+
+    function navigateBack() {
+      if (window.history.length > 1 && document.referrer && !document.referrer.includes(location.pathname)) {
+        window.history.back();
+      } else {
+        window.location.href = '/gallery/';
+      }
+    }
+
+    // Initialize KaTeX formulas
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\(", right: "\)", display: false},
+            {left: "\[", right: "\]", display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    });
   </script>
 </body>
 </html>
