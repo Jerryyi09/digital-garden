@@ -44,11 +44,11 @@ test("library path checks reject siblings and traversal", () => {
 
 test("signed URL preserves Chinese, spaces, hash and reserved filename characters", () => {
   const path = `${ROOT}/文学/A #?%& 01.m4b`
-  const url = new URL(mediaUrl("https://melyi.uk/alist", { path }, "abc:1+/="))
+  const url = new URL(mediaUrl("https://melyi.uk:8089/alist", { path }, "abc:1+/="))
   assert.equal(decodeURIComponent(url.pathname), `/alist/d${path}`)
   assert.equal(url.searchParams.get("sign"), "abc:1+/=")
   assert.equal(url.hash, "")
-  assert.throws(() => mediaUrl("https://melyi.uk/alist", { path: "/secret/file.mp3" }, "abc"))
+  assert.throws(() => mediaUrl("https://melyi.uk:8089/alist", { path: "/secret/file.mp3" }, "abc"))
 })
 
 test("replacing a file creates a different progress identity", () => {

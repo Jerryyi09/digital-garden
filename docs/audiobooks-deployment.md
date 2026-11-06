@@ -58,10 +58,10 @@ Cloudflare 只托管界面，不存音频、不代理音频、不存 AList 密�
 
 | 环境 | 入口 | API 与媒体 |
 | --- | --- | --- |
-| Cloudflare | `https://notes.melyi.uk/studio/audiobooks/` | `https://melyi.uk/alist` |
-| NUC 外网 HTTPS | `https://melyi.uk/studio/audiobooks/` | 同域 `/alist` |
+| Cloudflare | `https://notes.melyi.uk/studio/audiobooks/` | `https://melyi.uk:8089/alist` |
+| NUC 外网 HTTPS | `https://melyi.uk:8089/studio/audiobooks/` | 同域 `/alist` |
 | NUC 内网 HTTP | `http://10.0.0.85:8088/studio/audiobooks/` | 同域 `/alist` |
-| NUC 内网 HTTPS | `https://melyi.uk/studio/audiobooks/`（需内网 DNS/回流） | 同域 `/alist` |
+| NUC 内网 HTTPS | `https://melyi.uk:8089/studio/audiobooks/`（需内网 DNS/回流） | 同域 `/alist` |
 
 2026-10-18 实测：根域名 443 可访问 NUC Nginx；旧的外网 `:8089` 不可达；`notes.melyi.uk` 受 Cloudflare Access 保护。Docker 端口仍为 `8088:80`、`8089:443`。不要根据容器端口推断外网端口。内网 HTTP 可播放，但不能安装 Service Worker；完整 PWA 请用可信 HTTPS，不能用自签名证书或 IP 证书错误页面替代。
 

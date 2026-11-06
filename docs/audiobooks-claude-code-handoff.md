@@ -114,8 +114,8 @@ c866258 Use list layout for audiobook library and recent playback
 
 | 使用环境 | 页面地址 | 数据/媒体来源 |
 | --- | --- | --- |
-| Cloudflare | `https://notes.melyi.uk/studio/audiobooks/` | `https://melyi.uk/alist` |
-| NUC 公网 HTTPS | `https://melyi.uk/studio/audiobooks/` | 同域 `/alist` |
+| Cloudflare | `https://notes.melyi.uk/studio/audiobooks/` | `https://melyi.uk:8089/alist` |
+| NUC 公网 HTTPS | `https://melyi.uk:8089/studio/audiobooks/` | 同域 `/alist` |
 | NUC 内网 HTTP | `http://10.0.0.85:8088/studio/audiobooks/` | 同域 `/alist` |
 | Mac 开发预览 | `http://127.0.0.1:8766/studio/audiobooks/` | 默认公共 HTTPS AList |
 | 样书独立试听 | `http://127.0.0.1:8768/` | 本机私有生成产物，仅用于验证 |
