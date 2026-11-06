@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>《万物简史》导读</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.08);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.12);
+        --bg-warm: rgba(251, 146, 60, 0.12);
+        --bg-danger: rgba(248, 113, 113, 0.12);
+        --bg-success: rgba(74, 222, 128, 0.12);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 740px; margin: 0 auto; }
+    p, li { text-align: justify; margin-bottom: 0.55em; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    /* 顶部 Hero 卡片 */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3.5px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--text-main);
+    }
+    .hero-quote p { margin-bottom: 0.4em; }
+    .hero-quote p:last-child { margin-bottom: 0; }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .t-btn:hover { opacity: 0.85; }
+    .t-btn.btn-open { background: var(--bg-accent); color: var(--primary); }
+    .t-btn.btn-close { background: var(--bg-warm); color: var(--secondary); }
+
+    .part-divider {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin: 20px 2px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目 */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.18s ease;
+    }
+    details.guide-section[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+      background: var(--bg-card);
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .color-navy { background: var(--bg-accent); color: var(--primary); }
+    .color-amber { background: var(--bg-warm); color: var(--secondary); }
+    .color-bamboo { background: var(--bg-success); color: var(--success); }
+    .color-purple { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+    .color-rose { background: var(--bg-danger); color: var(--danger); }
+    .color-cyan { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+
+    .sec-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--text-main); }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; font-weight: 600; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+
+    .section-content {
+      padding: 10px 12px 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 14px 18px 22px; }
+    }
+
+    /* 内部小标题与区块 */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; }
+
+    /* 纯色块 */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 12px;
+      border-radius: 6px;
+      margin: 9px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 标签 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 表格移动端自适应 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 10px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    ul, ol { padding-left: 19px; margin: 6px 0 10px; }
+    li { font-size: 14.8px; margin-bottom: 5px; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      background: var(--bg-subtle);
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      color: var(--primary);
+    }
+    pre {
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+    }
+    pre code { background: none; padding: 0; color: var(--text-main); }
+
+    footer {
+      text-align: center;
+      padding: 28px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      
+      <h1>《万物简史》导读</h1>
+      <div class="hero-sub">Rosemary Garden 精读导读</div>
+      
+    </header>
+
+    <!-- 置顶工具栏 -->
+    <nav class="toolbar">
+      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 展开全部 (6)</button>
+      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 收起全部</button>
+      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 回到顶部</button>
+    </nav>
+
+    <!-- 手风琴内容区块 -->
+    <main>
+      
+      <div class="part-divider" id="part-1">
+        <span>《万物简史》导读</span>
+      </div><div class="part-preamble item-block"><div class="tint-box">
+<p>作者：比尔·布莱森（Bill Bryson）| 译者：严维明、陈邕 | 出版：接力出版社（中文版）/ 皇冠出版社（台版）</p>
+</div>
+<hr>
+</div>
+      <details class="guide-section" id="sec-01" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">01</span>
+            <span class="sec-title">【模块一：作者其人】</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>学科背景与立场</strong>
+比尔·布莱森（1951—）是美国著名的非虚构作家与旅游文学作家，毕业于德雷克大学，曾长期旅居英国并为《泰晤士报》《独立报》撰稿。他并非科班科学家，而是一位以“极度好奇的门外汉”自居的写作者。这一立场决定了全书的核心视角：<strong>站在“科学小白”的困惑处发问</strong>，而非专家式的居高临下。他坦承自己写这本书的动机，是因为在飞机上突然意识到“我对这颗居住了一辈子的星球几乎一无所知”——甚至不知道人类是怎么测出地球重量的。</p>
+<p><strong>论证风格</strong>
+布莱森的武器是<strong>叙事八卦与尺度比喻</strong>。他很少直接堆砌公式，而是把科学概念转化为日常经验（如“质子小到什么程度？就像把一只苍蝇放在圣保罗大教堂中央”），并花费大量笔墨挖掘科学家本人的怪癖、偏执、失败与私人恩怨。这意味着阅读节奏是**“悬疑传记体”**：每章以一个问题勾住你，然后带你穿越到19世纪的实验室或20世纪的学术会议，看人类如何跌跌撞撞地逼近答案。信息密度高，但语气轻松，适合碎片化阅读。</p>
+<p><strong>成书背景</strong>
+本书初版于2003年，获2004年英国Aventis科学图书奖。彼时“科学”在大众文化中往往等同于冰冷的数据与应试教育的枯燥，布莱森试图回答一个元问题：<strong>“能不能把科学写得让人愿意读下去？”</strong> 这也是对1990年代《时间简史》热潮的回应——霍金的书证明了大众渴望理解宇宙，但布莱森想证明，这种理解可以更有趣、更全景、更有人味。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-02" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">02</span>
+            <span class="sec-title">【模块二：核心问题与逻辑链】</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>核心问题</strong>
+我们是如何从绝对的虚无中走来，并最终演化成今天这个样子的？更具体地说：<strong>人类到底是如何一步步知道这些关于宇宙、地球和自身的知识的？</strong></p>
+<p><strong>主要论点</strong></p>
+<ol>
+<li><p><strong>科学史不是线性进步，而是一部充满错误、偏执、运气与偏见的侦探小说</strong>
+从牛顿到爱因斯坦，从居里夫人到威尔逊（板块构造），重大发现往往来自“边缘人”的执念、权威者的误判，或纯粹的仪器故障。教科书呈现的是“干净的结论”，布莱森还原的是“血淋淋的过程”。</p>
+</li>
+<li><p><strong>我们的存在是无数极端巧合叠加的奇迹</strong>
+宇宙常数哪怕微调亿万分之一，恒星便无法形成；地球恰好处在太阳系的宜居带，且有木星为我们挡彗星；恐龙灭绝给了哺乳动物机会。这些不是“设计”的证据，而是概率的深渊——理解这一点，才能理解生命的脆弱与珍贵。</p>
+</li>
+<li><p><strong>常识是科学最大的敌人，而“不知道”是科学的起点</strong>
+地球是平的、太阳绕地球转、物种不变……这些“显而易见”的常识都被科学推翻。布莱森反复强调：科学的本质不是掌握真理，而是承认无知并系统性地犯错。</p>
+</li>
+</ol>
+<p><strong>最终行动主张</strong>
+布莱森没有给出具体的“做什么”，但他的隐性主张是：<strong>在科学时代做一个有科学史素养的公民</strong>。这意味着当你再看到“最新研究表明”时，你会追问——样本量多少？测量方法可靠吗？这个结论在十年后会被推翻吗？</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-03">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">03</span>
+            <span class="sec-title">【模块三：思想坐标系】</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>真正原创的部分</strong></p>
+<ul>
+<li><strong>叙事框架的原创</strong>：将天文学、粒子物理、地质学、化学、古生物学、人类学按“人类认知的时间线”而非“学科分类”重新编织。这不是学科知识的原创，而是<strong>知识组织的原创</strong>。</li>
+<li><strong>科学家作为“人”的复魅</strong>：传统科普聚焦理论与发现，布莱森系统性地挖掘科学家的性格缺陷、资金困境、政治打压与私人恩怨，构建了“科学社会学”的民间版本。</li>
+<li><strong>“尺度感”的通俗化</strong>：用日常比喻让读者真正理解宇宙的大、原子的小、时间的漫长——这种“认知校准”是本书最持久的贡献。</li>
+</ul>
+<p><strong>整合自已有理论的部分</strong></p>
+<ul>
+<li>宇宙大爆炸与粒子物理部分整合自伽莫夫、温伯格、霍金等人的标准宇宙学叙事</li>
+<li>地质学与板块构造整合自韦格纳、赫斯、威尔逊的学说史</li>
+<li>演化论与DNA部分整合自达尔文、华莱士、沃森与克里克、道金斯的经典框架</li>
+</ul>
+<p><strong>在驳斥什么</strong></p>
+<ul>
+<li><strong>教科书式的科学教育</strong>：科学不是“已经写好的答案”，而是“正在进行的争论”</li>
+<li><strong>“科学确定性”的傲慢</strong>：书中大量案例（如地球年龄的测算从几千年修正到几十亿年）证明，今天的“定论”可能就是明天的“谬误”</li>
+<li><strong>学科壁垒的幻觉</strong>：物理学家、化学家、地质学家各自为战，而真相往往出现在交叉地带</li>
+</ul>
+<p><strong>历史位置</strong>
+这是21世纪科学通识写作的<strong>集大成之作</strong>。在布莱森之前，霍金证明了宇宙学可以通俗化，戴蒙德（《枪炮、病菌与钢铁》）证明了跨学科叙事的力量，但布莱森第一次将<strong>从宇宙大爆炸到人类文明的完整科学史</strong>用单一线索、统一语气、面向完全外行读者的姿态呈现出来。它不是某一领域的开山之作，而是<strong>科学普及范式的里程碑</strong>。</p>
+<p><strong>与你书单的实质联结</strong></p>
+<div class="tint-box">
+<p><em>您未在请求中提供个人阅读书单，此模块暂略。如您补充近期书目（如《时间简史》《枪炮、病菌与钢铁》《自私的基因》《人类简史》等），可建立如下类型的交叉分析：与《时间简史》的宇宙学叙事互补、与《人类简史》的宏观视角差异、与《自私的基因》的生命演化视角对照等。</em></p>
+</div>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-04">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">04</span>
+            <span class="sec-title">【模块四：与你的相关性】</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <div class="tint-box">
+<p><em>注：由于您未在请求中填写具体的关注主题，以下为基于“通识/科学兴趣型读者”的通用相关性分析。如您有特定关注领域（如科技史、地质学、生命演化、科学哲学等），可进一步精准化。</em></p>
+</div>
+<p><strong>直接相关的部分</strong></p>
+<ul>
+<li>如果你需要一张<strong>现代科学的全景地图</strong>，本书是最佳入口：它告诉你天文学、物理学、化学、地质学、生物学之间的逻辑衔接，而非孤立的知识点</li>
+<li>如果你厌倦了“科学家都是天才圣人”的刻板叙事，本书会展示科学发现的真实生态：经费、嫉妒、战争、政治如何塑造了我们“知道”什么</li>
+<li>如果你需要<strong>与人交谈时的科学谈资</strong>，书中关于地球年龄测定、恐龙灭绝、DNA发现的叙事都是高信息密度的社交货币</li>
+</ul>
+<p><strong>可能挑战你已有认知的观点</strong></p>
+<ul>
+<li>“科学事实一旦被证实就不可动摇”——书中展示地球年龄从几千年到几十亿年的认知跳跃，提醒你当下许多“科学共识”可能只是临时驿站</li>
+<li>“重大发现来自天才的灵光一现”——布莱森证明，更多突破来自耐心测量、错误累积、仪器改进，以及研究者之间的恶性竞争；天才往往被高估</li>
+<li>“人类是进化的巅峰”——从宇宙尺度看，人类出现的时间短到可以忽略不计，且我们正处于第六次大灭绝的潜在开端</li>
+</ul>
+<p><strong>意想不到的连接点</strong></p>
+<ul>
+<li>科学家们的<strong>性格缺陷与发现之间的关系</strong>：比如牛顿的偏执与他在光学上的突破，或居里夫妇在简陋棚屋中的坚持——这对任何需要长期专注的创造性工作都有迁移价值</li>
+<li><strong>测量与认知的哲学</strong>：全书反复出现“我们如何知道不可直接观察之物”（如地球内部、原子结构、宇宙边缘）——这与批判性思维、信息素养直接相关</li>
+<li><strong>“无知”作为生产力</strong>：布莱森展示，承认自己无知往往是科学突破的起点——这对个人学习和组织创新都有反直觉的启发</li>
+</ul>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-05">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">05</span>
+            <span class="sec-title">【模块五：思维结构地图】</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>全书六大部分的逻辑关系</strong></p>
+<pre><code>第一部分（宇宙起源）：失落的世界
+     ↓ 从虚无到万物：大爆炸、粒子、恒星
+第二部分（地球的大小）：地球如何被测量
+     ↓ 从宇宙到行星：地球年龄、地质学、板块构造
+第三部分（新世界的诞生）：元素与原子的故事
+     ↓ 从行星到物质：化学、元素周期表、原子结构
+第四部分（危险的行星）：地球本身的狂暴历史
+     ↓ 从物质到环境：冰期、火山、灭绝事件
+第五部分（生命的崛起）：生命的出现与演化
+     ↓ 从环境到生命：DNA、自然选择、物种爆发
+第六部分（人类的出现）：从猿到文明
+     ↓ 从生命到意识：古人类学、智人扩散
+</code></pre>
+<p><strong>核心概念关系</strong></p>
+<ul>
+<li><strong>宇宙尺度</strong> ↔ <strong>原子尺度</strong>：对立——极大与极小的两端，人类恰好处于中间，这是布莱森反复强调的“尺度奇迹”</li>
+<li><strong>科学理论</strong> ↔ <strong>科学家生平</strong>：双线并行——知识进步与人性弱点相互缠绕，不可分离</li>
+<li><strong>确定性</strong> → <strong>不确定性</strong>：递进——越往现代，科学越承认“我们不知道的东西远比知道的多”</li>
+</ul>
+<p><strong>如果只读三章</strong></p>
+<ol>
+<li><strong>开篇（宇宙起源/大爆炸章节）</strong> — 建立全书的尺度感与叙事基调。读完你会理解“138亿年”不是数字，而是人类认知的极限挑战，也是全书最美的章节之一。</li>
+<li><strong>地球年龄测定或板块构造章节</strong> — 这是全书方法论最清晰的示范：看人类如何从“地球只有几千年”的宗教确信，通过放射性测年一步步走向“45亿年”的科学共识。它展示了科学如何自我纠错。</li>
+<li><strong>生命演化或恐龙灭绝章节</strong> — 理解“偶然性”在生命史中的绝对主宰。你会明白人类的出现不是必然，而是无数灭绝事件后的幸存者偏差。</li>
+</ol>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-06">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">06</span>
+            <span class="sec-title">【模块六：分层阅读问题】</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>表层问题（读完能直接回答）</strong></p>
+<ol>
+<li>宇宙大爆炸理论的核心证据有哪些？（如宇宙微波背景辐射、哈勃红移）</li>
+<li>科学家是如何测定地球年龄的？关键人物和关键技术是什么？（如铅同位素测年、克莱尔·帕特森）</li>
+<li>板块构造学说如何推翻“大陆固定论”？魏格纳的“大陆漂移”为什么最初被嘲笑，后来又被接受？</li>
+</ol>
+<p><strong>深层问题（需要主动思考）</strong></p>
+<ol>
+<li>布莱森反复强调科学发现中的“错误”和“运气”，这是否与科学方法的“客观理性”形象矛盾？科学的进步究竟是逻辑的胜利，还是试错与竞争的副产品？</li>
+<li>书中大量科学家因性格、政治或经费问题被埋没或推崇，这对“科学是纯粹真理追求”的叙事构成了什么挑战？我们当下对“科学权威”的信任应该如何校准？</li>
+<li>从宇宙138亿年到人类20万年的叙事跳跃中，布莱森如何处理“意义”问题？科学描述越完整，人类的存在是否显得越偶然、越虚无？</li>
+</ol>
+<p><strong>迁移问题（与你的处境对话）</strong></p>
+<ol>
+<li>你所在的行业或领域中，有哪些被当作“常识”的假设，可能类似于当年的“地心说”或“稳态宇宙论”，正等待被推翻？</li>
+<li>布莱森展示的科学发现史充满延迟、混乱和人际斗争，这对你理解“当下最前沿知识（如AI、基因编辑、气候科学）的可靠性”有什么影响？</li>
+<li>如果科学进步依赖极端巧合和少数偏执者，普通人系统学习科学史的意义何在？在信息过载的时代，这本书给你的“认知过滤器”是什么？</li>
+</ol>
+<hr>
+<p><strong>读完这本书之后，你应该能回答的问题：</strong></p>
+<div class="tint-box">
+<p>当你面对任何一个科学新闻、技术突破或专家论断时，你能判断它处于科学史的哪个阶段（萌芽假说/激烈争议/范式确立/等待被推翻），并理解**“我们是怎么知道的”比“知道什么”更重要**——这正是科学素养的底层操作系统。</p>
+</div>
+<hr>
+<p><em>生成时间：2026-06-08 | 关注主题：未提供（通用通识/科学兴趣）</em></p>
+
+        </div>
+      </details>
+    </main>
+
+    <footer>
+      <p>Rosemary Garden · <a href="/gallery/">返回作品廊</a> · <a href="/library/">返回图书馆</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+  </script>
+</body>
+</html>

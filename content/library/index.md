@@ -25,87 +25,94 @@ cssclasses:
     <button type="button" role="radio" aria-checked="false" data-sort="title">标题</button>
   </div>
 </div>
+<div class="g-chips" role="tablist" aria-label="分类筛选">
+  <button type="button" class="g-chip-btn is-active" data-chip="all">全部 <em>17</em></button>
+  <button type="button" class="g-chip-btn" data-chip="数学">数学 <em>1</em></button>
+  <button type="button" class="g-chip-btn" data-chip="物理">物理 <em>1</em></button>
+  <button type="button" class="g-chip-btn" data-chip="语文">语文 <em>13</em></button>
+  <button type="button" class="g-chip-btn" data-chip="阅读成长">阅读成长 <em>2</em></button>
+</div>
 
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
   <summary><span>数学 · 初中代数核心思维体系</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/初中代数核心思维体系/初中代数核心思维体系" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 学习笔记/01 Areas/数学/初中代数核心思维体系 数学 · 初中代数核心思维体系" data-room="Library" data-updated="1793939439344">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01-areas/数学/初中代数核心思维体系/" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 学习笔记/01 Areas/数学/初中代数核心思维体系 数学 · 初中代数核心思维体系" data-room="Library" data-root-category="数学" data-updated="1793939439344">
   <span class="g-row-text"><strong>初中代数核心思维体系</strong><small>11月6日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
   <summary><span>物理</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/物理/物理学科思维" data-garden-item data-title="物理学科思维" data-search="物理学科思维 学习笔记/01 Areas/物理 物理" data-room="Library" data-updated="1793939439344">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01-areas/物理/物理学科思维" data-garden-item data-title="物理学科思维" data-search="物理学科思维 学习笔记/01 Areas/物理 物理" data-room="Library" data-root-category="物理" data-updated="1793939439344">
   <span class="g-row-text"><strong>物理学科思维</strong><small>11月6日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
   <summary><span>语文 · 初二课文</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/三篇山水小品文" data-garden-item data-title="三篇山水小品文" data-search="三篇山水小品文 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793350338093">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01-areas/语文/初二课文/三篇山水小品文" data-garden-item data-title="三篇山水小品文" data-search="三篇山水小品文 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-root-category="语文" data-updated="1793350338093">
   <span class="g-row-text"><strong>三篇山水小品文</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初二课文/《三峡》" data-garden-item data-title="《三峡》" data-search="《三峡》 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-updated="1793339957000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初二课文/《三峡》" data-garden-item data-title="《三峡》" data-search="《三峡》 学习笔记/01 Areas/语文/初二课文 语文 · 初二课文" data-room="Library" data-root-category="语文" data-updated="1793339957000">
   <span class="g-row-text"><strong>《三峡》</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
   <summary><span>语文 · 初一课文</span><em>11</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《阿长与〈山海经〉》" data-garden-item data-title="《阿长与〈山海经〉》" data-search="《阿长与〈山海经〉》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1793342497000">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《阿长与〈山海经〉》" data-garden-item data-title="《阿长与〈山海经〉》" data-search="《阿长与〈山海经〉》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1793342497000">
   <span class="g-row-text"><strong>《阿长与〈山海经〉》</strong><small>10月30日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《井冈翠竹》" data-garden-item data-title="《井冈翠竹》" data-search="《井冈翠竹》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《井冈翠竹》" data-garden-item data-title="《井冈翠竹》" data-search="《井冈翠竹》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《井冈翠竹》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《假如生活欺骗了你》" data-garden-item data-title="《假如生活欺骗了你》" data-search="《假如生活欺骗了你》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《假如生活欺骗了你》" data-garden-item data-title="《假如生活欺骗了你》" data-search="《假如生活欺骗了你》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《假如生活欺骗了你》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《未选择的路》" data-garden-item data-title="《未选择的路》" data-search="《未选择的路》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《未选择的路》" data-garden-item data-title="《未选择的路》" data-search="《未选择的路》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《未选择的路》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《登幽州台歌》" data-garden-item data-title="《登幽州台歌》" data-search="《登幽州台歌》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《登幽州台歌》" data-garden-item data-title="《登幽州台歌》" data-search="《登幽州台歌》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《登幽州台歌》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《紫藤萝瀑布》" data-garden-item data-title="《紫藤萝瀑布》" data-search="《紫藤萝瀑布》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《紫藤萝瀑布》" data-garden-item data-title="《紫藤萝瀑布》" data-search="《紫藤萝瀑布》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《紫藤萝瀑布》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《青春之光》" data-garden-item data-title="《青春之光》" data-search="《青春之光》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《青春之光》" data-garden-item data-title="《青春之光》" data-search="《青春之光》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《青春之光》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《驿路梨花》" data-garden-item data-title="《驿路梨花》" data-search="《驿路梨花》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《驿路梨花》" data-garden-item data-title="《驿路梨花》" data-search="《驿路梨花》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《驿路梨花》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/《骆驼祥子》" data-garden-item data-title="《骆驼祥子》" data-search="《骆驼祥子》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/《骆驼祥子》" data-garden-item data-title="《骆驼祥子》" data-search="《骆驼祥子》 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>《骆驼祥子》</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/七下文言文" data-garden-item data-title="七下文言文" data-search="七下文言文 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/七下文言文" data-garden-item data-title="七下文言文" data-search="七下文言文 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>七下文言文</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/语文/初一课文/钢铁是怎样炼成的？" data-garden-item data-title="钢铁是怎样炼成的？" data-search="钢铁是怎样炼成的？ 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-updated="1781165541000">
+<a class="g-row" href="/学习笔记/01-areas/语文/初一课文/钢铁是怎样炼成的？" data-garden-item data-title="钢铁是怎样炼成的？" data-search="钢铁是怎样炼成的？ 学习笔记/01 Areas/语文/初一课文 语文 · 初一课文" data-room="Library" data-root-category="语文" data-updated="1781165541000">
   <span class="g-row-text"><strong>钢铁是怎样炼成的？</strong><small>6月11日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
   <summary><span>阅读成长 · 科普作品</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/阅读成长/科普作品/《万物简史》导读" data-garden-item data-title="《万物简史》导读" data-search="《万物简史》导读 学习笔记/01 Areas/阅读成长/科普作品 阅读成长 · 科普作品" data-room="Library" data-updated="1781067152000">
+  <div class="g-list"><a class="g-row" href="/学习笔记/01-areas/阅读成长/科普作品/《万物简史》导读" data-garden-item data-title="《万物简史》导读" data-search="《万物简史》导读 学习笔记/01 Areas/阅读成长/科普作品 阅读成长 · 科普作品" data-room="Library" data-root-category="阅读成长" data-updated="1781067152000">
   <span class="g-row-text"><strong>《万物简史》导读</strong><small>6月10日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/阅读成长/科普作品/《科学的故事》导读" data-garden-item data-title="《科学的故事》导读" data-search="《科学的故事》导读 学习笔记/01 Areas/阅读成长/科普作品 阅读成长 · 科普作品" data-room="Library" data-updated="1781067152000">
+<a class="g-row" href="/学习笔记/01-areas/阅读成长/科普作品/《科学的故事》导读" data-garden-item data-title="《科学的故事》导读" data-search="《科学的故事》导读 学习笔记/01 Areas/阅读成长/科普作品 阅读成长 · 科普作品" data-room="Library" data-root-category="阅读成长" data-updated="1781067152000">
   <span class="g-row-text"><strong>《科学的故事》导读</strong><small>6月10日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>

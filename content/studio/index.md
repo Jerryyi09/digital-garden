@@ -20,14 +20,15 @@ cssclasses:
 
 
 
+
 <div class="g-directory" data-garden-directory>
 <details class="g-folder is-flat" data-folder open>
   
-  <div class="g-list"><a class="g-row" href="/studio/audiobooks/" data-garden-item data-title="有声书 · 听见一本书" data-search="有声书 · 听见一本书  工具" data-room="Studio" data-updated="0" data-router-ignore>
+  <div class="g-list"><a class="g-row" href="/studio/audiobooks/" data-garden-item data-title="有声书 · 听见一本书" data-search="有声书 · 听见一本书  工具" data-room="Studio" data-root-category="工具" data-updated="0" data-router-ignore>
   <span class="g-row-text"><strong>有声书 · 听见一本书</strong><small>Audiobooks</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="https://melyi.uk/alist/" data-garden-item data-title="Alist 资源库" data-search="Alist 资源库  资源" data-room="Studio" data-updated="0" data-router-ignore target="_blank" rel="noopener">
+<a class="g-row" href="https://melyi.uk/alist/" data-garden-item data-title="Alist 资源库" data-search="Alist 资源库  资源" data-room="Studio" data-root-category="资源" data-updated="0" data-router-ignore target="_blank" rel="noopener">
   <span class="g-row-text"><strong>Alist 资源库</strong><small>文件与媒体</small></span>
   <span class="g-row-go" aria-hidden="true">↗</span>
 </a></div>
