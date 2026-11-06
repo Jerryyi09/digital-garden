@@ -1407,6 +1407,61 @@ button:active { opacity: 0.7; }
 .readalong-floating-player:active {
   transform: scale(0.92);
 }
+
+/* “我的”界面：书签列表统一样式与对齐 */
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-card);
+}
+.bookmark-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+  padding-right: 12px;
+}
+.bookmark-name {
+  font-size: 14px;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bookmark-time {
+  font-size: 12px;
+  color: var(--brand-blue, #1890ff);
+  font-variant-numeric: tabular-nums;
+}
+.bookmark-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.wx-btn-subtle, .wx-btn-del {
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  transition: opacity 0.15s ease;
+}
+.wx-btn-subtle {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--brand-blue, #1890ff);
+  font-weight: 500;
+}
+.wx-btn-del {
+  background: rgba(207, 19, 34, 0.08);
+  color: #cf1322;
+}
+.wx-btn-subtle:hover, .wx-btn-del:hover {
+  opacity: 0.8;
+}
 .floating-vinyl-wrap {
   width: 62px;
   height: 62px;

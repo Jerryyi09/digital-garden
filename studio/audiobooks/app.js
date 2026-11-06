@@ -496,28 +496,65 @@ async function renderSyncItems() {
     container.append(group)
   }
   const bookmarks = rows.filter(row => row.kind === "bookmark" && !row.value?.deleted)
-  const heading = document.createElement("p")
-  heading.textContent = `书签（${bookmarks.length}）`
-  container.append(heading)
-  for (const row of bookmarks) {
-    if (!row.value?.track || !isWithinRoot(row.value.track.path)) continue
-    const group = document.createElement("div")
-    const open = document.createElement("button")
-    open.textContent = `${row.value.track.name} · ${durationText(row.value.position)}`
-    open.addEventListener("click", attempt(async () => {
-      await loadTrack(row.value.track)
-      pendingPosition = Math.max(0, row.value.position)
-      restorePosition()
-    }))
-    const removeBookmark = document.createElement("button")
-    removeBookmark.textContent = "删除"
-    removeBookmark.addEventListener("click", attempt(async () => {
-      await userSync.save("bookmark", row.id, { ...row.value, deleted: true })
-      await renderSyncItems()
-      scheduleUserSync()
-    }))
-    group.append(open, removeBookmark)
-    container.append(group)
+  if (bookmarks.length > 0) {
+    const heading = document.createElement("div")
+    heading.className = "menu-item"
+    const headingLabel = document.createElement("div")
+    headingLabel.className = "menu-label"
+    const headingIcon = document.createElement("span")
+    headingIcon.className = "menu-icon"
+    headingIcon.textContent = "🔖"
+    const headingText = document.createElement("span")
+    headingText.textContent = "我的书签"
+    headingLabel.append(headingIcon, headingText)
+    const headingVal = document.createElement("span")
+    headingVal.className = "menu-val"
+    headingVal.textContent = `${bookmarks.length} 条`
+    heading.append(headingLabel, headingVal)
+    container.append(heading)
+
+    for (const row of bookmarks) {
+      if (!row.value?.track || !isWithinRoot(row.value.track.path)) continue
+      const itemEl = document.createElement("div")
+      itemEl.className = "menu-item bookmark-item"
+
+      const label = document.createElement("div")
+      label.className = "bookmark-info"
+      const name = document.createElement("span")
+      name.className = "bookmark-name"
+      name.textContent = row.value.track.name
+      const time = document.createElement("span")
+      time.className = "bookmark-time"
+      time.textContent = `停在 ${durationText(row.value.position)}`
+      label.append(name, time)
+
+      const actions = document.createElement("div")
+      actions.className = "bookmark-actions"
+
+      const playBtn = document.createElement("button")
+      playBtn.className = "wx-btn-subtle"
+      playBtn.textContent = "继续听"
+      playBtn.type = "button"
+      playBtn.addEventListener("click", attempt(async () => {
+        await loadTrack(row.value.track)
+        pendingPosition = Math.max(0, row.value.position)
+        restorePosition()
+      }))
+
+      const delBtn = document.createElement("button")
+      delBtn.className = "wx-btn-del"
+      delBtn.textContent = "删除"
+      delBtn.type = "button"
+      delBtn.addEventListener("click", attempt(async () => {
+        await userSync.save("bookmark", row.id, { ...row.value, deleted: true })
+        await renderSyncItems()
+        scheduleUserSync()
+      }))
+
+      actions.append(playBtn, delBtn)
+      itemEl.append(label, actions)
+      container.append(itemEl)
+    }
   }
 }
 
