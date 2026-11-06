@@ -29,28 +29,28 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/初中代数核心思维体系/初中代数核心思维体系" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 学习笔记/01 Areas/数学/初中代数核心思维体系 数学 · 初中代数核心思维体系" data-room="Library" data-updated="1793939439344">
-  <span class="g-row-text"><strong>初中代数核心思维体系</strong><small>Library · 数学 · 初中代数核心思维体系</small></span>
+  <div class="g-list"><a class="g-row" href="/html/数学/初中代数核心思维体系/初中代数核心思维体系.html" data-garden-item data-title="初中代数核心思维体系 · 深度导读与赏析" data-search="初中代数核心思维体系 · 深度导读与赏析 数学/初中代数核心思维体系 数学 · 初中代数核心思维体系" data-room="Gallery" data-updated="1793941311801" data-router-ignore>
+  <span class="g-row-text"><strong>初中代数核心思维体系 · 深度导读与赏析</strong><small>Gallery · 数学 · 初中代数核心思维体系</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01 Areas/物理/物理学科思维" data-garden-item data-title="物理学科思维" data-search="物理学科思维 学习笔记/01 Areas/物理 物理" data-room="Library" data-updated="1793939439344">
-  <span class="g-row-text"><strong>物理学科思维</strong><small>Library · 物理</small></span>
+<a class="g-row" href="/html/物理/物理学科思维.html" data-garden-item data-title="物理学科思维 · 深度导读与赏析" data-search="物理学科思维 · 深度导读与赏析 物理 物理" data-room="Gallery" data-updated="1793941311801" data-router-ignore>
+  <span class="g-row-text"><strong>物理学科思维 · 深度导读与赏析</strong><small>Gallery · 物理</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/数学/平面几何/刻画思维训练题.html" data-garden-item data-title="初二平面几何刻画思维（G1-G7）高阶特训题集（修订审校版）" data-search="初二平面几何刻画思维（G1-G7）高阶特训题集（修订审校版） 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793515247141" data-router-ignore>
-  <span class="g-row-text"><strong>初二平面几何刻画思维（G1-G7）高阶特训题集（修订审校版）</strong><small>Gallery · 数学 · 平面几何</small></span>
+<a class="g-row" href="/html/语文/初一课文/《井冈翠竹》.html" data-garden-item data-title="《井冈翠竹》 · 深度导读与赏析" data-search="《井冈翠竹》 · 深度导读与赏析 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-updated="1793941311801" data-router-ignore>
+  <span class="g-row-text"><strong>《井冈翠竹》 · 深度导读与赏析</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/数学/平面几何/刻画思维训练之二.html" data-garden-item data-title="几何刻画思维快速反应块：等边三角形与轴对称" data-search="几何刻画思维快速反应块：等边三角形与轴对称 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793513721124" data-router-ignore>
-  <span class="g-row-text"><strong>几何刻画思维快速反应块：等边三角形与轴对称</strong><small>Gallery · 数学 · 平面几何</small></span>
+<a class="g-row" href="/html/语文/初一课文/《假如生活欺骗了你》.html" data-garden-item data-title="《假如生活欺骗了你》 · 深度导读与赏析" data-search="《假如生活欺骗了你》 · 深度导读与赏析 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-updated="1793941311801" data-router-ignore>
+  <span class="g-row-text"><strong>《假如生活欺骗了你》 · 深度导读与赏析</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/数学/平面几何/geometry_4week_training.html" data-garden-item data-title="初中平面几何刻画思维｜四周专项训练" data-search="初中平面几何刻画思维｜四周专项训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-updated="1793503744955" data-router-ignore>
-  <span class="g-row-text"><strong>初中平面几何刻画思维｜四周专项训练</strong><small>Gallery · 数学 · 平面几何</small></span>
+<a class="g-row" href="/html/语文/初一课文/《未选择的路》.html" data-garden-item data-title="《未选择的路》 · 深度导读与赏析" data-search="《未选择的路》 · 深度导读与赏析 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-updated="1793941311801" data-router-ignore>
+  <span class="g-row-text"><strong>《未选择的路》 · 深度导读与赏析</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/语文/初二课文/《孟子》三章赏析.html" data-garden-item data-title="《孟子》三章深度赏析与读写结合导读" data-search="《孟子》三章深度赏析与读写结合导读 语文/初二课文 语文 · 初二课文" data-room="Gallery" data-updated="1793355878312" data-router-ignore>
-  <span class="g-row-text"><strong>《孟子》三章深度赏析与读写结合导读</strong><small>Gallery · 语文 · 初二课文</small></span>
+<a class="g-row" href="/html/语文/初一课文/《登幽州台歌》.html" data-garden-item data-title="《登幽州台歌》 · 深度导读与赏析" data-search="《登幽州台歌》 · 深度导读与赏析 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-updated="1793941311801" data-router-ignore>
+  <span class="g-row-text"><strong>《登幽州台歌》 · 深度导读与赏析</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>

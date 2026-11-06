@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>初中代数核心思维体系 · 深度导读与赏析</title>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.08);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.12);
+        --bg-warm: rgba(251, 146, 60, 0.12);
+        --bg-danger: rgba(248, 113, 113, 0.12);
+        --bg-success: rgba(74, 222, 128, 0.12);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 740px; margin: 0 auto; }
+    p, li { text-align: justify; margin-bottom: 0.55em; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    /* 顶部 Hero 卡片 */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3.5px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--text-main);
+    }
+    .hero-quote p { margin-bottom: 0.4em; }
+    .hero-quote p:last-child { margin-bottom: 0; }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .t-btn:hover { opacity: 0.85; }
+    .t-btn.btn-open { background: var(--bg-accent); color: var(--primary); }
+    .t-btn.btn-close { background: var(--bg-warm); color: var(--secondary); }
+
+    .part-divider {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin: 20px 2px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目 */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.18s ease;
+    }
+    details.guide-section[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+      background: var(--bg-card);
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .color-navy { background: var(--bg-accent); color: var(--primary); }
+    .color-amber { background: var(--bg-warm); color: var(--secondary); }
+    .color-bamboo { background: var(--bg-success); color: var(--success); }
+    .color-purple { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+    .color-rose { background: var(--bg-danger); color: var(--danger); }
+    .color-cyan { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+
+    .sec-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--text-main); }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; font-weight: 600; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+
+    .section-content {
+      padding: 10px 12px 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 14px 18px 22px; }
+    }
+
+    /* 内部小标题与区块 */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; }
+
+    /* 纯色块 */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 12px;
+      border-radius: 6px;
+      margin: 9px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 标签 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 表格移动端自适应 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 10px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    ul, ol { padding-left: 19px; margin: 6px 0 10px; }
+    li { font-size: 14.8px; margin-bottom: 5px; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      background: var(--bg-subtle);
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      color: var(--primary);
+    }
+    pre {
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+    }
+    pre code { background: none; padding: 0; color: var(--text-main); }
+
+    footer {
+      text-align: center;
+      padding: 28px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      
+      <h1>初中代数核心思维体系</h1>
+      <div class="hero-sub">Rosemary Garden 精读导读</div>
+      
+    </header>
+
+    <!-- 置顶工具栏 -->
+    <nav class="toolbar">
+      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 展开全部 (9)</button>
+      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 收起全部</button>
+      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 回到顶部</button>
+    </nav>
+
+    <!-- 手风琴内容区块 -->
+    <main>
+      
+      <div class="part-divider" id="part-1">
+        <span>从因式分解到函数压轴题</span>
+      </div><div class="part-preamble item-block"><p>初中代数从因式分解、一元二次方程、不等式，到一次函数、反比例函数、二次函数，表面上是不同的知识模块，实际上构成了一套高度统一的数学思维系统。</p>
+<p>对于中考压轴题，真正的能力分水岭不是掌握多少公式、题型和技巧，而是能否做到：</p>
+<p><strong>从复杂代数形式中识别结构，从变量关系中提取约束，从条件变化中构建模型，从参数与函数中研究整体解的性质。</strong></p>
+<p>我建议将这一领域构建为 <strong>8 大核心思维、6 大压轴题能力、5 级递进训练体系</strong>，而不是依照课本章节简单串联。</p>
+</div>
+      <details class="guide-section" id="sec-01" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">01</span>
+            <span class="sec-title">一、初中代数的 8 大核心数学思维</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>底层代数思维  高阶函数思维</p>
+<p>01</p>
+<p><strong>结构识别</strong></p>
+<p>识别式子背后的数学结构</p>
+<p>02</p>
+<p><strong>等价变形</strong></p>
+<p>在合法变形中保持解集</p>
+<p>03</p>
+<p><strong>变量与约束</strong></p>
+<p>研究变量的自由度与限制</p>
+<p>04</p>
+<p><strong>分类讨论</strong></p>
+<p>根据临界条件划分情形</p>
+<p>05</p>
+<p><strong>函数与对应</strong></p>
+<p>把孤立计算升级为关系研究</p>
+<p>06</p>
+<p><strong>数形结合</strong></p>
+<p>在表达式与图像间转换</p>
+<p>07</p>
+<p><strong>参数与动态</strong></p>
+<p>研究整个解族及其变化</p>
+<p>08</p>
+<p><strong>整体与极值</strong></p>
+<p>研究存在性、最值和不变量</p>
+<div class="sub-heading">1. 结构识别思维：从计算式看到数学对象</div>
+<p>这是从因式分解开始最需要训练的能力。</p>
+<p>面对</p>
+<p>$$
+x^4-5x^2+4
+$$</p>
+<p>普通学生可能尝试机械套公式。具有结构意识的学生会立即发现：</p>
+<ul>
+<li>只出现 $x^2$ 和 $x^4$，可以视作关于 $x^2$ 的二次式。</li>
+<li>令 $t=x^2$，原式变为 $t^2-5t+4$。</li>
+<li>分解得到 $(x^2-1)(x^2-4)$。</li>
+</ul>
+<p>最终得到：</p>
+<p>$$
+(x-1)(x+1)(x-2)(x+2)
+$$</p>
+<p>这里真正的思想不是换元技巧，而是 <strong>通过改变观察层级，将复杂对象识别为熟悉结构</strong>。</p>
+<p>需要训练的结构包括：平方差、完全平方、二次三项式、对称式、轮换式、齐次式、整体代换，以及隐藏在分式、根式中的共同子结构。</p>
+<p>压轴题中的关键迁移是：不仅识别多项式结构，还要识别方程结构、函数结构和几何条件转化后的代数结构。</p>
+<div class="sub-heading">2. 等价变形思维：不只是会变形，还要控制逻辑</div>
+<p>代数运算有一个经常被忽略的本质：<strong>每一步变形是否保持原问题的解集？</strong></p>
+<p>例如：</p>
+<p>$$
+(x-2)(x+1)=0
+$$</p>
+<p>如果直接两边除以 $x-2$，就会丢失 $x=2$ 这个解。</p>
+<p>进一步需要理解：</p>
+<ul>
+<li>恒等变形与条件等价的区别</li>
+<li>平方可能引入增根</li>
+<li>约分可能丢失定义域限制</li>
+<li>乘除含参数的表达式需要区分是否为零</li>
+<li>不等式乘除负数必须改变方向</li>
+</ul>
+<p>压轴题中的高阶能力是建立一条完整的 <strong>等价变形链</strong>，并随时掌握哪些条件是必要条件、充分条件或充要条件。</p>
+<div class="sub-heading">3. 变量—约束思维：代数建模的核心</div>
+<p>这是初中代数中最值得强化、也最容易被忽视的能力之一。</p>
+<p>假设题目给出：</p>
+<p>$$
+x+y=6,\qquad xy=8
+$$</p>
+<p>普通学生会直接联立求解。</p>
+<p>高水平学生会先意识到：两个变量受到两个关系约束，通常已经没有连续变化的自由度。</p>
+<p>如果将条件改为：</p>
+<p>$$
+x+y=6,\qquad x&gt;0,\quad y&gt;0
+$$</p>
+<p>则系统保留一个自由度，可以令 $y=6-x$，且 $0&lt;x&lt;6$。</p>
+<p>此时：</p>
+<p>$$
+xy=x(6-x)=9-(x-3)^2
+$$</p>
+<p>问题就从二元关系转化为单变量的函数最值问题。</p>
+<p>关键训练是：</p>
+<p><strong>变量识别 → 约束整合 → 自由度判断 → 主变量选择 → 可行域确定 → 目标表达式建立。</strong></p>
+<p>这套方法能贯通代数应用题、动点函数、参数方程和最值压轴题。</p>
+<div class="sub-heading">4. 分类讨论思维：寻找决定数学行为变化的临界点</div>
+<p>分类讨论的本质不是把所有可能性逐个列出，而是找到 <strong>问题结构发生变化的边界</strong>。</p>
+<p>例如研究：</p>
+<p>$$
+|x-a|+|x-3|
+$$</p>
+<p>应该以 $x=a$、$x=3$ 为分段边界，同时注意 $a$ 与 3 的大小关系。</p>
+<p>再比如讨论一元二次方程的根：</p>
+<p>$$
+x^2-2mx+m+2=0
+$$</p>
+<p>判别式：</p>
+<p>$$
+\Delta=4(m^2-m-2)=4(m-2)(m+1)
+$$</p>
+<p>真正改变方程实根数量的临界参数是：</p>
+<p>$$
+m=-1,\qquad m=2
+$$</p>
+<p>因此，最重要的是识别：</p>
+<ul>
+<li>哪些量决定分类？</li>
+<li>哪些值是临界值？</li>
+<li>每个区域的结论是否保持稳定？</li>
+<li>分类是否互斥且穷尽？</li>
+<li>边界点是否被单独处理？</li>
+</ul>
+<p>这实际上已经接近数学中研究 <strong>参数空间分区</strong> 的思想。</p>
+<div class="sub-heading">5. 函数与对应思维：从求数值提升到研究关系</div>
+<p>方程研究某个条件何时成立，函数研究变量之间如何对应与变化。</p>
+<p>例如：</p>
+<p>$$
+x^2-4x+3=0
+$$</p>
+<p>既可以视为方程，也可以将</p>
+<p>$$
+f(x)=x^2-4x+3
+$$</p>
+<p>看成一个函数。</p>
+<p>$y=x^2-4x+3$</p>
+<p>$y=0$</p>
+<p><img src="assets/quadratic-roots.png" alt="二次函数的零点"></p>
+<p>这样，一个代数对象便拥有了多种解释：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th>研究对象</th>
+<th>数学含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>因式分解</td>
+<td>$(x-1)(x-3)$</td>
+</tr>
+<tr>
+<td>方程求根</td>
+<td>函数的零点</td>
+</tr>
+<tr>
+<td>不等式</td>
+<td>函数图像所在的正负区域</td>
+</tr>
+<tr>
+<td>配方</td>
+<td>$f(x)=(x-2)^2-1$</td>
+</tr>
+<tr>
+<td>极值</td>
+<td>最小值为 $-1$</td>
+</tr>
+<tr>
+<td>参数变化</td>
+<td>图像和零点如何变化</td>
+</tr>
+</tbody></table>
+<p>这就是压轴题必须掌握的 <strong>方程—不等式—函数统一观</strong>。</p>
+<div class="sub-heading">6. 数形结合思维：在符号与图像之间双向推理</div>
+<p>初级数形结合是根据函数解析式画图。</p>
+<p>高级数形结合则要求：</p>
+<p>从解析式推断图像形态，从图像特征反推出解析式约束；而且能利用图像研究方程解的数量、不等式解集、函数最值、交点存在性和参数范围。</p>
+<p>例如：</p>
+<p>$$
+x^2-4x+3=k
+$$</p>
+<p>不是每次都需要套求根公式。</p>
+<p>只需研究水平直线 $y=k$ 与抛物线的交点数量，即可得到：</p>
+<ul>
+<li>$k&lt;-1$：无实数解</li>
+<li>$k=-1$：一个不同的实数解</li>
+<li>$k&gt;-1$：两个不同的实数解</li>
+</ul>
+<p>核心是把 <strong>代数解的数量转化为图像交点的数量</strong>。</p>
+<div class="sub-heading">7. 参数与动态思维：从一个答案研究一族问题</div>
+<p>压轴题往往不是让你研究一个固定函数，而是研究一个函数族。</p>
+<p>例如：</p>
+<p>$$
+f_a(x)=x^2-2ax+3
+$$</p>
+<p>通过配方：</p>
+<p>$$
+f_a(x)=(x-a)^2+3-a^2
+$$</p>
+<p>便可以看出：</p>
+<ul>
+<li>对称轴是 $x=a$</li>
+<li>顶点是 $(a,3-a^2)$</li>
+<li>顶点随着参数变化沿另一条抛物线运动</li>
+<li>最小值随参数变化</li>
+</ul>
+<p>这里最值得训练的是：<strong>参数变化时，哪些结构不变，哪些性质变化，何时发生质变？</strong></p>
+<p>当题目加入 $x\in[0,4]$ 的限制时，最小值的表达式会随着顶点是否落入区间而改变。这正是典型的函数压轴题机制。</p>
+<div class="sub-heading">8. 整体与极值思维：超越逐点计算</div>
+<p>面对最值问题，需要先判断：</p>
+<ul>
+<li>研究对象在什么集合内变化？</li>
+<li>极值是否存在？</li>
+<li>候选极值来自顶点、端点，还是分段临界点？</li>
+<li>能否构造非负量证明界限？</li>
+<li>等号在什么条件下成立？</li>
+<li>边界能否真正取到？</li>
+</ul>
+<p>例如：</p>
+<p>$$
+xy\le \frac{(x+y)^2}{4}
+$$</p>
+<p>其本质来自：</p>
+<p>$$
+(x-y)^2\ge0
+$$</p>
+<p>因此，一个代数恒等式可以同时承担证明、估计和寻找等号条件的作用。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-02" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">02</span>
+            <span class="sec-title">二、从因式分解到函数，应该建立的统一知识主干</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p><strong>代数式与因式分解</strong></p>
+<p>结构、恒等变形、整体代换</p>
+<p><strong>方程与不等式</strong></p>
+<p>解集、等价、判别式、参数分类</p>
+<p><strong>函数与图像</strong></p>
+<p>对应、零点、单调性、交点、极值</p>
+<p><strong>参数与综合建模</strong></p>
+<p>存在性、动态、分段、最优化、数形融合</p>
+<p>这四层不是简单的知识递进，而是可双向转化的研究对象。</p>
+<p>例如复杂函数问题可能需要降维为方程，方程需要转化成因式分解；而原本的因式分解问题也可能通过构造函数，获得更直观的研究路径。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-03">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">03</span>
+            <span class="sec-title">三、中考代数压轴题必须具备的 6 大解题能力</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <table class="term-table">
+<thead>
+<tr>
+<th>能力</th>
+<th>必须达到的水平</th>
+<th>典型压轴问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A1 结构洞察</td>
+<td>从复杂表达式识别隐藏结构</td>
+<td>高次式、对称式、整体换元</td>
+</tr>
+<tr>
+<td>A2 条件整合</td>
+<td>建立变量、约束和目标之间的关系</td>
+<td>多条件代数综合</td>
+</tr>
+<tr>
+<td>A3 逆向建模</td>
+<td>从目标性质倒推参数关系</td>
+<td>已知根、交点、最值反求参数</td>
+</tr>
+<tr>
+<td>A4 临界分析</td>
+<td>找到分类边界与状态转折</td>
+<td>含参数方程、区间最值</td>
+</tr>
+<tr>
+<td>A5 动态推演</td>
+<td>理解函数、点、图像随参数的运动</td>
+<td>动点、动直线、函数族</td>
+</tr>
+<tr>
+<td>A6 全局论证</td>
+<td>完整证明存在、唯一、最优和取等条件</td>
+<td>存在性与最值综合</td>
+</tr>
+</tbody></table>
+<p>其中，<strong>A2、A4、A5、A6 是决定压轴题上限的核心能力</strong>。</p>
+<p>普通训练往往过多集中在 A1 的运算技巧，而缺少对整体解空间的分析。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-04">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">04</span>
+            <span class="sec-title">四、典型压轴思维案例：区间上的动态最值</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>研究函数：</p>
+<p>$$
+f_a(x)=x^2-2ax+3,\qquad 0\le x\le4
+$$</p>
+<p>求最小值 $m(a)$。</p>
+<p>这道题计算并不复杂，但训练了至少四种核心思维。</p>
+<p>首先配方：</p>
+<p>$$
+f_a(x)=(x-a)^2+3-a^2
+$$</p>
+<p>顶点位置是 $x=a$，而允许的 $x$ 只在 $[0,4]$ 内。</p>
+<p>关键问题不是直接求导或套公式，而是：<strong>顶点何时进入、停留、离开允许区间？</strong></p>
+<p>$y=(x-a)^2+3-a^2$</p>
+<p>$0\le x\le4$</p>
+<p><img src="assets/interval-minimum.png" alt="不同参数下的区间最值"></p>
+<p><em>静态图展示了参数 $a=-1,2,5$ 时的代表情形。</em></p>
+<p>可以调节参数 $a$，观察函数在固定区间上的变化。</p>
+<p>当 $a&lt;0$，顶点位于区间左侧，最小值在 $x=0$ 取得。</p>
+<p>当 $0\le a\le4$，顶点位于区间内部或端点，最小值在 $x=a$ 取得。</p>
+<p>当 $a&gt;4$，顶点位于区间右侧，最小值在 $x=4$ 取得。</p>
+<p>因此：</p>
+<p>$$
+\boxed{
+m(a)=
+\begin{cases}
+3,&amp;a&lt;0\
+3-a^2,&amp;0\le a\le4\
+19-8a,&amp;a&gt;4
+\end{cases}
+}
+$$</p>
+<p>这里真正需要习得的不是答案，而是一套迁移性极强的推理链：</p>
+<p><strong>研究对象 → 允许范围 → 关键特征点 → 临界参数 → 分段求解 → 边界校验。</strong></p>
+<p>进一步可以追问：若将区间改成 $[b,b+4]$，临界参数如何迁移？若目标改成最大值，又会发生什么变化？</p>
+<p>这类反向变化训练，比重复做十道同构题更能培养独立分析能力。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-05">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">05</span>
+            <span class="sec-title">五、构建五级递进训练体系</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>我建议把代数压轴能力设计成五级，不以年级划分，而以思维成熟程度划分。</p>
+<div class="sub-heading">L1</div>
+<p><strong>结构感知</strong>
+看到复杂表达式，识别可利用的整体与隐藏关系</p>
+<p>训练载体：因式分解、恒等式构造、整体换元</p>
+<p>达标证据：能够解释为什么选择这种变形，而非仅给出计算</p>
+<div class="sub-heading">L2</div>
+<p><strong>关系建模</strong>
+从文字、条件和表达式中构建变量约束系统</p>
+<p>训练载体：方程组、分式、代数应用、变量消元</p>
+<p>达标证据：能准确识别主变量、定义域、独立条件和冗余条件</p>
+<div class="sub-heading">L3</div>
+<p><strong>函数统摄</strong>
+把方程、不等式、零点、单调性和最值统一起来</p>
+<p>训练载体：一次、反比例、二次函数的交点与综合</p>
+<p>达标证据：能在符号、图像、表格之间自主切换</p>
+<div class="sub-heading">L4</div>
+<p><strong>动态与临界</strong>
+对含参数问题进行完整分类与边界推理</p>
+<p>训练载体：动区间、动直线、分段函数、参数根的分布</p>
+<p>达标证据：分类完备、边界准确、没有遗漏或无效情形</p>
+<div class="sub-heading">L5</div>
+<p><strong>压轴综合与创造</strong>
+独立发现核心不变量、构造辅助模型、证明最优结论</p>
+<p>训练载体：代数几何综合、存在性、最值、参数反求、新定义</p>
+<p>达标证据：能形成多路径解题地图，比较策略并完成严谨证明</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-06">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">06</span>
+            <span class="sec-title">六、4 周专项训练计划</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>面向已掌握初中基本代数运算、希望冲击中考压轴题的学生，建议每周 5 次，每次 45–60 分钟。题量不宜过大，应优先提升单题的思维密度。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th>周次</th>
+<th>主攻能力</th>
+<th>具体训练</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 周</td>
+<td>结构与等价</td>
+<td>因式分解结构辨识、换元、恒等变形、根与解集控制</td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td>关系与建模</td>
+<td>多变量约束、方程与函数转换、消元、定义域和可行域</td>
+</tr>
+<tr>
+<td>第 3 周</td>
+<td>数形与参数</td>
+<td>二次函数图像、根的分布、交点数量、含参数区间最值</td>
+</tr>
+<tr>
+<td>第 4 周</td>
+<td>综合与创新</td>
+<td>动态函数、分段临界、存在性、代数几何综合与多解法比较</td>
+</tr>
+</tbody></table>
+<p>每周五次训练可采用统一节奏：第一次建立结构模型，第二次做变式，第三次进行逆向问题，第四次完成压轴综合，第五次进行错误诊断与陌生题迁移。</p>
+<p>特别要注意：因式分解不应独立占用过多时间。它是后续方程、函数及综合建模的工具，必须尽快进入跨章节迁移。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-07">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">07</span>
+            <span class="sec-title">七、每道压轴题训练时，必须形成的 7 步思维闭环</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这是我认为最值得嵌入教学系统的部分。</p>
+<ol>
+<li><strong>表征问题</strong>：有哪些变量、参数、条件、范围和目标？</li>
+<li><strong>识别结构</strong>：能否发现对称性、整体结构、函数关系或隐含等价条件？</li>
+<li><strong>建立模型</strong>：应该选择方程、不等式、函数，还是构造辅助变量？</li>
+<li><strong>寻找突破口</strong>：先消去哪个变量？先确定哪个关键关系？能否从目标倒推？</li>
+<li><strong>分析临界</strong>：哪些状态会变化？什么条件触发？如何完整分类？</li>
+<li><strong>构建证明链</strong>：每一步是否等价？解是否存在？是否漏解、增根或遗漏边界？</li>
+<li><strong>复盘迁移</strong>：核心思想是什么？若改变条件，原方法在哪一步失效？如何重构？</li>
+</ol>
+<p>这里尤其应该强化两件事：</p>
+<p><strong>第一，解题前的结构预测。</strong> 在开始计算前，先要求学生说出可能的模型、核心障碍和预期的分类边界。</p>
+<p><strong>第二，解题后的反向生成。</strong> 不只是把原题重新做一遍，而是要求学生改变参数、限制条件或目标，构造出一类新问题，并预测其解的结构。</p>
+<hr>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-08">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">08</span>
+            <span class="sec-title">八、进一步提升到真正的压轴题研究能力</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>仅仅掌握八大思维和五级训练还不够。面向拔尖学生，我会再增加四种高阶能力：</p>
+<p><strong>1. 解空间意识。</strong> 不只求解，而是研究所有满足条件的对象构成什么集合，何时为空、何时有限、何时连续。例如参数变化引起方程实根数量的变化。</p>
+<p><strong>2. 逆向构造意识。</strong> 从“希望出现两个交点”“希望最值等于某个数”“希望某个等式成立”出发，反推必要约束。这是从求解者转变为问题设计者的重要一步。</p>
+<p><strong>3. 不变量与单调量意识。</strong> 动态过程中某些量保持不变，另一些量具有确定的变化方向。识别这两类信息，可以显著减少无效计算。</p>
+<p><strong>4. 方法选择与复杂度意识。</strong> 同一道题可能存在联立消元、判别式、配方、图像交点、构造不等式等不同路径。高水平学生需要判断哪条路径最短、最可靠、最有推广价值，而不是见到题就套熟悉的方法。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-09">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">09</span>
+            <span class="sec-title">最终建议</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>把初中代数教学的主线从传统的：</p>
+<p>因式分解 → 方程 → 不等式 → 函数 → 综合题</p>
+<p>升级为：</p>
+<p><strong>结构识别 → 约束建模 → 等价推理 → 函数统摄 → 动态临界 → 全局优化 → 逆向创造。</strong></p>
+<p>前者是知识目录，后者才是真正可迁移的数学思维能力体系。</p>
+<p>如果要用于高水平中考压轴训练，我建议下一步将其细化为一门 <strong>24 讲的《初中代数与函数深度思维课程》</strong>：每讲选取一个核心思维模型，用由浅入深的代表性真题或原创高质量题，设计“结构识别—策略构思—独立证明—反例挑战—变式迁移”的完整训练过程，并以陌生题中的独立建模能力作为最终评价标准。</p>
+
+        </div>
+      </details>
+    </main>
+
+    <footer>
+      <p>Rosemary Garden · 高颜值自包含导读 · <a href="/gallery/">返回作品廊</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+  </script>
+</body>
+</html>
