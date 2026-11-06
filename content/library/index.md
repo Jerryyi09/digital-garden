@@ -15,7 +15,7 @@ cssclasses:
 
 <header class="g-page-head">
   <h1>Library</h1>
-  <span class="g-count" data-garden-count>16 项</span>
+  <span class="g-count" data-garden-count>17 项</span>
 </header>
 
 <div class="g-tools">
@@ -28,9 +28,16 @@ cssclasses:
 
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
-  <summary><span>数学 · 方法经验</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/方法经验/刻画思维训练" data-garden-item data-title="刻画思维训练" data-search="刻画思维训练 学习笔记/01 Areas/数学/方法经验 数学 · 方法经验" data-room="Library" data-updated="1793503744955">
-  <span class="g-row-text"><strong>刻画思维训练</strong><small>11月1日</small></span>
+  <summary><span>数学 · 初中代数核心思维体系</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/数学/初中代数核心思维体系/初中代数核心思维体系" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 学习笔记/01 Areas/数学/初中代数核心思维体系 数学 · 初中代数核心思维体系" data-room="Library" data-updated="1793939439344">
+  <span class="g-row-text"><strong>初中代数核心思维体系</strong><small>11月6日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
+<details class="g-folder" data-folder open>
+  <summary><span>物理</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/学习笔记/01 Areas/物理/物理学科思维" data-garden-item data-title="物理学科思维" data-search="物理学科思维 学习笔记/01 Areas/物理 物理" data-room="Library" data-updated="1793939439344">
+  <span class="g-row-text"><strong>物理学科思维</strong><small>11月6日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
