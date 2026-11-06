@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process"
 import fs from "node:fs/promises"
 import path from "node:path"
+import { slugifyFilePath, simplifySlug } from "@quartz-community/utils"
 
 const projectRoot = path.resolve(import.meta.dirname, "..")
 const contentDir = path.join(projectRoot, "content")
@@ -191,12 +192,12 @@ async function getNotes() {
 
     const markdown = await fs.readFile(file, "utf8")
     const frontmatter = parseFrontmatter(markdown)
-    const slug = relativePath.replace(/\.md$/, "").split(path.sep).join("/")
+    const noteUrl = "/" + simplifySlug(slugifyFilePath(relativePath))
     const folder = path.dirname(relativePath)
 
     notes.push({
       title: frontmatter.title || path.basename(file, ".md"),
-      url: `/${slug}`,
+      url: noteUrl,
       room: "Library",
       folder: folder === "." ? "" : folder.split(path.sep).join("/"),
       category: shortFolder(folder),
@@ -209,9 +210,17 @@ async function getNotes() {
 
 async function getHtmlPages() {
   const files = (await walk(htmlDir)).filter((file) => file.toLowerCase().endsWith(".html"))
+  const fileSet = new Set(files)
+  // If <dir>/<name>/index.html exists, skip the redirect alias <dir>/<name>.html
+  const mainFiles = files.filter((file) => {
+    if (path.basename(file) === "index.html") return true
+    const baseWithoutExt = file.slice(0, -5)
+    const counterpartIndex = path.join(baseWithoutExt, "index.html")
+    return !fileSet.has(counterpartIndex)
+  })
   const pages = []
 
-  for (const file of files) {
+  for (const file of mainFiles) {
     const html = await fs.readFile(file, "utf8")
     const relativePath = path.relative(htmlDir, file)
     let folder = path.dirname(relativePath)
@@ -236,9 +245,10 @@ async function getStudioItems() {
   const alist = {
     title: "Alist 资源库",
     kind: "文件与媒体",
-    url: "https://melyi.uk/alist/",
+    url: "https://melyi.uk:8089/alist/",
     room: "Studio",
     category: "资源",
+    standalone: true,
   }
 
   if (!(await pathExists(studioIndexPath))) return [alist]
@@ -253,7 +263,7 @@ async function getStudioItems() {
       url: item.url,
       room: "Studio",
       category: "工具",
-      standalone: item.standalone === true,
+      standalone: item.standalone === true || String(item.url).includes("/studio/"),
     })),
     alist,
   ]
@@ -278,6 +288,12 @@ function isExternal(url) {
   return /^https?:\/\//i.test(url)
 }
 
+function rootCategory(category = "") {
+  if (!category || category === "作品" || category === "未分类") return "互动作品"
+  const first = category.split(" · ")[0].trim()
+  return first || "其他"
+}
+
 function row(item, { showRoom = false } = {}) {
   const external = isExternal(item.url)
   // Standalone pages are not Quartz pages: let the browser load them normally.
@@ -285,8 +301,9 @@ function row(item, { showRoom = false } = {}) {
   const target = external ? ' target="_blank" rel="noopener"' : ""
   const meta =
     item.kind || (showRoom ? `${item.room} · ${item.category}` : formatDate(item.updated))
+  const root = rootCategory(item.category || item.room)
 
-  return `<a class="g-row" href="${escapeHtml(item.url)}" data-garden-item data-title="${escapeHtml(item.title)}" data-search="${escapeHtml(`${item.title} ${item.folder || ""} ${item.category || ""}`)}" data-room="${escapeHtml(item.room)}" data-updated="${Number(item.updated) || 0}"${attrs}${target}>
+  return `<a class="g-row" href="${escapeHtml(item.url)}" data-garden-item data-title="${escapeHtml(item.title)}" data-search="${escapeHtml(`${item.title} ${item.folder || ""} ${item.category || ""}`)}" data-room="${escapeHtml(item.room)}" data-root-category="${escapeHtml(root)}" data-updated="${Number(item.updated) || 0}"${attrs}${target}>
   <span class="g-row-text"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(meta)}</small></span>
   <span class="g-row-go" aria-hidden="true">${external ? "↗" : "›"}</span>
 </a>`
@@ -367,6 +384,25 @@ function listingPage({ title, description, cssClass, active, items, searchable =
 </div>`
     : ""
 
+  // Extract root categories for chips
+  const rootCounts = new Map()
+  for (const item of items) {
+    const root = rootCategory(item.category || item.room)
+    rootCounts.set(root, (rootCounts.get(root) || 0) + 1)
+  }
+
+  const chipsHtml = searchable && rootCounts.size > 1
+    ? `<div class="g-chips" role="tablist" aria-label="分类筛选">
+  <button type="button" class="g-chip-btn is-active" data-chip="all">全部 <em>${items.length}</em></button>
+  ${[...rootCounts.entries()]
+    .map(
+      ([root, count]) =>
+        `<button type="button" class="g-chip-btn" data-chip="${escapeHtml(root)}">${escapeHtml(root)} <em>${count}</em></button>`,
+    )
+    .join("\n  ")}
+</div>`
+    : ""
+
   return pageFrame({
     title,
     description,
@@ -379,6 +415,7 @@ function listingPage({ title, description, cssClass, active, items, searchable =
 </header>
 
 ${tools}
+${chipsHtml}
 
 <div class="g-directory" data-garden-directory>
 ${(flat ? [["", items]] : [...groups])

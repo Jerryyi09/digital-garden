@@ -60,7 +60,7 @@ console.log("Building Quartz site and standalone HTML...")
 run("npm", ["run", "build"])
 
 console.log("Preparing changed content for Git...")
-run("git", ["add", "content", "html"])
+run("git", ["add", "content", "html", "publish-dates.json"])
 
 const status = output("git", ["status", "--short"])
 

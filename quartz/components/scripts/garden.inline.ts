@@ -50,7 +50,7 @@ function renderRecent() {
     const link = document.createElement("a")
     link.className = "g-row"
     link.href = item.url
-    if (!item.url.startsWith(location.origin) || item.url.includes("/html/")) {
+    if (!item.url.startsWith(location.origin) || item.url.includes("/html/") || item.url.includes("/studio/")) {
       link.dataset.routerIgnore = ""
     }
     const text = document.createElement("span")
@@ -76,9 +76,11 @@ function setupListing() {
 
   const search = document.querySelector<HTMLInputElement>("[data-garden-search]")
   const buttons = [...document.querySelectorAll<HTMLButtonElement>("[data-sort]")]
+  const chipButtons = [...document.querySelectorAll<HTMLButtonElement>("[data-chip]")]
   const count = document.querySelector<HTMLElement>("[data-garden-count]")
   const empty = document.querySelector<HTMLElement>("[data-garden-empty]")
   let sort = "updated"
+  let currentChip = "all"
 
   const folders = [...directory.querySelectorAll<HTMLDetailsElement>("[data-folder]")].map(folder => {
     const list = folder.querySelector<HTMLElement>(".g-list")
@@ -87,6 +89,13 @@ function setupListing() {
     return { folder, list, rows, searchText }
   })
   let appliedSort = ""
+
+  // Mobile optimization: on narrow screens with multiple folders, collapse folders except the first
+  if (window.innerWidth < 640 && folders.length > 2) {
+    folders.forEach(({ folder }, idx) => {
+      folder.open = idx === 0
+    })
+  }
 
   const update = () => {
     const query = (search?.value || "").trim().toLocaleLowerCase()
@@ -103,16 +112,33 @@ function setupListing() {
       }
       let shown = 0
       for (const row of rows) {
-        row.hidden = !searchText.get(row)!.includes(query)
-        if (!row.hidden) shown++
+        const matchesQuery = !query || searchText.get(row)!.includes(query)
+        const rowRoot = row.dataset.rootCategory || ""
+        const matchesChip = currentChip === "all" || rowRoot === currentChip
+        const isVisible = matchesQuery && matchesChip
+        row.hidden = !isVisible
+        if (isVisible) shown++
       }
       folder.hidden = shown === 0
-      if (query && shown) folder.open = true
+      if ((query || currentChip !== "all") && shown) folder.open = true
       visible += shown
     }
     appliedSort = sort
     if (count) count.textContent = `${visible} 项`
     if (empty) empty.hidden = visible !== 0
+  }
+
+  const onChip = (event: Event) => {
+    const button = event.currentTarget as HTMLButtonElement
+    currentChip = button.dataset.chip || "all"
+    for (const other of chipButtons) {
+      other.classList.toggle("is-active", other === button)
+    }
+    update()
+  }
+  for (const chip of chipButtons) {
+    chip.addEventListener("click", onChip)
+    window.addCleanup?.(() => chip.removeEventListener("click", onChip))
   }
 
   const onSort = (event: Event) => {
