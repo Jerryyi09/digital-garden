@@ -29,7 +29,11 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/学习笔记/01-areas/语文/练笔作文/八上期中作文练笔" data-garden-item data-title="八上期中作文练笔" data-search="八上期中作文练笔 学习笔记/01 Areas/语文/练笔作文 语文 · 练笔作文" data-room="Library" data-root-category="语文" data-updated="1793971455552">
+  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/几何刻画思维课.html" data-garden-item data-title="几何刻画思维课：专家几何认知研究与心理动画训练" data-search="几何刻画思维课：专家几何认知研究与心理动画训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-root-category="数学" data-updated="1794046923031" data-router-ignore>
+  <span class="g-row-text"><strong>几何刻画思维课：专家几何认知研究与心理动画训练</strong><small>Gallery · 数学 · 平面几何</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/学习笔记/01-areas/语文/练笔作文/八上期中作文练笔" data-garden-item data-title="八上期中作文练笔" data-search="八上期中作文练笔 学习笔记/01 Areas/语文/练笔作文 语文 · 练笔作文" data-room="Library" data-root-category="语文" data-updated="1793971455552">
   <span class="g-row-text"><strong>八上期中作文练笔</strong><small>Library · 语文 · 练笔作文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
@@ -47,10 +51,6 @@ cssclasses:
 </a>
 <a class="g-row" href="/html/语文/初一课文/《井冈翠竹》/" data-garden-item data-title="《井冈翠竹》" data-search="《井冈翠竹》 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-root-category="语文" data-updated="1793950203082" data-router-ignore>
   <span class="g-row-text"><strong>《井冈翠竹》</strong><small>Gallery · 语文 · 初一课文</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/html/语文/初一课文/《假如生活欺骗了你》/" data-garden-item data-title="《假如生活欺骗了你》" data-search="《假如生活欺骗了你》 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-root-category="语文" data-updated="1793950203082" data-router-ignore>
-  <span class="g-row-text"><strong>《假如生活欺骗了你》</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>
