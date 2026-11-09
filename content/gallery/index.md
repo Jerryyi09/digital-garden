@@ -37,8 +37,8 @@ cssclasses:
 
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
-  <summary><span>英语 · Writing</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/英语/Writing/试题作文训练.html" data-garden-item data-title="初中英语高分写作：从语言表达走向思维与叙事" data-search="初中英语高分写作：从语言表达走向思维与叙事 英语/Writing 英语 · Writing" data-room="Gallery" data-root-category="英语" data-updated="1794202280975" data-router-ignore>
+  <summary><span>英语 · writing</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/英语/writing/试题作文训练.html" data-garden-item data-title="初中英语高分写作：从语言表达走向思维与叙事" data-search="初中英语高分写作：从语言表达走向思维与叙事 英语/writing 英语 · writing" data-room="Gallery" data-root-category="英语" data-updated="1794203056974" data-router-ignore>
   <span class="g-row-text"><strong>初中英语高分写作：从语言表达走向思维与叙事</strong><small>11月9日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>

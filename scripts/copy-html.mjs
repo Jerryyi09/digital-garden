@@ -16,6 +16,7 @@ async function pathExists(filePath) {
 
 async function copyDir(source, destination) {
   await fs.mkdir(destination, { recursive: true })
+  await fs.chmod(destination, 0o755).catch(() => {})
   const entries = await fs.readdir(source, { withFileTypes: true })
 
   for (const entry of entries) {
@@ -30,6 +31,19 @@ async function copyDir(source, destination) {
       await copyDir(sourcePath, destinationPath)
     } else if (entry.isFile()) {
       await fs.copyFile(sourcePath, destinationPath)
+      await fs.chmod(destinationPath, 0o644).catch(() => {})
+
+      // For standalone *.html (excluding index.html), also generate a mirror directory with index.html
+      // This ensures 100% clean-URL compatibility across Nginx, Cloudflare Pages, and SPA routers
+      if (entry.name.endsWith(".html") && entry.name !== "index.html") {
+        const baseName = entry.name.slice(0, -5)
+        const mirrorDir = path.join(destination, baseName)
+        await fs.mkdir(mirrorDir, { recursive: true })
+        await fs.chmod(mirrorDir, 0o755).catch(() => {})
+        const mirrorIndex = path.join(mirrorDir, "index.html")
+        await fs.copyFile(sourcePath, mirrorIndex)
+        await fs.chmod(mirrorIndex, 0o644).catch(() => {})
+      }
     }
   }
 }
