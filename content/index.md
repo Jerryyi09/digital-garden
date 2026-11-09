@@ -29,7 +29,11 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/html/数学/平面几何/几何刻画思维课.html" data-garden-item data-title="几何刻画思维课：专家几何认知研究与心理动画训练" data-search="几何刻画思维课：专家几何认知研究与心理动画训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-root-category="数学" data-updated="1794046923031" data-router-ignore>
+  <div class="g-list"><a class="g-row" href="/html/英语/Writing/试题作文训练.html" data-garden-item data-title="初中英语高分写作：从语言表达走向思维与叙事" data-search="初中英语高分写作：从语言表达走向思维与叙事 英语/Writing 英语 · Writing" data-room="Gallery" data-root-category="英语" data-updated="1794202280975" data-router-ignore>
+  <span class="g-row-text"><strong>初中英语高分写作：从语言表达走向思维与叙事</strong><small>Gallery · 英语 · Writing</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/数学/平面几何/几何刻画思维课.html" data-garden-item data-title="几何刻画思维课：专家几何认知研究与心理动画训练" data-search="几何刻画思维课：专家几何认知研究与心理动画训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-root-category="数学" data-updated="1794046923031" data-router-ignore>
   <span class="g-row-text"><strong>几何刻画思维课：专家几何认知研究与心理动画训练</strong><small>Gallery · 数学 · 平面几何</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
@@ -47,10 +51,6 @@ cssclasses:
 </a>
 <a class="g-row" href="/html/物理/物理学科思维/" data-garden-item data-title="物理学科思维" data-search="物理学科思维 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1793950203082" data-router-ignore>
   <span class="g-row-text"><strong>物理学科思维</strong><small>Gallery · 物理</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/html/语文/初一课文/《井冈翠竹》/" data-garden-item data-title="《井冈翠竹》" data-search="《井冈翠竹》 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-root-category="语文" data-updated="1793950203082" data-router-ignore>
-  <span class="g-row-text"><strong>《井冈翠竹》</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>
