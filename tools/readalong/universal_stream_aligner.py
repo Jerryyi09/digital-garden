@@ -171,6 +171,7 @@ def get_spine_htmls(epub_path: Path) -> list[str]:
             if idref in manifest:
                 href = manifest[idref]
                 full_href = f"{opf_dir}/{href}".lstrip("/") if opf_dir and opf_dir != "." else href
+                full_href = os.path.normpath(full_href).replace("\\", "/").lstrip("/")
                 resolved = entry_names.get(unquote(full_href), full_href)
                 if resolved.lower().endswith((".htm", ".html", ".xhtml", ".xml")):
                     spine_htmls.append(resolved)

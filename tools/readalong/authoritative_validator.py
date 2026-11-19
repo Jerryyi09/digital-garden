@@ -109,7 +109,18 @@ def probe_audio_duration(path):
     duration = float(raw)
     return duration if math.isfinite(duration) and duration > 0 else 0.0
   except (OSError, ValueError, wave.Error, subprocess.SubprocessError):
-    return 0.0
+    # Retry with explicit format hint if container auto-detection fails on ID3v2 RIFF mp3
+    try:
+      ext = Path(path).suffix.lower().lstrip(".")
+      fmt = "mp3" if ext in ("mp3", "m4a", "m4b") else ext
+      raw = subprocess.check_output([
+        "ffprobe", "-v", "error", "-f", fmt, "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1", str(path),
+      ], stderr=subprocess.DEVNULL, timeout=30)
+      duration = float(raw)
+      return duration if math.isfinite(duration) and duration > 0 else 0.0
+    except Exception:
+      return 0.0
 
 
 def canonical_text(text):

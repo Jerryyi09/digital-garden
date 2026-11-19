@@ -37,13 +37,23 @@ CATEGORY="$(basename "$(dirname "$TARGET")")"
 NAME="$(basename "$TARGET")"
 
 # 判断参数是单本书还是分类目录
-has_book_subdirs=false
-for sub in "$TARGET"/*; do
-  if [[ -d "$sub" ]] && [[ ! "$(basename "$sub")" =~ ^\. ]] && [[ "$(basename "$sub")" != "readalong" ]]; then
-    has_book_subdirs=true
+has_direct_epub=false
+for f in "$TARGET"/*.epub; do
+  if [[ -f "$f" ]]; then
+    has_direct_epub=true
     break
   fi
 done
+
+has_book_subdirs=false
+if [ "$has_direct_epub" = false ]; then
+  for sub in "$TARGET"/*; do
+    if [[ -d "$sub" ]] && [[ ! "$(basename "$sub")" =~ ^\. ]] && [[ "$(basename "$sub")" != "readalong" ]] && [[ "$(basename "$sub")" != ".readalong_revisions" ]]; then
+      has_book_subdirs=true
+      break
+    fi
+  done
+fi
 
 if [ "$has_book_subdirs" = true ]; then
   # 分类目录模式
@@ -52,9 +62,16 @@ if [ "$has_book_subdirs" = true ]; then
   BATCH_NAME="${CATEGORY}-${TIMESTAMP}"
   SCAN_ROOT="$TARGET"
 else
-  # 单本书模式
+  # 单本书模式（直接包含 EPUB，即使含有 Disc 子目录也作为单书管理）
   IS_SINGLE_BOOK=true
-  UNIT_ID="$CATEGORY/$NAME"
+  # 兼容分卷子目录：如果上一级是母集（如 文明的故事），UNIT_ID 为 "母集/子分卷"
+  PARENT_DIR_NAME="$(basename "$(dirname "$TARGET")")"
+  GRANDPARENT_DIR_NAME="$(basename "$(dirname "$(dirname "$TARGET")")")"
+  if [ "$GRANDPARENT_DIR_NAME" = "未命名文件夹" ] || [ "$GRANDPARENT_DIR_NAME" = "有声书" ]; then
+    UNIT_ID="$CATEGORY/$NAME"
+  else
+    UNIT_ID="$PARENT_DIR_NAME/$NAME"
+  fi
   BATCH_NAME="${CATEGORY}-${NAME}-${TIMESTAMP}"
   SCAN_ROOT="$(dirname "$TARGET")"
 fi

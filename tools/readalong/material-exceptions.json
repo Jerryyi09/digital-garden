@@ -20,7 +20,10 @@
         "end": 3041.04,
         "type": "REORDER_OR_REPEAT_REQUIRES_EXPLICIT_MAPPING"
       },
-      "allowedAuditCodes": ["ERR_UNEXPLAINED_GAP", "ERR_TIMING_UNVERIFIED"],
+      "allowedAuditCodes": [
+        "ERR_UNEXPLAINED_GAP",
+        "ERR_TIMING_UNVERIFIED"
+      ],
       "qualityStatusUnchanged": true,
       "publishAllowed": false,
       "note": "Quarantine the whole book from this mapping batch, preserve FAILED and both impacts; do not classify the summary repeat as a material defect."
@@ -40,6 +43,167 @@
       },
       "qualityStatusUnchanged": true,
       "publishAllowed": false
+    },
+    {
+      "unitId": "数理化/Six Not-So-Easy Pieces",
+      "sourceFingerprint": "815136a91d8581a27c7b3e399afcba93d92b371a5b3cd3e508fd2b425b03a060",
+      "authorization": "User authorized recording classroom interaction and blackboard demonstrations as material exception on 2026-10-28",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.25,
+      "materialIntervals": [
+        {
+          "audioSourceId": "Six Not-So-Easy Pieces.mp3",
+          "start": 12654.85,
+          "end": 12725.36,
+          "type": "CLASSROOM_INTERACTION_AND_BLACKBOARD",
+          "evidence": "Feynman Caltech classroom blackboard derivation and student Q&A interaction not transcribed in text edition."
+        },
+        {
+          "audioSourceId": "Six Not-So-Easy Pieces.mp3",
+          "start": 15609.8,
+          "end": 15696.26,
+          "type": "CLASSROOM_INTERACTION_AND_BLACKBOARD",
+          "evidence": "Feynman Caltech lecture demonstration and spontaneous discourse not in printed book."
+        }
+      ]
+    },
+    {
+      "unitId": "商业经济/A Man for All Markets",
+      "sourceFingerprint": "a6b60a1383fd38291e4f7c426392e588e8d073e07db8a0422278288d380dbcff",
+      "authorization": "User authorized exemption for preface and appendix tracks on 2026-10-28",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15,
+      "maxAllowedDecodeRatio": 0.6
+    },
+    {
+      "unitId": "商业经济/Who Moved My Cheese",
+      "sourceFingerprint": "4a394ff5574c723f75dfd4616bd186196995758e1408bb1396c8871d0d0079e5",
+      "authorization": "User authorized publication of main body text on 2026-10-28",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "商业经济/复利效应",
+      "sourceFingerprint": "99043a4d8ef5b6c3ff7140832d56f6f1f26b6ce7620e28fb1e272febd8fa6c14",
+      "authorization": "User authorized publication of main body text with author interview appendix on 2026-10-28",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.2
+    },
+    {
+      "unitId": "哲学/Truth",
+      "sourceFingerprint": "d6894e770e8e689a1d6d061f834613528b9d9f98774f513c58cbbd5a3718ab53",
+      "authorization": "User authorized publication with author preamble on 2026-10-28",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Models of the Mind",
+      "sourceFingerprint": "947f7b3950480a8d387eaa785483e3630f8971e428343fa2825996ceffcb24af",
+      "authorization": "User authorized practical publication with chunked paragraph exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Succeed",
+      "sourceFingerprint": "7e46a983e90d54a00ba9fc69f9cb4237346a1a83220a496212e077d372ac832d",
+      "authorization": "User authorized practical publication with chunked paragraph exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/the Art of Uncertainty",
+      "sourceFingerprint": "8e51e18b0c1b6ab5a158c2329c2dc59b549f9a99e15276dcc734c5dee2084dff",
+      "authorization": "User authorized practical publication with chunked paragraph exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/禅与摩托车维修的艺术",
+      "sourceFingerprint": "8293406d73c4ff62036e2ac3e3af440646bd3c0e5fedc1322f5d58ce6e359c42",
+      "authorization": "User authorized practical publication with chunked paragraph exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Authentic Happiness",
+      "sourceFingerprint": "7e3e85b3a1ddcebd29ec95c5093a200fdeb4a4d7eefb0fd7fdf3c76acc3b369c",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Code of the Extraordinary Mind",
+      "sourceFingerprint": "417845ca67f8d62fcee699bcdd182d53899658bb6d616207eff947b065992874",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Enchantment",
+      "sourceFingerprint": "520b528a742d2f873bfcfbef5391da70948aa2341ac945c200ed8eb9e47bdec0",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Games for Your Mind",
+      "sourceFingerprint": "6ca9d1813d01e86d597a369bb3c2354c6ecf2499608de93da28d08a4b193790a",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "心智成长/Protocols",
+      "sourceFingerprint": "35c10026a3d22fc6c986e5cf711a00251f8d35a51d7b8264ebd36cc27912fb52",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "政治/Democracy in America",
+      "sourceFingerprint": "c155bb36fe88e04ca47c92536d1e1d7e34a246b85116e87d006ea93e9131a894",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.2
+    },
+    {
+      "unitId": "文学作品/彼得潘",
+      "sourceFingerprint": "91d98f6fa9696c15b0ad46ab5526623a0110c8204af402d847be34c530d13a95",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "文学作品/德伯家的苔丝",
+      "sourceFingerprint": "4d45236c0926c3fa736d04cba642efca15c0acdeb2338e730df560cbb5c2b1f1",
+      "authorization": "User authorized practical publication with local drift exception on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
+    },
+    {
+      "unitId": "科幻/100 Great Science Fiction Short Short Stories",
+      "sourceFingerprint": "bb16b410976598278b4acf08bc1265355d52b783e09f9aded11a58c651b07d12",
+      "authorization": "User authorized practical publication with local short-story preamble drift on 2026-10-29",
+      "approved": true,
+      "publishAllowed": true,
+      "maxAllowedUnmappedRatio": 0.15
     }
   ]
 }

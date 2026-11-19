@@ -53,23 +53,20 @@ def prepare_category_metadata(cat_dir: Path):
         except Exception:
           pass
 
-    # Summary
+    # Summary: 必须为中文约 100 字，严禁直接倾倒英文 OPF description
     sum_p = bdir / "summary.txt"
-    if not sum_p.is_file():
-      desc_text = ""
-      try:
-        with zipfile.ZipFile(epubs[0]) as z:
-          c_xml = z.read("META-INF/container.xml")
-          root = ET.fromstring(c_xml)
-          opf_path = root.find(".//{*}rootfile").attrib["full-path"]
-          opf = ET.fromstring(z.read(opf_path))
-          desc = opf.find(".//{*}metadata/{*}description")
-          if desc is not None and desc.text:
-            desc_text = BeautifulSoup(desc.text, "html.parser").get_text("\n", strip=True)
-      except Exception:
-        pass
-      if not desc_text:
-        desc_text = f"《{bdir.name}》有声书与精排电子书阅读。"
+    needs_chinese_summary = True
+    if sum_p.is_file():
+      existing = sum_p.read_text(encoding="utf-8", errors="ignore").strip()
+      import re
+      zh_count = len(re.findall(r"[一-龥]", existing))
+      # 如果已有中文且字数在 50~200 字之间，视为合格
+      if zh_count >= 50 and (zh_count / max(1, len(existing))) >= 0.5:
+        needs_chinese_summary = False
+
+    if needs_chinese_summary:
+      from tools.readalong.chinese_summary_helper import get_or_create_chinese_summary
+      desc_text = get_or_create_chinese_summary(bdir.name, cat_dir.name)
       sum_p.write_text(desc_text, encoding="utf-8")
 
 

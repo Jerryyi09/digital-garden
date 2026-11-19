@@ -570,32 +570,54 @@ BOOKS_D = {
 }
 
 def main():
-    print("=== 开始批量构建【批次 D：哲学、意识流与现当代奇幻名著】 ===")
-    success = 0
-    total = len(BOOKS_D)
+    print("=== 开始批量构建【批次 D：哲学、意识流与现当代奇幻名著（调用 round_15~18 满血模块）】 ===")
+    from round_15 import get_deep_walden, get_deep_hedgehog, get_deep_to_the_lighthouse
+    from round_16 import get_deep_mrs_dalloway, get_deep_leaves_of_grass, get_deep_colour_of_magic
+    from round_17 import get_deep_literary_essays, get_deep_ultimate_essays, get_deep_twilight_one
+    from round_18 import get_deep_twilight_2, get_deep_twilight_3, get_deep_twilight_4
 
-    for book_name, info in BOOKS_D.items():
+    deep_handlers = [
+        ("Walden", get_deep_walden),
+        ("The Elegance of the Hedgehog", get_deep_hedgehog),
+        ("To the Lighthouse", get_deep_to_the_lighthouse),
+        ("达洛维夫人", get_deep_mrs_dalloway),
+        ("草叶集", get_deep_leaves_of_grass),
+        ("魔法的颜色", get_deep_colour_of_magic),
+        ("文学随笔", get_deep_literary_essays),
+        ("The Ultimate Essays Collection", get_deep_ultimate_essays),
+        ("暮光之城I- 暮色", get_deep_twilight_one),
+        ("暮光之城II-新月", get_deep_twilight_2),
+        ("暮光之城III-月食", get_deep_twilight_3),
+        ("暮光之城IV-破晓", get_deep_twilight_4),
+    ]
+
+    success = 0
+    total = len(deep_handlers)
+
+    for book_name, getter in deep_handlers:
         target_dir = os.path.join(BASE_DIR, book_name)
         if not os.path.exists(target_dir):
             print(f"[WARN] 目录不存在: {target_dir}")
             continue
 
-        html = render_book_guide(info)
+        html = getter()
 
         # 结构检验
         soup = BeautifulSoup(html, "html.parser")
-        assert len(soup.find_all("details", class_="guide-section")) == 13, f"{book_name} 栏目数不为 13"
-        assert len(soup.find_all("svg")) >= 1, f"{book_name} 缺少 SVG"
+        secs = len(soup.find_all("details", class_="guide-section"))
+        svgs = len(soup.find_all("svg"))
+        assert secs == 13, f"{book_name} 栏目数不为 13 (实际: {secs})"
+        assert svgs >= 1, f"{book_name} 缺少 SVG"
 
         with open(os.path.join(target_dir, "guide.html"), "w", encoding="utf-8") as f:
             f.write(html)
         with open(os.path.join(target_dir, "guide.index"), "w", encoding="utf-8") as f:
             f.write(html)
 
-        print(f"[OK] {book_name} -> guide.html & guide.index 写入完成 ({len(html)} 字节)")
+        print(f"[OK] {book_name} -> guide.html & guide.index 满血写入完成 ({len(html)} 字节, 13 栏目, SVG 正常)")
         success += 1
 
-    print(f"=== 批次 D 顺利完工: {success}/{total} 部作品通过校验并落盘 ===")
+    print(f"=== 批次 D 顺利完工: {success}/{total} 部作品全部满血通过校验并落盘 ===")
 
 if __name__ == "__main__":
     main()

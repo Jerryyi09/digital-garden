@@ -97,10 +97,21 @@ def cmd_rollback(args):
 
 
 def cmd_practical(args):
-  from tools.readalong.practical_publisher import audit_practical, publish_practical, rollback_practical, exclude_readalong
+  from tools.readalong.practical_publisher import audit_practical, publish_practical, rollback_practical, exclude_readalong, source_files, sha256
   material = None
   if getattr(args, 'material_policy', None):
     material = json.loads(Path(args.material_policy).read_text())
+  else:
+    from tools.readalong.material_policy import POLICY_PATH
+    if POLICY_PATH.exists():
+      material = json.loads(POLICY_PATH.read_text(encoding='utf-8'))
+  if isinstance(material, dict) and "entries" in material:
+    import hashlib
+    b_path = Path(args.book)
+    files = source_files(b_path, {'.mp3', '.m4b', '.m4a', '.epub'})
+    source_hashes = {str(p.relative_to(b_path)): sha256(p) for p in files}
+    fp = hashlib.sha256(json.dumps(source_hashes, sort_keys=True).encode()).hexdigest()
+    material = next((e for e in material["entries"] if e.get("sourceFingerprint") == fp), None)
   if args.command == 'audit-practical':
     result = audit_practical(args.book, args.staging, material,
       workers=args.workers, incremental_cache=args.incremental_cache)

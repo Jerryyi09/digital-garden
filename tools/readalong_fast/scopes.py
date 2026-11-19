@@ -27,6 +27,8 @@ def material_ranges(material, sources, source_fingerprint=None):
     raise ValueError("Material policy must bind the current audio and EPUB fingerprint")
   if material.get("approved") is False or not (material.get("approved") is True or material.get("authorization")):
     raise ValueError("Unapproved material scope cannot alter quality metrics")
+  if "materialIntervals" not in material and "materialInterval" not in material:
+    return {}
   if "materialIntervals" in material and "materialInterval" in material:
     raise ValueError("Use one material-range representation, not conflicting policies")
   rows = material.get("materialIntervals") if "materialIntervals" in material else [material.get("materialInterval")]

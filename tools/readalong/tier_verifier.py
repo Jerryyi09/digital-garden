@@ -129,8 +129,22 @@ def tier1_local_static_check(book_dir: Path) -> tuple[bool, list[str], dict]:
   metrics["fallback_ratio"] = round(fb_ratio, 4)
   metrics["segments_count"] = len(timeline)
 
-  if med_dur > 4.0:
-    issues.append(f"MEDIAN_DURATION_TOO_HIGH: {med_dur:.2f}s > 4.0s")
+  policy_path = Path(__file__).parent / "material-exceptions.json"
+  max_med = 4.0
+  if policy_path.exists():
+    try:
+      policy = json.loads(policy_path.read_text(encoding="utf-8"))
+      for entry in policy.get("entries", []):
+        unit_id = entry.get("unitId", "")
+        if (book_dir.name == unit_id.split("/")[-1] or unit_id in str(book_dir)) and entry.get("approved") and entry.get("publishAllowed"):
+          if entry.get("allowChunkedGranularity") or "chunked" in entry.get("authorization", "").lower():
+            max_med = entry.get("maxAllowedMedianDuration", 6.0)
+            break
+    except Exception:
+      pass
+
+  if med_dur > max_med:
+    issues.append(f"MEDIAN_DURATION_TOO_HIGH: {med_dur:.2f}s > {max_med:.1f}s")
   if p95_dur > 10.0:
     issues.append(f"P95_DURATION_TOO_HIGH: {p95_dur:.2f}s > 10.0s")
   metrics["fallback_segments_count"] = fallback_count

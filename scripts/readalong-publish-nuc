@@ -101,15 +101,35 @@ elif (run_dir / 'results.json').exists():
             u = next(x for x in inv['units'] if x['unit_id'] == uid)
             candidates[uid] = (u['book_dir'], Path(r['candidatePath']))
 
+if not candidates:
+    for base in (run_dir / 'run', run_dir):
+        if base.is_dir():
+            for sub in base.iterdir():
+                if sub.is_dir() and (sub / 'timeline.json').exists():
+                    for u in inv['units']:
+                        from tools.readalong.batch_candidate_remapper import sanitize_slug
+                        if sanitize_slug(u['unit_id']) == sub.name:
+                            candidates[u['unit_id']] = (u['book_dir'], sub)
+
 print(f'Found {len(candidates)} candidate(s) ready for audit, publish & sync')
 
 synced_books_for_tier2 = []
 failed_books = []
 
 for uid, (b_dir_str, c_path) in sorted(candidates.items()):
-    cat, name = uid.split('/', 1)
     b_dir = Path(b_dir_str)
-    print(f'\n--- Processing {uid} ---')
+    parts = b_dir.parts
+    if '未命名文件夹' in parts:
+        rel_book = Path(*parts[parts.index('未命名文件夹') + 1:]).as_posix()
+        cat = rel_book.split('/')[0]
+        name = rel_book.split('/', 1)[1]
+    elif '有声书' in parts:
+        rel_book = Path(*parts[parts.index('有声书') + 1:]).as_posix()
+        cat = rel_book.split('/')[0]
+        name = rel_book.split('/', 1)[1]
+    else:
+        cat, name = uid.split('/', 1)
+    print(f'\n--- Processing {uid} (category={cat}, name={name}) ---')
 
     # 1. 本地物理审核
     print(f'[1/3] Auditing candidate practical...')

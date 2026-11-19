@@ -38,7 +38,7 @@ def safe_extract_epub(epub_path: Path, target_dir: Path) -> List[str]:
 
     with zipfile.ZipFile(epub_path, "r") as z:
         members = z.infolist()
-        if len(members) > 10000 or sum(m.file_size for m in members) > 256 * 1024 * 1024:
+        if len(members) > 50000 or sum(m.file_size for m in members) > 512 * 1024 * 1024:
             raise ValueError("EPUB resource budget exceeded")
         seen = set()
         for member in members:

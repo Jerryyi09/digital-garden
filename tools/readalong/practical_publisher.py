@@ -85,7 +85,8 @@ def accepts_practical_metrics(metrics, material=None):
     return True
   if material and material.get('publishAllowed') is True and material.get('authorization'):
     max_exemption = material.get('maxAllowedUnmappedRatio', 0.25)
-    if ratio <= max_exemption and unavailable/total <= .05+1e-9:
+    max_decode_exemption = material.get('maxAllowedDecodeRatio', 0.05)
+    if ratio <= max_exemption and unavailable/total <= max_decode_exemption + 1e-9:
       return True
   if metrics.get('generatorUsability') in ('USABLE', 'USABLE_WITH_GAPS') and total >= 3600:
     al_cnt = metrics.get('alignedTrackCount', 0)

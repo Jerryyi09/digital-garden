@@ -122,6 +122,13 @@ def decode_pcm(audio, start, duration, evidence_path, parameters, tolerant=False
   proc = subprocess.run(["ffmpeg", "-v", "error", "-ss", str(start), "-i", str(audio),
     "-t", str(duration), "-map", "0:a:0", "-vn", "-ac", "1", "-ar", "16000",
     "-f", "f32le", "pipe:1"], check=False, capture_output=True)
+  # If container detection failed on an ID3-prefixed mp3, retry with explicit -f mp3
+  if getattr(proc, "returncode", 0) != 0 and Path(audio).suffix.lower() == ".mp3":
+    proc_retry = subprocess.run(["ffmpeg", "-v", "error", "-f", "mp3", "-ss", str(start), "-i", str(audio),
+      "-t", str(duration), "-map", "0:a:0", "-vn", "-ac", "1", "-ar", "16000",
+      "-f", "f32le", "pipe:1"], check=False, capture_output=True)
+    if getattr(proc_retry, "returncode", 0) == 0 and len(getattr(proc_retry, "stdout", b"")) > 0:
+      proc = proc_retry
   stderr = getattr(proc, "stderr", b"").decode(errors="replace")
   code = getattr(proc, "returncode", 0)
   text = stderr.lower()
@@ -155,6 +162,13 @@ def decode_pcm(audio, start, duration, evidence_path, parameters, tolerant=False
         '-i', str(audio), '-t', str(duration), '-map', '0:a:0', '-vn', '-ac', '1', '-ar', '16000',
         '-af', 'aresample=16000,aformat=sample_fmts=flt:channel_layouts=mono,asettb=1/16000,ashowinfo', '-f', 'f32le', 'pipe:1'],
         check=False, capture_output=True)
+      if getattr(probe, "returncode", 0) != 0 and Path(audio).suffix.lower() == ".mp3":
+        probe_retry = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-v', 'info', '-filter_threads', '1', '-threads', '1', '-f', 'mp3', '-ss', str(start),
+          '-i', str(audio), '-t', str(duration), '-map', '0:a:0', '-vn', '-ac', '1', '-ar', '16000',
+          '-af', 'aresample=16000,aformat=sample_fmts=flt:channel_layouts=mono,asettb=1/16000,ashowinfo', '-f', 'f32le', 'pipe:1'],
+          check=False, capture_output=True)
+        if getattr(probe_retry, "returncode", 0) == 0 and len(getattr(probe_retry, "stdout", b"")) > 0:
+          probe = probe_retry
       probe_text = getattr(probe, 'stderr', b'').decode(errors='replace')
       # Preserve system faults even if they happen only on the diagnostic pass.
       for marker, number in (('no space left on device', errno.ENOSPC), ('permission denied', errno.EACCES),

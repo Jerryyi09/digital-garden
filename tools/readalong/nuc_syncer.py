@@ -46,10 +46,22 @@ def build_book_sync_manifest(book_dir: Path):
     if audio_id and (book_dir / audio_id).is_file():
       source_files.append(audio_id)
 
-  # 5. epub if present
-  for ep in book_dir.glob("*.epub"):
+  # Fallback: if manifest lists no audios (e.g. AUDIO_ONLY), discover physical audios
+  if not manifest.get("audioSources"):
+    for ext in ("*.mp3", "*.m4b", "*.m4a", "*/*.mp3", "*/*.m4b", "*/*.m4a"):
+      for f in book_dir.glob(ext):
+        if f.is_file():
+          source_files.append(f.relative_to(book_dir).as_posix())
+
+  # 5. pdf documents (guidebooks / lectures)
+  for pdf in sorted(set(list(book_dir.glob("*.pdf")) + list(book_dir.glob("*/*.pdf")))):
+    if pdf.is_file():
+      source_files.append(pdf.relative_to(book_dir).as_posix())
+
+  # 6. epub if present (including subvolumes)
+  for ep in sorted(set(list(book_dir.glob("*.epub")) + list(book_dir.glob("*/*.epub")))):
     if ep.is_file():
-      source_files.append(ep.name)
+      source_files.append(ep.relative_to(book_dir).as_posix())
 
   return {
     "manifest": manifest,
@@ -75,7 +87,7 @@ def resolve_rsync_bin():
 
 def build_book_rsync_command(book_dir: Path, remote_dest: str, backup_dir: str, sync_info: dict,
                              *, source_group=False, relative_prefix="", dry_run=False):
-  rsync_cmd = [resolve_rsync_bin(), "-av", "-s", "-R", "--iconv=UTF-8-MAC,UTF-8",
+  rsync_cmd = [resolve_rsync_bin(), "-av", "-s", "-R", "-L", "--iconv=UTF-8-MAC,UTF-8",
     "-e", NUC_RSYNC_E, "--stats", "--itemize-changes",
     "--exclude=._*", "--exclude=.DS_Store"]
   if source_group:
@@ -158,8 +170,11 @@ def resolve_remote_book(category, book_name, remote_host=DEFAULT_REMOTE_TARGET,
   one remote read; otherwise the result is fetched once and cached per category.
   """
   normalized_directory_name(category)
-  normalized_directory_name(book_name)
   host = canonical_nuc_target(remote_host)
+  if "/" in book_name:
+    parts = [normalized_directory_name(p) for p in book_name.split("/")]
+    return category, "/".join(parts)
+  normalized_directory_name(book_name)
   if listing is None:
     cache_key = (host, remote_base, category)
     listing = _REMOTE_LISTING_CACHE.get(cache_key)
@@ -187,8 +202,10 @@ def sync_book_to_nuc(book_dir: Path, category: str, book_name: str, remote_host=
   # Only explicitly selected assets cross the /./ relative-path boundary.
   with tempfile.TemporaryDirectory(prefix="readalong-sync-") as temp:
     staging = Path(temp)
-    (staging / category).mkdir()
-    (staging / category / book_name).symlink_to(book_dir.resolve(), target_is_directory=True)
+    (staging / category).mkdir(parents=True, exist_ok=True)
+    symlink_target = staging / category / book_name
+    symlink_target.parent.mkdir(parents=True, exist_ok=True)
+    symlink_target.symlink_to(book_dir.resolve(), target_is_directory=True)
     for source_group in (True, False):
       if source_group and not sync_info["sources"]:
         continue

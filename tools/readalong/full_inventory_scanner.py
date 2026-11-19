@@ -135,25 +135,30 @@ def build_full_inventory(roots: List[Path], run_dir: Path) -> Dict[str, Any]:
                              key=lambda x: natural_sort_key(x.name))
 
         for d in direct_dirs:
-            # Special case: Great Mental Models has 4 explicit volume subdirectories
-            if root.name == "心智成长" and d.name == "Great Mental Models":
-                sub_vols = sorted([sub for sub in d.iterdir() if sub.is_dir() and not sub.name.startswith(".") and sub.name not in ("readalong", ".readalong_revisions", "work")],
-                                  key=lambda x: natural_sort_key(x.name))
-                for vol in sub_vols:
-                    unit_audios = [a for a in raw_audios if a.is_relative_to(vol)]
-                    unit_epubs = [e for e in raw_epubs if e.is_relative_to(vol)]
-                    unit_others = [o for o in raw_others if o.is_relative_to(vol)]
-                    units_in_root.append({
-                        "book_dir": vol,
-                        "rel_path": vol.relative_to(root).as_posix(),
-                        "parent_work": d.name,
-                        "is_subvolume": True,
-                        "audios": unit_audios,
-                        "epubs": unit_epubs,
-                        "others": unit_others,
-                    })
+            sub_dirs = sorted([sub for sub in d.iterdir() if sub.is_dir() and not sub.name.startswith(".") and sub.name not in ("readalong", ".readalong_revisions", "work", ".readalong_rollback")],
+                              key=lambda x: natural_sort_key(x.name))
+            d_root_epubs = [e for e in raw_epubs if e.parent == d]
+            has_subvolume_epubs = any(any(e.is_relative_to(sub) for e in raw_epubs) for sub in sub_dirs)
+
+            # Case A: Multi-volume collection (each subfolder is a volume with its own epubs/audios)
+            # Examples: Great Mental Models, 文明的故事, 笛卡尔谈谈方法, Horrible Science
+            if not d_root_epubs and has_subvolume_epubs:
+                for vol in sub_dirs:
+                    vol_audios = [a for a in raw_audios if a.is_relative_to(vol)]
+                    vol_epubs = [e for e in raw_epubs if e.is_relative_to(vol)]
+                    vol_others = [o for o in raw_others if o.is_relative_to(vol)]
+                    if vol_audios or vol_epubs:
+                        units_in_root.append({
+                            "book_dir": vol,
+                            "rel_path": vol.relative_to(root).as_posix(),
+                            "parent_work": d.name,
+                            "is_subvolume": True,
+                            "audios": vol_audios,
+                            "epubs": vol_epubs,
+                            "others": vol_others,
+                        })
             else:
-                # All audio/epubs under d belongs to d (including nested Discs like in '心流')
+                # Case B: Standard book or Single EPUB with multi-disc audio subfolders (e.g. Utopia)
                 unit_audios = [a for a in raw_audios if a.is_relative_to(d)]
                 unit_epubs = [e for e in raw_epubs if e.is_relative_to(d)]
                 unit_others = [o for o in raw_others if o.is_relative_to(d)]
@@ -176,9 +181,9 @@ def build_full_inventory(roots: List[Path], run_dir: Path) -> Dict[str, Any]:
             rel_path = u["rel_path"]
             unit_id = f"{root.name}/{rel_path}"
 
-            unit_audios = sorted(u["audios"], key=lambda x: natural_sort_key(x.name))
-            unit_epubs = sorted(u["epubs"], key=lambda x: natural_sort_key(x.name))
-            unit_others = sorted(u["others"], key=lambda x: natural_sort_key(x.name))
+            unit_audios = sorted(u["audios"], key=lambda x: natural_sort_key(x.relative_to(b_dir).as_posix()))
+            unit_epubs = sorted(u["epubs"], key=lambda x: natural_sort_key(x.relative_to(b_dir).as_posix()))
+            unit_others = sorted(u["others"], key=lambda x: natural_sort_key(x.relative_to(b_dir).as_posix()))
 
             for a in unit_audios:
                 if a in all_assigned_audios:

@@ -1180,6 +1180,13 @@ def generate(unit, output, cache, inputs, material=None, screen=True):
       key = (heard["audioSourceId"], para["document"], para["fragment"])
       # Native ASR units may touch, but must never manufacture positive time.
       previous = timeline[-1] if timeline and timeline[-1]["audioSourceId"] == heard["audioSourceId"] else None
+      if previous and previous.get("document") == para["document"] and previous.get("fragment") == para["fragment"]:
+        previous["end"] = max(previous["end"], heard["end"])
+        cursor = match["end"]
+        last_match_document = para["document"]
+        context_end = heard["end"]
+        last_physical_match = {"audioSourceId": heard["audioSourceId"], "document": para["document"], "tokenEnd": match["end"]}
+        continue
       a = heard["start"]
       if previous and a < previous["end"]:
         if previous["end"]-a > .05 or heard["end"] <= previous["end"]:

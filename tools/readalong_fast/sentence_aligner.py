@@ -587,6 +587,9 @@ def merge_stream_projection_with_paragraph_fallback(projected, paragraph_refinem
   for coarse in paragraph_refinement:
     source_fragment = coarse.get("sourceSentenceFragment") or coarse.get("fragment")
     key = (coarse.get("audioSourceId"), coarse.get("document"), source_fragment)
+    # If the sentence is already positioned by stream projection, skip duplicate fallback
+    if key in projected_by_sentence:
+      continue
     exact = [seg for seg in projected_by_sentence.get(key, [])
       if seg.get("end", 0) > coarse.get("start", 0) and seg.get("start", 0) < coarse.get("end", 0)]
     if not exact:
@@ -626,14 +629,32 @@ def merge_stream_projection_with_paragraph_fallback(projected, paragraph_refinem
     if overlaps:
       idx, fallback = max(overlaps, key=lambda row: min(seg["end"], row[1]["end"])-max(seg["start"], row[1]["start"]))
       consumed.update(index for index, _ in overlaps)
-      merged.append({**seg, "document": fallback["document"], "fragment": fallback["fragment"],
-        "text": fallback.get("text", seg.get("text", "")),
+      fine_sentence_id = fallback.get("sourceSentenceFragment") or seg.get("sourceSentenceFragment")
+      merged.append({
+        **seg,
+        "document": fallback.get("document", seg.get("document")),
+        "fragment": fallback.get("fragment", seg.get("fragment")),
+        "sourceSentenceFragment": fine_sentence_id,
+        "text": fallback.get("text") or seg.get("text", ""),
         "occurrenceId": f"{fallback.get('occurrenceId', '0')}:projected:{seg_idx}",
-        "timingStatus": fallback.get("timingStatus", "SENTENCE_FROM_PARAGRAPH"),
-        "sourceSentenceFragment": fallback.get("sourceSentenceFragment")})
+        "timingStatus": "SENTENCE_EXACT" if seg.get("timingStatus") == "SENTENCE_EXACT" else fallback.get("timingStatus", "SENTENCE_FROM_PARAGRAPH")
+      })
     else:
       merged.append(seg)
-  merged.extend(fallback for idx, fallback in enumerate(fallbacks) if idx not in consumed)
+
+  # Enforce single-sentence placement: never append an unconsumed fallback if its
+  # sentence anchor is already satisfied in the timeline.
+  placed_anchors = {(seg.get("audioSourceId"), seg.get("document"),
+                     seg.get("sourceSentenceFragment") or seg.get("fragment"))
+                    for seg in merged}
+  for idx, fallback in enumerate(fallbacks):
+    if idx in consumed:
+      continue
+    anchor_key = (fallback.get("audioSourceId"), fallback.get("document"),
+                  fallback.get("sourceSentenceFragment") or fallback.get("fragment"))
+    if anchor_key not in placed_anchors:
+      merged.append(fallback)
+      placed_anchors.add(anchor_key)
   # Some upstream coarse matches round to a zero-width interval. They are not
   # playable/highlightable evidence and must not reach the strict resolver.
   merged = [seg for seg in merged if isinstance(seg.get("start"), (int, float))
