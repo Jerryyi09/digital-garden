@@ -10,7 +10,20 @@ type RecentItem = { title: string; url: string; room?: string; at: number }
 function readRecent(): RecentItem[] {
   try {
     const items = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]")
-    return Array.isArray(items) ? items.filter((item) => item && item.url && item.title) : []
+    if (!Array.isArray(items)) return []
+    return items
+      .filter((item) => item && item.url && item.title)
+      .map((item) => {
+        try {
+          const url = new URL(item.url, location.href)
+          if (url.hostname === location.hostname && url.port !== location.port) {
+            url.port = location.port
+          }
+          return { ...item, url: url.href }
+        } catch {
+          return item
+        }
+      })
   } catch {
     return []
   }
