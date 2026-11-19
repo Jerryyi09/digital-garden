@@ -18,3 +18,7 @@ __pycache__/
 *.pyc
 
 private/readalong-remediation/
+
+# Local-only readalong scripts with hardcoded /Users/jerryyi paths
+tools/readalong/batch_story_of_civilization.py
+tools/readalong/build_round_18.py
