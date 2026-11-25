@@ -18,7 +18,9 @@ SCIFI_MAP = {
     "Top Sci-Fi and Fantasy": get_top_fantasy_guide,
 }
 
-BASE_DIR = "/Volumes/750/Music/有声书/科幻"
+from guide_paths import guide_category_path
+
+BASE_DIR = guide_category_path("科幻")
 
 def main():
     print("=== 开始批量构建【科幻】目录深度导读 guide.html ===")

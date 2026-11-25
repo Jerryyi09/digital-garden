@@ -7,16 +7,24 @@ Unified runner for Literature & Sci-Fi book guide production.
 import os
 import sys
 import subprocess
+import argparse
+from pathlib import Path
 
 def run_step(cmd, desc):
     print(f"\n>>> 正在执行: {desc}")
-    res = subprocess.run(cmd, shell=True, env=dict(os.environ, PYTHONPATH="tools/readalong"))
+    script = Path(__file__).resolve().parent / cmd.split("/")[-1]
+    res = subprocess.run([sys.executable, str(script)], env=os.environ.copy())
     if res.returncode != 0:
         print(f"[FAIL] 执行失败: {desc} (退出码: {res.returncode})")
         sys.exit(res.returncode)
     print(f"[SUCCESS] {desc} 完成")
 
 def main():
+    parser = argparse.ArgumentParser(description="Generate the fixed Sci-Fi and literature guide batches locally")
+    parser.add_argument("--library-root", help="Local SSD library root; overrides READALONG_LIBRARY_ROOT")
+    args = parser.parse_args()
+    if args.library_root:
+        os.environ["READALONG_LIBRARY_ROOT"] = args.library_root
     print("====================================================")
     print("  Rosemary Garden 有声书深度导读 (guide.html) 生成系统")
     print("====================================================")

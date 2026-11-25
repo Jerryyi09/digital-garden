@@ -3,7 +3,9 @@ import os
 import sys
 from bs4 import BeautifulSoup
 
-BASE_DIR = "/Volumes/750/Music/有声书/文学作品"
+from guide_paths import guide_category_path
+
+BASE_DIR = guide_category_path("文学作品")
 
 def append_to_section(file_path, sec_title, extra_html):
     with open(file_path, "r", encoding="utf-8") as f:

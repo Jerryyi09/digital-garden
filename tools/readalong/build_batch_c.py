@@ -9,7 +9,9 @@ from bs4 import BeautifulSoup
 from generate_scifi_guides import render_section, TEMPLATE_HEAD, TEMPLATE_FOOT
 from build_batch_a import render_book_guide
 
-BASE_DIR = "/Volumes/750/Music/有声书/文学作品"
+from guide_paths import guide_category_path
+
+BASE_DIR = guide_category_path("文学作品")
 
 BOOKS_C = {
     "了不起的盖茨比": {

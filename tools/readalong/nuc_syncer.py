@@ -36,7 +36,7 @@ def build_book_sync_manifest(book_dir: Path):
     dirs_to_sync.append(f".readalong_revisions/{asset_rev}")
 
   # 3. cover and summary
-  for name in ("cover.jpg", "cover.jpeg", "summary.txt"):
+  for name in ("cover.jpg", "cover.jpeg", "summary.txt", "guide.html", "guide.index"):
     if (book_dir / name).is_file():
       files_to_sync.append(name)
 
@@ -186,13 +186,19 @@ def resolve_remote_book(category, book_name, remote_host=DEFAULT_REMOTE_TARGET,
 
 
 def sync_book_to_nuc(book_dir: Path, category: str, book_name: str, remote_host=DEFAULT_REMOTE_TARGET,
-                     remote_base="/mnt/750/Music/有声书", extra_rsync_args=None, *, dry_run=False):
+                     remote_base="/mnt/750/Music/有声书", extra_rsync_args=None, *, dry_run=False, guides_only=False):
   """Sync managed assets with backups and missing sources without overwriting sources."""
   if extra_rsync_args:
     assert_safe_sync_args(extra_rsync_args)
     raise ValueError("Extra rsync arguments are unsupported; use dry_run=True for previews")
   target_host = canonical_nuc_target(remote_host)
-  sync_info = build_book_sync_manifest(book_dir)
+  if guides_only:
+    files = [name for name in ("guide.html", "guide.index") if (book_dir / name).is_file()]
+    if not files:
+      raise ValueError(f"No guide files in {book_dir}")
+    sync_info = {"files": files, "sources": [], "dirs": []}
+  else:
+    sync_info = build_book_sync_manifest(book_dir)
   category, book_name = resolve_remote_book(category, book_name, target_host, remote_base)
   ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
   backup_dir = f"/home/hp/readalong-sync-backup/{ts}/{category}/{book_name}"

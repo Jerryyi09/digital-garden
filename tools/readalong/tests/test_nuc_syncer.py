@@ -257,3 +257,28 @@ class NucSyncerSafetyTests(unittest.TestCase):
 
 if __name__ == "__main__":
   unittest.main()
+
+
+class GuideSyncTests(unittest.TestCase):
+  def test_guides_are_managed_assets(self):
+    with tempfile.TemporaryDirectory() as tmp:
+      book = Path(tmp)
+      (book / 'readalong').mkdir()
+      (book / 'readalong/readalong.manifest.json').write_text('{}')
+      for name in ('guide.html', 'guide.index'):
+        (book / name).write_text('<html>guide</html>')
+      info = build_book_sync_manifest(book)
+      self.assertTrue({'guide.html', 'guide.index'} <= set(info['files']))
+      self.assertFalse({'guide.html', 'guide.index'} & set(info['sources']))
+
+  def test_guide_only_needs_no_manifest_and_preserves_preview(self):
+    with tempfile.TemporaryDirectory() as tmp:
+      book = Path(tmp)
+      (book / 'guide.html').write_text('<html>guide</html>')
+      with patch('tools.readalong.nuc_syncer.resolve_remote_book', return_value=('Cat', 'Book')), patch('tools.readalong.nuc_syncer.run_nuc') as run:
+        sync_book_to_nuc(book, 'Cat', 'Book', guides_only=True, dry_run=True)
+        command = run.call_args.args[0]
+        self.assertIn('--dry-run', command)
+        self.assertIn('--backup', command)
+        self.assertTrue(any(x.endswith('/guide.html') for x in command))
+        self.assertFalse(any(x.endswith('/readalong') for x in command))

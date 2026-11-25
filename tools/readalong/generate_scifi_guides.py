@@ -7,7 +7,9 @@ import os
 import sys
 from bs4 import BeautifulSoup
 
-BASE_DIR = "/Volumes/750/Music/有声书/科幻"
+from guide_paths import guide_category_path
+
+BASE_DIR = guide_category_path("科幻")
 
 TEMPLATE_HEAD = """<!DOCTYPE html>
 <html lang="zh-CN">
