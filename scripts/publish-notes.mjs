@@ -87,6 +87,25 @@ function findObsidianEmbeds(markdown) {
   return matches.map((match) => match[1].trim())
 }
 
+function findRelativeMarkdownAssets(markdown) {
+  const assets = []
+  for (const match of markdown.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)) {
+    const trimmed = match[1].trim()
+    const targetMatch = trimmed.match(/^<?([^>\s]+)>?(?:\s+(?:"[^"]*"|'[^']*'))?$/)
+    const rawUrl = targetMatch ? targetMatch[1] : trimmed
+    if (/^(?:https?:|data:|blob:|\/|#)/i.test(rawUrl)) continue
+    let decoded = rawUrl
+    try {
+      decoded = decodeURIComponent(rawUrl)
+    } catch {
+      // Keep original if malformed
+    }
+    const clean = decoded.split(/[?#]/)[0]
+    if (clean) assets.push(clean)
+  }
+  return assets
+}
+
 async function buildAssetIndex(files) {
   const index = new Map()
 
@@ -220,6 +239,17 @@ async function main() {
       const assetOutput = path.join(contentDir, "attachments", path.basename(embed))
       await fs.mkdir(path.dirname(assetOutput), { recursive: true })
       await fs.copyFile(matches[0], assetOutput)
+    }
+
+    for (const relAsset of findRelativeMarkdownAssets(markdown)) {
+      const sourceAsset = path.resolve(path.dirname(file), relAsset)
+      if (path.relative(vaultPath, sourceAsset).startsWith("..")) continue
+      if (!(await pathExists(sourceAsset))) continue
+      const relOut = path.relative(vaultPath, sourceAsset)
+      if (relOut.startsWith("..")) continue
+      const assetOutput = path.join(contentDir, relOut)
+      await fs.mkdir(path.dirname(assetOutput), { recursive: true })
+      await fs.copyFile(sourceAsset, assetOutput)
     }
   }
 

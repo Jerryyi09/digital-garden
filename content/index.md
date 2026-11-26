@@ -29,28 +29,28 @@ cssclasses:
 
 <section class="g-section">
   <div class="g-section-head"><h2>最近更新</h2><a href="/library/">全部 ›</a></div>
-  <div class="g-list"><a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795681486488.6091" data-router-ignore>
+  <div class="g-list"><a class="g-row" href="/html/数学/初中代数核心思维体系/" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 数学 数学" data-room="Gallery" data-root-category="数学" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>初中代数核心思维体系</strong><small>Gallery · 数学</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/物理/物理学科思维/" data-garden-item data-title="物理学科思维" data-search="物理学科思维 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>物理学科思维</strong><small>Gallery · 物理</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795687239327" data-router-ignore>
   <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>Gallery · 计算机 AI</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/学习笔记/01-areas/计算机-ai/ai-工程认知的理论体系与训练方法" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 学习笔记/01 Areas/计算机 AI 计算机 AI" data-room="Library" data-root-category="计算机 AI" data-updated="1795681485594">
-  <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>Library · 计算机 AI</small></span>
+<a class="g-row" href="/html/语文/初一课文/《井冈翠竹》/" data-garden-item data-title="《井冈翠竹》" data-search="《井冈翠竹》 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-root-category="语文" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>《井冈翠竹》</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/英语/writing/试题作文训练.html" data-garden-item data-title="初中英语高分写作：从语言表达走向思维与叙事" data-search="初中英语高分写作：从语言表达走向思维与叙事 英语/writing 英语 · writing" data-room="Gallery" data-root-category="英语" data-updated="1794203056974" data-router-ignore>
-  <span class="g-row-text"><strong>初中英语高分写作：从语言表达走向思维与叙事</strong><small>Gallery · 英语 · writing</small></span>
+<a class="g-row" href="/html/语文/初一课文/《假如生活欺骗了你》/" data-garden-item data-title="《假如生活欺骗了你》" data-search="《假如生活欺骗了你》 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-root-category="语文" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>《假如生活欺骗了你》</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/数学/平面几何/几何刻画思维课.html" data-garden-item data-title="几何刻画思维课：专家几何认知研究与心理动画训练" data-search="几何刻画思维课：专家几何认知研究与心理动画训练 数学/平面几何 数学 · 平面几何" data-room="Gallery" data-root-category="数学" data-updated="1794046923031" data-router-ignore>
-  <span class="g-row-text"><strong>几何刻画思维课：专家几何认知研究与心理动画训练</strong><small>Gallery · 数学 · 平面几何</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/学习笔记/01-areas/语文/练笔作文/八上期中作文练笔" data-garden-item data-title="八上期中作文练笔" data-search="八上期中作文练笔 学习笔记/01 Areas/语文/练笔作文 语文 · 练笔作文" data-room="Library" data-root-category="语文" data-updated="1793971455552">
-  <span class="g-row-text"><strong>八上期中作文练笔</strong><small>Library · 语文 · 练笔作文</small></span>
-  <span class="g-row-go" aria-hidden="true">›</span>
-</a>
-<a class="g-row" href="/html/语文/练笔作文/八上期中作文练笔/" data-garden-item data-title="八上期中作文练笔" data-search="八上期中作文练笔 语文/练笔作文 语文 · 练笔作文" data-room="Gallery" data-root-category="语文" data-updated="1793971455552" data-router-ignore>
-  <span class="g-row-text"><strong>八上期中作文练笔</strong><small>Gallery · 语文 · 练笔作文</small></span>
+<a class="g-row" href="/html/语文/初一课文/《未选择的路》/" data-garden-item data-title="《未选择的路》" data-search="《未选择的路》 语文/初一课文 语文 · 初一课文" data-room="Gallery" data-root-category="语文" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>《未选择的路》</strong><small>Gallery · 语文 · 初一课文</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </section>

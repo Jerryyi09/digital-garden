@@ -175,6 +175,36 @@
       -webkit-overflow-scrolling: touch;
     }
 
+    /* 图片与 Mermaid / SVG 适配 */
+    .section-content img, .hero-preamble img, .part-preamble img, .hero-quote img {
+      max-width: 100%;
+      height: auto;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+    }
+    .mermaid-block {
+      margin: 12px 0;
+      padding: 12px;
+      background: #ffffff;
+      color: #1c2429;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+    }
+    .mermaid-block .mermaid {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      white-space: pre;
+    }
+    .mermaid-block svg {
+      max-width: 100%;
+      height: auto;
+    }
+
     .part-divider {
       font-size: 13px;
       font-weight: 800;
@@ -1025,6 +1055,9 @@
   <script>
     function toggleAllSections(openState) {
       document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+      if (openState && typeof window.__renderVisibleMermaid === 'function') {
+        window.__renderVisibleMermaid();
+      }
     }
 
     function navigateBack() {

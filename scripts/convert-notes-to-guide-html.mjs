@@ -1,6 +1,8 @@
 import fs from "node:fs/promises"
+import { existsSync } from "node:fs"
 import path from "node:path"
 import process from "node:process"
+import { fileURLToPath } from "node:url"
 import { marked } from "marked"
 
 // Configure marked
@@ -24,6 +26,17 @@ const ignoredDirs = new Set([
   ".publish-backups",
 ])
 
+const imageExtensions = new Set([
+  ".avif",
+  ".bmp",
+  ".gif",
+  ".jpeg",
+  ".jpg",
+  ".png",
+  ".svg",
+  ".webp",
+])
+
 async function pathExists(filePath) {
   try {
     await fs.access(filePath)
@@ -45,6 +58,216 @@ async function walk(dir, files = []) {
     }
   }
   return files
+}
+
+export function buildAssetIndex(files) {
+  const index = new Map()
+  for (const file of files) {
+    const ext = path.extname(file).toLowerCase()
+    if (!imageExtensions.has(ext)) continue
+    const name = path.basename(file)
+    if (!index.has(name)) index.set(name, [])
+    index.get(name).push(file)
+  }
+  return index
+}
+
+function commonPrefixLength(a, b) {
+  const aParts = path.resolve(a).split(path.sep)
+  const bParts = path.resolve(b).split(path.sep)
+  let count = 0
+  while (count < aParts.length && count < bParts.length && aParts[count] === bParts[count]) {
+    count++
+  }
+  return count
+}
+
+function resolveVaultAsset(rawTarget, sourceFile, assetIndex) {
+  const cleanTarget = rawTarget.split(/[?#]/)[0].trim()
+  if (!cleanTarget) return null
+
+  if (sourceFile) {
+    const relativeCandidate = path.resolve(path.dirname(sourceFile), cleanTarget)
+    if (existsSync(relativeCandidate)) {
+      return relativeCandidate
+    }
+  }
+
+  if (!assetIndex) return null
+  const matches = assetIndex.get(path.basename(cleanTarget)) ?? []
+  if (matches.length === 0) return null
+  if (matches.length === 1 || !sourceFile) return matches[0]
+
+  return [...matches].sort(
+    (a, b) => commonPrefixLength(b, sourceFile) - commonPrefixLength(a, sourceFile),
+  )[0]
+}
+
+function parseEmbedParams(parts) {
+  let alt = ""
+  let width = ""
+  let height = ""
+
+  if (parts.length === 1) {
+    const sizeMatch = parts[0].match(/^(\d+)(?:x(\d+))?$/i)
+    if (sizeMatch) {
+      width = sizeMatch[1]
+      height = sizeMatch[2] || ""
+    } else {
+      alt = parts[0]
+    }
+  } else if (parts.length >= 2) {
+    const last = parts[parts.length - 1]
+    const sizeMatch = last.match(/^(\d+)(?:x(\d+))?$/i)
+    if (sizeMatch) {
+      width = sizeMatch[1]
+      height = sizeMatch[2] || ""
+      alt = parts.slice(0, -1).join(" | ")
+    } else {
+      alt = parts.join(" | ")
+    }
+  }
+
+  return { alt, width, height }
+}
+
+function encodeRelativeSrc(relPath) {
+  return relPath
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/")
+}
+
+function allocateAssetDest(resolvedPath, preferredRel, usedDestBySrc, usedSrcByDest) {
+  const existingDest = usedDestBySrc.get(resolvedPath)
+  if (existingDest) return existingDest
+
+  let candidate = preferredRel
+  if (usedSrcByDest.has(candidate) && usedSrcByDest.get(candidate) !== resolvedPath) {
+    const ext = path.extname(preferredRel)
+    const stem = preferredRel.slice(0, preferredRel.length - ext.length)
+    let suffix = 2
+    while (usedSrcByDest.has(`${stem}-${suffix}${ext}`)) {
+      suffix++
+    }
+    candidate = `${stem}-${suffix}${ext}`
+  }
+
+  usedDestBySrc.set(resolvedPath, candidate)
+  usedSrcByDest.set(candidate, resolvedPath)
+  return candidate
+}
+
+function replaceOutsideInlineCode(line, replacer) {
+  const segments = line.split(/(`+[^`]*`+)/g)
+  return segments
+    .map((segment, index) => (index % 2 === 1 ? segment : replacer(segment)))
+    .join("")
+}
+
+/**
+ * Rewrite Obsidian image embeds `![[...]]` and local Markdown relative images
+ * `![alt](path)` into portable `<img src="...">` / relative links, recording
+ * the resolved local files in `assetsToCopy`. Skips fenced and inline code.
+ */
+export function preprocessMarkdownMedia(markdown, { sourceFile = "", assetIndex = null } = {}) {
+  const assetsToCopy = []
+  const usedDestBySrc = new Map()
+  const usedSrcByDest = new Map()
+  const lines = markdown.split("\n")
+  let fenceChar = ""
+  let fenceLen = 0
+
+  const transformedLines = lines.map((line) => {
+    const fenceMatch = line.match(/^\s*([`~]{3,})/)
+    if (fenceMatch) {
+      const marker = fenceMatch[1]
+      if (!fenceChar) {
+        fenceChar = marker[0]
+        fenceLen = marker.length
+      } else if (marker[0] === fenceChar && marker.length >= fenceLen) {
+        fenceChar = ""
+        fenceLen = 0
+      }
+      return line
+    }
+
+    if (fenceChar) return line
+
+    return replaceOutsideInlineCode(line, (text) => {
+      // 1. Obsidian image embeds: ![[path/to/image.png|alt|500]]
+      let out = text.replace(/!\[\[([^\]]+)\]\]/g, (fullMatch, rawInner) => {
+        const parts = rawInner.split("|").map((p) => p.trim())
+        const rawTarget = (parts[0] || "").split("#")[0].trim()
+        const ext = path.extname(rawTarget).toLowerCase()
+        if (!imageExtensions.has(ext)) return fullMatch
+
+        const resolved = resolveVaultAsset(rawTarget, sourceFile, assetIndex)
+        if (!resolved) return fullMatch
+
+        const fileName = path.basename(resolved)
+        const destRel = allocateAssetDest(
+          resolved,
+          `assets/${fileName}`,
+          usedDestBySrc,
+          usedSrcByDest,
+        )
+        if (!assetsToCopy.some((item) => item.destRel === destRel)) {
+          assetsToCopy.push({ src: resolved, destRel })
+        }
+
+        const { alt, width, height } = parseEmbedParams(parts.slice(1).filter(Boolean))
+        const widthAttr = width ? ` width="${escapeHtml(width)}"` : ""
+        const heightAttr = height ? ` height="${escapeHtml(height)}"` : ""
+        return `<img src="${encodeRelativeSrc(destRel)}" alt="${escapeHtml(alt)}"${widthAttr}${heightAttr} loading="lazy" />`
+      })
+
+      // 2. Standard markdown relative images: ![alt](relative/path.png)
+      out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (fullMatch, alt, rawTargetAndTitle) => {
+        const trimmed = rawTargetAndTitle.trim()
+        const targetMatch = trimmed.match(/^<?([^>\s]+)>?(?:\s+(?:"[^"]*"|'[^']*'))?$/)
+        const rawUrl = targetMatch ? targetMatch[1] : trimmed
+        if (/^(?:https?:|data:|blob:|\/|#)/i.test(rawUrl)) return fullMatch
+
+        let decodedUrl = rawUrl
+        try {
+          decodedUrl = decodeURIComponent(rawUrl)
+        } catch {
+          // Keep original if malformed percent-encoding
+        }
+
+        const cleanUrl = decodedUrl.split(/[?#]/)[0]
+        const ext = path.extname(cleanUrl).toLowerCase()
+        if (!imageExtensions.has(ext)) return fullMatch
+
+        const resolved = resolveVaultAsset(cleanUrl, sourceFile, assetIndex)
+        if (!resolved) return fullMatch
+
+        const sourceDir = sourceFile ? path.dirname(sourceFile) : ""
+        let preferredRel = `assets/${path.basename(resolved)}`
+        if (sourceDir) {
+          const relFromSource = path.relative(sourceDir, resolved).split(path.sep).join("/")
+          if (relFromSource && !relFromSource.startsWith("..") && !path.isAbsolute(relFromSource)) {
+            preferredRel = relFromSource
+          }
+        }
+
+        const destRel = allocateAssetDest(resolved, preferredRel, usedDestBySrc, usedSrcByDest)
+        if (!assetsToCopy.some((item) => item.destRel === destRel)) {
+          assetsToCopy.push({ src: resolved, destRel })
+        }
+
+        return `![${alt}](${encodeRelativeSrc(destRel)})`
+      })
+
+      return out
+    })
+  })
+
+  return {
+    markdown: transformedLines.join("\n"),
+    assetsToCopy,
+  }
 }
 
 function parseFrontmatter(markdown) {
@@ -107,6 +330,12 @@ function postProcessHtml(rawHtml) {
 
   // Wrap tables with mobile-friendly class
   html = html.replace(/<table>/g, '<table class="term-table">')
+
+  // Convert fenced mermaid blocks into dedicated containers rendered client-side
+  html = html.replace(
+    /<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g,
+    '<div class="mermaid-block"><div class="mermaid">$1</div></div>',
+  )
 
   // Badges replacement for text markers
   html = html.replace(
@@ -238,8 +467,12 @@ const colorThemes = [
   "color-cyan",
 ]
 
-function renderToAccordionHtml(markdown, filePath) {
-  const { frontmatter, body } = parseFrontmatter(markdown)
+export function renderToAccordionHtmlWithAssets(markdown, filePath, options = {}) {
+  const { frontmatter, body: rawBody } = parseFrontmatter(markdown)
+  const { markdown: body, assetsToCopy } = preprocessMarkdownMedia(rawBody, {
+    sourceFile: filePath,
+    assetIndex: options.assetIndex ?? null,
+  })
   const title =
     frontmatter.title || path.basename(filePath, path.extname(filePath))
   const author = frontmatter.author || ""
@@ -264,11 +497,11 @@ function renderToAccordionHtml(markdown, filePath) {
           .split("\n")
           .map((l) => l.replace(/^>\s?/, ""))
           .join("\n")
-        heroQuoteHtml = marked.parse(quoteText)
+        heroQuoteHtml = postProcessHtml(marked.parse(quoteText))
         const rest = preamble.slice(quoteMatch[0].length).trim()
         if (rest) restPreambleHtml = postProcessHtml(marked.parse(rest))
       } else {
-        heroQuoteHtml = marked.parse(preamble)
+        heroQuoteHtml = postProcessHtml(marked.parse(preamble))
       }
     } else {
       restPreambleHtml = postProcessHtml(marked.parse(preamble))
@@ -330,6 +563,8 @@ function renderToAccordionHtml(markdown, filePath) {
     }
   }
 
+  const hasMermaid = bodyHtml.includes('class="mermaid"') || heroQuoteHtml.includes('class="mermaid"')
+
   // Badges list
   const badges = []
   if (category) badges.push(`<span class="badge">${escapeHtml(category)}</span>`)
@@ -344,7 +579,88 @@ function renderToAccordionHtml(markdown, filePath) {
   if (category) subParts.push(category)
   const heroSub = subParts.length ? subParts.join(" · ") : "Rosemary Garden 精读导读"
 
-  return `<!DOCTYPE html>
+  const mermaidScriptBlock = hasMermaid
+    ? `
+  <script type="module">
+    const mermaidBlocks = Array.from(document.querySelectorAll('.mermaid'));
+    if (mermaidBlocks.length > 0) {
+      for (const el of mermaidBlocks) {
+        el.dataset.mermaidSrc = el.textContent || '';
+      }
+
+      const loadMermaid = async () => {
+        const urls = [
+          'https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.esm.min.mjs',
+          'https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs',
+        ];
+        for (const url of urls) {
+          try {
+            const mod = await import(url);
+            return mod.default || mod;
+          } catch (err) {
+            console.warn('Failed to load Mermaid from', url, err);
+          }
+        }
+        return null;
+      };
+
+      let mermaidApi = null;
+      let renderQueue = Promise.resolve();
+
+      const isVisible = (el) => {
+        let cur = el.parentElement;
+        while (cur) {
+          if (cur.tagName === 'DETAILS' && !cur.open) return false;
+          cur = cur.parentElement;
+        }
+        return true;
+      };
+
+      const renderVisibleMermaid = () => {
+        renderQueue = renderQueue.then(async () => {
+          if (!mermaidApi) {
+            mermaidApi = await loadMermaid();
+            if (!mermaidApi) return;
+            mermaidApi.initialize({
+              startOnLoad: false,
+              securityLevel: 'loose',
+              theme: 'default',
+              flowchart: { htmlLabels: true, useMaxWidth: true },
+            });
+          }
+          const pending = mermaidBlocks.filter(
+            (el) => !el.dataset.rendered && isVisible(el),
+          );
+          for (const el of pending) {
+            el.textContent = el.dataset.mermaidSrc || '';
+            el.removeAttribute('data-processed');
+            try {
+              await mermaidApi.run({ nodes: [el] });
+              if (el.querySelector('svg')) {
+                el.dataset.rendered = 'true';
+              }
+            } catch (err) {
+              console.error('Mermaid render error:', err);
+              el.textContent = el.dataset.mermaidSrc || '';
+            }
+          }
+        });
+        return renderQueue;
+      };
+
+      document.querySelectorAll('details.guide-section').forEach((details) => {
+        details.addEventListener('toggle', () => {
+          if (details.open) renderVisibleMermaid();
+        });
+      });
+
+      window.__renderVisibleMermaid = renderVisibleMermaid;
+      renderVisibleMermaid();
+    }
+  </script>`
+    : ""
+
+  const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -519,6 +835,36 @@ function renderToAccordionHtml(markdown, filePath) {
       padding: 6px 0;
       margin: 8px 0;
       -webkit-overflow-scrolling: touch;
+    }
+
+    /* 图片与 Mermaid / SVG 适配 */
+    .section-content img, .hero-preamble img, .part-preamble img, .hero-quote img {
+      max-width: 100%;
+      height: auto;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+    }
+    .mermaid-block {
+      margin: 12px 0;
+      padding: 12px;
+      background: #ffffff;
+      color: #1c2429;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+    }
+    .mermaid-block .mermaid {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      white-space: pre;
+    }
+    .mermaid-block svg {
+      max-width: 100%;
+      height: auto;
     }
 
     .part-divider {
@@ -721,6 +1067,9 @@ function renderToAccordionHtml(markdown, filePath) {
   <script>
     function toggleAllSections(openState) {
       document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+      if (openState && typeof window.__renderVisibleMermaid === 'function') {
+        window.__renderVisibleMermaid();
+      }
     }
 
     function navigateBack() {
@@ -745,25 +1094,44 @@ function renderToAccordionHtml(markdown, filePath) {
         });
       }
     });
-  </script>
+  </script>${mermaidScriptBlock}
 </body>
 </html>`
+
+  return { html, assetsToCopy }
 }
 
-async function convertFile(sourceFile, outputHtmlFile) {
+export function renderToAccordionHtml(markdown, filePath, options = {}) {
+  return renderToAccordionHtmlWithAssets(markdown, filePath, options).html
+}
+
+export async function convertFile(sourceFile, outputHtmlFile, options = {}) {
   const markdown = await fs.readFile(sourceFile, "utf8")
-  const html = renderToAccordionHtml(markdown, sourceFile)
-  await fs.mkdir(path.dirname(outputHtmlFile), { recursive: true })
+  const { html, assetsToCopy } = renderToAccordionHtmlWithAssets(markdown, sourceFile, options)
+  const outputDir = path.dirname(outputHtmlFile)
+  await fs.mkdir(outputDir, { recursive: true })
+  await fs.chmod(outputDir, 0o755).catch(() => {})
   await fs.writeFile(outputHtmlFile, html, "utf8")
+  await fs.chmod(outputHtmlFile, 0o644).catch(() => {})
+
+  for (const asset of assetsToCopy) {
+    const destPath = path.join(outputDir, asset.destRel)
+    await fs.mkdir(path.dirname(destPath), { recursive: true })
+    await fs.chmod(path.dirname(destPath), 0o755).catch(() => {})
+    await fs.copyFile(asset.src, destPath)
+    await fs.chmod(destPath, 0o644).catch(() => {})
+  }
 }
 
 async function main() {
   const specificFile = process.argv[2]
   if (specificFile) {
     const fullPath = path.resolve(specificFile)
+    const searchRoot = (await pathExists(vaultPath)) ? vaultPath : path.dirname(fullPath)
+    const assetIndex = buildAssetIndex(await walk(searchRoot))
     const outName = path.basename(fullPath, ".md") + ".html"
     const outPath = path.join(htmlDir, "notes", outName)
-    await convertFile(fullPath, outPath)
+    await convertFile(fullPath, outPath, { assetIndex })
     console.log(`Converted: ${fullPath} -> ${outPath}`)
     return
   }
@@ -776,6 +1144,7 @@ async function main() {
   console.log(`Scanning vault: ${vaultPath}...`)
   const files = await walk(vaultPath)
   const markdownFiles = files.filter((f) => f.endsWith(".md"))
+  const assetIndex = buildAssetIndex(files)
 
   let convertedCount = 0
 
@@ -802,7 +1171,7 @@ async function main() {
     const indexPath = path.join(workDir, "index.html")
     const flatPath = path.join(htmlDir, ...cleanDirParts, `${baseName}.html`)
 
-    await convertFile(file, indexPath)
+    await convertFile(file, indexPath, { assetIndex })
     // Also provide a flat alias so direct .html URLs redirect smoothly
     const redirectHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=./${encodeURIComponent(baseName)}/"><script>location.replace('./${encodeURIComponent(baseName)}/');</script></head><body></body></html>`
     await fs.writeFile(flatPath, redirectHtml, "utf8")
@@ -815,7 +1184,9 @@ async function main() {
   console.log(`Successfully converted ${convertedCount} published notes to accordion HTML.`)
 }
 
-main().catch((err) => {
-  console.error("Error converting notes:", err)
-  process.exit(1)
-})
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error("Error converting notes:", err)
+    process.exit(1)
+  })
+}

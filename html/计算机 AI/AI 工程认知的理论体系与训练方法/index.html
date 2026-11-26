@@ -175,6 +175,36 @@
       -webkit-overflow-scrolling: touch;
     }
 
+    /* 图片与 Mermaid / SVG 适配 */
+    .section-content img, .hero-preamble img, .part-preamble img, .hero-quote img {
+      max-width: 100%;
+      height: auto;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+    }
+    .mermaid-block {
+      margin: 12px 0;
+      padding: 12px;
+      background: #ffffff;
+      color: #1c2429;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+    }
+    .mermaid-block .mermaid {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      white-space: pre;
+    }
+    .mermaid-block svg {
+      max-width: 100%;
+      height: auto;
+    }
+
     .part-divider {
       font-size: 13px;
       font-weight: 800;
@@ -472,7 +502,7 @@
 </ul>
 <p>这正是计算机领域的“心理动画”。</p>
 <p>我建议将这一理论扩展到 AI 工程课程，建立一个 AI Notional Machine（AI 概念执行机器）。
-![[Pasted image 20261126162040.png]]</p>
+<img src="assets/Pasted%20image%2020261126162040.png" alt="" loading="lazy" /></p>
 <p>学生需要能够在没有实际调用 AI 之前，沿着这个模型预测系统可能发生什么。</p>
 <p>尤其重要的是区分：</p>
 <div class="tint-box">
@@ -483,7 +513,7 @@
 <p>认知工程与人因工程 · 1995</p>
 <p>如果说 Notional Machine 解决的是“系统如何运行”，那么 Endsley 解决的是“人如何在动态系统中保持理解和控制”。</p>
 <p>态势感知理论源于航空、复杂设备操作等动态决策环境，经典框架包含三个层级：感知环境中的要素、理解当前情境、预测未来状态。</p>
-<pre><code class="language-mermaid">graph TD
+<div class="mermaid-block"><div class="mermaid">graph TD
     subgraph &quot;态势感知 (Situation Awareness)&quot;
         SA1[&quot;SA1 · Perception 感知&lt;br&gt;当前系统实际发生了什么？&lt;br&gt;工具调用、数据来源、任务进度、错误日志、权限状态&quot;]
         SA2[&quot;SA2 · Comprehension 理解&lt;br&gt;这些状态对当前目标意味着什么？&lt;br&gt;错误原因、组件依赖、风险、完成条件&quot;]
@@ -502,7 +532,7 @@
     style SA2 fill:#f9f9f9,stroke:#333,stroke-width:2px
     style SA3 fill:#f9f9f9,stroke:#333,stroke-width:2px
     style SA4 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,stroke-dasharray: 5 5
-</code></pre>
+</div></div>
 <p>这套理论特别适用于 Agent、人机协同和自动化工作流课程。</p>
 <p>例如：</p>
 <div class="tint-box">
@@ -644,7 +674,7 @@
 <p>Sterman 通过动态决策实验研究人们对反馈系统的误判，实验涉及多个参与者、反馈关系、时间延迟和非线性机制。</p>
 <p>这一研究对于 Agent 工作流非常有意义。</p>
 <p>例如，某个系统设计了自动审查与自动修订：</p>
-<pre><code class="language-mermaid">graph LR
+<div class="mermaid-block"><div class="mermaid">graph LR
     A[生成初稿] --&gt; B[自动审查]
     B --&gt; C{审查通过?}
     C -- 否 --&gt; D[自动修订]
@@ -656,7 +686,7 @@
     style C fill:#fff,stroke:#333
     style D fill:#fff,stroke:#333
     style E fill:#e8f5e9,stroke:#4caf50
-</code></pre>
+</div></div>
 <p>反馈循环并不天然带来质量提升。它的效果取决于评价信号、修订机制、终止条件及各组件的失败相关性。</p>
 <p>学生需要能够预测：</p>
 <div class="tint-box">
@@ -724,8 +754,8 @@
 <p>2004年的《Mechanical Reasoning by Mental Simulation》进一步讨论了机械推理中的心理模拟机制。</p>
 <p>这可能是连接 Koedinger 几何构型块研究与 AI 工程心智建模的最佳理论桥梁之一。</p>
 <p>三者存在一个共同的认知机制：
-![[Pasted image 20261126161739.png]]</p>
-<pre><code class="language-mermaid">graph TD
+<img src="assets/Pasted%20image%2020261126161739.png" alt="" loading="lazy" /></p>
+<div class="mermaid-block"><div class="mermaid">graph TD
     subgraph &quot;几何领域 (Koedinger)&quot;
         K1[&quot;图形构型块&quot;] --&gt; K2[&quot;关系与约束&quot;] --&gt; K3[&quot;证明规划&quot;]
     end
@@ -749,7 +779,7 @@
     
     style Target fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
     style Final fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
-</code></pre>
+</div></div>
 <div class="tint-box">
 <p>这是跨研究领域的综合模型，不是三位研究者共同提出的现成理论。</p>
 </div>
@@ -772,7 +802,7 @@
         </summary>
         <div class="section-content">
           <p>综合上述研究，我建议不要只训练一种系统心智模型，而是建立六层相互关联的心理模型。</p>
-<pre><code class="language-mermaid">graph TD
+<div class="mermaid-block"><div class="mermaid">graph TD
     L1[&quot;L1 · 结构模型 Structural Model&lt;br&gt;系统由什么组成？&quot;]
     L2[&quot;L2 · 执行模型 Execution Model&lt;br&gt;系统如何一步步运行？&quot;]
     L3[&quot;L3 · 因果模型 Causal Model&lt;br&gt;为什么会产生这个结果？&quot;]
@@ -788,7 +818,7 @@
     style L4 fill:#e3f2fd,stroke:#1e88e5
     style L5 fill:#e3f2fd,stroke:#1e88e5
     style L6 fill:#e3f2fd,stroke:#1e88e5
-</code></pre>
+</div></div>
 <div class="tint-box">
 <p>这里的 L1–L6 代表心理模型的六个层面，不是 Growth OS 的能力成熟度等级。正式学科包中可以使用 M1–M6，避免命名冲突。</p>
 </div>
@@ -833,7 +863,7 @@
 <p>2019年的研究在13所学校、493名11—14岁学生中进行了评价，年龄范围与你的中学课程设计高度相关。PRIMM 由五个环节组成：Predict、Run、Investigate、Modify、Make。</p>
 <p>原有 PRIMM 已具有中学编程教学的研究基础；下面将其扩展到 AI 工程领域，是新的设计候选方案。</p>
 <div class="sub-heading">AI-PRIMM：从预测到创造</div>
-<pre><code class="language-mermaid">graph LR
+<div class="mermaid-block"><div class="mermaid">graph LR
     P[&quot;P - Predict · 心中预测&lt;br&gt;不运行 AI，先预测系统执行过程、可能输出和失败条件。&quot;]
     R[&quot;R - Run · 真实运行&lt;br&gt;实际执行系统，获得输出、日志、工具调用和状态证据。&quot;]
     I[&quot;I - Investigate · 差异调查&lt;br&gt;比较预测与现实，定位机制理解、信息或系统设计上的偏差。&quot;]
@@ -847,7 +877,7 @@
     style I fill:#fff3e0,stroke:#ff9800
     style M1 fill:#fff3e0,stroke:#ff9800
     style M2 fill:#fff3e0,stroke:#ff9800
-</code></pre>
+</div></div>
 <p>它与几何心象课程的训练节奏天然呼应：</p>
 <table class="term-table">
 <thead>
@@ -955,7 +985,7 @@
 <p>评价的是假设生成、因果推理和不确定性管理。</p>
 <div class="sub-heading">训练二：概率分支心理预演</div>
 <p>假设一个 AI 工作流收到一份证据不充分的资料。</p>
-<pre><code class="language-mermaid">graph TD
+<div class="mermaid-block"><div class="mermaid">graph TD
     Start[&quot;收到证据不充分的资料&quot;] --&gt; Branch{&quot;系统策略&quot;}
     
     Branch -- &quot;策略A&quot; --&gt; A1[&quot;直接要求生成结论&quot;]
@@ -967,7 +997,7 @@
     C1 --&gt; RiskC[&quot;风险: 人工审核成为瓶颈或流于形式&quot;]
     
     style Branch fill:#fce4ec,stroke:#e91e63
-</code></pre>
+</div></div>
 <div class="tint-box">
 <p>思考：系统没有显式核验环节，哪些输出风险无法由架构约束消除？</p>
 </div>
@@ -1169,7 +1199,7 @@
         </summary>
         <div class="section-content">
           <p>以下为课程设计层面的候选进阶，不等同于 Growth OS 正式的 L1–L4 等级定义。</p>
-<pre><code class="language-mermaid">graph TD
+<div class="mermaid-block"><div class="mermaid">graph TD
     L1[&quot;L1: 单系统、确定性运行&lt;br&gt;追踪变量、状态、输入输出、简单程序与确定性工作流。&lt;br&gt;目标：在头脑中正确运行一个已知机制。&quot;]
     L2[&quot;L2: 概率性与分支运行&lt;br&gt;引入 AI 生成、上下文变化、模型不确定性、失败分支。&lt;br&gt;目标：预测可能结果及其发生条件，而不是只预测唯一输出。&quot;]
     L3[&quot;L3: 多人、多组件与人机协同运行&lt;br&gt;追踪任务委派、多 Agent、工具调用、共享信息、人工干预和反馈循环。&lt;br&gt;目标：能够监督、诊断和控制复杂协同系统。&quot;]
@@ -1181,7 +1211,7 @@
     style L2 fill:#e8f5e9,stroke:#4caf50
     style L3 fill:#e8f5e9,stroke:#4caf50
     style L4 fill:#e8f5e9,stroke:#4caf50
-</code></pre>
+</div></div>
 <p>第四级尤其重要。</p>
 <p>几何高手能够在头脑中构造原图不存在的辅助线；优秀的 AI 工程设计者也需要在头脑中构造原系统不存在的新组件、新接口、新反馈机制和新协同方式，并提前判断这些改变可能带来什么。</p>
 <p>这就是从心理模拟走向工程创造。</p>
@@ -1287,7 +1317,7 @@
         </summary>
         <div class="section-content">
           <p>经过这轮研究，我建议调整上一版学科包方案中“系统心智建模”的地位，将其提升为核心认知主轴。</p>
-<pre><code class="language-mermaid">graph TD
+<div class="mermaid-block"><div class="mermaid">graph TD
     subgraph Goal [&quot;终极目标：适应性专长与智能增强创造&quot;]
         direction TB
         Center[&quot;心中运行&lt;br&gt;Mental Simulation of Human–AI Systems&quot;]
@@ -1313,7 +1343,7 @@
     
     style Center fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
     style Progression fill:#fff3e0,stroke:#ff9800,stroke-width:2px
-</code></pre>
+</div></div>
 <p>与几何学科包相比，可以形成一组极有价值的对称关系。</p>
 <table class="term-table">
 <thead>
@@ -1391,6 +1421,9 @@
   <script>
     function toggleAllSections(openState) {
       document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+      if (openState && typeof window.__renderVisibleMermaid === 'function') {
+        window.__renderVisibleMermaid();
+      }
     }
 
     function navigateBack() {
@@ -1415,6 +1448,83 @@
         });
       }
     });
+  </script>
+  <script type="module">
+    const mermaidBlocks = Array.from(document.querySelectorAll('.mermaid'));
+    if (mermaidBlocks.length > 0) {
+      for (const el of mermaidBlocks) {
+        el.dataset.mermaidSrc = el.textContent || '';
+      }
+
+      const loadMermaid = async () => {
+        const urls = [
+          'https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.esm.min.mjs',
+          'https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs',
+        ];
+        for (const url of urls) {
+          try {
+            const mod = await import(url);
+            return mod.default || mod;
+          } catch (err) {
+            console.warn('Failed to load Mermaid from', url, err);
+          }
+        }
+        return null;
+      };
+
+      let mermaidApi = null;
+      let renderQueue = Promise.resolve();
+
+      const isVisible = (el) => {
+        let cur = el.parentElement;
+        while (cur) {
+          if (cur.tagName === 'DETAILS' && !cur.open) return false;
+          cur = cur.parentElement;
+        }
+        return true;
+      };
+
+      const renderVisibleMermaid = () => {
+        renderQueue = renderQueue.then(async () => {
+          if (!mermaidApi) {
+            mermaidApi = await loadMermaid();
+            if (!mermaidApi) return;
+            mermaidApi.initialize({
+              startOnLoad: false,
+              securityLevel: 'loose',
+              theme: 'default',
+              flowchart: { htmlLabels: true, useMaxWidth: true },
+            });
+          }
+          const pending = mermaidBlocks.filter(
+            (el) => !el.dataset.rendered && isVisible(el),
+          );
+          for (const el of pending) {
+            el.textContent = el.dataset.mermaidSrc || '';
+            el.removeAttribute('data-processed');
+            try {
+              await mermaidApi.run({ nodes: [el] });
+              if (el.querySelector('svg')) {
+                el.dataset.rendered = 'true';
+              }
+            } catch (err) {
+              console.error('Mermaid render error:', err);
+              el.textContent = el.dataset.mermaidSrc || '';
+            }
+          }
+        });
+        return renderQueue;
+      };
+
+      document.querySelectorAll('details.guide-section').forEach((details) => {
+        details.addEventListener('toggle', () => {
+          if (details.open) renderVisibleMermaid();
+        });
+      });
+
+      window.__renderVisibleMermaid = renderVisibleMermaid;
+      renderVisibleMermaid();
+    }
   </script>
 </body>
 </html>

@@ -84,8 +84,8 @@
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/数学/初中代数核心思维体系/index.html": {
-    "sha": "f4ca4ff3b365cd21",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "93e2770979354378",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/数学/平面几何/geometry_4week_training.html": {
     "sha": "da3819f5fd7c49a8",
@@ -112,108 +112,116 @@
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/物理/物理学科思维/index.html": {
-    "sha": "b5dc4459d1d3bd44",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "2ecbf7d3e3dde85c",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/英语/writing/试题作文训练.html": {
     "sha": "279842fd83ee377a",
     "modified": "2026-11-09T05:44:16.974Z"
+  },
+  "html/计算机 AI/AI 工程认知的理论体系与训练方法.html": {
+    "sha": "daffce8d8a01147c",
+    "modified": "2026-11-26T16:24:51+08:00"
+  },
+  "html/计算机 AI/AI 工程认知的理论体系与训练方法/index.html": {
+    "sha": "d881eee11dd51952",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《井冈翠竹》.html": {
     "sha": "0d4a3470552e412d",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《井冈翠竹》/index.html": {
-    "sha": "5eae203f144ef655",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "8bac1516f0700e5a",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《假如生活欺骗了你》.html": {
     "sha": "12889e0f17ba6d9e",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《假如生活欺骗了你》/index.html": {
-    "sha": "9276b19037d25ef9",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "bb67d87cc4b21600",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《未选择的路》.html": {
     "sha": "1acb8cab5e25a369",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《未选择的路》/index.html": {
-    "sha": "fb8544155ea53c0f",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "7a5d8fbdc43c930a",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《登幽州台歌》.html": {
     "sha": "ab67b6a706c85ed7",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《登幽州台歌》/index.html": {
-    "sha": "47875fc691aed083",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "eda5dd2941fd33c6",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《紫藤萝瀑布》.html": {
     "sha": "6d1d60c43358e996",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《紫藤萝瀑布》/index.html": {
-    "sha": "e162cdbf3600d5da",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "6f180fcee226dee8",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《阿长与〈山海经〉》.html": {
     "sha": "b16eb693339a9513",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《阿长与〈山海经〉》/index.html": {
-    "sha": "ab0420ca317f1e1f",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "1cfe05a4dfa9f0fd",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《青春之光》.html": {
     "sha": "8c14ce68240e25c2",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《青春之光》/index.html": {
-    "sha": "9f0b155a408c6066",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "c3e2e3bfbc9cc463",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《驿路梨花》.html": {
     "sha": "e574922289e13f01",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《驿路梨花》/index.html": {
-    "sha": "1e3e481df43be234",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "01422f9f9a02a0df",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/《骆驼祥子》.html": {
     "sha": "3569a4ea2892680d",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/《骆驼祥子》/index.html": {
-    "sha": "2a44475ebe7fc27f",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "135b38a260fcb452",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/七下文言文.html": {
     "sha": "f84cb760abaf1fc5",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/七下文言文/index.html": {
-    "sha": "fabfdf244a4d1d5e",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "32cda64b730c59a7",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初一课文/钢铁是怎样炼成的？.html": {
     "sha": "ceb4b352ce00eec1",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初一课文/钢铁是怎样炼成的？/index.html": {
-    "sha": "5403b3a255b6818f",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "8903c71ef39a5bb5",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初二课文/《三峡》.html": {
     "sha": "3ef23e85aa46ea05",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初二课文/《三峡》/index.html": {
-    "sha": "5f391c526a9ef388",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "0a77fee628ea2ee9",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初二课文/《孟子》三章赏析.html": {
     "sha": "844b06fa99b3f5ce",
@@ -224,8 +232,8 @@
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/语文/初二课文/三篇山水小品文/index.html": {
-    "sha": "2f7be777a2091e0d",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "b842729563e7469c",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/语文/初二课文/与朱元思书.html": {
     "sha": "7856e1f023309657",
@@ -264,23 +272,23 @@
     "modified": "2026-11-06T13:24:15.552Z"
   },
   "html/语文/练笔作文/八上期中作文练笔/index.html": {
-    "sha": "7e4dc122e335b15e",
-    "modified": "2026-11-06T13:24:15.552Z"
+    "sha": "7ab4138319c567cc",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/阅读成长/科普作品/《万物简史》导读.html": {
     "sha": "43c519ff034378f1",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/阅读成长/科普作品/《万物简史》导读/index.html": {
-    "sha": "12b8cc73323f5433",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "425d59cfa8f4a06a",
+    "modified": "2026-11-26T10:00:39.327Z"
   },
   "html/阅读成长/科普作品/《科学的故事》导读.html": {
     "sha": "77ba68a1d6ad062c",
     "modified": "2026-11-06T06:19:19.567Z"
   },
   "html/阅读成长/科普作品/《科学的故事》导读/index.html": {
-    "sha": "b6bc8afd40297eb0",
-    "modified": "2026-11-06T07:30:03.082Z"
+    "sha": "9029d7e564505807",
+    "modified": "2026-11-26T10:00:39.327Z"
   }
 }
