@@ -15,7 +15,7 @@ cssclasses:
 
 <header class="g-page-head">
   <h1>Gallery</h1>
-  <span class="g-count" data-garden-count>34 项</span>
+  <span class="g-count" data-garden-count>35 项</span>
 </header>
 
 <div class="g-tools">
@@ -26,7 +26,8 @@ cssclasses:
   </div>
 </div>
 <div class="g-chips" role="tablist" aria-label="分类筛选">
-  <button type="button" class="g-chip-btn is-active" data-chip="all">全部 <em>34</em></button>
+  <button type="button" class="g-chip-btn is-active" data-chip="all">全部 <em>35</em></button>
+  <button type="button" class="g-chip-btn" data-chip="计算机 AI">计算机 AI <em>1</em></button>
   <button type="button" class="g-chip-btn" data-chip="英语">英语 <em>1</em></button>
   <button type="button" class="g-chip-btn" data-chip="数学">数学 <em>5</em></button>
   <button type="button" class="g-chip-btn" data-chip="语文">语文 <em>23</em></button>
@@ -36,6 +37,13 @@ cssclasses:
 </div>
 
 <div class="g-directory" data-garden-directory>
+<details class="g-folder" data-folder open>
+  <summary><span>计算机 AI</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795681486488.6091" data-router-ignore>
+  <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>11月26日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a></div>
+</details>
 <details class="g-folder" data-folder open>
   <summary><span>英语 · writing</span><em>1</em></summary>
   <div class="g-list"><a class="g-row" href="/html/英语/writing/试题作文训练.html" data-garden-item data-title="初中英语高分写作：从语言表达走向思维与叙事" data-search="初中英语高分写作：从语言表达走向思维与叙事 英语/writing 英语 · writing" data-room="Gallery" data-root-category="英语" data-updated="1794203056974" data-router-ignore>

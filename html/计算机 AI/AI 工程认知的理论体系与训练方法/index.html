@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>AI 工程认知的理论体系与训练方法</title>
+  <!-- KaTeX for math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.08);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.12);
+        --bg-warm: rgba(251, 146, 60, 0.12);
+        --bg-danger: rgba(248, 113, 113, 0.12);
+        --bg-success: rgba(74, 222, 128, 0.12);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 740px; margin: 0 auto; }
+    p, li { text-align: justify; margin-bottom: 0.55em; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    /* 顶部 Hero 卡片 */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3.5px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--text-main);
+    }
+    .hero-quote p { margin-bottom: 0.4em; }
+    .hero-quote p:last-child { margin-bottom: 0; }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 1.1fr 1.2fr 1fr 0.8fr;
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 3px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .t-btn:hover { opacity: 0.85; }
+    .t-btn.btn-back { background: var(--bg-accent); color: var(--primary); font-weight: 700; }
+    .t-btn.btn-open { background: var(--bg-subtle); color: var(--text-main); }
+    .t-btn.btn-close { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* PWA 全屏模式右下角浮动返回按钮 */
+    .fab-back {
+      position: fixed;
+      right: 14px;
+      bottom: 22px;
+      z-index: 99;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      cursor: pointer;
+      opacity: 0.9;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.18s, opacity 0.18s;
+    }
+    .fab-back:hover, .fab-back:active {
+      transform: scale(1.08);
+      opacity: 1;
+      background: var(--bg-accent);
+    }
+    .fab-back svg { width: 20px; height: 20px; }
+
+    /* 公式排版防溢出 */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .part-divider {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin: 20px 2px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目 */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.18s ease;
+    }
+    details.guide-section[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+      background: var(--bg-card);
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .color-navy { background: var(--bg-accent); color: var(--primary); }
+    .color-amber { background: var(--bg-warm); color: var(--secondary); }
+    .color-bamboo { background: var(--bg-success); color: var(--success); }
+    .color-purple { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+    .color-rose { background: var(--bg-danger); color: var(--danger); }
+    .color-cyan { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+
+    .sec-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--text-main); }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; font-weight: 600; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+
+    .section-content {
+      padding: 10px 12px 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 14px 18px 22px; }
+    }
+
+    /* 内部小标题与区块 */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; }
+
+    /* 纯色块 */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 12px;
+      border-radius: 6px;
+      margin: 9px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 标签 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 表格移动端自适应 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 10px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    ul, ol { padding-left: 19px; margin: 6px 0 10px; }
+    li { font-size: 14.8px; margin-bottom: 5px; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      background: var(--bg-subtle);
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      color: var(--primary);
+    }
+    pre {
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+    }
+    pre code { background: none; padding: 0; color: var(--text-main); }
+
+    footer {
+      text-align: center;
+      padding: 28px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      
+      <h1>AI 工程认知的理论体系与训练方法</h1>
+      <div class="hero-sub">Rosemary Garden 精读导读</div>
+      
+    </header>
+
+    <!-- 置顶工具栏 -->
+    <nav class="toolbar">
+      <button class="t-btn btn-back" onclick="navigateBack()">← 作品廊</button>
+      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 全部展开 (10)</button>
+      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 全部收起</button>
+      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 顶部</button>
+    </nav>
+
+    <!-- 手风琴内容区块 -->
+    <main>
+      
+      <div class="part-divider" id="part-1">
+        <span>从“心中成图”到“心中运行”：AI 工程认知的理论体系与训练方法</span>
+      </div><div class="part-preamble item-block"><p>我认为，“心中运行”值得在 <code>ai-practice</code> 学科包中发展为一个独立的核心训练领域，而不是仅仅作为系统思维的一项子技能。</p>
+<p>几何心理动画的本质，是人在没有实际操作图形的情况下，在头脑中模拟图形的生成、变换、约束与关系变化。</p>
+<p>AI 工程中的“心中运行”则更进一步：</p>
+<div class="tint-box">
+<p>人在没有实际执行智能系统之前，能够在头脑中构建系统的因果模型，模拟信息流、控制流、状态变化、AI 的可能行为以及人机交互的后果，并据此规划、预测、诊断和重构系统。</p>
+</div>
+<p>这里的“模拟”并不是要求人能够预测大语言模型的每一个输出 token，而是要求人能够理解系统的运行机制、可能的行为范围、不确定性、失败条件与控制边界。</p>
+<p>两者的认知结构有很强的对应关系。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">几何心理动画</th>
+<th align="left">AI 系统心理运行</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">图形构型块</td>
+<td align="left">系统功能组件</td>
+</tr>
+<tr>
+<td align="left">图形生成顺序</td>
+<td align="left">系统构建与执行顺序</td>
+</tr>
+<tr>
+<td align="left">点、线、角的关系</td>
+<td align="left">数据、接口、状态与依赖关系</td>
+</tr>
+<tr>
+<td align="left">动点轨迹</td>
+<td align="left">信息流与状态迁移</td>
+</tr>
+<tr>
+<td align="left">运动约束与不变量</td>
+<td align="left">系统约束、接口契约与不变量</td>
+</tr>
+<tr>
+<td align="left">特殊位置与退化</td>
+<td align="left">边界条件与故障状态</td>
+</tr>
+<tr>
+<td align="left">辅助线构造</td>
+<td align="left">新组件、校验机制与反馈回路</td>
+</tr>
+<tr>
+<td align="left">证明规划</td>
+<td align="left">工程规划与验证路径</td>
+</tr>
+<tr>
+<td align="left">几何直觉的形式化验证</td>
+<td align="left">系统直觉的实验与评测验证</td>
+</tr>
+</tbody></table>
+<p>不过，AI 系统与几何图形存在一个关键差异：几何关系通常是确定性的，智能系统的行为则具有概率性、环境依赖性和一定程度的不可预测性。</p>
+<p>所以，“心中运行”必须同时包含确定性机制推演、概率性行为预测和不确定性管理。</p>
+</div>
+      <details class="guide-section" id="sec-01" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">01</span>
+            <span class="sec-title">一、最值得借鉴的八条理论研究路线</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>我查阅了计算机教育、认知科学、认知工程、人因工程和 Human–AI Interaction 的相关研究。其中，Sorva 的概念执行机器、Endsley 的态势感知、Johnson-Laird 的心理模型和人机共享心理模型研究，尤其值得像几何课研究 Koedinger 一样深入开采。</p>
+<div class="sub-heading">1. Johnson-Laird：心理模型理论（Mental Model Theory）</div>
+<p>心理模型理论的核心观点是，人并非只能通过抽象符号规则进行推理，还可以在头脑中建立代表现实或可能情境的内部模型，并通过操作这些模型得出结论。</p>
+<p>对于 AI 工程教育，关键在于区分三种理解：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">理解层次</th>
+<th align="left">学生的表现</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">陈述性知识</td>
+<td align="left">知道什么是 RAG、Agent、上下文窗口</td>
+</tr>
+<tr>
+<td align="left">结构性理解</td>
+<td align="left">知道这些组件之间怎样连接</td>
+</tr>
+<tr>
+<td align="left">可运行的心理模型</td>
+<td align="left">能根据具体输入预测系统行为，解释异常，并设计改进</td>
+</tr>
+</tbody></table>
+<p>只有第三层真正接近我们所说的“心中运行”。</p>
+<p>例如，学生知道 Agent 可以调用工具，并不意味着他理解：</p>
+<div class="tint-box">
+<p>如果工具返回错误信息、调用失败或者返回值不完整，后续 Agent 会怎样行动？系统能否识别失败？是否会继续执行？人在哪里介入？</p>
+</div>
+<p>这些问题要求学生在脑海中构建一个可以运行、可以改变条件、可以产生不同后果的内部系统模型。</p>
+<p>2026 年发表的人机交互心理模型系统性范围综述，也将用户对 AI 的内部表征作为理解人机交互行为的重要研究对象，并区分心理模型、信任和对 AI 意图的归因。</p>
+<div class="tint-box">
+<p><strong>课程转化</strong>：建立心理模型、运行模型、比较预测与实际结果、修正心理模型。</p>
+</div>
+<div class="sub-heading">2. Sorva：概念执行机器（Notional Machine）</div>
+<p>计算机科学教育 · 2013</p>
+<p>这是与几何心理动画最直接对应的成熟研究方向。</p>
+<p>Sorva 将 Notional Machine 描述为一台用于理解某类程序如何执行的抽象计算机。他的综述指出，建立正确的概念执行机器是初学者学习编程面临的重要挑战。</p>
+<p>学习编程的学生不能只理解代码语法，还需要在头脑中模拟：</p>
+<ul>
+<li>当前变量和状态是什么；</li>
+<li>下一步执行什么指令；</li>
+<li>条件判断会进入哪个分支；</li>
+<li>数据如何变化；</li>
+<li>哪些信息会被保留。</li>
+</ul>
+<p>这正是计算机领域的“心理动画”。</p>
+<p>我建议将这一理论扩展到 AI 工程课程，建立一个 AI Notional Machine（AI 概念执行机器）。
+![[Pasted image 20261126162040.png]]</p>
+<p>学生需要能够在没有实际调用 AI 之前，沿着这个模型预测系统可能发生什么。</p>
+<p>尤其重要的是区分：</p>
+<div class="tint-box">
+<p>模型生成了一条工具调用请求，不等于工具已经执行；工具返回成功，不等于业务目标已经实现；AI 声称记住了某件事，不等于信息已经持久化。</p>
+</div>
+<p>这种概念执行机器可以成为 AI 学科包的基础认知模型。</p>
+<div class="sub-heading">3. Endsley：态势感知理论（Situation Awareness）</div>
+<p>认知工程与人因工程 · 1995</p>
+<p>如果说 Notional Machine 解决的是“系统如何运行”，那么 Endsley 解决的是“人如何在动态系统中保持理解和控制”。</p>
+<p>态势感知理论源于航空、复杂设备操作等动态决策环境，经典框架包含三个层级：感知环境中的要素、理解当前情境、预测未来状态。</p>
+<pre><code class="language-mermaid">graph TD
+    subgraph &quot;态势感知 (Situation Awareness)&quot;
+        SA1[&quot;SA1 · Perception 感知&lt;br&gt;当前系统实际发生了什么？&lt;br&gt;工具调用、数据来源、任务进度、错误日志、权限状态&quot;]
+        SA2[&quot;SA2 · Comprehension 理解&lt;br&gt;这些状态对当前目标意味着什么？&lt;br&gt;错误原因、组件依赖、风险、完成条件&quot;]
+        SA3[&quot;SA3 · Projection 预测&lt;br&gt;如果继续执行，接下来可能发生什么？&lt;br&gt;状态演化、错误传播、可能后果、干预时机&quot;]
+        
+        SA1 --&gt; SA2 --&gt; SA3
+    end
+
+    subgraph &quot;AI 工程教育扩展 (Extension)&quot;
+        SA4[&quot;SA4 · Intervention &amp; Control 干预与控制&lt;br&gt;当前状态下，应如何调整策略？&lt;br&gt;课程设计层面的扩展动作&quot;]
+    end
+
+    SA3 --&gt; SA4
+    
+    style SA1 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style SA2 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style SA3 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style SA4 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,stroke-dasharray: 5 5
+</code></pre>
+<p>这套理论特别适用于 Agent、人机协同和自动化工作流课程。</p>
+<p>例如：</p>
+<div class="tint-box">
+<p>AI 告诉学生“任务已经完成”。</p>
+<ul>
+<li>SA1：实际有哪些文件、测试结果、执行日志？</li>
+<li>SA2：这些证据是否满足任务要求？</li>
+<li>SA3：如果立即部署，可能发生什么问题？</li>
+</ul>
+</div>
+<p>掌握态势感知的学生不会被 AI 的语言表现牵着走，而是能够根据真实状态作出判断。</p>
+<p>我建议将三个层级直接转化成训练范式和诊断标准，并进一步增加一个课程设计层面的动作：干预与控制。</p>
+<div class="tint-box">
+<p><strong>注意</strong>：这个第四动作是我们为了 AI 工程教育提出的扩展，不是 Endsley 原有的第四级态势感知。</p>
+</div>
+<div class="sub-heading">4. Sarter &amp; Woods：模式感知与自动化意外（Mode Awareness）</div>
+<p>认知系统工程 · 1995</p>
+<p>这是一个容易被 AI 教育忽略、但极具现实价值的研究方向。</p>
+<p>Sarter 和 Woods 在航空自动化研究中发现，当操作者无法准确理解自动化系统当前处于什么模式、为什么进入该模式、下一步会做什么时，就容易发生所谓的 Automation Surprise（自动化意外）。</p>
+<p>在 AI 系统中，同样存在类似问题。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">用户的心理预期</th>
+<th align="left">系统实际可能发生的情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AI 正在研究问题</td>
+<td align="left">AI 正在依据已有知识生成文本</td>
+</tr>
+<tr>
+<td align="left">AI 已经调用工具</td>
+<td align="left">AI 只是提出了工具调用请求</td>
+</tr>
+<tr>
+<td align="left">AI 已经保存信息</td>
+<td align="left">信息可能仅存在于当前上下文</td>
+</tr>
+<tr>
+<td align="left">AI 已经完成任务</td>
+<td align="left">只生成了方案，并未执行</td>
+</tr>
+<tr>
+<td align="left">AI 正在自主检查结果</td>
+<td align="left">系统可能没有任何独立验证环节</td>
+</tr>
+<tr>
+<td align="left">AI 理解我的全部意图</td>
+<td align="left">当前上下文可能缺少关键约束</td>
+</tr>
+</tbody></table>
+<p>这种差异可以称为心理模型与真实系统状态之间的失配。</p>
+<p>建议开发独立的“模式辨别训练”，让学生面对不同 AI 工作状态，判断系统目前实际具备什么信息、能力和权限。</p>
+<p>特别是学习 Agent 时，要训练学生区分：</p>
+<ul>
+<li>规划态与执行态；</li>
+<li>生成态与检索态；</li>
+<li>建议态与决策态；</li>
+<li>临时上下文与持久化状态；</li>
+<li>自动执行与等待人工确认。</li>
+</ul>
+<p>这些训练不能仅考察术语，而要让学生根据实际记录判断当前系统状态。</p>
+<div class="sub-heading">5. Gary Klein：专家决策与心理预演</div>
+<p>Naturalistic Decision Making · 自然情境决策</p>
+<p>Klein 的 Recognition-Primed Decision Model（识别启动决策模型）研究了专家如何在复杂现实环境中迅速作出决策。</p>
+<p>其中的重要机制是：专家识别熟悉的情境结构，形成一个可行行动方案，再通过心理模拟判断该方案可能产生什么后果。</p>
+<p>这与 Koedinger 的几何构型识别存在很有启发性的相似性。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">几何专家</th>
+<th align="left">工程专家</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">识别有意义的构型块</td>
+<td align="left">识别有意义的系统状态与问题模式</td>
+</tr>
+<tr>
+<td align="left">激活相关定理与方法</td>
+<td align="left">激活已有案例与工程策略</td>
+</tr>
+<tr>
+<td align="left">预测可能的证明路线</td>
+<td align="left">预测可能的执行过程</td>
+</tr>
+<tr>
+<td align="left">发现缺失条件</td>
+<td align="left">发现风险、缺失组件与信息</td>
+</tr>
+<tr>
+<td align="left">调整证明规划</td>
+<td align="left">修订架构和行动方案</td>
+</tr>
+</tbody></table>
+<p>相关的 Prospective Hindsight（前瞻性回顾）研究，则通过把未来某一事件假设成已经发生，引导人生成可能的原因解释。</p>
+<p>可据此引入一个非常有用的工程最佳实践：Pre-mortem（事前验尸）。</p>
+<p>在项目尚未启动时，让学生假设：</p>
+<div class="tint-box">
+<p>“三天后，这个 AI 研究助手彻底失败了，而且使用者不再信任它。”</p>
+</div>
+<p>学生需要在头脑中逆向模拟导致失败的可能路径，找出最早的关键缺陷，并提出检测与预防方案。</p>
+<p>这种训练比单纯问“项目有什么风险”更具体，因为它要求学生把风险组织成一条可以解释的因果链。</p>
+<div class="sub-heading">6. Kulesza 等：解释性调试（Explanatory Debugging）</div>
+<p>Interactive Machine Learning · 2013–2015</p>
+<p>这是我认为对人理解 AI 并与之持续协同最具直接价值的研究之一。</p>
+<p>传统调试主要是：</p>
+<div class="tint-box">
+<p>人发现程序错误，然后修改代码。</p>
+</div>
+<p>解释性调试则强调双向过程：</p>
+<div class="tint-box">
+<p>智能系统向人提供关于预测的解释，人依据理解向系统反馈必要的修正。</p>
+</div>
+<p>Kulesza 等人在交互式机器学习系统中的实证研究发现，这类机制能够改善用户对系统的理解与纠错效率。</p>
+<p>它意味着，人机协同不仅是人不断修改 AI 的输出，更是人不断修正自己对 AI 的理解。</p>
+<p>例如：</p>
+<p>学生要求 AI 根据资料生成一个研究结论，结果发现其中出现了未经证实的推断。</p>
+<p>普通提示词训练可能教学生补一句：</p>
+<div class="tint-box">
+<p>“不要产生幻觉。”</p>
+</div>
+<p>解释性调试训练则要求进一步追问：</p>
+<ul>
+<li>系统实际获得了哪些材料？</li>
+<li>哪一部分输入不足以支持结论？</li>
+<li>事实与推断之间的边界在哪里？</li>
+<li>是检索错误、任务约束不足、生成偏差，还是验证流程缺失？</li>
+<li>怎样修改系统并验证所提出的原因？</li>
+</ul>
+<p>这里不仅修复了一个输出，还修复了学生的系统心理模型。</p>
+<div class="tint-box">
+<p><strong>注意</strong>：原研究针对的是可解释的交互式机器学习系统，不能直接假定大语言模型能够可靠解释自身内部推断过程。LLM 生成的自我解释也需要通过外部实验、输入输出对照和执行记录校验。</p>
+</div>
+<div class="sub-heading">7. Sterman：系统动力学与反馈误判</div>
+<p>System Dynamics · 1989</p>
+<p>“心中运行”不能只模拟线性工作流，还要训练学生理解反馈、延迟、累积与非线性关系。</p>
+<p>Sterman 通过动态决策实验研究人们对反馈系统的误判，实验涉及多个参与者、反馈关系、时间延迟和非线性机制。</p>
+<p>这一研究对于 Agent 工作流非常有意义。</p>
+<p>例如，某个系统设计了自动审查与自动修订：</p>
+<pre><code class="language-mermaid">graph LR
+    A[生成初稿] --&gt; B[自动审查]
+    B --&gt; C{审查通过?}
+    C -- 否 --&gt; D[自动修订]
+    D --&gt; B
+    C -- 是 --&gt; E[交付输出]
+    
+    style A fill:#fff,stroke:#333
+    style B fill:#fff,stroke:#333
+    style C fill:#fff,stroke:#333
+    style D fill:#fff,stroke:#333
+    style E fill:#e8f5e9,stroke:#4caf50
+</code></pre>
+<p>反馈循环并不天然带来质量提升。它的效果取决于评价信号、修订机制、终止条件及各组件的失败相关性。</p>
+<p>学生需要能够预测：</p>
+<div class="tint-box">
+<p>增加审查次数是否一定更可靠？多个 Agent 是否会共享相同错误？不断修改是否可能破坏原先正确的内容？系统会不会进入无法终止的循环？</p>
+</div>
+<p>这也是为什么“心中运行”应包含多轮动态演化，而不能只停留在流程图阅读。</p>
+<div class="sub-heading">8. Shared Mental Models：人机共享心理模型</div>
+<p>团队认知与人机协作 · 2022–2026</p>
+<p>这一研究方向将心理模型从个体扩展到协作团队。</p>
+<p>2022 年关于人机团队共享心理模型的理论综述，以及2026年发表的人机团队互补性框架，都将任务理解、能力理解、协作协调、信任校准等视为值得研究的机制。</p>
+<p>对 AI 工程教育而言，这意味着学生不仅要理解 AI 怎么运行，还要理解：</p>
+<div class="tint-box">
+<p>AI 系统获得的任务表征，与人自己头脑中的任务表征是否一致。</p>
+</div>
+<p>例如，人认为任务的第一优先级是科学严谨性，而提供给 AI 的上下文却主要强调语言流畅和输出速度。</p>
+<p>此时，问题不是 AI 完全不具备科学研究能力，而是人机之间的目标、约束和评价标准没有得到有效协调。</p>
+<p>建议将传统的提示词训练升级为：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">协同要素</th>
+<th align="left">学生需要建立的心理模型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">目标</td>
+<td align="left">AI 获得了怎样的任务目标？</td>
+</tr>
+<tr>
+<td align="left">背景</td>
+<td align="left">AI 实际能够访问哪些信息？</td>
+</tr>
+<tr>
+<td align="left">分工</td>
+<td align="left">AI 应承担什么，人必须承担什么？</td>
+</tr>
+<tr>
+<td align="left">能力</td>
+<td align="left">当前系统在哪些任务上可靠？</td>
+</tr>
+<tr>
+<td align="left">进度</td>
+<td align="left">任务现在处于什么状态？</td>
+</tr>
+<tr>
+<td align="left">成功标准</td>
+<td align="left">什么证据才意味着任务完成？</td>
+</tr>
+</tbody></table>
+<p>需要强调的是，这里的“共享心理模型”并不意味着 AI 与人具有相同的主观心理体验，而是指人机之间形成足以协调任务的功能性表征、信息与行为预期。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-02" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">02</span>
+            <span class="sec-title">二、最重要的新发现：Hegarty 的机械心理动画研究</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>在进一步检索中，我发现了一条与几何心理动画和 AI 系统心理运行联系尤其紧密的研究路线。</p>
+<p>Mary Hegarty 在1992年的论文《Mental Animation: Inferring Motion from Static Displays of Mechanical Systems》中提出，人进行机械心理动画时，会将机械系统分解为对应于各组件的较小单元，再按照系统运行的因果顺序逐步模拟这些组件。</p>
+<p>2004年的《Mechanical Reasoning by Mental Simulation》进一步讨论了机械推理中的心理模拟机制。</p>
+<p>这可能是连接 Koedinger 几何构型块研究与 AI 工程心智建模的最佳理论桥梁之一。</p>
+<p>三者存在一个共同的认知机制：
+![[Pasted image 20261126161739.png]]</p>
+<pre><code class="language-mermaid">graph TD
+    subgraph &quot;几何领域 (Koedinger)&quot;
+        K1[&quot;图形构型块&quot;] --&gt; K2[&quot;关系与约束&quot;] --&gt; K3[&quot;证明规划&quot;]
+    end
+    
+    subgraph &quot;机械领域 (Hegarty)&quot;
+        H1[&quot;组件分解&quot;] --&gt; H2[&quot;因果顺序&quot;] --&gt; H3[&quot;动态模拟&quot;]
+    end
+    
+    subgraph &quot;计算领域 (Sorva)&quot;
+        S1[&quot;抽象状态&quot;] --&gt; S2[&quot;执行追踪&quot;] --&gt; S3[&quot;行为预测&quot;]
+    end
+    
+    K2 -.-&gt; H2
+    H2 -.-&gt; S2
+    
+    K3 --&gt; Target[&quot;复杂系统的心理运行&quot;]
+    H3 --&gt; Target
+    S3 --&gt; Target
+    
+    Target --&gt; Final[&quot;分块 → 关系 → 因果顺序 → 动态模拟 → 预测 → 验证&quot;]
+    
+    style Target fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+    style Final fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+</code></pre>
+<div class="tint-box">
+<p>这是跨研究领域的综合模型，不是三位研究者共同提出的现成理论。</p>
+</div>
+<p>尤其值得借鉴的是 Hegarty 在2003年与 Kriz、Cate 关于内部心理动画和外部计算机动画的研究。他们直接比较了静态图、运动预测、计算机动画等教学条件对机械系统心理模型的影响。</p>
+<p>这为 AI 工程课程提出了一个非常明确的研究问题：</p>
+<div class="tint-box">
+<p>直接观看 Agent 执行过程，和先在头脑中预测 Agent 执行过程、再观看真实执行轨迹，两种学习方式是否会产生不同质量的系统心理模型？</p>
+</div>
+<p>我建议把这个问题作为学科包的重点本地验证假设。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-03">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">03</span>
+            <span class="sec-title">三、建立 AI 心理运行的六层模型</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>综合上述研究，我建议不要只训练一种系统心智模型，而是建立六层相互关联的心理模型。</p>
+<pre><code class="language-mermaid">graph TD
+    L1[&quot;L1 · 结构模型 Structural Model&lt;br&gt;系统由什么组成？&quot;]
+    L2[&quot;L2 · 执行模型 Execution Model&lt;br&gt;系统如何一步步运行？&quot;]
+    L3[&quot;L3 · 因果模型 Causal Model&lt;br&gt;为什么会产生这个结果？&quot;]
+    L4[&quot;L4 · 行为模型 Behavioral Model&lt;br&gt;AI 在不同条件下可能如何表现？&quot;]
+    L5[&quot;L5 · 协同模型 Collaboration Model&lt;br&gt;人与 AI 如何协调、干预和互补？&quot;]
+    L6[&quot;L6 · 演化模型 Evolution Model&lt;br&gt;系统如何在反馈中学习、改变和重构？&quot;]
+
+    L1 --&gt; L2 --&gt; L3 --&gt; L4 --&gt; L5 --&gt; L6
+    
+    style L1 fill:#e3f2fd,stroke:#1e88e5
+    style L2 fill:#e3f2fd,stroke:#1e88e5
+    style L3 fill:#e3f2fd,stroke:#1e88e5
+    style L4 fill:#e3f2fd,stroke:#1e88e5
+    style L5 fill:#e3f2fd,stroke:#1e88e5
+    style L6 fill:#e3f2fd,stroke:#1e88e5
+</code></pre>
+<div class="tint-box">
+<p>这里的 L1–L6 代表心理模型的六个层面，不是 Growth OS 的能力成熟度等级。正式学科包中可以使用 M1–M6，避免命名冲突。</p>
+</div>
+<div class="sub-heading">M1：结构心理模型——看见系统的骨架</div>
+<p>训练组件分解、层次关系、功能职责、接口与边界。</p>
+<p>学生看到一个 AI 应用时，不只是看到聊天界面，而能够识别模型、知识库、工具、状态管理、权限控制、评测等实际或候选组件，并通过证据确认它们是否存在。</p>
+<div class="sub-heading">M2：执行心理模型——让系统在头脑中运行</div>
+<p>训练执行顺序、数据流、控制流、状态迁移、分支与循环。</p>
+<p>这是与几何心理动画最直接对应的层面。</p>
+<div class="sub-heading">M3：因果心理模型——理解为什么</div>
+<p>训练因果传播、依赖关系、反馈、反事实推理、错误定位。</p>
+<p>de Kleer 与 Brown 的定性物理研究，以及 Forbus 的 Qualitative Process Theory，都试图根据系统结构和局部机制推导整体行为及因果解释。它们为“不依赖精确数值、先建立定性运行模型”的训练提供了理论参考。</p>
+<p>学生可以不懂完整的 Transformer 数学推导，但仍需理解为什么缺失信息、错误检索或不充分的验证会影响系统结果。</p>
+<div class="sub-heading">M4：行为心理模型——理解概率性 AI</div>
+<p>这一层是区别于传统计算机系统的关键。</p>
+<p>学生需要理解：</p>
+<div class="tint-box">
+<p>同样的输入未必产生完全相同的输出；模型可能在一种任务中表现很好，在另一种看似相近的任务中失败；语言表达的确定性不等于结论正确；系统行为不能仅由静态架构图完全推出。</p>
+</div>
+<p>因此，要从预测唯一答案，升级到预测可能行为、失败条件和不确定性范围。</p>
+<div class="sub-heading">M5：协同心理模型——理解人在系统中的位置</div>
+<p>学生不仅预测 AI，还要预测人类判断与 AI 行为之间的相互影响。</p>
+<p>例如，AI 提出一个看似合理的方案，人会不会因为 AI 表达自信而放弃自己的判断？AI 不知道学生的真实目的时，学生能否识别目标失配？什么时候应该介入、停止、重新委派？</p>
+<p>这涉及共享心理模型、态势感知、自动化偏误和恰当依赖。</p>
+<div class="sub-heading">M6：演化心理模型——理解系统如何变化</div>
+<p>训练跨轮次、跨任务、跨版本的动态系统思维。</p>
+<p>例如，当系统增加长期记忆、引入自动审查、改变模型或部署环境时，系统的行为和风险会发生什么变化？新的反馈机制会改善质量还是放大错误？</p>
+<p>这是真正走向复杂 AI 工程设计的高级能力。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-04">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">04</span>
+            <span class="sec-title">四、最成熟的教学实践：PRIMM 的 AI 工程扩展</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>Sentance、Waite 和 Kallia 提出的 PRIMM，是目前非常值得直接借鉴的计算机教育实践。</p>
+<p>2019年的研究在13所学校、493名11—14岁学生中进行了评价，年龄范围与你的中学课程设计高度相关。PRIMM 由五个环节组成：Predict、Run、Investigate、Modify、Make。</p>
+<p>原有 PRIMM 已具有中学编程教学的研究基础；下面将其扩展到 AI 工程领域，是新的设计候选方案。</p>
+<div class="sub-heading">AI-PRIMM：从预测到创造</div>
+<pre><code class="language-mermaid">graph LR
+    P[&quot;P - Predict · 心中预测&lt;br&gt;不运行 AI，先预测系统执行过程、可能输出和失败条件。&quot;]
+    R[&quot;R - Run · 真实运行&lt;br&gt;实际执行系统，获得输出、日志、工具调用和状态证据。&quot;]
+    I[&quot;I - Investigate · 差异调查&lt;br&gt;比较预测与现实，定位机制理解、信息或系统设计上的偏差。&quot;]
+    M1[&quot;M - Modify · 控制变量修改&lt;br&gt;修改一个关键条件或组件，重新预测并进行实验验证。&quot;]
+    M2[&quot;M - Make · 独立创造&lt;br&gt;将获得的系统认知迁移到新的真实任务，自主设计解决方案。&quot;]
+
+    P --&gt; R --&gt; I --&gt; M1 --&gt; M2
+    
+    style P fill:#fff3e0,stroke:#ff9800
+    style R fill:#fff3e0,stroke:#ff9800
+    style I fill:#fff3e0,stroke:#ff9800
+    style M1 fill:#fff3e0,stroke:#ff9800
+    style M2 fill:#fff3e0,stroke:#ff9800
+</code></pre>
+<p>它与几何心象课程的训练节奏天然呼应：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">几何心象训练</th>
+<th align="left">AI-PRIMM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">先心中成图</td>
+<td align="left">Predict</td>
+</tr>
+<tr>
+<td align="left">观看几何动画</td>
+<td align="left">Run</td>
+</tr>
+<tr>
+<td align="left">比较心象与实际图形</td>
+<td align="left">Investigate</td>
+</tr>
+<tr>
+<td align="left">改变条件，重新推演</td>
+<td align="left">Modify</td>
+</tr>
+<tr>
+<td align="left">创造辅助构型与证明路线</td>
+<td align="left">Make</td>
+</tr>
+</tbody></table>
+<p>区别是 AI-PRIMM 的终点并非仅仅理解系统，而是能够自主改变系统、创造系统。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-05">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">05</span>
+            <span class="sec-title">五、八种值得开发成正式任务族的心理运行训练</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>建议将下列任务族作为 <code>ai-practice.md</code> 的重要组成部分。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">任务族</th>
+<th align="left">训练操作</th>
+<th align="left">主要理论来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">系统块快认</td>
+<td align="left">快速识别功能组件、接口及依赖</td>
+<td align="left">Hegarty、Notional Machine</td>
+</tr>
+<tr>
+<td align="left">消失状态重建</td>
+<td align="left">根据前后状态推断中间执行过程</td>
+<td align="left">心理动画、状态追踪</td>
+</tr>
+<tr>
+<td align="left">无运行预测</td>
+<td align="left">在系统执行前预测结果与路径</td>
+<td align="left">PRIMM</td>
+</tr>
+<tr>
+<td align="left">因果链追踪</td>
+<td align="left">解释错误怎样从一个组件传播到另一个</td>
+<td align="left">Qualitative Reasoning</td>
+</tr>
+<tr>
+<td align="left">反事实扰动</td>
+<td align="left">改变一个条件，预测系统新行为</td>
+<td align="left">心理模拟、系统动力学</td>
+</tr>
+<tr>
+<td align="left">模式意外辨别</td>
+<td align="left">判断 AI 处于什么执行与权限状态</td>
+<td align="left">Sarter &amp; Woods</td>
+</tr>
+<tr>
+<td align="left">心理模型调试</td>
+<td align="left">由预测失败反推自己理解中的错误</td>
+<td align="left">Explanatory Debugging</td>
+</tr>
+<tr>
+<td align="left">人机协同预演</td>
+<td align="left">预测不同分工、沟通与干预策略的结果</td>
+<td align="left">Shared Mental Models、Endsley</td>
+</tr>
+</tbody></table>
+<p>下面以三个任务为例，说明真正应该训练到什么程度。</p>
+<div class="sub-heading">训练一：Agent 消失状态重建</div>
+<p>给出一个系统的初始状态与最终结果，但隐藏其中间执行记录。</p>
+<div class="tint-box">
+<p><strong>已知</strong>： 用户要求 AI 查询资料并生成带有来源的报告。
+<strong>结果</strong>： 报告语言流畅，但是其中一个引用不存在。</p>
+</div>
+<p>学生需要提出至少两种可能的执行路径，说明还需要查看哪些证据才能区分它们。</p>
+<div class="tint-box">
+<p><strong>关键在于不能把这一题设计成唯一答案题。</strong></p>
+</div>
+<p>不存在的引用可能来自未检索直接生成、错误资料、检索结果被错误解释等不同机制。优秀学生应当知道，缺乏运行记录时无法唯一定位原因。</p>
+<p>评价的是假设生成、因果推理和不确定性管理。</p>
+<div class="sub-heading">训练二：概率分支心理预演</div>
+<p>假设一个 AI 工作流收到一份证据不充分的资料。</p>
+<pre><code class="language-mermaid">graph TD
+    Start[&quot;收到证据不充分的资料&quot;] --&gt; Branch{&quot;系统策略&quot;}
+    
+    Branch -- &quot;策略A&quot; --&gt; A1[&quot;直接要求生成结论&quot;]
+    Branch -- &quot;策略B&quot; --&gt; B1[&quot;增加来源核验与证据不足处理&quot;]
+    Branch -- &quot;策略C&quot; --&gt; C1[&quot;关键结论必须经过人工审核&quot;]
+    
+    A1 --&gt; RiskA[&quot;风险: 产生无法验证的推断&quot;]
+    B1 --&gt; RiskB[&quot;风险: 核验机制本身可能失效或过度保守&quot;]
+    C1 --&gt; RiskC[&quot;风险: 人工审核成为瓶颈或流于形式&quot;]
+    
+    style Branch fill:#fce4ec,stroke:#e91e63
+</code></pre>
+<div class="tint-box">
+<p>思考：系统没有显式核验环节，哪些输出风险无法由架构约束消除？</p>
+</div>
+<div class="tint-box">
+<p>教学示意模型。实际分支取决于模型、指令、工具实现与人工流程。</p>
+</div>
+<p>这种训练要求学生从线性心理动画升级到分支式心理运行。</p>
+<p>在真实 AI 工程中，这是必不可少的。</p>
+<div class="sub-heading">训练三：双重心理模型调试</div>
+<p>当 AI 系统输出不符合预期时，学生需要同时检查两个模型：</p>
+<p>一个是外部工程系统的实际结构，另一个是自己对系统的理解。</p>
+<p>例如：</p>
+<div class="tint-box">
+<p>学生预测知识库中增加一条资料后，AI 一定会正确回答相关问题。
+实验却发现输出没有变化。</p>
+</div>
+<p>学生不能直接让 AI 修改程序，而要依次检查：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">待检验假设</th>
+<th align="left">对应证据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">资料没有成功保存</td>
+<td align="left">存储状态</td>
+</tr>
+<tr>
+<td align="left">资料保存了，但没有被检索</td>
+<td align="left">检索记录</td>
+</tr>
+<tr>
+<td align="left">资料检索到了，但未进入模型上下文</td>
+<td align="left">上下文记录</td>
+</tr>
+<tr>
+<td align="left">资料进入了上下文，但被错误解释</td>
+<td align="left">输入输出对照</td>
+</tr>
+<tr>
+<td align="left">我的预测本身不成立</td>
+<td align="left">多组控制变量实验</td>
+</tr>
+</tbody></table>
+<p>真正的学习发生在学生发现并修正自己心理模型中的错误时，而不只是系统最终恢复运行时。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-06">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">06</span>
+            <span class="sec-title">六、AI 心理运行的专业工程最佳实践</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>除了教育研究，还应引入软件工程、Agent 工程和 SRE 的成熟实践。但应把它们转化为认知训练，而不是照搬企业流程。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">工程实践</th>
+<th align="left">转化为学生认知训练</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Dry Run 预演</td>
+<td align="left">实际执行前手工推演数据和状态</td>
+</tr>
+<tr>
+<td align="left">Sequence Diagram 时序图</td>
+<td align="left">预测组件之间的通信顺序</td>
+</tr>
+<tr>
+<td align="left">State Machine 状态机</td>
+<td align="left">判断当前模式、转换条件和终止状态</td>
+</tr>
+<tr>
+<td align="left">Distributed Tracing 分布式追踪</td>
+<td align="left">根据实际记录重建系统执行过程</td>
+</tr>
+<tr>
+<td align="left">Fault Injection 故障注入</td>
+<td align="left">预测局部故障的传播与恢复</td>
+</tr>
+<tr>
+<td align="left">Pre-mortem 事前验尸</td>
+<td align="left">模拟未来失败并逆向寻找原因</td>
+</tr>
+<tr>
+<td align="left">Regression Testing 回归测试</td>
+<td align="left">预测修改可能破坏哪些原有能力</td>
+</tr>
+<tr>
+<td align="left">Observability 可观测性</td>
+<td align="left">设计足以判断真实系统状态的信息</td>
+</tr>
+<tr>
+<td align="left">Human-in-the-loop 人工介入</td>
+<td align="left">设计人在何处、依据什么作出判断</td>
+</tr>
+<tr>
+<td align="left">Architecture Trade-off 架构取舍</td>
+<td align="left">比较简单流程与复杂 Agent 的成本和收益</td>
+</tr>
+</tbody></table>
+<p>Anthropic 的《Building Effective Agents》强调区分工作流与自主 Agent，从简单方案起步，依靠全面评测逐步增加复杂度，并提高执行过程的透明性。这些是值得吸收的产业实践，而非针对中学生的教学效果研究。</p>
+<p>Google SRE 关于分布式系统监控的实践，则提供了如何通过可观测信号理解真实运行状态的工程范例。</p>
+<p>Amershi 等人的18项人机交互设计指南，也非常适合转化为学生的工程设计检查项：明确 AI 能力、支持纠错、允许拒绝、管理能力变化、给予用户适当控制。</p>
+<p>这里有一个重要的教育原则：</p>
+<div class="tint-box">
+<p>一个无法被有效观察和验证的系统，即使学生画出了漂亮的架构图，也很难证明学生真正理解并控制了它。</p>
+</div>
+<p>所以心理运行训练最终必须连接真实系统的可观测性设计。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-07">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">07</span>
+            <span class="sec-title">七、建立心理运行能力的可测标准</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>参考几何课对心理操作记录的要求，AI 工程课不应只收集最终答案，而应收集学生的预测、解释、判断和模型修订证据。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">测评维度</th>
+<th align="left">可观察证据</th>
+<th align="left">伪掌握表现</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">结构理解</td>
+<td align="left">独立重建系统组件与依赖</td>
+<td align="left">能复述 AI 生成的架构说明</td>
+</tr>
+<tr>
+<td align="left">执行预测</td>
+<td align="left">给定输入，正确追踪关键状态</td>
+<td align="left">运行之后才解释结果</td>
+</tr>
+<tr>
+<td align="left">因果推理</td>
+<td align="left">识别可能原因并设计鉴别实验</td>
+<td align="left">把最后一个报错当成根因</td>
+</tr>
+<tr>
+<td align="left">不确定性理解</td>
+<td align="left">区分必然、可能、未知的行为</td>
+<td align="left">把概率性系统当成确定性程序</td>
+</tr>
+<tr>
+<td align="left">反事实推理</td>
+<td align="left">改变条件后正确预测后果</td>
+<td align="left">只能解释原始示范案例</td>
+</tr>
+<tr>
+<td align="left">协同判断</td>
+<td align="left">根据真实状态决定是否干预</td>
+<td align="left">一律信任或一律拒绝 AI</td>
+</tr>
+<tr>
+<td align="left">心理模型修订</td>
+<td align="left">明确原预测错误在哪里</td>
+<td align="left">只修改输出、不修正理解</td>
+</tr>
+<tr>
+<td align="left">系统创造</td>
+<td align="left">将心理模型用于设计新系统</td>
+<td align="left">直接让 AI 生成完整方案</td>
+</tr>
+</tbody></table>
+<p>建议每次关键训练至少形成一份简洁的心理运行记录：</p>
+<pre><code class="language-text">1. 系统表征：我认为系统由哪些组件组成？
+2. 初始条件：系统当前有什么信息和状态？
+3. 心中运行：接下来可能发生什么？
+4. 因果依据：为什么预计会这样？
+5. 不确定性：哪些结果目前无法确定？
+6. 实际证据：真实运行发生了什么？
+7. 模型修订：我原先的理解哪里需要改变？
+8. 新的预测：改变条件后，又会发生什么？
+</code></pre>
+<p>但与几何包的心理操作记录一样，不应将填写完整记录表变成每一轮的机械要求。复杂任务可以保留完整记录，简单任务只需捕捉关键预测和修订。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-08">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">08</span>
+            <span class="sec-title">八、建议形成四级训练进阶</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>以下为课程设计层面的候选进阶，不等同于 Growth OS 正式的 L1–L4 等级定义。</p>
+<pre><code class="language-mermaid">graph TD
+    L1[&quot;L1: 单系统、确定性运行&lt;br&gt;追踪变量、状态、输入输出、简单程序与确定性工作流。&lt;br&gt;目标：在头脑中正确运行一个已知机制。&quot;]
+    L2[&quot;L2: 概率性与分支运行&lt;br&gt;引入 AI 生成、上下文变化、模型不确定性、失败分支。&lt;br&gt;目标：预测可能结果及其发生条件，而不是只预测唯一输出。&quot;]
+    L3[&quot;L3: 多人、多组件与人机协同运行&lt;br&gt;追踪任务委派、多 Agent、工具调用、共享信息、人工干预和反馈循环。&lt;br&gt;目标：能够监督、诊断和控制复杂协同系统。&quot;]
+    L4[&quot;L4: 系统演化与创造性重构&lt;br&gt;根据新的问题、约束、技术和反馈，预演尚不存在的系统，设计验证实验并实施创新。&lt;br&gt;目标：从理解既有系统走向创造新系统。&quot;]
+
+    L1 --&gt; L2 --&gt; L3 --&gt; L4
+    
+    style L1 fill:#e8f5e9,stroke:#4caf50
+    style L2 fill:#e8f5e9,stroke:#4caf50
+    style L3 fill:#e8f5e9,stroke:#4caf50
+    style L4 fill:#e8f5e9,stroke:#4caf50
+</code></pre>
+<p>第四级尤其重要。</p>
+<p>几何高手能够在头脑中构造原图不存在的辅助线；优秀的 AI 工程设计者也需要在头脑中构造原系统不存在的新组件、新接口、新反馈机制和新协同方式，并提前判断这些改变可能带来什么。</p>
+<p>这就是从心理模拟走向工程创造。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-09">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">09</span>
+            <span class="sec-title">九、核心研究文献：建议优先开采顺序</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <table class="term-table">
+<thead>
+<tr>
+<th align="left">优先级</th>
+<th align="left">文献</th>
+<th align="left">对学科包的价值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">P0</td>
+<td align="left"><a href="https://pubmed.ncbi.nlm.nih.gov/1402712/">Hegarty, 1992 — Mental Animation</a></td>
+<td align="left">心理动画、组件分解、因果执行</td>
+</tr>
+<tr>
+<td align="left">P0</td>
+<td align="left"><a href="https://eric.ed.gov/?id=EJ1042409">Sorva, 2013 — Notional Machines</a></td>
+<td align="left">概念执行机器与程序心理模型</td>
+</tr>
+<tr>
+<td align="left">P0</td>
+<td align="left"><a href="https://doi.org/10.1080/08993408.2019.1608781">Sentance et al., 2019 — PRIMM</a></td>
+<td align="left">中学生系统预测与操作训练</td>
+</tr>
+<tr>
+<td align="left">P0</td>
+<td align="left"><a href="https://doi.org/10.1518/001872095779049543">Endsley, 1995 — Situation Awareness</a></td>
+<td align="left">动态感知、理解、预测</td>
+</tr>
+<tr>
+<td align="left">P0</td>
+<td align="left"><a href="https://openaccess.city.ac.uk/id/eprint/13819/">Kulesza et al., 2015 — Explanatory Debugging</a></td>
+<td align="left">系统理解与心理模型修订</td>
+</tr>
+<tr>
+<td align="left">P0</td>
+<td align="left"><a href="https://doi.org/10.1080/1463922X.2022.2061080">Shared Mental Models in Human-AI Teams, 2022</a></td>
+<td align="left">人机任务协调与共享表征</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left"><a href="https://doi.org/10.1518/001872095779049516">Sarter &amp; Woods, 1995 — Mode Awareness</a></td>
+<td align="left">自动化意外与控制状态理解</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left"><a href="https://pubmed.ncbi.nlm.nih.gov/15165554/">Hegarty, 2004 — Mechanical Reasoning by Mental Simulation</a></td>
+<td align="left">心理模拟机制</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left"><a href="https://dspace.mit.edu/entities/publication/b0fc8bdb-a8bb-4560-8de5-c1528362df2f">Forbus, 1984 — Qualitative Process Theory</a></td>
+<td align="left">定性因果推演</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left"><a href="https://www.sciencedirect.com/science/article/pii/0749597889900411">Sterman, 1989 — Misperceptions of Feedback</a></td>
+<td align="left">反馈回路与动态系统误判</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left"><a href="https://doi.org/10.1145/3290605.3300233">Amershi et al., 2019 — Guidelines for Human-AI Interaction</a></td>
+<td align="left">人机交互工程设计</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left"><a href="https://doi.org/10.1007/s00146-026-03038-1">Users’ Mental Models within Human–AI Interaction, 2026</a></td>
+<td align="left">最新心理模型研究综述</td>
+</tr>
+<tr>
+<td align="left">P2</td>
+<td align="left"><a href="https://academic.oup.com/pnasnexus/article/5/3/pgag030/8490283">Human–AI Teaming Complementarity Framework, 2026</a></td>
+<td align="left">人机互补、协同与责任</td>
+</tr>
+</tbody></table>
+<div class="tint-box">
+<p>P0–P2 表示建议研发优先级，并不代表证据质量的学术排名。</p>
+</div>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-10">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">10</span>
+            <span class="sec-title">十、对 `ai-practice.md` 的进一步架构修订建议</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>经过这轮研究，我建议调整上一版学科包方案中“系统心智建模”的地位，将其提升为核心认知主轴。</p>
+<pre><code class="language-mermaid">graph TD
+    subgraph Goal [&quot;终极目标：适应性专长与智能增强创造&quot;]
+        direction TB
+        Center[&quot;心中运行&lt;br&gt;Mental Simulation of Human–AI Systems&quot;]
+        
+        M1[&quot;结构模型&quot;]
+        M2[&quot;执行模型&quot;]
+        M3[&quot;因果模型&quot;]
+        M4[&quot;行为模型&quot;]
+        M5[&quot;协同模型&quot;]
+        M6[&quot;演化模型&quot;]
+        
+        Center --- M1 &amp; M2 &amp; M3 &amp; M4 &amp; M5 &amp; M6
+        
+        Train[&quot;专业认知训练&lt;br&gt;AI-PRIMM、因果追踪、心理模型调试&quot;]
+        Practice[&quot;真实 PBL 实践&lt;br&gt;研究、设计、构建、测试、创新&quot;]
+        
+        Progression[&quot;理解 → 预测 → 控制 → 协同 → 创造&quot;]
+        
+        M1 &amp; M2 &amp; M3 &amp; M4 &amp; M5 &amp; M6 --&gt; Train
+        Train --&gt; Practice
+        Practice --&gt; Progression
+    end
+    
+    style Center fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style Progression fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+</code></pre>
+<p>与几何学科包相比，可以形成一组极有价值的对称关系。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">几何刻画思维</th>
+<th align="left">AI 工程思维</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">核心能力</td>
+<td align="left">心中成图</td>
+<td align="left">心中运行</td>
+</tr>
+<tr>
+<td align="left">专家认知内核</td>
+<td align="left">构型与几何关系</td>
+<td align="left">系统、因果与行为</td>
+</tr>
+<tr>
+<td align="left">心理操作</td>
+<td align="left">拆解、运动、变换、重组</td>
+<td align="left">追踪、分支、模拟、干预</td>
+</tr>
+<tr>
+<td align="left">训练主线</td>
+<td align="left">心象—图形—证明</td>
+<td align="left">心智模型—实验—工程</td>
+</tr>
+<tr>
+<td align="left">高阶能力</td>
+<td align="left">创造辅助构型</td>
+<td align="left">创造新的系统与协同机制</td>
+</tr>
+<tr>
+<td align="left">验证方式</td>
+<td align="left">数学证明</td>
+<td align="left">实验、评测、运行证据</td>
+</tr>
+<tr>
+<td align="left">最终目标</td>
+<td align="left">几何结构洞察</td>
+<td align="left">复杂智能系统洞察与驾驭</td>
+</tr>
+</tbody></table>
+<div class="sub-heading">研究边界</div>
+<p>这里提出的六层心理模型、八种训练范式、AI-PRIMM 和四级训练进阶，均属于综合已有研究后形成的课程研发候选方案，不是已经被统一验证的成熟 AI 教学体系。</p>
+<p>尤其需要在真实课程中验证三件事：</p>
+<ul>
+<li>先心理预演再运行，是否比直接操作 AI 更有利于建立准确的系统心理模型。</li>
+<li>心理模型训练能否迁移到陌生 AI 工具、Agent 架构和真实工程任务。</li>
+<li>学生是否能在广泛使用 AI 的同时，持续提升独立理解、协同判断和创造能力。</li>
+</ul>
+<p>不应在验证之前将它们整体标记为 <code>LOCAL_VALIDATED</code>。</p>
+<p>我的核心建议是：在 <code>ai-practice.md</code> 中正式设立“系统心理运行与人机协同认知”专节，作为类似于 <code>geometry-imagery.md</code> 中五段心象训练的专业认知底座，但不强制采用固定章轮模板。</p>
+<p>因为真正驾驭 AI 的人，不能只是知道如何向 AI 提出要求，也不能只是等待 AI 交付结果。</p>
+<p>他需要在行动之前预见系统，在行动之中理解系统，在行动之后修正系统，并最终能够在头脑中创造一个尚未存在的系统，再借助 AI 将其转化为现实。</p>
+
+        </div>
+      </details>
+    </main>
+
+    <!-- PWA / 移动端悬浮快捷返回按钮 -->
+    <button class="fab-back" onclick="navigateBack()" aria-label="返回作品廊" title="返回作品廊">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <footer>
+      <p>Rosemary Garden · <a href="/gallery/">返回作品廊</a> · <a href="/library/">返回图书馆</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+    }
+
+    function navigateBack() {
+      if (window.history.length > 1 && document.referrer && !document.referrer.includes(location.pathname)) {
+        window.history.back();
+      } else {
+        window.location.href = '/gallery/';
+      }
+    }
+
+    // Initialize KaTeX formulas
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\(", right: "\)", display: false},
+            {left: "\[", right: "\]", display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+</body>
+</html>
