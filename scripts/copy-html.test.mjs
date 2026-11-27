@@ -18,9 +18,10 @@ test("copyHtmlDir mirrors slugified directories while keeping asset filenames in
     writeFileSync(join(workDir, "assets", "Pasted image 1.png"), "png-bytes")
     writeFileSync(join(src, "计算机 AI", "AI 工程认知.html"), "<html>redirect</html>")
 
-    // Case 2: standalone *.html without counterpart index.html
-    mkdirSync(join(src, "英语", "Writing"), { recursive: true })
+    // Case 2: standalone *.html without counterpart index.html + sibling images/
+    mkdirSync(join(src, "英语", "Writing", "images"), { recursive: true })
     writeFileSync(join(src, "英语", "Writing", "My Essay.html"), "<html>essay</html>")
+    writeFileSync(join(src, "英语", "Writing", "images", "Fig 1.svg"), "<svg></svg>")
 
     await copyHtmlDir(src, dst)
 
@@ -53,6 +54,19 @@ test("copyHtmlDir mirrors slugified directories while keeping asset filenames in
     assert.equal(
       readFileSync(join(dst, "英语", "writing", "my-essay", "index.html"), "utf8"),
       "<html>essay</html>",
+    )
+    // Sibling images/ mirrored into both raw and slugified standalone page dirs
+    assert.equal(
+      readFileSync(join(dst, "英语", "Writing", "images", "Fig 1.svg"), "utf8"),
+      "<svg></svg>",
+    )
+    assert.equal(
+      readFileSync(join(dst, "英语", "Writing", "My Essay", "images", "Fig 1.svg"), "utf8"),
+      "<svg></svg>",
+    )
+    assert.equal(
+      readFileSync(join(dst, "英语", "writing", "my-essay", "images", "Fig 1.svg"), "utf8"),
+      "<svg></svg>",
     )
   } finally {
     rmSync(root, { recursive: true, force: true })

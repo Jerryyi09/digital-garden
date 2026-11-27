@@ -56,9 +56,17 @@ function slugifySegments(segments) {
  * links rewritten by `@quartz-community/crawl-links` (spaces -> `-`, uppercase ->
  * lowercase) resolve cleanly alongside raw URLs, while keeping relative asset
  * filenames inside `assets/` and `images/` subdirectories intact.
+ * Also mirrors sibling `images/` and `assets/` folders into mirrored
+ * `<name>/index.html` directories so relative asset URLs resolve with or without
+ * a trailing slash.
  */
 export async function copyHtmlDir(source, destination) {
-  async function walkAndCopy(currentSource, pageRelSegments = [], assetRelSegments = null) {
+  async function walkAndCopy(
+    currentSource,
+    pageRelSegments = [],
+    assetRelSegments = null,
+    inheritedMirrorRoots = [],
+  ) {
     await fs.mkdir(path.join(destination, ...pageRelSegments, ...(assetRelSegments ?? [])), {
       recursive: true,
     })
@@ -68,6 +76,27 @@ export async function copyHtmlDir(source, destination) {
 
     const entries = await fs.readdir(currentSource, { withFileTypes: true })
     const entryNames = new Set(entries.map((e) => e.name))
+    const slugPageRel = slugifySegments(pageRelSegments)
+    const slugPageParts = slugPageRel ? slugPageRel.split("/") : []
+
+    let currentMirrorRoots = inheritedMirrorRoots
+    if (assetRelSegments === null) {
+      const mirrorSet = new Set()
+      for (const entry of entries) {
+        if (!entry.isFile()) continue
+        if (!entry.name.toLowerCase().endsWith(".html")) continue
+        if (entry.name.toLowerCase() === "index.html") continue
+        const baseName = entry.name.slice(0, -5)
+        const hasDirectoryIndex =
+          entryNames.has(baseName) &&
+          (await pathExists(path.join(currentSource, baseName, "index.html")))
+        if (hasDirectoryIndex) continue
+
+        mirrorSet.add(path.join(destination, ...pageRelSegments, baseName))
+        mirrorSet.add(path.join(destination, ...slugPageParts, slugifyPath(baseName)))
+      }
+      currentMirrorRoots = [...mirrorSet]
+    }
 
     for (const entry of entries) {
       if (entry.name === ".DS_Store") continue
@@ -77,14 +106,17 @@ export async function copyHtmlDir(source, destination) {
       const sourcePath = path.join(currentSource, entry.name)
 
       if (entry.isDirectory()) {
+        const isEnteringAssetDir =
+          assetRelSegments === null && (entry.name === "assets" || entry.name === "images")
         const nextAssetSegments =
           assetRelSegments !== null
             ? [...assetRelSegments, entry.name]
-            : entry.name === "assets" || entry.name === "images"
+            : isEnteringAssetDir
               ? [entry.name]
               : null
         const nextPageSegments = nextAssetSegments !== null ? pageRelSegments : [...pageRelSegments, entry.name]
-        await walkAndCopy(sourcePath, nextPageSegments, nextAssetSegments)
+        const nextMirrorRoots = nextAssetSegments !== null ? currentMirrorRoots : []
+        await walkAndCopy(sourcePath, nextPageSegments, nextAssetSegments, nextMirrorRoots)
         continue
       }
 
@@ -94,7 +126,6 @@ export async function copyHtmlDir(source, destination) {
       const rawDest = path.join(destination, ...rawRelParts)
       await copyFileWithMode(sourcePath, rawDest)
 
-      const slugPageRel = slugifySegments(pageRelSegments)
       const isHtmlPage = assetRelSegments === null && entry.name.toLowerCase().endsWith(".html")
       const isStandaloneHtml = isHtmlPage && entry.name.toLowerCase() !== "index.html"
       const baseName = isStandaloneHtml ? entry.name.slice(0, -5) : null
@@ -114,11 +145,7 @@ export async function copyHtmlDir(source, destination) {
           : `${slugifyPath(baseName)}.html`
         : entry.name
 
-      const slugRelParts = [
-        ...(slugPageRel ? slugPageRel.split("/") : []),
-        ...(assetRelSegments ?? []),
-        slugFileName,
-      ]
+      const slugRelParts = [...slugPageParts, ...(assetRelSegments ?? []), slugFileName]
       const slugDest = path.join(destination, ...slugRelParts)
 
       if (slugDest !== rawDest) {
@@ -127,15 +154,17 @@ export async function copyHtmlDir(source, destination) {
 
       if (isStandaloneHtml && !hasDirectoryIndex) {
         const slugBaseName = slugifyPath(baseName)
-        const slugMirrorIndex = path.join(
-          destination,
-          ...(slugPageRel ? slugPageRel.split("/") : []),
-          slugBaseName,
-          "index.html",
-        )
+        const slugMirrorIndex = path.join(destination, ...slugPageParts, slugBaseName, "index.html")
         const rawMirrorIndex = path.join(destination, ...pageRelSegments, baseName, "index.html")
         if (slugMirrorIndex !== rawMirrorIndex) {
           await copyFileWithMode(sourcePath, slugMirrorIndex)
+        }
+      }
+
+      if (!isHtmlPage && currentMirrorRoots.length > 0) {
+        for (const mirrorRoot of currentMirrorRoots) {
+          const mirrorAssetDest = path.join(mirrorRoot, ...(assetRelSegments ?? []), entry.name)
+          await copyFileWithMode(sourcePath, mirrorAssetDest)
         }
       }
     }

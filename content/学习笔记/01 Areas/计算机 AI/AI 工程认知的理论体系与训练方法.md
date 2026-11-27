@@ -1,5 +1,5 @@
 ---
-modified: 2026-11-26T08:24:45.594Z
+modified: 2026-11-27T07:08:31.433Z
 publish: true
 ---
 
@@ -249,20 +249,7 @@ Sterman 通过动态决策实验研究人们对反馈系统的误判，实验涉
 
 例如，某个系统设计了自动审查与自动修订：
 
-```mermaid
-graph LR
-    A[生成初稿] --> B[自动审查]
-    B --> C{审查通过?}
-    C -- 否 --> D[自动修订]
-    D --> B
-    C -- 是 --> E[交付输出]
-    
-    style A fill:#fff,stroke:#333
-    style B fill:#fff,stroke:#333
-    style C fill:#fff,stroke:#333
-    style D fill:#fff,stroke:#333
-    style E fill:#e8f5e9,stroke:#4caf50
-```
+![[Pasted image 20261127144601.png]]
 
 反馈循环并不天然带来质量提升。它的效果取决于评价信号、修订机制、终止条件及各组件的失败相关性。
 
@@ -355,24 +342,7 @@ graph TD
 
 综合上述研究，我建议不要只训练一种系统心智模型，而是建立六层相互关联的心理模型。
 
-```mermaid
-graph TD
-    L1["L1 · 结构模型 Structural Model<br>系统由什么组成？"]
-    L2["L2 · 执行模型 Execution Model<br>系统如何一步步运行？"]
-    L3["L3 · 因果模型 Causal Model<br>为什么会产生这个结果？"]
-    L4["L4 · 行为模型 Behavioral Model<br>AI 在不同条件下可能如何表现？"]
-    L5["L5 · 协同模型 Collaboration Model<br>人与 AI 如何协调、干预和互补？"]
-    L6["L6 · 演化模型 Evolution Model<br>系统如何在反馈中学习、改变和重构？"]
-
-    L1 --> L2 --> L3 --> L4 --> L5 --> L6
-    
-    style L1 fill:#e3f2fd,stroke:#1e88e5
-    style L2 fill:#e3f2fd,stroke:#1e88e5
-    style L3 fill:#e3f2fd,stroke:#1e88e5
-    style L4 fill:#e3f2fd,stroke:#1e88e5
-    style L5 fill:#e3f2fd,stroke:#1e88e5
-    style L6 fill:#e3f2fd,stroke:#1e88e5
-```
+![[Pasted image 20261127144656.png]]
 
 > 这里的 L1–L6 代表心理模型的六个层面，不是 Growth OS 的能力成熟度等级。正式学科包中可以使用 M1–M6，避免命名冲突。
 
@@ -426,22 +396,7 @@ Sentance、Waite 和 Kallia 提出的 PRIMM，是目前非常值得直接借鉴�
 
 ### AI-PRIMM：从预测到创造
 
-```mermaid
-graph LR
-    P["P - Predict · 心中预测<br>不运行 AI，先预测系统执行过程、可能输出和失败条件。"]
-    R["R - Run · 真实运行<br>实际执行系统，获得输出、日志、工具调用和状态证据。"]
-    I["I - Investigate · 差异调查<br>比较预测与现实，定位机制理解、信息或系统设计上的偏差。"]
-    M1["M - Modify · 控制变量修改<br>修改一个关键条件或组件，重新预测并进行实验验证。"]
-    M2["M - Make · 独立创造<br>将获得的系统认知迁移到新的真实任务，自主设计解决方案。"]
-
-    P --> R --> I --> M1 --> M2
-    
-    style P fill:#fff3e0,stroke:#ff9800
-    style R fill:#fff3e0,stroke:#ff9800
-    style I fill:#fff3e0,stroke:#ff9800
-    style M1 fill:#fff3e0,stroke:#ff9800
-    style M2 fill:#fff3e0,stroke:#ff9800
-```
+![[Pasted image 20261127144719.png]]
 
 它与几何心象课程的训练节奏天然呼应：
 
@@ -476,10 +431,7 @@ graph LR
 
 给出一个系统的初始状态与最终结果，但隐藏其中间执行记录。
 
-> **已知**： 用户要求 AI 查询资料并生成带有来源的报告。
-> **结果**： 报告语言流畅，但是其中一个引用不存在。
-
-学生需要提出至少两种可能的执行路径，说明还需要查看哪些证据才能区分它们。
+![[Pasted image 20261127144752.png]]
 
 > **关键在于不能把这一题设计成唯一答案题。**
 
@@ -600,20 +552,7 @@ Amershi 等人的18项人机交互设计指南，也非常适合转化为学生�
 
 以下为课程设计层面的候选进阶，不等同于 Growth OS 正式的 L1–L4 等级定义。
 
-```mermaid
-graph TD
-    L1["L1: 单系统、确定性运行<br>追踪变量、状态、输入输出、简单程序与确定性工作流。<br>目标：在头脑中正确运行一个已知机制。"]
-    L2["L2: 概率性与分支运行<br>引入 AI 生成、上下文变化、模型不确定性、失败分支。<br>目标：预测可能结果及其发生条件，而不是只预测唯一输出。"]
-    L3["L3: 多人、多组件与人机协同运行<br>追踪任务委派、多 Agent、工具调用、共享信息、人工干预和反馈循环。<br>目标：能够监督、诊断和控制复杂协同系统。"]
-    L4["L4: 系统演化与创造性重构<br>根据新的问题、约束、技术和反馈，预演尚不存在的系统，设计验证实验并实施创新。<br>目标：从理解既有系统走向创造新系统。"]
-
-    L1 --> L2 --> L3 --> L4
-    
-    style L1 fill:#e8f5e9,stroke:#4caf50
-    style L2 fill:#e8f5e9,stroke:#4caf50
-    style L3 fill:#e8f5e9,stroke:#4caf50
-    style L4 fill:#e8f5e9,stroke:#4caf50
-```
+![[Pasted image 20261127144934.png]]
 
 第四级尤其重要。
 

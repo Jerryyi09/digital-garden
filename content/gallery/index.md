@@ -15,7 +15,7 @@ cssclasses:
 
 <header class="g-page-head">
   <h1>Gallery</h1>
-  <span class="g-count" data-garden-count>35 项</span>
+  <span class="g-count" data-garden-count>37 项</span>
 </header>
 
 <div class="g-tools">
@@ -26,10 +26,10 @@ cssclasses:
   </div>
 </div>
 <div class="g-chips" role="tablist" aria-label="分类筛选">
-  <button type="button" class="g-chip-btn is-active" data-chip="all">全部 <em>35</em></button>
+  <button type="button" class="g-chip-btn is-active" data-chip="all">全部 <em>37</em></button>
+  <button type="button" class="g-chip-btn" data-chip="计算机 AI">计算机 AI <em>2</em></button>
+  <button type="button" class="g-chip-btn" data-chip="物理">物理 <em>2</em></button>
   <button type="button" class="g-chip-btn" data-chip="数学">数学 <em>5</em></button>
-  <button type="button" class="g-chip-btn" data-chip="物理">物理 <em>1</em></button>
-  <button type="button" class="g-chip-btn" data-chip="计算机 AI">计算机 AI <em>1</em></button>
   <button type="button" class="g-chip-btn" data-chip="语文">语文 <em>23</em></button>
   <button type="button" class="g-chip-btn" data-chip="阅读成长">阅读成长 <em>2</em></button>
   <button type="button" class="g-chip-btn" data-chip="英语">英语 <em>1</em></button>
@@ -38,23 +38,31 @@ cssclasses:
 
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
-  <summary><span>数学</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/数学/初中代数核心思维体系/" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 数学 数学" data-room="Gallery" data-root-category="数学" data-updated="1795687239327" data-router-ignore>
-  <span class="g-row-text"><strong>初中代数核心思维体系</strong><small>11月26日</small></span>
+  <summary><span>计算机 AI</span><em>2</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/计算机 AI/AI 工程思维与人机协同实践学科包：设计与研发建议/" data-garden-item data-title="AI 工程思维与人机协同实践学科包：设计与研发建议" data-search="AI 工程思维与人机协同实践学科包：设计与研发建议 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795763312456.062" data-router-ignore>
+  <span class="g-row-text"><strong>AI 工程思维与人机协同实践学科包：设计与研发建议</strong><small>11月27日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>11月26日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
-  <summary><span>物理</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/物理/物理学科思维/" data-garden-item data-title="物理学科思维" data-search="物理学科思维 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1795687239327" data-router-ignore>
+  <summary><span>物理</span><em>2</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/物理/从物理专家认知到系统训练与科学创造/" data-garden-item data-title="从物理专家认知到系统训练与科学创造" data-search="从物理专家认知到系统训练与科学创造 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1795763312416.101" data-router-ignore>
+  <span class="g-row-text"><strong>从物理专家认知到系统训练与科学创造</strong><small>11月27日</small></span>
+  <span class="g-row-go" aria-hidden="true">›</span>
+</a>
+<a class="g-row" href="/html/物理/物理学科思维/" data-garden-item data-title="物理学科思维" data-search="物理学科思维 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1795687239327" data-router-ignore>
   <span class="g-row-text"><strong>物理学科思维</strong><small>11月26日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
-  <summary><span>计算机 AI</span><em>1</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795687239327" data-router-ignore>
-  <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>11月26日</small></span>
+  <summary><span>数学</span><em>1</em></summary>
+  <div class="g-list"><a class="g-row" href="/html/数学/初中代数核心思维体系/" data-garden-item data-title="初中代数核心思维体系" data-search="初中代数核心思维体系 数学 数学" data-room="Gallery" data-root-category="数学" data-updated="1795687239327" data-router-ignore>
+  <span class="g-row-text"><strong>初中代数核心思维体系</strong><small>11月26日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>

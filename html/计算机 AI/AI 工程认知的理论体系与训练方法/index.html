@@ -674,20 +674,7 @@
 <p>Sterman 通过动态决策实验研究人们对反馈系统的误判，实验涉及多个参与者、反馈关系、时间延迟和非线性机制。</p>
 <p>这一研究对于 Agent 工作流非常有意义。</p>
 <p>例如，某个系统设计了自动审查与自动修订：</p>
-<div class="mermaid-block"><div class="mermaid">graph LR
-    A[生成初稿] --&gt; B[自动审查]
-    B --&gt; C{审查通过?}
-    C -- 否 --&gt; D[自动修订]
-    D --&gt; B
-    C -- 是 --&gt; E[交付输出]
-    
-    style A fill:#fff,stroke:#333
-    style B fill:#fff,stroke:#333
-    style C fill:#fff,stroke:#333
-    style D fill:#fff,stroke:#333
-    style E fill:#e8f5e9,stroke:#4caf50
-</div></div>
-<p>反馈循环并不天然带来质量提升。它的效果取决于评价信号、修订机制、终止条件及各组件的失败相关性。</p>
+<img src="assets/Pasted%20image%2020261127144601.png" alt="" loading="lazy" /><p>反馈循环并不天然带来质量提升。它的效果取决于评价信号、修订机制、终止条件及各组件的失败相关性。</p>
 <p>学生需要能够预测：</p>
 <div class="tint-box">
 <p>增加审查次数是否一定更可靠？多个 Agent 是否会共享相同错误？不断修改是否可能破坏原先正确的内容？系统会不会进入无法终止的循环？</p>
@@ -802,24 +789,7 @@
         </summary>
         <div class="section-content">
           <p>综合上述研究，我建议不要只训练一种系统心智模型，而是建立六层相互关联的心理模型。</p>
-<div class="mermaid-block"><div class="mermaid">graph TD
-    L1[&quot;L1 · 结构模型 Structural Model&lt;br&gt;系统由什么组成？&quot;]
-    L2[&quot;L2 · 执行模型 Execution Model&lt;br&gt;系统如何一步步运行？&quot;]
-    L3[&quot;L3 · 因果模型 Causal Model&lt;br&gt;为什么会产生这个结果？&quot;]
-    L4[&quot;L4 · 行为模型 Behavioral Model&lt;br&gt;AI 在不同条件下可能如何表现？&quot;]
-    L5[&quot;L5 · 协同模型 Collaboration Model&lt;br&gt;人与 AI 如何协调、干预和互补？&quot;]
-    L6[&quot;L6 · 演化模型 Evolution Model&lt;br&gt;系统如何在反馈中学习、改变和重构？&quot;]
-
-    L1 --&gt; L2 --&gt; L3 --&gt; L4 --&gt; L5 --&gt; L6
-    
-    style L1 fill:#e3f2fd,stroke:#1e88e5
-    style L2 fill:#e3f2fd,stroke:#1e88e5
-    style L3 fill:#e3f2fd,stroke:#1e88e5
-    style L4 fill:#e3f2fd,stroke:#1e88e5
-    style L5 fill:#e3f2fd,stroke:#1e88e5
-    style L6 fill:#e3f2fd,stroke:#1e88e5
-</div></div>
-<div class="tint-box">
+<img src="assets/Pasted%20image%2020261127144656.png" alt="" loading="lazy" /><div class="tint-box">
 <p>这里的 L1–L6 代表心理模型的六个层面，不是 Growth OS 的能力成熟度等级。正式学科包中可以使用 M1–M6，避免命名冲突。</p>
 </div>
 <div class="sub-heading">M1：结构心理模型——看见系统的骨架</div>
@@ -863,22 +833,7 @@
 <p>2019年的研究在13所学校、493名11—14岁学生中进行了评价，年龄范围与你的中学课程设计高度相关。PRIMM 由五个环节组成：Predict、Run、Investigate、Modify、Make。</p>
 <p>原有 PRIMM 已具有中学编程教学的研究基础；下面将其扩展到 AI 工程领域，是新的设计候选方案。</p>
 <div class="sub-heading">AI-PRIMM：从预测到创造</div>
-<div class="mermaid-block"><div class="mermaid">graph LR
-    P[&quot;P - Predict · 心中预测&lt;br&gt;不运行 AI，先预测系统执行过程、可能输出和失败条件。&quot;]
-    R[&quot;R - Run · 真实运行&lt;br&gt;实际执行系统，获得输出、日志、工具调用和状态证据。&quot;]
-    I[&quot;I - Investigate · 差异调查&lt;br&gt;比较预测与现实，定位机制理解、信息或系统设计上的偏差。&quot;]
-    M1[&quot;M - Modify · 控制变量修改&lt;br&gt;修改一个关键条件或组件，重新预测并进行实验验证。&quot;]
-    M2[&quot;M - Make · 独立创造&lt;br&gt;将获得的系统认知迁移到新的真实任务，自主设计解决方案。&quot;]
-
-    P --&gt; R --&gt; I --&gt; M1 --&gt; M2
-    
-    style P fill:#fff3e0,stroke:#ff9800
-    style R fill:#fff3e0,stroke:#ff9800
-    style I fill:#fff3e0,stroke:#ff9800
-    style M1 fill:#fff3e0,stroke:#ff9800
-    style M2 fill:#fff3e0,stroke:#ff9800
-</div></div>
-<p>它与几何心象课程的训练节奏天然呼应：</p>
+<img src="assets/Pasted%20image%2020261127144719.png" alt="" loading="lazy" /><p>它与几何心象课程的训练节奏天然呼应：</p>
 <table class="term-table">
 <thead>
 <tr>
@@ -973,12 +928,7 @@
 <p>下面以三个任务为例，说明真正应该训练到什么程度。</p>
 <div class="sub-heading">训练一：Agent 消失状态重建</div>
 <p>给出一个系统的初始状态与最终结果，但隐藏其中间执行记录。</p>
-<div class="tint-box">
-<p><strong>已知</strong>： 用户要求 AI 查询资料并生成带有来源的报告。
-<strong>结果</strong>： 报告语言流畅，但是其中一个引用不存在。</p>
-</div>
-<p>学生需要提出至少两种可能的执行路径，说明还需要查看哪些证据才能区分它们。</p>
-<div class="tint-box">
+<img src="assets/Pasted%20image%2020261127144752.png" alt="" loading="lazy" /><div class="tint-box">
 <p><strong>关键在于不能把这一题设计成唯一答案题。</strong></p>
 </div>
 <p>不存在的引用可能来自未检索直接生成、错误资料、检索结果被错误解释等不同机制。优秀学生应当知道，缺乏运行记录时无法唯一定位原因。</p>
@@ -1199,20 +1149,7 @@
         </summary>
         <div class="section-content">
           <p>以下为课程设计层面的候选进阶，不等同于 Growth OS 正式的 L1–L4 等级定义。</p>
-<div class="mermaid-block"><div class="mermaid">graph TD
-    L1[&quot;L1: 单系统、确定性运行&lt;br&gt;追踪变量、状态、输入输出、简单程序与确定性工作流。&lt;br&gt;目标：在头脑中正确运行一个已知机制。&quot;]
-    L2[&quot;L2: 概率性与分支运行&lt;br&gt;引入 AI 生成、上下文变化、模型不确定性、失败分支。&lt;br&gt;目标：预测可能结果及其发生条件，而不是只预测唯一输出。&quot;]
-    L3[&quot;L3: 多人、多组件与人机协同运行&lt;br&gt;追踪任务委派、多 Agent、工具调用、共享信息、人工干预和反馈循环。&lt;br&gt;目标：能够监督、诊断和控制复杂协同系统。&quot;]
-    L4[&quot;L4: 系统演化与创造性重构&lt;br&gt;根据新的问题、约束、技术和反馈，预演尚不存在的系统，设计验证实验并实施创新。&lt;br&gt;目标：从理解既有系统走向创造新系统。&quot;]
-
-    L1 --&gt; L2 --&gt; L3 --&gt; L4
-    
-    style L1 fill:#e8f5e9,stroke:#4caf50
-    style L2 fill:#e8f5e9,stroke:#4caf50
-    style L3 fill:#e8f5e9,stroke:#4caf50
-    style L4 fill:#e8f5e9,stroke:#4caf50
-</div></div>
-<p>第四级尤其重要。</p>
+<img src="assets/Pasted%20image%2020261127144934.png" alt="" loading="lazy" /><p>第四级尤其重要。</p>
 <p>几何高手能够在头脑中构造原图不存在的辅助线；优秀的 AI 工程设计者也需要在头脑中构造原系统不存在的新组件、新接口、新反馈机制和新协同方式，并提前判断这些改变可能带来什么。</p>
 <p>这就是从心理模拟走向工程创造。</p>
 

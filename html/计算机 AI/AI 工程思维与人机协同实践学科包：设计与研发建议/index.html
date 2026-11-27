@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>AI 工程思维与人机协同实践学科包：设计与研发建议</title>
+  <!-- KaTeX for math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --bg-accent: rgba(23, 93, 126, 0.08);
+      --bg-warm: rgba(192, 86, 33, 0.08);
+      --bg-danger: rgba(185, 28, 28, 0.06);
+      --bg-success: rgba(21, 128, 61, 0.07);
+      --text-main: #1c2429;
+      --text-muted: #52606d;
+      --text-soft: #7b8794;
+      --primary: #175d7e;
+      --secondary: #c05621;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --border: rgba(28, 36, 41, 0.09);
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #12161a;
+        --bg-card: #1b2127;
+        --bg-subtle: #232b33;
+        --bg-accent: rgba(56, 189, 248, 0.12);
+        --bg-warm: rgba(251, 146, 60, 0.12);
+        --bg-danger: rgba(248, 113, 113, 0.12);
+        --bg-success: rgba(74, 222, 128, 0.12);
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-soft: #64748b;
+        --primary: #38bdf8;
+        --secondary: #fb923c;
+        --success: #4ade80;
+        --danger: #f87171;
+        --border: rgba(255, 255, 255, 0.09);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+      padding: 8px 8px 72px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    @media (min-width: 640px) {
+      body { padding: 20px 16px 88px; font-size: 16px; }
+    }
+    .container { max-width: 740px; margin: 0 auto; }
+    p, li { text-align: justify; margin-bottom: 0.55em; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    /* 顶部 Hero 卡片 */
+    .hero {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border-top: 3.5px solid var(--primary);
+      padding: 18px 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .badge-warm { background: var(--bg-warm); color: var(--secondary); }
+    .hero h1 {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+    .hero-quote {
+      background: var(--bg-subtle);
+      border-left: 3.5px solid var(--secondary);
+      padding: 10px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.68;
+      color: var(--text-main);
+    }
+    .hero-quote p { margin-bottom: 0.4em; }
+    .hero-quote p:last-child { margin-bottom: 0; }
+
+    /* 置顶工具栏 */
+    .toolbar {
+      position: sticky;
+      top: 6px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 1.1fr 1.2fr 1fr 0.8fr;
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .t-btn {
+      background: var(--bg-subtle);
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 3px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .t-btn:hover { opacity: 0.85; }
+    .t-btn.btn-back { background: var(--bg-accent); color: var(--primary); font-weight: 700; }
+    .t-btn.btn-open { background: var(--bg-subtle); color: var(--text-main); }
+    .t-btn.btn-close { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* PWA 全屏模式右下角浮动返回按钮 */
+    .fab-back {
+      position: fixed;
+      right: 14px;
+      bottom: 22px;
+      z-index: 99;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      cursor: pointer;
+      opacity: 0.9;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.18s, opacity 0.18s;
+    }
+    .fab-back:hover, .fab-back:active {
+      transform: scale(1.08);
+      opacity: 1;
+      background: var(--bg-accent);
+    }
+    .fab-back svg { width: 20px; height: 20px; }
+
+    /* 公式排版防溢出 */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 图片与 Mermaid / SVG 适配 */
+    .section-content img, .hero-preamble img, .part-preamble img, .hero-quote img {
+      max-width: 100%;
+      height: auto;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+    }
+    .mermaid-block {
+      margin: 12px 0;
+      padding: 12px;
+      background: #ffffff;
+      color: #1c2429;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+    }
+    .mermaid-block .mermaid {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      white-space: pre;
+    }
+    .mermaid-block svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .part-divider {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin: 20px 2px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* 手风琴栏目 */
+    details.guide-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.18s ease;
+    }
+    details.guide-section[open] {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    summary.section-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      user-select: none;
+      background: var(--bg-card);
+    }
+    summary.section-summary::-webkit-details-marker { display: none; }
+    .sum-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .sec-num {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .color-navy { background: var(--bg-accent); color: var(--primary); }
+    .color-amber { background: var(--bg-warm); color: var(--secondary); }
+    .color-bamboo { background: var(--bg-success); color: var(--success); }
+    .color-purple { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+    .color-rose { background: var(--bg-danger); color: var(--danger); }
+    .color-cyan { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
+
+    .sec-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--text-main); }
+    .sum-icon { font-size: 16px; color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; font-weight: 600; }
+    details[open] > summary .sum-icon { transform: rotate(45deg); color: var(--primary); }
+
+    .section-content {
+      padding: 10px 12px 18px;
+      border-top: 1px solid var(--border);
+    }
+    @media (min-width: 640px) {
+      .section-content { padding: 14px 18px 22px; }
+    }
+
+    /* 内部小标题与区块 */
+    .sub-heading {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 14px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-heading::before { content: "▍"; color: var(--secondary); font-size: 12px; }
+
+    .item-block {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .item-block:last-child { border-bottom: none; }
+
+    /* 纯色块 */
+    .tint-box, .tint-accent, .tint-warm, .tint-good, .tint-bad {
+      padding: 9px 12px;
+      border-radius: 6px;
+      margin: 9px 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+    .tint-box { background: var(--bg-subtle); }
+    .tint-accent { background: var(--bg-accent); border-left: 3px solid var(--primary); border-radius: 0 6px 6px 0; }
+    .tint-warm { background: var(--bg-warm); border-left: 3px solid var(--secondary); border-radius: 0 6px 6px 0; }
+    .tint-good { background: var(--bg-success); border-left: 3px solid var(--success); border-radius: 0 6px 6px 0; }
+    .tint-bad { background: var(--bg-danger); border-left: 3px solid var(--danger); border-radius: 0 6px 6px 0; }
+
+    /* 标签 */
+    .badge-evidence, .badge-context, .badge-comment {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    .badge-evidence { background: var(--bg-accent); color: var(--primary); }
+    .badge-context { background: var(--bg-warm); color: var(--secondary); }
+    .badge-comment { background: var(--bg-subtle); color: var(--text-muted); }
+
+    /* 表格移动端自适应 */
+    table.term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 10px 0;
+      table-layout: fixed;
+    }
+    table.term-table th, table.term-table td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    table.term-table th {
+      background: var(--bg-subtle);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    ul, ol { padding-left: 19px; margin: 6px 0 10px; }
+    li { font-size: 14.8px; margin-bottom: 5px; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      background: var(--bg-subtle);
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      color: var(--primary);
+    }
+    pre {
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+    }
+    pre code { background: none; padding: 0; color: var(--text-main); }
+
+    footer {
+      text-align: center;
+      padding: 28px 0 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部总览 Hero -->
+    <header class="hero">
+      
+      <h1>AI 工程思维与人机协同实践学科包：设计与研发建议</h1>
+      <div class="hero-sub">Rosemary Garden 精读导读</div>
+      
+    </header>
+
+    <!-- 置顶工具栏 -->
+    <nav class="toolbar">
+      <button class="t-btn btn-back" onclick="navigateBack()">← 作品廊</button>
+      <button class="t-btn btn-open" onclick="toggleAllSections(true)">📖 全部展开 (17)</button>
+      <button class="t-btn btn-close" onclick="toggleAllSections(false)">📁 全部收起</button>
+      <button class="t-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ 顶部</button>
+    </nav>
+
+    <!-- 手风琴内容区块 -->
+    <main>
+      
+      <div class="part-divider" id="part-1">
+        <span>AI 工程思维与人机协同实践学科包：设计与研发建议</span>
+      </div><div class="part-preamble item-block"><p>基于你现在提供的《12 学科包机制：定位、设计与实战开发指南》，我对前面的方案有一个重要修正：</p>
+<p>不应该建设一个包罗万象的 AI 学科学习资源包，而应该建设一个<strong>围绕 AI 工程、人机协同、开放式问题解决与创新实践任务簇的领域认知与教学决策包</strong>。</p>
+<p>这两者有本质区别。前者容易成为不断膨胀的知识库，后者才符合现有学科包的架构定位，能够真正提升 Course Creator 的研究、造课、命题、反馈与审计能力。</p>
+<p>建议首个学科包命名为：</p>
+<p><code>skills/ai-course-creator/references/subject-packs/ai-practice.md</code></p>
+<p>中文名称：<strong>AI 工程认知与人机协同创造实践</strong>。</p>
+<p>其研究目标不是解决“AI 应该教哪些知识”，而是回答一个更深层的问题：</p>
+<div class="tint-box">
+<p>在一个知识快速更新、认知工作可以部分外包给智能系统、问题与解决路径均不确定的世界里，人如何形成驾驭复杂系统、持续学习、独立判断和创造真实价值的能力？这些能力如何被系统训练并获得可靠的成长证据？</p>
+</div>
+<p>这个定位决定了它不能简单照搬几何心象或写作课的训练结构。</p>
+</div>
+      <details class="guide-section" id="sec-01" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">01</span>
+            <span class="sec-title">一、从现有两个学科包中迁移什么，又必须突破什么</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>几何和写作学科包的真正价值，并不在于五段心象模板或者六大写作任务族本身，而在于它们沉淀了一套<strong>领域研究到教学实践的转化机制</strong>。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">可迁移的经验</th>
+<th align="left">几何刻画</th>
+<th align="left">写作创作</th>
+<th align="left">AI 工程与人机协同</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>研究专家的真实认知活动</strong></td>
+<td align="left">构型识别、心理动画、证明规划</td>
+<td align="left">构思、组织、表达、监控、修订</td>
+<td align="left">问题建模、系统心智模型、任务委派、验证、创新</td>
+</tr>
+<tr>
+<td align="left"><strong>提炼可训练技能</strong></td>
+<td align="left">解构、旋转、约束追踪</td>
+<td align="left">立意、材料发展、篇章推进</td>
+<td align="left">分解、抽象、预测、委派、调试、证据判断</td>
+</tr>
+<tr>
+<td align="left"><strong>建立可复用任务族</strong></td>
+<td align="left">消失帧预测、快认辨伪</td>
+<td align="left">多方案取舍、独立成文</td>
+<td align="left">黑箱实验、故障注入、人机分工、评测设计</td>
+</tr>
+<tr>
+<td align="left"><strong>防止伪掌握</strong></td>
+<td align="left">遮图也能答的伪快认题</td>
+<td align="left">能说明修改理由却不能独立成文</td>
+<td align="left">AI 能完成项目却不能证明学生掌握</td>
+</tr>
+<tr>
+<td align="left"><strong>规定领域反馈边界</strong></td>
+<td align="left">视觉关系不能替代证明</td>
+<td align="left">有据保留也是合法选择</td>
+<td align="left">有据拒绝 AI、停止自动化也是正确决策</td>
+</tr>
+<tr>
+<td align="left"><strong>建立独立检验</strong></td>
+<td align="left">无图心理操作、陌生题</td>
+<td align="left">无示范诊断、独立作品</td>
+<td align="left">无 AI 理解测验、陌生工具协同、系统故障修复</td>
+</tr>
+</tbody></table>
+<p>但 AI 工程课程还必须解决传统学科包不太需要面对的三个问题：</p>
+<ul>
+<li><strong>知识疆域不断变化</strong>：不能以固定知识目录作为长期课程骨架。</li>
+<li><strong>学习与生产同时发生</strong>：学生在创造产品的同时习得知识，但 AI 可能代替了本该由学生完成的认知活动。</li>
+<li><strong>目标和路径都可能演化</strong>：项目中不仅需要找到答案，还可能需要重新定义问题、修改目标，甚至否定最初的方案。</li>
+</ul>
+<p>因此，AI 实践学科包应该继承几何包的认知操作训练精度、写作包的创造性与多合理方案原则，同时增加开放探究、人机协同及工程验证机制。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-02" open>
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">02</span>
+            <span class="sec-title">二、核心架构裁决：不是新增一个传统学科，而是定义一种任务域</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>根据《12 学科包机制》第三节，学科包必须按真实任务路由，而非学科名称路由。</p>
+<p>所以不建议直接创建覆盖所有信息科技、编程、机器学习和 AI 素养教育的巨大学科包。</p>
+<p>建议 <code>ai-practice.md</code> 首先服务以下任务：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">课程或章节的核心任务</th>
+<th align="left">是否命中</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">与 AI 协同完成复杂研究、设计、创造任务</td>
+<td align="left"><strong>是</strong></td>
+</tr>
+<tr>
+<td align="left">设计、构建、测试 AI 应用或智能工作流</td>
+<td align="left"><strong>是</strong></td>
+</tr>
+<tr>
+<td align="left">通过实验理解 AI 系统能力、局限和行为</td>
+<td align="left"><strong>是</strong></td>
+</tr>
+<tr>
+<td align="left">比较不同人机分工与协作策略</td>
+<td align="left"><strong>是</strong></td>
+</tr>
+<tr>
+<td align="left">学习 AI 辅助编程、调试与系统设计</td>
+<td align="left"><strong>是</strong></td>
+</tr>
+<tr>
+<td align="left">纯 Python 语法训练</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">纯计算机算法与数据结构训练</td>
+<td align="left">不自动命中</td>
+</tr>
+<tr>
+<td align="left">普通课程中偶尔使用 AI 答疑</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">学习 AI 发展历史或社会影响</td>
+<td align="left">仅相关任务命中</td>
+</tr>
+</tbody></table>
+<p>将来，如果多门课程形成了独立且稳定的计算机科学专家认知规律，再考虑抽取 <code>cs-modeling.md</code>，专门解决计算思维、程序心理模型、算法设计与抽象建模的问题。</p>
+<p>现阶段不宜同时建两个高度重叠的包。 先以 <code>ai-practice.md</code> 验证跨课程复用性，再依据真实课程回流判断是否需要分离。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-03">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">03</span>
+            <span class="sec-title">三、AI 实践类课程的学科本质：五种学习范式的转变</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>传统课程与 AI 工程实践课程并非完全对立，但后者必须特别强调以下转变。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">传统课程常见组织方式</th>
+<th align="left">AI 工程课程需要强化的方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Learning to Know</strong>：获得知识</td>
+<td align="left"><strong>Learning to Learn</strong>：研究未知、快速获得新知识</td>
+</tr>
+<tr>
+<td align="left"><strong>Learning to Do</strong>：执行技能</td>
+<td align="left"><strong>Learning to Orchestrate</strong>：组织人、AI、工具与资源</td>
+</tr>
+<tr>
+<td align="left"><strong>Problem Solving</strong>：求解问题</td>
+<td align="left"><strong>Problem Framing</strong>：发现和重新定义问题</td>
+</tr>
+<tr>
+<td align="left"><strong>Applying Knowledge</strong>：应用已学知识</td>
+<td align="left"><strong>Knowledge Creation</strong>：组合跨界知识创造新方案</td>
+</tr>
+<tr>
+<td align="left"><strong>Mastery</strong>：证明已经掌握</td>
+<td align="left"><strong>Adaptive Expertise</strong>：在陌生情境中继续学习和创新</td>
+</tr>
+</tbody></table>
+<p>其中，我认为 <strong>Adaptive Expertise（适应性专长）</strong> 应当成为这一学科包的顶层认知目标。</p>
+<p>它要求学生既能高质量完成熟悉任务，也能在任务、工具和环境发生变化时重新组织已有知识，发现不足，主动学习并创造新的解决路径。</p>
+<p>这比“熟练使用 AI”更稳定，也比单纯的“计算思维”更全面。</p>
+<div class="sub-heading">3.1 适应性专长：效率与创新是两个不同的维度</div>
+<p>Hatano 和 Inagaki 提出的适应性专长，以及 Schwartz、Bransford 和 Sears 关于迁移的研究，特别适合作为 AI 工程教育的底层理论。</p>
+<p>他们区分了<strong>熟练执行已知程序的效率</strong>，与<strong>面对新情况时学习、重组知识和发明新策略的能力</strong>。后续研究也将 Preparation for Future Learning（PFL，为未来学习做准备）视为培养适应性专长的重要方向。
+<img src="assets/Pasted%20image%2020261127145353.png" alt="" loading="lazy" /></p>
+<p>这个框架尤其适用于 AI 时代：熟练操作某个工具的价值可能快速下降，而能够理解原理、识别新问题、学习新工具和重构工作流的价值更持久。</p>
+<p>所以学科包必须同时培养：</p>
+<ul>
+<li><strong>效率能力</strong>：能够可靠执行已经掌握的工程方法。</li>
+<li><strong>创新能力</strong>：能够突破已有方法，主动研究和创造新的解决路径。</li>
+<li><strong>适应能力</strong>：当工具、需求、约束发生变化时，能够重新建立解决方案。</li>
+</ul>
+<p>不能只追求效率而使学生变成 AI 操作员，也不能只追求创新而让学生停留在创意表达和不可靠的原型演示。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-04">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">04</span>
+            <span class="sec-title">四、双支柱研究底座：建议重点吸收的成熟理论与前沿实践</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>以下研究按它们在学科包中承担的功能组织，而不是按论文发表时间排列。</p>
+<p>需要特别注意：政策能力框架、教育理论、工程最佳实践和教学干预研究具有不同证据性质，不能统一标记为“已验证有效”。</p>
+<div class="sub-heading">4.1 内容支柱：AI 专家究竟怎样认知、判断与行动</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">研究与实践路线</th>
+<th align="left">核心贡献</th>
+<th align="left">学科包转化方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Adaptive Expertise / PFL</strong></td>
+<td align="left">熟练执行与持续创新并重</td>
+<td align="left">陌生工具学习、约束变化、跨项目迁移</td>
+</tr>
+<tr>
+<td align="left"><strong>Brennan &amp; Resnick 计算思维框架</strong></td>
+<td align="left">概念、实践、认知视角三位一体</td>
+<td align="left">抽象、模块化、调试、迭代、重组</td>
+</tr>
+<tr>
+<td align="left"><strong>Jagged Technological Frontier</strong></td>
+<td align="left">AI 能力边界呈不均匀分布</td>
+<td align="left">能力边界探测、任务委派判断</td>
+</tr>
+<tr>
+<td align="left"><strong>Human–AI Synergy</strong></td>
+<td align="left">人机组合不必然优于单独的人或 AI</td>
+<td align="left">人、AI、协同方案对照实验</td>
+</tr>
+<tr>
+<td align="left"><strong>Human–AI Interaction Guidelines</strong></td>
+<td align="left">人机交互需要支持纠错、控制和合理预期</td>
+<td align="left">控制权设计、干预、异常恢复</td>
+</tr>
+<tr>
+<td align="left"><strong>AI Literacy / AI System Design</strong></td>
+<td align="left">AI 理解、应用、伦理与系统设计</td>
+<td align="left">AI 心智模型与工程能力统一发展</td>
+</tr>
+</tbody></table>
+<p>其中，有三项研究特别值得像几何课研究 Koedinger 一样深入开采。</p>
+<h4>（1）Brennan &amp; Resnick：计算思维不仅是概念，而是实践与认知视角</h4>
+<p>他们在2012年提出的框架，将计算思维区分为<strong>计算概念、计算实践和计算视角</strong>。计算实践涵盖实验迭代、测试调试、复用重组、抽象与模块化等活动。</p>
+<p>这与几何的构型块研究具有相似的课程价值。
+几何专家可以把复杂图形拆成具有推理价值的局部构型；AI 工程专家也需要把复杂系统组织成具有明确职责、接口和依赖关系的组件。</p>
+<p>由此可以开发 <strong>系统刻画思维训练</strong>：</p>
+<div class="tint-box">
+<p>从系统整体看见组件，从组件看见信息流，从信息流看见状态变化，从状态变化预测行为和故障。</p>
+</div>
+<p>这相当于将几何课的“心中成图”迁移到“心中运行系统”。</p>
+<h4>（2）Dell’Acqua 等：AI 能力的锯齿状边界</h4>
+<p>这一系列研究表明，AI 在某些知识工作任务中能够显著改善表现，但在超出其能力范围的任务中，过度依赖可能产生负面效果。任务之间的能力差异并不总是符合人的直觉。相关研究的正式论文已于2026年发表。</p>
+<p>课程中不能简单教学生：</p>
+<div class="tint-box">
+<p>“AI 擅长分析，不擅长创造”或“AI 擅长编程，不擅长推理”。</p>
+</div>
+<p>应该训练学生建立<strong>经实验校准的 AI 能力边界模型</strong>。
+同一个 AI，可能擅长生成代码，却无法可靠判断某个特定需求是否已经满足；可能擅长整理研究资料，却无法区分一篇论文实际证明的结论与合理推测。</p>
+<p>由此可以提炼出一项关键技能：</p>
+<div class="tint-box">
+<p>面对具体任务，主动探测 AI 能力边界，而不是根据工具品牌、输出流畅度或历史印象决定是否信任。</p>
+</div>
+<h4>（3）Vaccaro、Almaatouq &amp; Malone：人机协同不是天然增益</h4>
+<p>2024年发表在 Nature Human Behaviour 的系统综述与元分析，研究了人类与 AI 组合的表现，发现协同效果具有明显异质性，并不保证人机组合一定优于表现更好的人类或 AI 单独工作。</p>
+<p>这项研究对人机协同课程极为重要。
+学科包不应该预先规定人必须做规划、AI 必须做执行，或者一律采用所谓“人主导、AI 辅助”的固定操作流程，而应当让学生根据任务性质和证据确定分工。</p>
+<p>例如，将同一任务分别交给：</p>
+<ul>
+<li>人独立完成；</li>
+<li>AI 独立生成候选；</li>
+<li>人与 AI 按设计的机制协同完成。</li>
+</ul>
+<p>再比较正确性、创新性、成本、风险与人的理解程度。
+最终学生需要形成的是<strong>协同系统设计能力</strong>，而不是一套永远不变的 AI 使用纪律。</p>
+<div class="sub-heading">4.2 教学法支柱：开放、创造、协同的能力怎样学会</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">理论或实践</th>
+<th align="left">对 AI 工程教育的主要价值</th>
+<th align="left">建议采用的机制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Papert 建造主义</strong></td>
+<td align="left">通过构建有意义的作品促进理解</td>
+<td align="left">可运行作品、真实用户、反思重构</td>
+</tr>
+<tr>
+<td align="left"><strong>Resnick 创造性学习</strong></td>
+<td align="left">项目、兴趣、同伴与游戏式探索</td>
+<td align="left">创意试验、同伴反馈、持续迭代</td>
+</tr>
+<tr>
+<td align="left"><strong>认知学徒制</strong></td>
+<td align="left">显化隐性的专家判断与策略</td>
+<td align="left">出声示范、决策解释、支架撤除</td>
+</tr>
+<tr>
+<td align="left"><strong>Preparation for Future Learning</strong></td>
+<td align="left">培养获得新知识和运用新资源的能力</td>
+<td align="left">陌生技术学习挑战</td>
+</tr>
+<tr>
+<td align="left"><strong>MIT RAICA</strong></td>
+<td align="left">以有社会价值的项目组织中学 AI 学习</td>
+<td align="left">责任设计、动手实践、完整项目</td>
+</tr>
+<tr>
+<td align="left"><strong>AI 辅助学习研究</strong></td>
+<td align="left">区分任务表现与真实学习成果</td>
+<td align="left">支持条件记录、无 AI 复演</td>
+</tr>
+<tr>
+<td align="left"><strong>AI 代码认知参与研究</strong></td>
+<td align="left">避免代码生成替代必要的理解与练习</td>
+<td align="left">预测、解释、修改和调试生成代码</td>
+</tr>
+</tbody></table>
+<p>MIT 的 RAICA（Responsible AI for Computational Action）已经将探索 AI、动手创造和真实价值导向结合起来，并具有针对中学阶段的课程模块。它适合作为项目任务设计的参考标杆，而不是照搬其全部知识内容。</p>
+<p>此外，Resnick 的创造性学习理念强调 <em>Projects、Passion、Peers、Play</em>，能够为开放式 AI 创新项目提供重要的教学设计原则。</p>
+<div class="sub-heading">4.3 AI 辅助学习的独特红线：表现与学习必须分开</div>
+<p>Bastani 等人2025年发表于 PNAS 的研究，通过近千名高中生的数学教学实验，发现直接使用缺少学习护栏的生成式 AI，可能改善练习阶段的表现，却损害撤除 AI 后的独立表现；采用教师设计提示的 AI 导师则能够缓解这种负面影响。</p>
+<p>Kazemitabaar 等人的 AI 代码学习研究，则进一步探索如何通过设计不同程度的认知参与活动，帮助学生在使用 AI 生成代码时保持必要的学习投入。</p>
+<p>这两条研究路线应当直接影响学科包的硬规则。
+但不能据此断言所有 AI 工程项目都应限制 AI 输出。具体是否限制，取决于当前任务的<strong>学习目标</strong>：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">当前任务目的</th>
+<th align="left">AI 使用策略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">训练学生自己的系统建模能力</td>
+<td align="left">AI 不得代替学生完成核心模型</td>
+</tr>
+<tr>
+<td align="left">训练学生评估生成方案的能力</td>
+<td align="left">可以让 AI 完整生成候选方案</td>
+</tr>
+<tr>
+<td align="left">训练陌生知识获取能力</td>
+<td align="left">鼓励 AI 协助研究，但学生必须验证与解释</td>
+</tr>
+<tr>
+<td align="left">创造完整工程产品</td>
+<td align="left">允许广泛委派实现工作，学生保留关键判断与责任</td>
+</tr>
+<tr>
+<td align="left">测量独立掌握</td>
+<td align="left">撤除会代替目标认知操作的支持</td>
+</tr>
+</tbody></table>
+<div class="tint-box">
+<p><strong>不是减少 AI 使用本身，而是确保 AI 不替代本轮真正要训练的认知活动。</strong></p>
+</div>
+<p>这条原则建议作为整个 <code>ai-practice.md</code> 的最高领域教学规则。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-05">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">05</span>
+            <span class="sec-title">五、建立 AI 工程的专家认知模型</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这是整个学科包最需要深入研究的地方。
+如果几何刻画课研究的是专家怎样在头脑中组织几何构型，作文课研究的是专家怎样在头脑中组织意义与表达，那么 AI 工程课应当研究：</p>
+<div class="tint-box">
+<p>专家怎样在头脑中表征一个尚不存在的复杂系统，并预测人、AI、数据、工具和环境相互作用时会发生什么。</p>
+</div>
+<p>我建议将这一能力称为 <strong>系统心智建模（System Mental Modeling）</strong>。
+它与系统思维相关，但更强调能够执行具体的心理模拟和工程推理。</p>
+<div class="sub-heading">5.1 将几何“心中成图”迁移为“心中运行系统”</div>
+<img src="assets/Pasted%20image%2020261127145430.png" alt="" loading="lazy" /><p>计算机教育领域已经存在非常值得借鉴的研究。
+Sorva 在2013年的综述中指出，初学者理解程序运行的动态过程存在重要困难，建议将 <strong>Notional Machine（概念化执行机器）</strong> 作为显式教学目标。</p>
+<p>这一理论与几何心象训练高度呼应：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">几何刻画思维</th>
+<th align="left">AI 工程刻画思维</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">看见图形整体</td>
+<td align="left">看见系统整体</td>
+</tr>
+<tr>
+<td align="left">拆解局部构型</td>
+<td align="left">拆解功能组件</td>
+</tr>
+<tr>
+<td align="left">想象图形生成过程</td>
+<td align="left">想象系统构建与执行过程</td>
+</tr>
+<tr>
+<td align="left">追踪动点与约束</td>
+<td align="left">追踪数据、控制流和状态</td>
+</tr>
+<tr>
+<td align="left">预测特殊位置与退化</td>
+<td align="left">预测异常输入、失败状态</td>
+</tr>
+<tr>
+<td align="left">补充辅助线</td>
+<td align="left">增加接口、校验或恢复组件</td>
+</tr>
+<tr>
+<td align="left">规划证明路径</td>
+<td align="left">规划实现与验证路径</td>
+</tr>
+</tbody></table>
+<div class="tint-box">
+<p><em>这一迁移属于有理论支持的课程设计推论，不是已经由 Sorva 研究直接验证的 Agent 系统教学方法。</em></p>
+</div>
+<div class="sub-heading">5.2 建议提炼十类专家认知操作</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">操作</th>
+<th align="left">认知本质</th>
+<th align="left">学生可以留下的证据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>问题刻画</strong></td>
+<td align="left">从模糊需求中提取真实问题</td>
+<td align="left">问题模型、成功标准</td>
+</tr>
+<tr>
+<td align="left"><strong>抽象</strong></td>
+<td align="left">去除无关细节，保留关键关系</td>
+<td align="left">概念图、简化模型</td>
+</tr>
+<tr>
+<td align="left"><strong>分解</strong></td>
+<td align="left">将复杂任务组织成可处理的子问题</td>
+<td align="left">任务树、依赖图</td>
+</tr>
+<tr>
+<td align="left"><strong>心理执行</strong></td>
+<td align="left">预演系统运行与状态变化</td>
+<td align="left">执行轨迹、状态表</td>
+</tr>
+<tr>
+<td align="left"><strong>能力边界判断</strong></td>
+<td align="left">判断人和 AI 对具体任务的适配性</td>
+<td align="left">能力测试与分工理由</td>
+</tr>
+<tr>
+<td align="left"><strong>上下文建模</strong></td>
+<td align="left">确定系统作出正确判断所需的信息</td>
+<td align="left">信息清单、缺口分析</td>
+</tr>
+<tr>
+<td align="left"><strong>反事实推演</strong></td>
+<td align="left">想象条件改变后的系统行为</td>
+<td align="left">多场景预测、失败预演</td>
+</tr>
+<tr>
+<td align="left"><strong>证据校验</strong></td>
+<td align="left">区分事实、推断、生成内容和可验证结果</td>
+<td align="left">核验记录、测试证据</td>
+</tr>
+<tr>
+<td align="left"><strong>设计取舍</strong></td>
+<td align="left">在成本、效果、安全和复杂度之间判断</td>
+<td align="left">多方案比较、决策记录</td>
+</tr>
+<tr>
+<td align="left"><strong>重构创新</strong></td>
+<td align="left">改变问题表征、技术路径或系统结构</td>
+<td align="left">新方案、版本变化、创新理由</td>
+</tr>
+</tbody></table>
+<p>这十类操作是建议的初始候选技能体系，不必写死为十章，也不必要求每门课覆盖全部。
+真正的学科包应该根据实际课程目标，从中选择主训练链，再通过本课研究进一步修订技能分类。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-06">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">06</span>
+            <span class="sec-title">六、解决“知识既深又宽”的问题：知识拓扑而非知识目录</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>AI 工程类课程不能只有项目活动和操作技巧。没有深厚的理论理解，学生很容易形成低水平的 AI 应用经验。
+但也不能要求学生先完整学完数学、计算机科学、机器学习、软件工程、人机交互和各应用领域，才能开始创新实践。</p>
+<p>我建议建立 <strong>双轴知识拓扑</strong>。
+<img src="assets/Pasted%20image%2020261127145452.png" alt="" loading="lazy" /></p>
+<div class="sub-heading">6.1 纵向：稳定的知识主干</div>
+<p>建议学科包将以下五类知识作为专业深度的重要来源：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">知识主干</th>
+<th align="left">关键认知问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>计算与信息</strong></td>
+<td align="left">信息如何表示、处理、存储和传递？</td>
+</tr>
+<tr>
+<td align="left"><strong>数据与机器学习</strong></td>
+<td align="left">系统如何从数据中学习？如何泛化？</td>
+</tr>
+<tr>
+<td align="left"><strong>模型与智能行为</strong></td>
+<td align="left">语言模型如何生成结果？其能力与局限是什么？</td>
+</tr>
+<tr>
+<td align="left"><strong>软件与系统工程</strong></td>
+<td align="left">如何把模型、程序、数据、工具组织成可靠系统？</td>
+</tr>
+<tr>
+<td align="left"><strong>人机交互与治理</strong></td>
+<td align="left">如何确保系统真正服务人的目标、判断与价值？</td>
+</tr>
+</tbody></table>
+<p>这里可以借鉴 AI4K12 的五大理念：感知、表征与推理、学习、自然交互、社会影响，以及 UNESCO 2024 年学生 AI 能力框架。
+但它们应作为知识和能力覆盖的研究索引，而不是直接复制成每门课的目录。</p>
+<div class="sub-heading">6.2 横向：真实问题带动跨学科学习</div>
+<p>每个项目都可以引入新的学科知识，例如：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">需要横向连接的知识</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AI 鸟类观察研究助手</td>
+<td align="left">生态学、分类学、统计学、数据质量</td>
+</tr>
+<tr>
+<td align="left">AI 古诗词学习系统</td>
+<td align="left">语言学、文学、教学法、知识表征</td>
+</tr>
+<tr>
+<td align="left">AI 物理实验分析系统</td>
+<td align="left">力学、误差分析、建模、可视化</td>
+</tr>
+<tr>
+<td align="left">AI 音乐创作伙伴</td>
+<td align="left">和声、曲式、声学、创造性评价</td>
+</tr>
+<tr>
+<td align="left">AI 社会观察研究助手</td>
+<td align="left">社会学、调查方法、证据论证、伦理</td>
+</tr>
+</tbody></table>
+<p>这些项目甚至可以让 AI 工程学科包与已有几何、写作学科包联合调用。</p>
+<p>例如制作 AI 几何教学系统时：</p>
+<ul>
+<li><code>ai-practice.md</code> 负责系统设计、人机协同、评测和工程可靠性。</li>
+<li><code>geometry-imagery.md</code> 负责几何心理操作训练、构型命题和领域教学真实性。</li>
+</ul>
+<p>两者都只提供领域规则，不相互替代。</p>
+<div class="sub-heading">6.3 建立三个知识时效层</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">时效层</th>
+<th align="left">内容</th>
+<th align="left">维护原则</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>稳定内核</strong></td>
+<td align="left">抽象、算法、系统、概率、证据、认知与工程原则</td>
+<td align="left">长期沉淀</td>
+</tr>
+<tr>
+<td align="left"><strong>演进机制</strong></td>
+<td align="left">LLM、检索增强、工具调用、Agent、评测方法</td>
+<td align="left">随研究进展更新</td>
+</tr>
+<tr>
+<td align="left"><strong>快速变化实现</strong></td>
+<td align="left">模型名称、API、SDK、平台、插件、价格</td>
+<td align="left">每次造课按需查证</td>
+</tr>
+</tbody></table>
+<p>例如，“检索内容需要验证其相关性与证据质量”可以写入学科包；某个具体 RAG 框架的 API 参数则不适合写死在学科包正文中。
+这样可以避免学科包随着技术升级快速失效。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-07">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">07</span>
+            <span class="sec-title">七、AI 学科包的训练体系：虚实结合的十二类任务族</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>我认为现有几何包八种训练范式的思路非常值得迁移。但 AI 工程课需要同时训练三类能力：</p>
+<ul>
+<li><strong>虚</strong>：抽象理解与心理操作。</li>
+<li><strong>实</strong>：真实系统构建与创新行动。</li>
+<li><strong>虚实转换</strong>：把理解转化为实践，再从实践反推理论和认知结构。</li>
+</ul>
+<p>据此建议设计以下十二类候选任务族。</p>
+<div class="sub-heading">A 类：抽象理解与系统心智训练</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">任务族</th>
+<th align="left">核心操作</th>
+<th align="left">主要证据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>A1 黑箱行为探测</strong></td>
+<td align="left">改变一个输入条件，预测并观察 AI 行为</td>
+<td align="left">预测、实验记录、机制解释</td>
+</tr>
+<tr>
+<td align="left"><strong>A2 系统拆解与重组</strong></td>
+<td align="left">隔离功能组件，追踪接口与依赖</td>
+<td align="left">架构图、依赖关系</td>
+</tr>
+<tr>
+<td align="left"><strong>A3 心中运行系统</strong></td>
+<td align="left">不执行程序，预测数据流、状态和输出</td>
+<td align="left">手工执行轨迹</td>
+</tr>
+<tr>
+<td align="left"><strong>A4 反事实与故障预测</strong></td>
+<td align="left">移除组件、修改条件或注入错误</td>
+<td align="left">失败预测、因果链</td>
+</tr>
+</tbody></table>
+<p>其中，A3 可以直接借鉴几何心理动画的教学方法。</p>
+<p>进一步结合 PRIMM（Predict–Run–Investigate–Modify–Make）：</p>
+<div class="tint-box">
+<p>先预测 → 运行验证 → 调查差异 → 修改系统 → 自主创造。</p>
+</div>
+<p>PRIMM 已经在学校编程教学研究中得到探讨和应用。把它进一步迁移到复杂 AI 工作流，仍属于需要本地验证的课程设计。</p>
+<div class="sub-heading">B 类：人机协同与工程判断训练</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">任务族</th>
+<th align="left">核心操作</th>
+<th align="left">主要证据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>B1 问题重构</strong></td>
+<td align="left">将模糊需求转化为可检验任务</td>
+<td align="left">需求规格、成功标准</td>
+</tr>
+<tr>
+<td align="left"><strong>B2 坏—改—测</strong></td>
+<td align="left">比较提示词或上下文设计并进行控制变量测试</td>
+<td align="left">版本对照、测试结果</td>
+</tr>
+<tr>
+<td align="left"><strong>B3 委派与协同实验</strong></td>
+<td align="left">设计人机分工并比较不同策略</td>
+<td align="left">分工记录、结果对比</td>
+</tr>
+<tr>
+<td align="left"><strong>B4 AI 输出审计</strong></td>
+<td align="left">发现错误、核验证据、决定接受或拒绝</td>
+<td align="left">证据链、审计记录</td>
+</tr>
+</tbody></table>
+<p>这里尤其需要继承写作包的“有据保留也是合法决策”原则。
+对于 AI 输出：</p>
+<div class="tint-box">
+<p><strong>有据接受、有据修改、有据拒绝、有据暂停，都是合法决策。</strong></p>
+</div>
+<p>不能因为任务叫“提示词优化”就强迫学生修改一个已经满足要求的提示词；不能因为任务叫“AI 自动化”就强迫学生在自动化明显不划算时继续使用 AI。</p>
+<p>Schemmer 等提出的 Appropriate Reliance（恰当依赖）测量框架，关注人能否根据建议质量决定采纳还是拒绝。这非常适合作为人机协同任务的研究起点。</p>
+<div class="sub-heading">C 类：创造、工程实践与适应性专长训练</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">任务族</th>
+<th align="left">核心操作</th>
+<th align="left">主要证据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>C1 约束下的原型构建</strong></td>
+<td align="left">将需求转化为最小可行系统</td>
+<td align="left">可运行原型、测试报告</td>
+</tr>
+<tr>
+<td align="left"><strong>C2 故障定位与恢复</strong></td>
+<td align="left">根据证据定位缺陷，修复并回归验证</td>
+<td align="left">故障报告、修复证据</td>
+</tr>
+<tr>
+<td align="left"><strong>C3 跨领域创新设计</strong></td>
+<td align="left">结合两个或多个领域知识创造新方案</td>
+<td align="left">概念原型、取舍理由</td>
+</tr>
+<tr>
+<td align="left"><strong>C4 陌生技术学习</strong></td>
+<td align="left">从未学过的技术或工具中提取并应用有效知识</td>
+<td align="left">学习记录、迁移成果</td>
+</tr>
+</tbody></table>
+<p>C4 是 AI 学科包相对传统学科包最特殊的一种训练范式。
+它不是考学生有没有记住某个工具，而是考学生面对新工具时：</p>
+<ol>
+<li>能否界定自己的知识缺口；</li>
+<li>能否找到权威信息；</li>
+<li>能否建立初始理解；</li>
+<li>能否通过实验检验理解；</li>
+<li>能否独立解决一个此前不会解决的问题。</li>
+</ol>
+<p>这是 Preparation for Future Learning 在 AI 工程课程中的具体转化，也是“求新求变”能力最值得系统训练的地方。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-08">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">08</span>
+            <span class="sec-title">八、代表性训练任务示例</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>为了避免学科包停留在概念层面，我建议至少设计四类达到金标准候选水平的示范任务。</p>
+<div class="sub-heading">示例1：心中运行一个 AI 工作流</div>
+<img src="assets/Pasted%20image%2020261127145518.png" alt="" loading="lazy" /><div class="sub-heading">示例2：坏—改—测，训练实验与验证思维</div>
+<p>学生拿到一条不稳定的 AI 指令，先在一组冻结的测试案例上建立基线，再选择一个变量进行修改，对照前后表现。</p>
+<p>必须区分：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">伪训练</th>
+<th align="left">真训练</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">让 AI 帮忙写一条更长的提示词</td>
+<td align="left">学生先诊断失败原因</td>
+</tr>
+<tr>
+<td align="left">用一个成功示例宣布优化完成</td>
+<td align="left">使用事先确定的多个测试案例</td>
+</tr>
+<tr>
+<td align="left">同时改变模型、提示词和材料</td>
+<td align="left">控制变量或明确混杂因素</td>
+</tr>
+<tr>
+<td align="left">用语言更流畅证明效果更好</td>
+<td align="left">按准确性、完整性和边界要求评价</td>
+</tr>
+<tr>
+<td align="left">发现更好方案就无限修改</td>
+<td align="left">已满足成功标准时允许停止</td>
+</tr>
+</tbody></table>
+<p>这类训练可以直接产生可供工程项目使用的测试资产。</p>
+<div class="sub-heading">示例3：恰当依赖 AI 的判断训练</div>
+<p><strong>协同判断微训练</strong>
+<em>根据当前证据，判断是否应采纳 AI 的结论或建议。</em></p>
+<ol>
+<li>AI 给出的结论正确，但与你最初的判断不同。你核验后确认其证据充分。
+[ ] 采纳  [ ] 不采纳 / 待核</li>
+<li>AI 给出了流畅的结论，但引用资料并不支持它的主张。
+[ ] 采纳  [ ] 不采纳 / 待核</li>
+<li>AI 提出一种更简单的实现方案，且通过全部预设测试。
+[ ] 采纳  [ ] 不采纳 / 待核</li>
+<li>AI 声称系统已经部署成功，但没有运行结果、日志或其他执行证据。
+[ ] 采纳  [ ] 不采纳 / 待核</li>
+</ol>
+<div class="tint-box">
+<img src="assets/Pasted%20image%2020261127145555.png" alt="" loading="lazy" /></div>
+<p>真实课程中应进一步加入“AI 给出的错误建议看起来非常合理”“学生自身的初始答案是错误的”等更具挑战性的案例。
+Buçinca 等人关于 Cognitive Forcing Functions（认知强制机制）的研究发现，一些要求用户在接受 AI 建议前投入独立思考的干预，可以减少过度依赖，但也需要考虑使用成本和体验。</p>
+<div class="sub-heading">示例4：陌生技术迁移挑战</div>
+<p>提供一个学生未使用过的简单工具接口和部分官方说明，要求学生在规定任务范围内：</p>
+<ul>
+<li>自主找出关键概念；</li>
+<li>建立调用流程的初始模型；</li>
+<li>设计一个最小实验；</li>
+<li>观察结果并修正模型；</li>
+<li>将其接入原有项目；</li>
+<li>解释它的适用边界和替代方案。</li>
+</ul>
+<p>这里允许 AI 大量参与搜索、解释和代码生成，因为目标恰恰是研究学习者如何利用外部资源获得新能力。
+但学生必须独立承担关键理解、选择和验证。
+这是一种比单纯“无 AI 考试”更接近未来真实工作环境的测评。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-09">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">09</span>
+            <span class="sec-title">九、PBL 与专业技能训练如何深度融合</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>我不建议为这一类课程规定类似几何五段心象的统一轮次模板。
+几何心象训练的任务结构具有较强的可重复性，而 AI 工程实践可能在不同阶段出现完全不同的学习需求。强制每一章都走相同流程，反而会损害真实项目的探索性。</p>
+<p>建议采用一种 <strong>Project-driven Skill Spiral（项目驱动的技能螺旋）</strong>。</p>
+<img src="assets/Pasted%20image%2020261127145619.png" alt="" loading="lazy" /><p>课程采用<strong>宏观项目里程碑</strong>与<strong>微观认知训练</strong>相结合的结构。</p>
+<div class="sub-heading">9.1 宏观：由真实项目里程碑组织学习</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">里程碑</th>
+<th align="left">主要产出</th>
+<th align="left">学习价值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>P1 问题发现</strong></td>
+<td align="left">用户需求、问题陈述、价值判断</td>
+<td align="left">发现和定义问题</td>
+</tr>
+<tr>
+<td align="left"><strong>P2 研究与建模</strong></td>
+<td align="left">知识地图、假设、系统设计</td>
+<td align="left">深入理解问题</td>
+</tr>
+<tr>
+<td align="left"><strong>P3 可行性实验</strong></td>
+<td align="left">技术实验、方案比较</td>
+<td align="left">探索与决策</td>
+</tr>
+<tr>
+<td align="left"><strong>P4 原型构建</strong></td>
+<td align="left">可运行原型</td>
+<td align="left">工程实现</td>
+</tr>
+<tr>
+<td align="left"><strong>P5 评测与迭代</strong></td>
+<td align="left">测试集、失败报告、修订版本</td>
+<td align="left">可靠性与反馈</td>
+</tr>
+<tr>
+<td align="left"><strong>P6 交付与反思</strong></td>
+<td align="left">完整作品、设计答辩、成长证据</td>
+<td align="left">价值创造与迁移</td>
+</tr>
+</tbody></table>
+<div class="sub-heading">9.2 微观：按项目瓶颈调用训练范式</div>
+<p>学生在项目过程中出现什么认知缺口，就启动针对性的技能训练。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">项目中出现的问题</th>
+<th align="left">对应专项训练</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">不知道项目究竟要解决什么</td>
+<td align="left">问题刻画与需求重构</td>
+</tr>
+<tr>
+<td align="left">系统设计杂乱、组件关系不清</td>
+<td align="left">系统拆解、心理执行</td>
+</tr>
+<tr>
+<td align="left">AI 生成大量内容但难以控制</td>
+<td align="left">上下文建模与人机委派</td>
+</tr>
+<tr>
+<td align="left">输出漂亮但无法证明正确</td>
+<td align="left">证据校验与评测设计</td>
+</tr>
+<tr>
+<td align="left">程序出现错误却只会不断问 AI</td>
+<td align="left">故障定位与因果诊断</td>
+</tr>
+<tr>
+<td align="left">项目换一个场景就不会做</td>
+<td align="left">变式迁移与陌生技术学习</td>
+</tr>
+</tbody></table>
+<p>这与几何课的“专项技能—真题应用”形成了很好的对应关系。
+区别在于：AI 工程项目不只是已学技能的应用场，而是不断产生新的学习问题和知识需求的研究场。</p>
+<div class="sub-heading">9.3 给创新留出非功利性探索空间</div>
+<p>不应该把所有学习活动都绑定到项目交付指标。
+Resnick 的创造性学习强调游戏式探索与个人兴趣，这意味着学生还需要一定的自由实验空间。建议设置<strong>开放探索时段</strong>，允许学生尝试暂时没有明确用途的新技术、新组合和新想法。</p>
+<p>探索活动不必强制产出产品，但应鼓励记录：</p>
+<div class="tint-box">
+<p>发现了什么意外现象？形成了什么新的问题？哪个原有假设被推翻？这项发现是否可能产生新的用途？</p>
+</div>
+<p>这样才能避免 PBL 退化为工程项目管理培训。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-10">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">10</span>
+            <span class="sec-title">十、AI 学科包最重要的新增机制：区分四种 AI 使用模式</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>传统课程中的 AI 主要是教师或辅导者，但在这一学科包中，AI 可能承担完全不同的职责。
+建议采用四种任务模式，并要求 Course Creator 在设计任务时明确当前 AI 的角色。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">模式</th>
+<th align="left">AI 角色</th>
+<th align="left">学生主要学习目标</th>
+<th align="left">AI 权限</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Learn</strong></td>
+<td align="left">导师、认知脚手架</td>
+<td align="left">获得个人知识与技能</td>
+<td align="left">不替代目标认知操作</td>
+</tr>
+<tr>
+<td align="left"><strong>Explore</strong></td>
+<td align="left">研究伙伴</td>
+<td align="left">探索未知、形成假设</td>
+<td align="left">可以提供资料、方案与反馈</td>
+</tr>
+<tr>
+<td align="left"><strong>Build</strong></td>
+<td align="left">工程协作者</td>
+<td align="left">组织资源、实现真实价值</td>
+<td align="left">可以承担大量实现工作</td>
+</tr>
+<tr>
+<td align="left"><strong>Assess</strong></td>
+<td align="left">测评对象或受控助手</td>
+<td align="left">证明个人能力或协同能力</td>
+<td align="left">根据测评构念限定支持</td>
+</tr>
+</tbody></table>
+<p>同一门课程甚至同一个项目可以在四种模式间转换。</p>
+<p>例如在建设研究助手时：</p>
+<ul>
+<li>在 <strong>Learn</strong> 模式中，学生需要亲自画出系统架构，AI 只能提供引导。</li>
+<li>在 <strong>Explore</strong> 模式中，可以让 AI 提出五种技术方案，并由学生调查、比较。</li>
+<li>在 <strong>Build</strong> 模式中，允许 AI 生成大量实现内容，但学生负责需求、验收和风险判断。</li>
+<li>在 <strong>Assess</strong> 模式中，可以要求学生独立解释架构、修改一个关键模块，或者使用 AI 解决新的复杂问题，以分别测量独立能力和协同能力。</li>
+</ul>
+<div class="tint-box">
+<p><strong>AI 是否应该给出完整答案，取决于当下的学习模式和目标，而不取决于一条全局性的禁止规则。</strong></p>
+</div>
+<p>这一机制比简单规定“AI 不得代做”更适合 AI 工程实践课。
+工程上，建议先将这四类模式作为学科包内的设计语义，利用已有 <code>teaching_actions</code>、<code>student_action</code>、<code>scaffold</code> 和 <code>evidence</code> 表达，不立即新增 Runtime 枚举或 JSON Schema 字段。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-11">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">11</span>
+            <span class="sec-title">十一、评价体系：必须同时测量四种不同的成长</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这一学科包不能只使用项目成功率或课程完成度作为评价依据。
+我建议采用四条独立但相互关联的评价轴。</p>
+<ul>
+<li><strong>认知理解</strong>：理解原理、建立模型、预测行为、解释因果与边界。</li>
+<li><strong>人机协同</strong>：任务委派、上下文管理、建议判断、控制权与责任。</li>
+<li><strong>工程实践</strong>：系统构建、调试、测试、可靠性、可维护性与价值交付。</li>
+<li><strong>适应性创造</strong>：陌生知识获取、方案重构、跨界连接与创新迁移。</li>
+</ul>
+<p>建议使用 <strong>Evidence-Centered Design（ECD，证据中心测评设计）</strong> 建立评价链：</p>
+<div class="tint-box">
+<p><strong>能力主张（Claim）→ 所需证据（Evidence）→ 能引出该证据的任务（Task）。</strong></p>
+</div>
+<p>ECD 的核心不是先出题再决定评分标准，而是先定义希望对学习者作出什么能力判断，再设计相应的证据与测评任务。</p>
+<div class="sub-heading">11.1 AI 工程能力可测目标示例</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">技能</th>
+<th align="left">可测目标</th>
+<th align="left">不能冒充掌握的情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>系统心智建模</strong></td>
+<td align="left">面对陌生系统图，预测指定输入下的执行路径和故障传播</td>
+<td align="left">AI 画出一张正确架构图</td>
+</tr>
+<tr>
+<td align="left"><strong>人机分工</strong></td>
+<td align="left">比较三种分工方案，并以质量、成本、风险证据支持选择</td>
+<td align="left">能背诵人机分工原则</td>
+</tr>
+<tr>
+<td align="left"><strong>可靠性验证</strong></td>
+<td align="left">构造能够暴露关键缺陷的测试案例，并判断实际结果</td>
+<td align="left">只有正常运行的演示</td>
+</tr>
+<tr>
+<td align="left"><strong>上下文工程</strong></td>
+<td align="left">识别任务所缺信息，补充必要上下文并通过对照测试</td>
+<td align="left">提示词变得更长</td>
+</tr>
+<tr>
+<td align="left"><strong>工程调试</strong></td>
+<td align="left">根据日志和测试隔离失败组件，修复并验证无回归</td>
+<td align="left">AI 给出修改方案，学生直接接受</td>
+</tr>
+<tr>
+<td align="left"><strong>创新迁移</strong></td>
+<td align="left">在新领域中重组已有方法，创造有价值且可验证的方案</td>
+<td align="left">AI 生成新颖创意清单</td>
+</tr>
+<tr>
+<td align="left"><strong>未来学习能力</strong></td>
+<td align="left">利用新资料和工具形成有效理解并解决陌生问题</td>
+<td align="left">能复述 AI 对技术文档的摘要</td>
+</tr>
+</tbody></table>
+<div class="sub-heading">11.2 评价人机协同，不能只测正确率</div>
+<img src="assets/Pasted%20image%2020261127145649.png" alt="" loading="lazy" /><p>这比“AI 使用得越少越好”或“AI 使用得越多越熟练”更有解释力。
+正式测评还需要记录学生初始判断、AI 建议、最终决策及理由，否则无法可靠区分学生是在独立判断、受到 AI 说服，还是仅仅猜对了答案。</p>
+<div class="sub-heading">11.3 与现有 L1–L4 成长证据对齐</div>
+<p>建议保留 Growth OS 的现有成长等级，不另造等级体系。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">成长等级</th>
+<th align="left">AI 工程能力的候选解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>L1</strong></td>
+<td align="left">在示范或明显支架下执行指定操作</td>
+</tr>
+<tr>
+<td align="left"><strong>L2</strong></td>
+<td align="left">在熟悉情境下独立完成核心操作</td>
+</tr>
+<tr>
+<td align="left"><strong>L3</strong></td>
+<td align="left">在复杂任务中自主选择并整合方法，能够判断与验证</td>
+</tr>
+<tr>
+<td align="left"><strong>L4</strong></td>
+<td align="left">面对陌生问题、工具或约束，主动学习、重构方案并创造价值</td>
+</tr>
+</tbody></table>
+<p>这一映射只是设计建议，最终必须服从 Growth OS 对 L1–L4 的正式定义。
+尤其不能因为学生使用了 AI，就自动降低其协同能力等级。评价应该判断他是否独立承担了该技能所要求的认知责任。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-12">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-cyan">12</span>
+            <span class="sec-title">十二、需要写入学科包的领域专属硬门禁</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>参考几何包的 G1–G9 门禁及写作包的实战反馈规则，我建议 AI 实践学科包首先建立以下十项候选检查规则。
+这些是语义审查规则，不是目前已经存在的机检脚本。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th>编号</th>
+<th>候选门禁</th>
+<th>要阻止的假象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI-G1</td>
+<td>学生核心认知操作必须明确</td>
+<td>AI 做完了任务就算学生学会</td>
+</tr>
+<tr>
+<td>AI-G2</td>
+<td>明确 AI 在当前任务中的角色与边界</td>
+<td>所有活动一律让 AI 代做或一律禁用 AI</td>
+</tr>
+<tr>
+<td>AI-G3</td>
+<td>项目成功标准须可检验</td>
+<td>“看起来不错”即宣布完成</td>
+</tr>
+<tr>
+<td>AI-G4</td>
+<td>关键事实与工程状态需要证据</td>
+<td>AI 声称已执行就认定已执行</td>
+</tr>
+<tr>
+<td>AI-G5</td>
+<td>测试覆盖正常、边界及关键失败情境</td>
+<td>只用一个成功案例证明系统可靠</td>
+</tr>
+<tr>
+<td>AI-G6</td>
+<td>允许有据接受、拒绝、保留与停止</td>
+<td>为完成训练步骤而强行修改或自动化</td>
+</tr>
+<tr>
+<td>AI-G7</td>
+<td>项目作品与学生掌握证据分开</td>
+<td>用复杂作品冒充高水平能力</td>
+</tr>
+<tr>
+<td>AI-G8</td>
+<td>技术信息必须验证适用版本和环境</td>
+<td>使用失效 API 或虚构平台能力</td>
+</tr>
+<tr>
+<td>AI-G9</td>
+<td>创新任务须包含实际问题与价值验证</td>
+<td>把技术功能堆叠包装成创新</td>
+</tr>
+<tr>
+<td>AI-G10</td>
+<td>涉及外部操作、隐私和权限须明确责任边界</td>
+<td>未经授权执行、泄露数据、不可控自动化</td>
+</tr>
+</tbody></table>
+<p>其中最值得借鉴几何包“遮图试答”思想的是 AI-G1 和 AI-G7。</p>
+<p>我建议设置三种领域审计测试。</p>
+<p><strong>遮输出测试</strong>：隐藏 AI 已经生成的成果，学生能否解释关键结构与决策？</p>
+<p><strong>改条件测试</strong>：改变需求、数据来源、约束或工具，学生能否预测后果并调整方案？</p>
+<p><strong>注入错误测试</strong>：向 AI 输出或系统中加入一个具有真实迷惑性的缺陷，学生能否通过证据找到它？</p>
+<p>这三种测试将 AI 工程课中的伪掌握问题转化为相对具体的可试做检查。</p>
+<p>但它们必须根据任务目标使用，不要求每轮全部执行。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-13">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-navy">13</span>
+            <span class="sec-title">十三、`ai-practice.md` 推荐文档结构</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>根据原《12 学科包机制》规定的五项核心功能，我建议新学科包采用以下结构。
+<img src="assets/Pasted%20image%2020261127145732.png" alt="" loading="lazy" /></p>
+<p>学科包中只沉淀跨课程稳定复用的原则、训练决策和领域边界。</p>
+<p>不应该写入：</p>
+<ul>
+<li>某门课程专属的章节安排、学生画像和项目题目；</li>
+<li>完整的中央工具卡、方法库内容；</li>
+<li>具体产品 API 手册和安装命令；</li>
+<li>未验证的 Runtime 功能；</li>
+<li>仅仅因为研究中出现过、但尚未形成课程价值的理论资料。</li>
+</ul>
+<p>篇幅也不需要对齐 <code>geometry-imagery.md</code> 的152行或者 <code>writing-craft.md</code> 的58行。应以领域决策覆盖充分、规则可执行且按需读取成本可控为准。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-14">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-amber">14</span>
+            <span class="sec-title">十四、学科包的研究证据表：建议初始研究底座</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这里给出可以直接作为研发起点的证据状态表。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">研究来源</th>
+<th align="left">支撑的学科包设计</th>
+<th align="left">初始证据状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Hatano &amp; Inagaki；Schwartz 等，Adaptive Expertise</td>
+<td align="left">效率与创新双维度、陌生任务迁移</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Sorva，2013，Notional Machines</td>
+<td align="left">显式训练系统运行的心理模型</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Brennan &amp; Resnick，2012</td>
+<td align="left">迭代、调试、复用、抽象、模块化</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Sentance 等，2019，PRIMM</td>
+<td align="left">预测、运行、调查、修改、创造</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Long &amp; Magerko，2020，AI Literacy</td>
+<td align="left">AI 理解、能力判断与使用素养</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">UNESCO，2024，AI Competency Framework</td>
+<td align="left">人类主体性、伦理、技术和系统设计</td>
+<td align="left">权威能力框架依据</td>
+</tr>
+<tr>
+<td align="left">OECD / EC，2026，AILit Framework</td>
+<td align="left">AI 互动、创造、管理与塑造</td>
+<td align="left">权威能力框架依据</td>
+</tr>
+<tr>
+<td align="left">Dell’Acqua 等，2026</td>
+<td align="left">AI 能力边界探测、任务委派</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Vaccaro 等，2024</td>
+<td align="left">人机协同比较与互补性</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Schemmer 等，2023</td>
+<td align="left">AI 建议的恰当依赖与辨别</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Buçinca 等，2021</td>
+<td align="left">独立判断与减少过度依赖</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Amershi 等，2019</td>
+<td align="left">人机交互控制、纠错与预期管理</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Bastani 等，2025</td>
+<td align="left">区分辅助表现与独立学习</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Kazemitabaar 等，2025</td>
+<td align="left">AI 生成代码中的认知参与</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">MIT RAICA</td>
+<td align="left">中学生 AI 项目实践与社会价值导向</td>
+<td align="left">实践标杆依据</td>
+</tr>
+<tr>
+<td align="left">Resnick 创造性学习</td>
+<td align="left">兴趣、项目、探索与同伴反馈</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+<tr>
+<td align="left">Mislevy 等，ECD</td>
+<td align="left">能力主张—证据—任务测评</td>
+<td align="left">SUPPORTED_INFERENCE</td>
+</tr>
+</tbody></table>
+<p>之所以没有直接将候选学科包规则标为 <code>LOCAL_VALIDATED</code>，是因为原始研究的证据不能代替 Growth OS 真实课程验证。</p>
+<p>对于十二类任务族、四种 AI 使用模式、系统心智建模的完整训练体系，以及 AI-G1–G10 等规则的具体组合，初始应标记为 <code>DESIGN_HYPOTHESIS</code>，并在试点后逐项升级，而不是整包一次性宣告验证完成。</p>
+<p>UNESCO 与2026年6月18日正式发布的 OECD / 欧盟委员会 AI 素养框架适合提供国际教育能力覆盖基准，但它们本身不构成具体训练范式的效果证明。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-15">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-bamboo">15</span>
+            <span class="sec-title">十五、如何与 Course Creator、中央资产和 Runtime 接轨</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>这一点要严格遵循原文第二、三、六节的分层机制。
+<img src="assets/Pasted%20image%2020261127145756.png" alt="" loading="lazy" /></p>
+<div class="sub-heading">15.1 不新增平行的正式资产体系</div>
+<p>学科包提炼的系统建模、任务委派、评测设计、工程验证等技能，应先查现有 <code>D-CS-*</code>、<code>D-PBL-*</code> 及相关跨学科能力资产。</p>
+<p>这里只是建议检索方向。我没有实际核查这些方法卡的当前编号和 <code>validation_complete</code> 状态，因此不列出未经验证的具体 ID。</p>
+<p>如果发现真正缺少学科方法或工具，再走现有研究候选与中央资产审核机制。</p>
+<div class="sub-heading">15.2 不为了 AI 项目实践立即改造 Runtime</div>
+<p>初期可以继续使用现有 v3 章节三件套，以章节和轮次组织：</p>
+<ul>
+<li>专项认知训练；</li>
+<li>项目里程碑；</li>
+<li>研究任务；</li>
+<li>实际工程操作；</li>
+<li>评测和反思。</li>
+</ul>
+<p>但长期 PBL 所需的跨章节项目状态、文件版本、外部工具执行日志、实验数据和持续迭代管理，是否已被现有 Runtime 支持，需要专项审查。</p>
+<p>不能因为学科包提出这些教学需要，就假设现有系统已经能够实现。</p>
+<p>建议第一阶段用学生提交的项目记录和实际证据完成教学闭环；只有在真实课程中发现明显且反复出现的运行缺口，才研究对现有 PBL Atelier 或 Runtime 的必要扩展。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-16">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-purple">16</span>
+            <span class="sec-title">十六、学科包的实战开发策略</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>原《12 学科包机制》规定，至少在一门真实课程的生成或升级及独立审计中跑通闭环，再正式定稿。</p>
+<p>我同意这一原则，同时建议按成熟度分三阶段推进。</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="left">主要任务</th>
+<th align="left">晋升条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Phase 1 研究候选包</strong></td>
+<td align="left">证据底座、专家认知模型、任务族、领域红线</td>
+<td align="left">来源与推导可审查</td>
+</tr>
+<tr>
+<td align="left"><strong>Phase 2 试点验证包</strong></td>
+<td align="left">修复现有 AI 课程，验证训练任务及真实课堂表现</td>
+<td align="left">契约测试、独立审计、教学试测</td>
+</tr>
+<tr>
+<td align="left"><strong>Phase 3 正式学科包</strong></td>
+<td align="left">在不同 AI 课程中复用，收敛稳定规律</td>
+<td align="left">跨课程复用性及证据回流</td>
+</tr>
+</tbody></table>
+<div class="sub-heading">建议选择三个差异化的试点场景</div>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">试点课程</th>
+<th align="left">主要验证内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>AI 工程思维与提示词实践</strong></td>
+<td align="left">坏改测、问题分解、上下文、能力边界、人机分工</td>
+</tr>
+<tr>
+<td align="left"><strong>AI 应用与智能工作流设计</strong></td>
+<td align="left">系统心智模型、构建、调试、评测、工程交付</td>
+</tr>
+<tr>
+<td align="left"><strong>AI 跨学科创新 PBL</strong></td>
+<td align="left">真实问题、陌生知识获取、开放探究与价值创造</td>
+</tr>
+</tbody></table>
+<p>第一门课可以验证训练范式是否有效落地。</p>
+<p>第二门课验证这些认知能力能否进入真实工程。</p>
+<p>第三门课验证学科包是否能够支持跨领域迁移和开放创新。</p>
+<p>如果三类课程实际共享的稳定规则远少于预期，就应该重新收缩学科包范围，而不是强制维持一个庞大统一包。</p>
+<div class="sub-heading">建议首个 Gold Standard 优先做什么</div>
+<p>我建议不要选择单纯的提示词优化章节作为唯一标杆，而是选择一个能够同时覆盖“虚、实、虚实转换”的完整项目片段：</p>
+<div class="tint-box">
+<p><strong>设计并验证一个可信 AI 研究助手。</strong></p>
+</div>
+<p>这个片段应当包括：</p>
+<table class="term-table">
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="left">学习任务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>抽象理解</strong></td>
+<td align="left">建立 AI 研究助手的系统心智模型</td>
+</tr>
+<tr>
+<td align="left"><strong>心理操作</strong></td>
+<td align="left">预测错误资料怎样影响下游结果</td>
+</tr>
+<tr>
+<td align="left"><strong>认知训练</strong></td>
+<td align="left">设计来源核验与失败识别任务</td>
+</tr>
+<tr>
+<td align="left"><strong>真实实践</strong></td>
+<td align="left">构建最小可用的研究工作流</td>
+</tr>
+<tr>
+<td align="left"><strong>工程验证</strong></td>
+<td align="left">使用正常、边界和失败案例评测</td>
+</tr>
+<tr>
+<td align="left"><strong>创新重构</strong></td>
+<td align="left">根据结果调整架构，比较替代方案</td>
+</tr>
+<tr>
+<td align="left"><strong>独立测评</strong></td>
+<td align="left">脱离原作品解释机制并解决陌生变式</td>
+</tr>
+<tr>
+<td align="left"><strong>协同测评</strong></td>
+<td align="left">使用 AI 学习新工具并实现新需求</td>
+</tr>
+</tbody></table>
+<p>如果这一小型项目片段能够真正跑通研究、训练、实践、测评与审计闭环，就可以沉淀为类似 <code>geometry-intensive-M03</code> 的领域标杆候选。</p>
+
+        </div>
+      </details>
+      <details class="guide-section" id="sec-17">
+        <summary class="section-summary">
+          <div class="sum-left">
+            <span class="sec-num color-rose">17</span>
+            <span class="sec-title">十七、最终架构建议：建设 AI 原生的学习范式</span>
+          </div>
+          <span class="sum-icon">＋</span>
+        </summary>
+        <div class="section-content">
+          <p>我认为，这次开发 AI 实践学科包的价值不应仅限于解决几门 AI 课程的质量问题。</p>
+<p>它可能成为 Growth OS 探索一种新型教育范式的起点。</p>
+<p>传统学科训练着重建立专业认知体系；PBL 着重让知识进入真实世界；AI 工程实践则增加了一种全新的能力：通过组织外部智能，不断扩展自身认知和行动的边界。</p>
+<p>三者应当融合，而不是相互取代。
+<img src="assets/Pasted%20image%2020261127145829.png" alt="" loading="lazy" /></p>
+<p>建议 <code>ai-practice.md</code> 最终围绕七个设计原则展开：</p>
+<ol>
+<li><strong>以适应性专长为目标</strong>：不仅掌握已知，也能主动学习未知。</li>
+<li><strong>以系统心智建模为认知根基</strong>：在抽象层面理解、模拟、预测和重构复杂系统。</li>
+<li><strong>以专业技能训练为能力形成机制</strong>：通过专项任务、变式、反馈和独立测评建立可靠技能。</li>
+<li><strong>以开放式 PBL 为实践主场</strong>：让真实问题和价值创造驱动跨学科学习。</li>
+<li><strong>以人机协同为新型实践方式</strong>：根据任务和证据合理组织外部智能。</li>
+<li><strong>以证据和评测为工程质量保障</strong>：不以 AI 的自信、作品的复杂程度或单次成功作为能力证明。</li>
+<li><strong>以人类主体性为最终边界</strong>：学生始终拥有定义目标、判断价值、作出决策和承担责任的能力。</li>
+</ol>
+<p>最终需要培养的，不是一个熟练使用 AI 的学生，而是一个能够借助 AI 不断扩展自己的知识疆域、认知深度、工程能力和创造能力的人。</p>
+<p>从现有学科包体系看，建议先把这份方案作为 <code>ai-practice</code> 的研究设计候选，利用即将修复与安装的 AI 课程完成首次实战沉淀，再决定正式规则、中央资产映射和金标准结构。不建议现在就修改通用 Runtime 协议，也不建议未经真实课程验证便将上述候选范式写成永久硬约束。</p>
+<pre><code></code></pre>
+
+        </div>
+      </details>
+    </main>
+
+    <!-- PWA / 移动端悬浮快捷返回按钮 -->
+    <button class="fab-back" onclick="navigateBack()" aria-label="返回作品廊" title="返回作品廊">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <footer>
+      <p>Rosemary Garden · <a href="/gallery/">返回作品廊</a> · <a href="/library/">返回图书馆</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleAllSections(openState) {
+      document.querySelectorAll('.guide-section').forEach(d => d.open = openState);
+      if (openState && typeof window.__renderVisibleMermaid === 'function') {
+        window.__renderVisibleMermaid();
+      }
+    }
+
+    function navigateBack() {
+      if (window.history.length > 1 && document.referrer && !document.referrer.includes(location.pathname)) {
+        window.history.back();
+      } else {
+        window.location.href = '/gallery/';
+      }
+    }
+
+    // Initialize KaTeX formulas
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\(", right: "\)", display: false},
+            {left: "\[", right: "\]", display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+</body>
+</html>
