@@ -39,18 +39,18 @@ cssclasses:
 <div class="g-directory" data-garden-directory>
 <details class="g-folder" data-folder open>
   <summary><span>计算机 AI</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/计算机 AI/AI 工程思维与人机协同实践学科包：设计与研发建议/" data-garden-item data-title="AI 工程思维与人机协同实践学科包：设计与研发建议" data-search="AI 工程思维与人机协同实践学科包：设计与研发建议 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795763312456.062" data-router-ignore>
-  <span class="g-row-text"><strong>AI 工程思维与人机协同实践学科包：设计与研发建议</strong><small>11月27日</small></span>
+  <div class="g-list"><a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795763558785" data-router-ignore>
+  <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>11月27日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
-<a class="g-row" href="/html/计算机 AI/AI 工程认知的理论体系与训练方法/" data-garden-item data-title="AI 工程认知的理论体系与训练方法" data-search="AI 工程认知的理论体系与训练方法 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795687239327" data-router-ignore>
-  <span class="g-row-text"><strong>AI 工程认知的理论体系与训练方法</strong><small>11月26日</small></span>
+<a class="g-row" href="/html/计算机 AI/AI 工程思维与人机协同实践学科包：设计与研发建议/" data-garden-item data-title="AI 工程思维与人机协同实践学科包：设计与研发建议" data-search="AI 工程思维与人机协同实践学科包：设计与研发建议 计算机 AI 计算机 AI" data-room="Gallery" data-root-category="计算机 AI" data-updated="1795763320000" data-router-ignore>
+  <span class="g-row-text"><strong>AI 工程思维与人机协同实践学科包：设计与研发建议</strong><small>11月27日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a></div>
 </details>
 <details class="g-folder" data-folder open>
   <summary><span>物理</span><em>2</em></summary>
-  <div class="g-list"><a class="g-row" href="/html/物理/从物理专家认知到系统训练与科学创造/" data-garden-item data-title="从物理专家认知到系统训练与科学创造" data-search="从物理专家认知到系统训练与科学创造 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1795763312416.101" data-router-ignore>
+  <div class="g-list"><a class="g-row" href="/html/物理/从物理专家认知到系统训练与科学创造/" data-garden-item data-title="从物理专家认知到系统训练与科学创造" data-search="从物理专家认知到系统训练与科学创造 物理 物理" data-room="Gallery" data-root-category="物理" data-updated="1795763320000" data-router-ignore>
   <span class="g-row-text"><strong>从物理专家认知到系统训练与科学创造</strong><small>11月27日</small></span>
   <span class="g-row-go" aria-hidden="true">›</span>
 </a>
